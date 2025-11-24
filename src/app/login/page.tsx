@@ -8,7 +8,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Footer } from '@/components/footer';
 import { toast } from '@/components/ui/use-toast';
 import { GraduationCap, Moon, Sun } from 'lucide-react';
 import { useTheme } from 'next-themes';
@@ -79,8 +78,7 @@ export default function LoginPage() {
       <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
         <div className="container mx-auto px-4 py-3 md:py-4 flex justify-between items-center">
           <Link href="/" className="flex items-center gap-2">
-            <GraduationCap className="h-6 w-6 md:h-8 md:w-8 text-primary" />
-            <span className="text-xl md:text-2xl font-bold">SM Educacional</span>
+            <GraduationCap className="h-8 w-8 md:h-10 md:w-10 text-primary" />
           </Link>
           
           <Button
@@ -157,8 +155,6 @@ export default function LoginPage() {
           </form>
         </Card>
       </div>
-
-      <Footer />
     </div>
   );
 }
