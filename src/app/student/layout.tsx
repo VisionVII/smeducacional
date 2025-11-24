@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation';
 import { auth } from '@/lib/auth';
 import { Navbar } from '@/components/navbar';
+import { Footer } from '@/components/footer';
 import { BookOpen, Award, LayoutDashboard, GraduationCap } from 'lucide-react';
 
 export default async function StudentLayout({
@@ -41,6 +42,7 @@ export default async function StudentLayout({
     <div className="min-h-screen flex flex-col">
       <Navbar user={session.user} links={studentLinks} />
       <main className="flex-1">{children}</main>
+      <Footer />
     </div>
   );
 }

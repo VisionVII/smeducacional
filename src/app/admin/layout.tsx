@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation';
 import { auth } from '@/lib/auth';
 import { Navbar } from '@/components/navbar';
+import { Footer } from '@/components/footer';
 import { LayoutDashboard, Users, BookOpen, Settings, BarChart3 } from 'lucide-react';
 
 export default async function AdminLayout({
@@ -46,6 +47,7 @@ export default async function AdminLayout({
     <div className="min-h-screen flex flex-col">
       <Navbar user={session.user} links={adminLinks} />
       <main className="flex-1">{children}</main>
+      <Footer />
     </div>
   );
 }
