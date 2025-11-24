@@ -146,7 +146,6 @@ export default function RegisterPage() {
             </CardFooter>
           </form>
         </Card>
-      </div>
     </div>
   );
 }

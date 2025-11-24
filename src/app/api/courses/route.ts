@@ -69,7 +69,11 @@ export async function GET(req: NextRequest) {
       },
     });
 
-    return NextResponse.json(courses);
+    return NextResponse.json(courses, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
   } catch (error) {
     console.error('Erro ao buscar cursos:', error);
     return NextResponse.json(

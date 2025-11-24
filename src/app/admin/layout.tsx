@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation';
 import { auth } from '@/lib/auth';
 import { Navbar } from '@/components/navbar';
 import { Footer } from '@/components/footer';
+import { Breadcrumbs } from '@/components/breadcrumbs';
 import { LayoutDashboard, Users, BookOpen, Settings, BarChart3 } from 'lucide-react';
 
 export default async function AdminLayout({
@@ -46,7 +47,12 @@ export default async function AdminLayout({
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar user={session.user} links={adminLinks} />
-      <main className="flex-1">{children}</main>
+      <main className="flex-1">
+        <div className="container mx-auto px-4 py-6">
+          <Breadcrumbs />
+          {children}
+        </div>
+      </main>
       <Footer />
     </div>
   );

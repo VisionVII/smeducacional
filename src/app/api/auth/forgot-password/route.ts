@@ -142,12 +142,14 @@ export async function POST(request: NextRequest) {
     // Enviar email
     if (process.env.RESEND_API_KEY) {
       try {
-        await resend.emails.send({
-          from: 'SM Educacional <no-reply@smeducacional.com.br>',
+        const result = await resend.emails.send({
+          from: 'SM Educacional <onboarding@resend.dev>',
           to: user.email,
           subject: 'Código de Recuperação de Senha - SM Educacional',
           html: getEmailHTML(code, user.name || 'Usuário'),
         });
+        
+        console.log('Email enviado com sucesso:', result);
       } catch (emailError) {
         console.error('Erro ao enviar email:', emailError);
         // Em desenvolvimento, vamos retornar o código mesmo que o email falhe

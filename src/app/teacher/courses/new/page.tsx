@@ -7,9 +7,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, Save, Loader2 } from 'lucide-react';
+import { Save, Loader2 } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { ImageUpload } from '@/components/image-upload';
+import { BackButton } from '@/components/back-button';
 
 interface Category {
   id: string;
@@ -123,14 +124,7 @@ export default function NewCoursePage() {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
-      <div className="mb-6">
-        <Link href="/teacher/courses">
-          <Button variant="ghost" size="sm">
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Voltar para meus cursos
-          </Button>
-        </Link>
-      </div>
+      <BackButton href="/teacher/courses" label="Voltar para meus cursos" />
 
       <Card>
         <CardHeader>

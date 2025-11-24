@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation';
 import { auth } from '@/lib/auth';
 import { Navbar } from '@/components/navbar';
 import { Footer } from '@/components/footer';
+import { Breadcrumbs } from '@/components/breadcrumbs';
 import { BookOpen, Plus, LayoutDashboard, Users } from 'lucide-react';
 
 export default async function TeacherLayout({
@@ -41,7 +42,12 @@ export default async function TeacherLayout({
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar user={session.user} links={teacherLinks} />
-      <main className="flex-1">{children}</main>
+      <main className="flex-1">
+        <div className="container mx-auto px-4 py-6">
+          <Breadcrumbs />
+          {children}
+        </div>
+      </main>
       <Footer />
     </div>
   );

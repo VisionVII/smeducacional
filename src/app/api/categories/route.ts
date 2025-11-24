@@ -17,7 +17,11 @@ export async function GET(req: NextRequest) {
       },
     });
 
-    return NextResponse.json(categories);
+    return NextResponse.json(categories, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
   } catch (error) {
     console.error('Erro ao buscar categorias:', error);
     return NextResponse.json(

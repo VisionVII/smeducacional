@@ -9,7 +9,6 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { VideoUpload } from '@/components/video-upload';
 import {
-  ArrowLeft,
   Plus,
   Edit,
   Trash2,
@@ -21,6 +20,7 @@ import {
   FileText,
 } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
+import { BackButton } from '@/components/back-button';
 
 interface Lesson {
   id: string;
@@ -308,12 +308,7 @@ export default function CourseContentPage({ params }: { params: Promise<{ id: st
       {/* Header */}
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <Link href="/teacher/courses">
-            <Button variant="ghost" size="sm">
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Voltar para meus cursos
-            </Button>
-          </Link>
+          <BackButton href="/teacher/courses" label="Voltar para meus cursos" />
           <h1 className="text-3xl font-bold mt-4">{course.title}</h1>
           <p className="text-gray-600 dark:text-gray-400 mt-1">
             Gerenciar conteúdo do curso

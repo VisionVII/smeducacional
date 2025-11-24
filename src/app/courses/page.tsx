@@ -1,200 +1,408 @@
-import { Suspense } from 'react';
+'use client';
+
+import { Suspense, useEffect, useState } from 'react';
 import Link from 'next/link';
-import { prisma } from '@/lib/db';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { BookOpen, Clock, Signal, Users } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { BookOpen, Clock, Signal, Users, Search, GraduationCap, Loader2, TrendingUp, Star, Sun, Moon } from 'lucide-react';
+import { useTheme } from 'next-themes';
 
-async function getCourses() {
-  const courses = await prisma.course.findMany({
-    where: {
-      isPublished: true,
-    },
-    include: {
-      category: true,
-      instructor: {
-        select: {
-          name: true,
-          avatar: true,
-        },
-      },
-      _count: {
-        select: {
-          enrollments: true,
-          modules: true,
-        },
-      },
-    },
-    orderBy: {
-      createdAt: 'desc',
-    },
-  });
-
-  return courses;
+interface Course {
+  id: string;
+  title: string;
+  slug: string;
+  description: string;
+  thumbnail: string | null;
+  duration: number | null;
+  level: string | null;
+  price: number;
+  isPaid: boolean;
+  category: {
+    id: string;
+    name: string;
+    icon: string | null;
+  };
+  instructor: {
+    name: string;
+    avatar: string | null;
+  };
+  _count: {
+    enrollments: number;
+    modules: number;
+  };
 }
 
-async function getCategories() {
-  const categories = await prisma.category.findMany({
-    orderBy: {
-      name: 'asc',
-    },
-  });
-
-  return categories;
+interface Category {
+  id: string;
+  name: string;
+  slug: string;
+  icon: string | null;
 }
 
-function CourseCardSkeleton() {
+function CoursesClient() {
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [selectedLevel, setSelectedLevel] = useState<string>('all');
+  const [sortBy, setSortBy] = useState<string>('recent');
+
+  useEffect(() => {
+    setMounted(true);
+    loadData();
+  }, []);
+
+  const loadData = async () => {
+    setIsLoading(true);
+    try {
+      const [coursesRes, categoriesRes] = await Promise.all([
+        fetch('/api/courses'),
+        fetch('/api/categories')
+      ]);
+
+      if (coursesRes.ok) {
+        const contentType = coursesRes.headers.get('content-type');
+        
+        if (contentType && contentType.includes('application/json')) {
+          try {
+            const coursesData = await coursesRes.json();
+            const publishedCourses = coursesData.filter((c: Course) => c.isPublished);
+            setCourses(publishedCourses);
+          } catch (jsonError) {
+            console.error('Erro ao parsear cursos:', jsonError);
+            setCourses([]);
+          }
+        } else {
+          setCourses([]);
+        }
+      } else {
+        setCourses([]);
+      }
+
+      if (categoriesRes.ok) {
+        const contentType = categoriesRes.headers.get('content-type');
+        
+        if (contentType && contentType.includes('application/json')) {
+          try {
+            const categoriesData = await categoriesRes.json();
+            setCategories(categoriesData);
+          } catch (jsonError) {
+            console.error('Erro ao parsear categorias:', jsonError);
+            setCategories([]);
+          }
+        } else {
+          setCategories([]);
+        }
+      } else {
+        setCategories([]);
+      }
+    } catch (error) {
+      console.error('Erro ao carregar dados:', error);
+      setCourses([]);
+      setCategories([]);
+    } finally {
+      setIsLoading(false);
+      console.log('[Courses] Carregamento finalizado');
+    }
+  };
+
+  // Filtrar e ordenar cursos
+  const filteredCourses = courses
+    .filter(course => {
+      const matchesSearch = course.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           course.description.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesCategory = selectedCategory === 'all' || course.category.id === selectedCategory;
+      const matchesLevel = selectedLevel === 'all' || course.level === selectedLevel;
+      
+      return matchesSearch && matchesCategory && matchesLevel;
+    })
+    .sort((a, b) => {
+      switch (sortBy) {
+        case 'popular':
+          return b._count.enrollments - a._count.enrollments;
+        case 'price-low':
+          return a.price - b.price;
+        case 'price-high':
+          return b.price - a.price;
+        case 'title':
+          return a.title.localeCompare(b.title);
+        default:
+          return 0;
+      }
+    });
+
+  const formatPrice = (price: number) => {
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL',
+    }).format(price);
+  };
+
   return (
-    <Card className="animate-pulse">
-      <CardHeader>
-        <div className="h-6 bg-gray-200 rounded w-3/4 mb-2"></div>
-        <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-      </CardHeader>
-      <CardContent>
-        <div className="h-20 bg-gray-200 rounded"></div>
-      </CardContent>
-      <CardFooter>
-        <div className="h-10 bg-gray-200 rounded w-full"></div>
-      </CardFooter>
-    </Card>
-  );
-}
+    <div className="min-h-screen flex flex-col bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-800">
+      {/* Header */}
+      <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
+        <div className="container mx-auto px-4 py-3 md:py-4 flex justify-between items-center">
+          <Link href="/" className="flex items-center gap-2">
+            <GraduationCap className="h-8 w-8 md:h-10 md:w-10 text-primary" />
+          </Link>
+          
+          <nav className="hidden sm:flex gap-4 md:gap-6 items-center">
+            <Link href="/courses" className="text-sm md:text-base font-medium text-primary">
+              Cursos
+            </Link>
+            <Link href="/about" className="text-sm md:text-base hover:text-primary transition-colors">
+              Sobre
+            </Link>
+          </nav>
 
-export default async function CoursesPage() {
-  const [courses, categories] = await Promise.all([getCourses(), getCategories()]);
+          <div className="flex items-center gap-2">
+            {mounted && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+              >
+                <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+                <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+              </Button>
+            )}
+            <Button asChild variant="ghost" size="sm">
+              <Link href="/login">Entrar</Link>
+            </Button>
+            <Button asChild size="sm">
+              <Link href="/register">Cadastrar</Link>
+            </Button>
+          </div>
+        </div>
+      </header>
 
-  return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-800">
       {/* Hero Section */}
-      <section className="py-20 px-4">
-        <div className="max-w-7xl mx-auto text-center">
-          <h1 className="text-5xl font-bold mb-6 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+      <section className="bg-primary/5 dark:bg-primary/10 py-12 md:py-16">
+        <div className="container mx-auto px-4 text-center">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4">
             Catálogo de Cursos
           </h1>
-          <p className="text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-2xl mx-auto">
-            Descubra cursos incríveis e comece sua jornada de aprendizado hoje mesmo
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            Explore nossa coleção de cursos e transforme sua carreira
           </p>
         </div>
       </section>
 
-      {/* Categories */}
-      {categories.length > 0 && (
-        <section className="px-4 mb-12">
-          <div className="max-w-7xl mx-auto">
-            <h2 className="text-2xl font-bold mb-6">Categorias</h2>
-            <div className="flex flex-wrap gap-3">
-              {categories.map((category) => (
-                <Link
-                  key={category.id}
-                  href={`/courses?category=${category.slug}`}
-                  className="px-4 py-2 rounded-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-blue-500 dark:hover:border-blue-400 transition-colors"
-                >
-                  <span className="mr-2">{category.icon}</span>
-                  {category.name}
-                </Link>
-              ))}
+      {/* Filters Section */}
+      <section className="container mx-auto px-4 py-8">
+        <div className="bg-card rounded-lg border p-4 md:p-6 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* Search */}
+            <div className="lg:col-span-2">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Buscar cursos..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+            </div>
+
+            {/* Category Filter */}
+            <div>
+              <select
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value)}
+                className="w-full h-10 rounded-md border border-input bg-background px-3 py-2 text-sm"
+              >
+                <option value="all">Todas as Categorias</option>
+                {categories.map(cat => (
+                  <option key={cat.id} value={cat.id}>{cat.name}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Level Filter */}
+            <div>
+              <select
+                value={selectedLevel}
+                onChange={(e) => setSelectedLevel(e.target.value)}
+                className="w-full h-10 rounded-md border border-input bg-background px-3 py-2 text-sm"
+              >
+                <option value="all">Todos os Níveis</option>
+                <option value="Iniciante">Iniciante</option>
+                <option value="Intermediário">Intermediário</option>
+                <option value="Avançado">Avançado</option>
+              </select>
             </div>
           </div>
-        </section>
-      )}
 
-      {/* Courses Grid */}
-      <section className="px-4 pb-20">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold">
-              {courses.length} {courses.length === 1 ? 'Curso Disponível' : 'Cursos Disponíveis'}
-            </h2>
+          {/* Sort Options */}
+          <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t">
+            <span className="text-sm text-muted-foreground mr-2">Ordenar:</span>
+            <Button
+              variant={sortBy === 'recent' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setSortBy('recent')}
+            >
+              Recentes
+            </Button>
+            <Button
+              variant={sortBy === 'popular' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setSortBy('popular')}
+            >
+              <TrendingUp className="h-4 w-4 mr-1" />
+              Populares
+            </Button>
+            <Button
+              variant={sortBy === 'title' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setSortBy('title')}
+            >
+              A-Z
+            </Button>
+            <Button
+              variant={sortBy === 'price-low' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setSortBy('price-low')}
+            >
+              Menor Preço
+            </Button>
           </div>
+        </div>
 
-          {courses.length === 0 ? (
-            <Card className="p-12 text-center">
-              <BookOpen className="h-16 w-16 mx-auto mb-4 text-gray-400" />
-              <h3 className="text-xl font-semibold mb-2">Nenhum curso disponível</h3>
-              <p className="text-gray-600 dark:text-gray-400">
-                Em breve teremos novos cursos para você!
-              </p>
-            </Card>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <Suspense fallback={<CourseCardSkeleton />}>
-                {courses.map((course) => (
-                  <Card key={course.id} className="flex flex-col hover:shadow-lg transition-shadow overflow-hidden">
-                    {/* Thumbnail */}
-                    {course.thumbnail ? (
-                      <div className="w-full h-48 overflow-hidden">
-                        <img
-                          src={course.thumbnail}
-                          alt={course.title}
-                          className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                        />
-                      </div>
-                    ) : (
-                      <div className="w-full h-48 bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-                        <BookOpen className="h-16 w-16 text-white opacity-50" />
+        {/* Results */}
+        <div className="mb-6">
+          <p className="text-muted-foreground">
+            {isLoading ? (
+              'Carregando...'
+            ) : (
+              <>
+                <span className="font-semibold text-foreground">{filteredCourses.length}</span>
+                {' '}curso{filteredCourses.length !== 1 ? 's' : ''} encontrado{filteredCourses.length !== 1 ? 's' : ''}
+              </>
+            )}
+          </p>
+        </div>
+
+        {/* Courses Grid */}
+        {isLoading ? (
+          <div className="flex items-center justify-center py-20">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          </div>
+        ) : filteredCourses.length === 0 ? (
+          <div className="text-center py-20">
+            <BookOpen className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
+            <h3 className="text-xl font-semibold mb-2">Nenhum curso encontrado</h3>
+            <p className="text-muted-foreground mb-6">
+              Tente ajustar seus filtros ou faça uma nova busca
+            </p>
+            <Button onClick={() => {
+              setSearchTerm('');
+              setSelectedCategory('all');
+              setSelectedLevel('all');
+            }}>
+              Limpar Filtros
+            </Button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredCourses.map((course) => (
+              <Card key={course.id} className="flex flex-col hover:shadow-lg transition-shadow overflow-hidden">
+                {/* Thumbnail */}
+                <div className="w-full h-48 relative overflow-hidden">
+                  {course.thumbnail ? (
+                    <img
+                      src={course.thumbnail}
+                      alt={course.title}
+                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
+                      <BookOpen className="h-16 w-16 text-primary/40" />
+                    </div>
+                  )}
+                  {!course.isPaid && (
+                    <div className="absolute top-2 right-2 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-semibold">
+                      GRATUITO
+                    </div>
+                  )}
+                </div>
+                
+                <CardHeader>
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="px-3 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary">
+                      {course.category.name}
+                    </span>
+                    {course.level && (
+                      <span className="px-2 py-1 rounded-full text-xs bg-muted text-muted-foreground">
+                        {course.level}
+                      </span>
+                    )}
+                  </div>
+                  <CardTitle className="line-clamp-2">{course.title}</CardTitle>
+                  <CardDescription>
+                    Por {course.instructor.name}
+                  </CardDescription>
+                </CardHeader>
+                
+                <CardContent className="flex-1">
+                  <p className="text-sm text-muted-foreground line-clamp-3 mb-4">
+                    {course.description}
+                  </p>
+                  <div className="flex flex-wrap gap-3 text-sm text-muted-foreground">
+                    {course.duration && (
+                      <div className="flex items-center gap-1">
+                        <Clock className="h-4 w-4" />
+                        <span>{Math.floor(course.duration / 60)}h</span>
                       </div>
                     )}
-                    
-                    <CardHeader>
-                      <div className="flex items-start justify-between mb-2">
-                        <span className="px-3 py-1 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300">
-                          {course.category.name}
-                        </span>
-                        {course.isPaid && (
-                          <span className="text-lg font-bold text-green-600 dark:text-green-400">
-                            R$ {course.price.toFixed(2)}
-                          </span>
-                        )}
-                        {!course.isPaid && (
-                          <span className="text-sm font-semibold text-green-600 dark:text-green-400">
-                            GRATUITO
-                          </span>
-                        )}
-                      </div>
-                      <CardTitle className="line-clamp-2">{course.title}</CardTitle>
-                      <CardDescription className="line-clamp-2">
-                        Por {course.instructor.name}
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent className="flex-1">
-                      <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-3 mb-4">
-                        {course.description}
-                      </p>
-                      <div className="flex flex-wrap gap-4 text-sm text-gray-600 dark:text-gray-400">
-                        {course.level && (
-                          <div className="flex items-center gap-1">
-                            <Signal className="h-4 w-4" />
-                            <span>{course.level}</span>
-                          </div>
-                        )}
-                        {course.duration && (
-                          <div className="flex items-center gap-1">
-                            <Clock className="h-4 w-4" />
-                            <span>{Math.floor(course.duration / 60)}h</span>
-                          </div>
-                        )}
-                        <div className="flex items-center gap-1">
-                          <Users className="h-4 w-4" />
-                          <span>{course._count.enrollments} alunos</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <BookOpen className="h-4 w-4" />
-                          <span>{course._count.modules} módulos</span>
-                        </div>
-                      </div>
-                    </CardContent>
-                    <CardFooter>
-                      <Button asChild className="w-full">
-                        <Link href={`/courses/${course.slug}`}>Ver Curso</Link>
-                      </Button>
-                    </CardFooter>
-                  </Card>
-                ))}
-              </Suspense>
-            </div>
-          )}
-        </div>
+                    <div className="flex items-center gap-1">
+                      <Users className="h-4 w-4" />
+                      <span>{course._count.enrollments}</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <BookOpen className="h-4 w-4" />
+                      <span>{course._count.modules} módulos</span>
+                    </div>
+                  </div>
+                </CardContent>
+                
+                <CardFooter className="flex items-center justify-between border-t pt-4">
+                  <div>
+                    {course.isPaid ? (
+                      <span className="text-2xl font-bold text-primary">
+                        {formatPrice(course.price)}
+                      </span>
+                    ) : (
+                      <span className="text-2xl font-bold text-green-600 dark:text-green-500">
+                        Grátis
+                      </span>
+                    )}
+                  </div>
+                  <Button asChild>
+                    <Link href={`/courses/${course.slug}`}>Ver Curso</Link>
+                  </Button>
+                </CardFooter>
+              </Card>
+            ))}
+          </div>
+        )}
       </section>
+
+      {/* Footer */}
+      <footer className="mt-auto border-t py-8">
+        <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
+          <p>© {new Date().getFullYear()} SM Educacional. Todos os direitos reservados.</p>
+        </div>
+      </footer>
     </div>
   );
+}
+
+export default function CoursesPage() {
+  return <CoursesClient />;
 }
