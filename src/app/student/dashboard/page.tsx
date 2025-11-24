@@ -1,8 +1,7 @@
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/db';
-import { Navbar } from '@/components/navbar';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { BookOpen, Award, Clock, TrendingUp, Home, Library, MessageSquare, Settings } from 'lucide-react';
+import { BookOpen, Award, Clock, TrendingUp } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 
@@ -37,17 +36,8 @@ export default async function StudentDashboard() {
     totalHours: Math.floor(Math.random() * 100), // Placeholder
   };
 
-  const navLinks = [
-    { href: '/student/dashboard', label: 'Dashboard', icon: <Home className="h-4 w-4" /> },
-    { href: '/student/courses', label: 'Meus Cursos', icon: <Library className="h-4 w-4" /> },
-    { href: '/student/certificates', label: 'Certificados', icon: <Award className="h-4 w-4" /> },
-    { href: '/student/support', label: 'Suporte', icon: <MessageSquare className="h-4 w-4" /> },
-    { href: '/student/settings', label: 'Configurações', icon: <Settings className="h-4 w-4" /> },
-  ];
-
   return (
     <div className="min-h-screen bg-background">
-      <Navbar user={user} links={navLinks} />
       
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8">

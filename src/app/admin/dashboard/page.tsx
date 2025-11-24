@@ -1,6 +1,5 @@
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/db';
-import { Navbar } from '@/components/navbar';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { BookOpen, Users, GraduationCap, TrendingUp, Home, Library, Settings, BarChart } from 'lucide-react';
 
@@ -23,13 +22,7 @@ export default async function AdminDashboard() {
     totalCertificates,
   };
 
-  const navLinks = [
-    { href: '/admin/dashboard', label: 'Dashboard', icon: <Home className="h-4 w-4" /> },
-    { href: '/admin/users', label: 'Usuários', icon: <Users className="h-4 w-4" /> },
-    { href: '/admin/courses', label: 'Cursos', icon: <Library className="h-4 w-4" /> },
-    { href: '/admin/reports', label: 'Relatórios', icon: <BarChart className="h-4 w-4" /> },
-    { href: '/admin/settings', label: 'Configurações', icon: <Settings className="h-4 w-4" /> },
-  ];
+
 
   // Usuários recentes
   const recentUsers = await prisma.user.findMany({
@@ -64,7 +57,6 @@ export default async function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Navbar user={user} links={navLinks} />
       
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8">

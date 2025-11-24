@@ -1,6 +1,5 @@
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/db';
-import { Navbar } from '@/components/navbar';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { BookOpen, Users, TrendingUp, MessageSquare, Home, Library, Settings, Plus } from 'lucide-react';
 import Link from 'next/link';
@@ -34,17 +33,10 @@ export default async function TeacherDashboard() {
     avgEngagement: Math.round(Math.random() * 100), // Placeholder
   };
 
-  const navLinks = [
-    { href: '/teacher/dashboard', label: 'Dashboard', icon: <Home className="h-4 w-4" /> },
-    { href: '/teacher/courses', label: 'Meus Cursos', icon: <Library className="h-4 w-4" /> },
-    { href: '/teacher/students', label: 'Alunos', icon: <Users className="h-4 w-4" /> },
-    { href: '/teacher/messages', label: 'Mensagens', icon: <MessageSquare className="h-4 w-4" /> },
-    { href: '/teacher/settings', label: 'Configurações', icon: <Settings className="h-4 w-4" /> },
-  ];
+
 
   return (
     <div className="min-h-screen bg-background">
-      <Navbar user={user} links={navLinks} />
       
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8 flex justify-between items-center">
