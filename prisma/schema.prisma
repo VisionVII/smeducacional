@@ -47,6 +47,8 @@ model User {
   phone         String?
   bio           String?
   emailVerified DateTime?
+  resetCode     String?
+  resetCodeExpires DateTime?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
