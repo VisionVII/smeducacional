@@ -15,8 +15,7 @@ export default function HomePage() {
       <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
         <div className="container mx-auto px-4 py-3 md:py-4 flex justify-between items-center">
           <Link href="/" className="flex items-center gap-2 flex-shrink-0">
-            <GraduationCap className="h-6 w-6 md:h-8 md:w-8 text-primary" />
-            <span className="text-xl md:text-2xl font-bold">SM Educacional</span>
+            <GraduationCap className="h-8 w-8 md:h-10 md:w-10 text-primary" />
           </Link>
           
           <nav className="hidden sm:flex gap-4 md:gap-6 items-center">

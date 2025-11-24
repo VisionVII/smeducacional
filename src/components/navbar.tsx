@@ -61,8 +61,7 @@ export function Navbar({ user, links }: NavbarProps) {
             className="flex items-center gap-2 flex-shrink-0"
             onClick={() => setMobileMenuOpen(false)}
           >
-            <GraduationCap className="h-6 w-6 text-primary" />
-            <span className="font-bold text-lg sm:text-xl">SM Educacional</span>
+            <GraduationCap className="h-8 w-8 md:h-10 md:w-10 text-primary" />
           </Link>
 
           {/* Desktop Navigation */}
