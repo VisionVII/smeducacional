@@ -6,12 +6,19 @@ import { checkRateLimit, getClientIP, RateLimitPresets } from '@/lib/rate-limit'
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-// Gerar código aleatório seguro de 6 dígitos
+// Gerar código aleatório seguro de 6 dígitos (100000-999999)
+// Usa rejection sampling para evitar viés do módulo
 function generateCode(): string {
-  // Usar crypto para geração segura de números aleatórios
-  const bytes = crypto.randomBytes(4);
-  const value = bytes.readUInt32BE(0);
-  return String(100000 + (value % 900000));
+  const range = 900000; // 999999 - 100000 + 1
+  const maxUnbiased = Math.floor(0xFFFFFFFF / range) * range;
+  
+  let value: number;
+  do {
+    const bytes = crypto.randomBytes(4);
+    value = bytes.readUInt32BE(0);
+  } while (value >= maxUnbiased);
+  
+  return String(100000 + (value % range));
 }
 
 // HTML do email personalizado
