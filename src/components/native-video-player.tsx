@@ -218,7 +218,8 @@ export function NativeVideoPlayer({
   return (
     <div
       id="video-container"
-      className="relative aspect-video bg-black rounded-lg overflow-hidden"
+      className="relative aspect-video bg-black rounded-lg overflow-hidden group"
+      onMouseMove={handleMouseMove}
     >
       <video
         ref={videoRef}
@@ -231,8 +232,105 @@ export function NativeVideoPlayer({
         onEnded={handleEnded}
         onError={handleError}
         playsInline
-        controls
       />
+      
+      {/* Custom Controls Overlay */}
+      <div
+        className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4 transition-opacity duration-300 ${
+          showControls || !playing ? 'opacity-100' : 'opacity-0'
+        }`}
+      >
+        {/* Progress Bar */}
+        <div className="mb-4">
+          <input
+            type="range"
+            min="0"
+            max="100"
+            value={played}
+            onChange={(e) => handleSeekChange(Number(e.target.value))}
+            onMouseDown={() => setSeeking(true)}
+            onMouseUp={() => setSeeking(false)}
+            className="w-full h-1 bg-gray-600 rounded-lg appearance-none cursor-pointer"
+            style={{
+              background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${played}%, #4b5563 ${played}%, #4b5563 100%)`,
+            }}
+          />
+          <div className="flex justify-between text-xs text-white mt-1">
+            <span>{formatTime(currentTime)}</span>
+            <span>{formatTime(duration)}</span>
+          </div>
+        </div>
+
+        {/* Control Buttons */}
+        <div className="flex items-center gap-4">
+          <Button
+            size="sm"
+            variant="ghost"
+            className="text-white hover:bg-white/20"
+            onClick={handlePlayPause}
+          >
+            {playing ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}
+          </Button>
+
+          <div className="flex items-center gap-2">
+            <Button
+              size="sm"
+              variant="ghost"
+              className="text-white hover:bg-white/20"
+              onClick={handleToggleMute}
+            >
+              {muted || volume === 0 ? (
+                <VolumeX className="h-5 w-5" />
+              ) : (
+                <Volume2 className="h-5 w-5" />
+              )}
+            </Button>
+            <input
+              type="range"
+              min="0"
+              max="1"
+              step="0.1"
+              value={muted ? 0 : volume}
+              onChange={(e) => handleVolumeChange(Number(e.target.value))}
+              className="w-20 h-1 bg-gray-600 rounded-lg appearance-none cursor-pointer"
+            />
+          </div>
+
+          <Button
+            size="sm"
+            variant="ghost"
+            className="text-white hover:bg-white/20 text-xs"
+            onClick={handlePlaybackRateChange}
+          >
+            {playbackRate}x
+          </Button>
+
+          <div className="ml-auto">
+            <Button
+              size="sm"
+              variant="ghost"
+              className="text-white hover:bg-white/20"
+              onClick={handleFullscreen}
+            >
+              <Maximize className="h-5 w-5" />
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      {/* Center Play Button Overlay */}
+      {!playing && (
+        <div className="absolute inset-0 flex items-center justify-center bg-black/40">
+          <Button
+            size="lg"
+            variant="ghost"
+            className="text-white hover:bg-white/20 rounded-full p-6"
+            onClick={handlePlayPause}
+          >
+            <Play className="h-16 w-16" />
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

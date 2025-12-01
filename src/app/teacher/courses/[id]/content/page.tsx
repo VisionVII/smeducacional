@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { VideoUpload } from '@/components/video-upload';
+import { VideoUploadEnhanced } from '@/components/video-upload-enhanced';
 import {
   Plus,
   Edit,
@@ -569,7 +569,7 @@ export default function CourseContentPage({ params }: { params: Promise<{ id: st
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="lesson-video">Vídeo da Aula</Label>
-                  <VideoUpload
+                  <VideoUploadEnhanced
                     value={lessonForm.videoUrl}
                     onChange={(url) =>
                       setLessonForm((prev) => ({ ...prev, videoUrl: url }))
@@ -578,7 +578,7 @@ export default function CourseContentPage({ params }: { params: Promise<{ id: st
                     maxSizeMB={500}
                   />
                   <p className="text-xs text-gray-500">
-                    Faça upload de um vídeo (até 500MB)
+                    Faça upload de um vídeo (até 500MB) ou cole um link do YouTube/Vimeo
                   </p>
                 </div>
                 <div className="space-y-2">
