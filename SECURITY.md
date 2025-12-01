@@ -17,7 +17,7 @@ A segurança do SM Educacional é levada a sério. Se você descobrir uma vulner
 
 **Por favor, NÃO reporte vulnerabilidades de segurança através de issues públicas do GitHub.**
 
-Em vez disso, envie um email para: **visionvii.tech@gmail.com**
+Em vez disso, envie um email para: **bullstockdev@gmail.com**
 
 Você deve receber uma resposta dentro de **48 horas úteis**. Se por algum motivo você não receber, por favor, acompanhe via email para garantir que recebemos sua mensagem original.
 
@@ -134,7 +134,7 @@ Mantemos um registro de vulnerabilidades corrigidas para transparência:
 
 Para questões gerais de segurança (não vulnerabilidades específicas):
 
-- **Email:** visionvii.tech@gmail.com
+- **Email:** bullstockdev@gmail.com
 - **GitHub:** [@VisionVII](https://github.com/VisionVII)
 - **Repositório:** [VisionVII/smeducacional](https://github.com/VisionVII/smeducacional)
 

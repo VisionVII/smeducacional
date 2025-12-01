@@ -1,0 +1,124 @@
+# Configuração do Dependabot para SM Educacional
+# Documentação: https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
+
+version: 2
+
+updates:
+  # ========================================
+  # NPM - Dependências JavaScript/TypeScript
+  # ========================================
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      # Verificar atualizações diariamente às 9h (horário UTC)
+      interval: "daily"
+      time: "09:00"
+      timezone: "Europe/Lisbon"
+    
+    # Abrir no máximo 5 PRs por vez para não sobrecarregar
+    open-pull-requests-limit: 5
+    
+    # Estratégia de versionamento
+    versioning-strategy: "increase"
+    
+    # Labels para organizar PRs
+    labels:
+      - "dependencies"
+      - "npm"
+      - "automated"
+    
+    # Reviewers automáticos (adicione usuários conforme necessário)
+    reviewers:
+      - "VisionVII"
+    
+    # Assignees automáticos
+    assignees:
+      - "VisionVII"
+    
+    # Prefixo para commits e PRs
+    commit-message:
+      prefix: "chore(deps)"
+      prefix-development: "chore(deps-dev)"
+      include: "scope"
+    
+    # Agrupar atualizações de dependências relacionadas
+    groups:
+      # Grupo para React e ecossistema
+      react:
+        patterns:
+          - "react*"
+          - "@types/react*"
+        update-types:
+          - "minor"
+          - "patch"
+      
+      # Grupo para Next.js
+      nextjs:
+        patterns:
+          - "next"
+          - "@next/*"
+        update-types:
+          - "minor"
+          - "patch"
+      
+      # Grupo para TypeScript
+      typescript:
+        patterns:
+          - "typescript"
+          - "@types/*"
+        update-types:
+          - "minor"
+          - "patch"
+      
+      # Grupo para ferramentas de desenvolvimento
+      dev-tools:
+        patterns:
+          - "eslint*"
+          - "prettier"
+          - "@typescript-eslint/*"
+        update-types:
+          - "minor"
+          - "patch"
+        dependency-type: "development"
+    
+    # Ignorar atualizações específicas (se necessário)
+    ignore:
+      # Exemplo: ignorar major updates de pacotes específicos
+      # - dependency-name: "next"
+      #   update-types: ["version-update:semver-major"]
+    
+    # Permitir atualizações de dependências indiretas
+    allow:
+      - dependency-type: "direct"
+      - dependency-type: "indirect"
+    
+    # Rebase automático quando houver conflitos
+    rebase-strategy: "auto"
+
+  # ========================================
+  # GitHub Actions - Workflows
+  # ========================================
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Europe/Lisbon"
+    
+    open-pull-requests-limit: 3
+    
+    labels:
+      - "dependencies"
+      - "github-actions"
+      - "automated"
+    
+    reviewers:
+      - "VisionVII"
+    
+    commit-message:
+      prefix: "ci"
+      include: "scope"
+    
+    # Sempre usar versões com hash SHA para segurança
+    # Exemplo: actions/checkout@v4 -> actions/checkout@abc123...
