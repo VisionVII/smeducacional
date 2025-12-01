@@ -42,3 +42,202 @@ next-env.d.ts
 
 # prisma
 prisma/.env
+
+# ============================================
+# SECURITY: Sensitive Files and Credentials
+# ============================================
+
+# Environment variables and configuration
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+.env.*.local
+*.env
+*.env.*
+
+# API Keys and Secrets
+secrets.json
+secrets.*.json
+config/secrets.json
+.secrets/
+*.secret
+*.secrets
+
+# Credentials and Authentication
+credentials.json
+credentials.*.json
+auth.json
+auth.*.json
+token.json
+tokens.json
+*.credentials
+service-account.json
+service-account-*.json
+
+# SSL/TLS Certificates and Keys
+*.key
+*.pem
+*.p12
+*.pfx
+*.crt
+*.cer
+*.der
+*.csr
+*.ca-bundle
+*.p7b
+*.p7c
+*.p7s
+*.spc
+
+# SSH Keys
+id_rsa
+id_rsa.*
+id_dsa
+id_dsa.*
+id_ecdsa
+id_ecdsa.*
+id_ed25519
+id_ed25519.*
+*.ppk
+*.pub
+
+# Database Files and Backups
+*.db
+*.sqlite
+*.sqlite3
+*.sql
+*.dump
+*.backup
+*.bak
+database.json
+db.json
+
+# Logs with Potential Sensitive Data
+*.log
+logs/
+*.log.*
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+pnpm-debug.log*
+
+# IDE and Editor Files (may contain sensitive paths)
+.vscode/settings.json
+.idea/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+*.sublime-project
+
+# OS Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# Temporary Files
+*.tmp
+*.temp
+tmp/
+temp/
+.cache/
+
+# Backup Files
+*~
+*.bak
+*.backup
+*.old
+*.orig
+
+# AWS and Cloud Provider Credentials
+.aws/
+.aws-sam/
+aws-exports.js
+amplify-export.json
+amplifyPush.json
+awsconfiguration.json
+
+# Google Cloud
+gcloud-service-key.json
+google-credentials.json
+*.gcp.json
+
+# Azure
+azure.json
+azure-credentials.json
+
+# Firebase
+firebase-adminsdk*.json
+.firebase/
+.firebaserc
+firebase-debug.log
+
+# Docker secrets
+docker-compose.override.yml
+.dockerignore.local
+
+# Kubernetes secrets
+*.kubeconfig
+kube-config
+k8s-secrets.yml
+
+# Terraform
+*.tfstate
+*.tfstate.*
+*.tfvars
+.terraform/
+terraform.rc
+
+# Ansible
+*.vault
+vault-password.txt
+
+# CI/CD Secrets
+.circleci/config.local.yml
+.github/secrets/
+.gitlab-ci.local.yml
+
+# Package Manager Tokens
+.npmrc
+.yarnrc
+.pnpmrc
+.npm/
+.yarn/
+
+# Application Specific
+uploads/
+user-uploads/
+private/
+confidential/
+sensitive/
+
+# Email Configuration
+mail-config.json
+smtp-config.json
+email-credentials.json
+
+# Payment Gateway Credentials
+stripe-*.json
+paypal-*.json
+payment-config.json
+
+# Analytics and Monitoring
+analytics-config.json
+monitoring-credentials.json
+
+# ============================================
+# END SECURITY SECTION
+# ============================================
