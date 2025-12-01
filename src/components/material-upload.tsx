@@ -13,9 +13,6 @@ import {
   File,
   Loader2,
   Download,
-  FilePdf,
-  FileSpreadsheet,
-  FileCode,
 } from 'lucide-react';
 
 interface Material {
@@ -129,11 +126,11 @@ export function MaterialUpload({
   };
 
   const getFileIcon = (fileType: string) => {
-    if (fileType.includes('pdf')) return <FilePdf className="h-5 w-5 text-red-600" />;
+    if (fileType.includes('pdf')) return <FileText className="h-5 w-5 text-red-600" />;
     if (fileType.includes('spreadsheet') || fileType.includes('excel')) 
-      return <FileSpreadsheet className="h-5 w-5 text-green-600" />;
+      return <FileText className="h-5 w-5 text-green-600" />;
     if (fileType.includes('code') || fileType.includes('text/plain'))
-      return <FileCode className="h-5 w-5 text-blue-600" />;
+      return <FileText className="h-5 w-5 text-blue-600" />;
     return <File className="h-5 w-5 text-gray-600" />;
   };
 

@@ -14,7 +14,7 @@ import {
   Loader2,
   Link as LinkIcon,
   PlayCircle,
-  Youtube,
+  Video,
 } from 'lucide-react';
 
 interface VideoUploadProps {
@@ -154,7 +154,7 @@ export function VideoUploadEnhanced({
           <div className="flex items-center gap-3 mb-4">
             <div className="flex-shrink-0">
               {isExternalVideo ? (
-                <Youtube className="h-10 w-10 text-red-600" />
+                <Video className="h-10 w-10 text-red-600" />
               ) : (
                 <PlayCircle className="h-10 w-10 text-blue-600" />
               )}
