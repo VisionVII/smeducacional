@@ -1,24 +1,29 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { PublicNavbar } from "@/components/public-navbar";
+import { Footer } from "@/components/footer";
 import Link from "next/link";
 import { BookOpen, Users, Award, TrendingUp } from "lucide-react";
 
 export default function AboutPage() {
   return (
-    <div className="min-h-screen">
-      {/* Hero Section */}
-      <section className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-20">
-        <div className="container mx-auto px-4">
-          <div className="max-w-3xl mx-auto text-center">
-            <h1 className="text-4xl md:text-5xl font-bold mb-6">
-              Sobre a SM Educacional
-            </h1>
-            <p className="text-xl opacity-90">
-              Transformando vidas através da educação de qualidade e acessível
-            </p>
+    <div className="min-h-screen flex flex-col">
+      <PublicNavbar />
+      
+      <main className="flex-1">
+        {/* Hero Section */}
+        <section className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-20">
+          <div className="container mx-auto px-4">
+            <div className="max-w-3xl mx-auto text-center">
+              <h1 className="text-4xl md:text-5xl font-bold mb-6">
+                Sobre a SM Educacional
+              </h1>
+              <p className="text-xl opacity-90">
+                Transformando vidas através da educação de qualidade e acessível
+              </p>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
       {/* Mission Section */}
       <section className="py-16 container mx-auto px-4">
@@ -132,6 +137,9 @@ export default function AboutPage() {
           </div>
         </div>
       </section>
+      </main>
+      
+      <Footer />
     </div>
   );
 }

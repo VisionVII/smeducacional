@@ -1,8 +1,13 @@
 import { Card } from "@/components/ui/card";
+import { PublicNavbar } from "@/components/public-navbar";
+import { Footer } from "@/components/footer";
 
 export default function TermsPage() {
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen flex flex-col">
+      <PublicNavbar />
+      
+      <main className="flex-1">
       <section className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-16">
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center">
@@ -112,6 +117,9 @@ export default function TermsPage() {
           </div>
         </Card>
       </section>
+      </main>
+      
+      <Footer />
     </div>
   );
 }

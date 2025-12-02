@@ -2,11 +2,16 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { PublicNavbar } from "@/components/public-navbar";
+import { Footer } from "@/components/footer";
 import { Mail, Phone, MapPin } from "lucide-react";
 
 export default function ContactPage() {
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen flex flex-col">
+      <PublicNavbar />
+      
+      <main className="flex-1">
       {/* Hero Section */}
       <section className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-16">
         <div className="container mx-auto px-4">
@@ -137,6 +142,9 @@ export default function ContactPage() {
           </div>
         </div>
       </section>
+      </main>
+      
+      <Footer />
     </div>
   );
 }

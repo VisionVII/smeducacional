@@ -3,7 +3,16 @@ import { auth } from '@/lib/auth';
 import { Navbar } from '@/components/navbar';
 import { Footer } from '@/components/footer';
 import { Breadcrumbs } from '@/components/breadcrumbs';
-import { BookOpen, Award, LayoutDashboard, GraduationCap } from 'lucide-react';
+import { 
+  BookOpen, 
+  Award, 
+  LayoutDashboard, 
+  GraduationCap, 
+  User, 
+  MessageSquare, 
+  Bell, 
+  ClipboardList 
+} from 'lucide-react';
 
 export default async function StudentLayout({
   children,
@@ -28,9 +37,29 @@ export default async function StudentLayout({
       icon: <BookOpen className="h-4 w-4" />,
     },
     {
+      href: '/student/activities',
+      label: 'Atividades',
+      icon: <ClipboardList className="h-4 w-4" />,
+    },
+    {
       href: '/student/certificates',
       label: 'Certificados',
       icon: <Award className="h-4 w-4" />,
+    },
+    {
+      href: '/student/messages',
+      label: 'Mensagens',
+      icon: <MessageSquare className="h-4 w-4" />,
+    },
+    {
+      href: '/student/notifications',
+      label: 'Notificações',
+      icon: <Bell className="h-4 w-4" />,
+    },
+    {
+      href: '/student/profile',
+      label: 'Perfil',
+      icon: <User className="h-4 w-4" />,
     },
     {
       href: '/courses',

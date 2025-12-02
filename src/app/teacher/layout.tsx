@@ -3,7 +3,7 @@ import { auth } from '@/lib/auth';
 import { Navbar } from '@/components/navbar';
 import { Footer } from '@/components/footer';
 import { Breadcrumbs } from '@/components/breadcrumbs';
-import { BookOpen, Plus, LayoutDashboard, Users } from 'lucide-react';
+import { BookOpen, Plus, LayoutDashboard, Users, MessageSquare, User } from 'lucide-react';
 
 export default async function TeacherLayout({
   children,
@@ -33,9 +33,14 @@ export default async function TeacherLayout({
       icon: <Plus className="h-4 w-4" />,
     },
     {
-      href: '/teacher/students',
-      label: 'Alunos',
-      icon: <Users className="h-4 w-4" />,
+      href: '/teacher/messages',
+      label: 'Mensagens',
+      icon: <MessageSquare className="h-4 w-4" />,
+    },
+    {
+      href: '/teacher/profile',
+      label: 'Perfil',
+      icon: <User className="h-4 w-4" />,
     },
   ];
 
