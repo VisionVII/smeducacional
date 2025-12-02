@@ -322,12 +322,13 @@ export function CoursePlayer({
 
           {/* Sidebar - Course Content */}
           <div className="lg:col-span-1">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Conteúdo do Curso</CardTitle>
-              </CardHeader>
-              <CardContent className="p-0">
-                <div className="max-h-[600px] overflow-y-auto">
+            <div className="lg:sticky lg:top-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Conteúdo do Curso</CardTitle>
+                </CardHeader>
+                <CardContent className="p-0">
+                  <div className="max-h-[calc(100vh-12rem)] overflow-y-auto">
                   {modules.map((module) => (
                     <div key={module.id} className="border-b last:border-b-0">
                       <button
@@ -390,6 +391,7 @@ export function CoursePlayer({
                 </div>
               </CardContent>
             </Card>
+            </div>
           </div>
         </div>
       </div>
