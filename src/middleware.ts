@@ -4,6 +4,29 @@ import { getToken } from 'next-auth/jwt';
 
 const PUBLIC_ROUTES = new Set(['/', '/login', '/register', '/forgot-password', '/courses', '/about']);
 
+// Security headers para todas as respostas
+function addSecurityHeaders(response: NextResponse): NextResponse {
+  // Prevenir clickjacking
+  response.headers.set('X-Frame-Options', 'DENY');
+  
+  // Prevenir MIME type sniffing
+  response.headers.set('X-Content-Type-Options', 'nosniff');
+  
+  // Ativar proteção XSS do navegador
+  response.headers.set('X-XSS-Protection', '1; mode=block');
+  
+  // Referrer Policy
+  response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+  
+  // Permissions Policy (anteriormente Feature Policy)
+  response.headers.set(
+    'Permissions-Policy', 
+    'camera=(), microphone=(), geolocation=(), interest-cohort=()'
+  );
+
+  return response;
+}
+
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
@@ -12,7 +35,8 @@ export async function middleware(request: NextRequest) {
   const isPublicRoute = PUBLIC_ROUTES.has(pathname) || isAuthRoute;
 
   if (!token && !isPublicRoute) {
-    return NextResponse.redirect(new URL('/login', request.url));
+    const response = NextResponse.redirect(new URL('/login', request.url));
+    return addSecurityHeaders(response);
   }
 
   if (token?.role) {
@@ -20,32 +44,37 @@ export async function middleware(request: NextRequest) {
 
     // Proteção de rotas por role
     if (pathname.startsWith('/student') && userRole !== 'STUDENT') {
-      return NextResponse.redirect(new URL('/', request.url));
+      const response = NextResponse.redirect(new URL('/', request.url));
+      return addSecurityHeaders(response);
     }
 
     if (pathname.startsWith('/teacher') && userRole !== 'TEACHER') {
-      return NextResponse.redirect(new URL('/', request.url));
+      const response = NextResponse.redirect(new URL('/', request.url));
+      return addSecurityHeaders(response);
     }
 
     if (pathname.startsWith('/admin') && userRole !== 'ADMIN') {
-      return NextResponse.redirect(new URL('/', request.url));
+      const response = NextResponse.redirect(new URL('/', request.url));
+      return addSecurityHeaders(response);
     }
 
     // Redirecionar para dashboard apropriado se já estiver logado
     if (pathname === '/login' || pathname === '/register') {
+      let redirectUrl = '/';
       if (userRole === 'STUDENT') {
-        return NextResponse.redirect(new URL('/student/dashboard', request.url));
+        redirectUrl = '/student/dashboard';
+      } else if (userRole === 'TEACHER') {
+        redirectUrl = '/teacher/dashboard';
+      } else if (userRole === 'ADMIN') {
+        redirectUrl = '/admin/dashboard';
       }
-      if (userRole === 'TEACHER') {
-        return NextResponse.redirect(new URL('/teacher/dashboard', request.url));
-      }
-      if (userRole === 'ADMIN') {
-        return NextResponse.redirect(new URL('/admin/dashboard', request.url));
-      }
+      const response = NextResponse.redirect(new URL(redirectUrl, request.url));
+      return addSecurityHeaders(response);
     }
   }
 
-  return NextResponse.next();
+  const response = NextResponse.next();
+  return addSecurityHeaders(response);
 }
 
 export const config = {
