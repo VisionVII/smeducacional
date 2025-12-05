@@ -1,4 +1,4 @@
-# 🚀 VisionVII - Projetos Públicos & Portfólio
+# 🚀 VisionVII - Projetos Público
 
 <div align="center">
   
