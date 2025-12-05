@@ -1,12 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { Resend } from 'resend';
+import crypto from 'crypto';
+import { checkRateLimit, getClientIP, RateLimitPresets } from '@/lib/rate-limit';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-// Gerar código aleatório de 6 dígitos
+// Gerar código aleatório seguro de 6 dígitos (100000-999999)
+// Usa rejection sampling para evitar viés do módulo
 function generateCode(): string {
-  return Math.floor(100000 + Math.random() * 900000).toString();
+  const range = 900000; // 999999 - 100000 + 1
+  const maxUnbiased = Math.floor(0xFFFFFFFF / range) * range;
+  
+  let value: number;
+  do {
+    const bytes = crypto.randomBytes(4);
+    value = bytes.readUInt32BE(0);
+  } while (value >= maxUnbiased);
+  
+  return String(100000 + (value % range));
 }
 
 // HTML do email personalizado
@@ -102,6 +114,22 @@ function getEmailHTML(code: string, userName: string): string {
 
 export async function POST(request: NextRequest) {
   try {
+    // Rate limiting - mais restritivo para prevenir abuso
+    const clientIP = getClientIP(request);
+    const rateLimitResult = checkRateLimit(`forgot-password:${clientIP}`, RateLimitPresets.passwordReset);
+    
+    if (!rateLimitResult.success) {
+      return NextResponse.json(
+        { error: 'Muitas tentativas. Tente novamente em alguns minutos.' },
+        { 
+          status: 429,
+          headers: {
+            'Retry-After': String(Math.ceil((rateLimitResult.resetTime - Date.now()) / 1000)),
+          }
+        }
+      );
+    }
+
     const { email } = await request.json();
 
     if (!email) {
@@ -111,30 +139,43 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Validar formato do email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return NextResponse.json(
+        { error: 'Email inválido' },
+        { status: 400 }
+      );
+    }
+
     // Verificar se o usuário existe
     const user = await prisma.user.findUnique({
-      where: { email },
+      where: { email: email.toLowerCase() },
       select: { id: true, name: true, email: true },
     });
 
+    // SEGURANÇA: Sempre retornar a mesma resposta para evitar enumeração de usuários
+    const successResponse = { 
+      message: 'Se o email estiver cadastrado, você receberá um código de recuperação.' 
+    };
+
     if (!user) {
-      return NextResponse.json(
-        { error: 'Email não encontrado' },
-        { status: 404 }
-      );
+      // Retornar mesma resposta para evitar enumeração de usuários
+      return NextResponse.json(successResponse);
     }
 
     // Gerar código
     const code = generateCode();
     const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 minutos
 
-    // Salvar código no banco (você pode criar uma tabela PasswordReset se preferir)
-    // Por enquanto, vou usar uma abordagem simples salvando em um campo temporário
+    // Hash do código antes de salvar no banco para maior segurança
+    const hashedCode = crypto.createHash('sha256').update(code).digest('hex');
+
+    // Salvar código hashado no banco
     await prisma.user.update({
       where: { id: user.id },
       data: {
-        // Vamos adicionar esses campos no schema depois
-        resetCode: code,
+        resetCode: hashedCode,
         resetCodeExpires: expiresAt,
       },
     });
@@ -142,37 +183,23 @@ export async function POST(request: NextRequest) {
     // Enviar email
     if (process.env.RESEND_API_KEY) {
       try {
-        const result = await resend.emails.send({
+        await resend.emails.send({
           from: 'SM Educacional <onboarding@resend.dev>',
           to: user.email,
           subject: 'Código de Recuperação de Senha - SM Educacional',
           html: getEmailHTML(code, user.name || 'Usuário'),
         });
-        
-        console.log('Email enviado com sucesso:', result);
       } catch (emailError) {
         console.error('Erro ao enviar email:', emailError);
-        // Em desenvolvimento, vamos retornar o código mesmo que o email falhe
-        if (process.env.NODE_ENV === 'development') {
-          return NextResponse.json({ 
-            message: 'Código gerado (dev mode)',
-            code // Apenas em dev
-          });
-        }
-        throw emailError;
+        // SEGURANÇA: Não expor detalhes do erro, apenas logar
+        // O código foi gerado mas não enviado - usuário pode tentar novamente
       }
     } else {
-      // Modo desenvolvimento sem RESEND_API_KEY
-      console.log('Código de recuperação:', code);
-      return NextResponse.json({ 
-        message: 'Código gerado (dev mode - check console)',
-        code // Apenas em dev
-      });
+      // Modo desenvolvimento sem RESEND_API_KEY - apenas log no console do servidor
+      console.log('[DEV] Código de recuperação para', email, ':', code);
     }
 
-    return NextResponse.json({ 
-      message: 'Código enviado para seu email' 
-    });
+    return NextResponse.json(successResponse);
 
   } catch (error) {
     console.error('Erro ao processar recuperação de senha:', error);
