@@ -244,7 +244,10 @@ Acesse em: `http://localhost:3000`
 ### 📸 Screenshots Disponíveis
 
 Visualize todas as 30 páginas do sistema em:
-👉 **[Pasta de Screenshots](./screenshots/README.md)**
+👉 **[Pasta de Screenshots com Imagens](./screenshots/)**
+
+Ou acesse o guia detalhado:
+👉 **[Guia de Screenshots](./screenshots/README.md)** - 30 páginas documentadas
 
 As capturas incluem:
 - 10 Páginas Públicas
