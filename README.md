@@ -37,6 +37,9 @@ A **VisionVII** é uma empresa focada em **desenvolvimento de software**, **inov
 ### 📚 SM Educacional - Plataforma de Ensino Online
 
 > *Sistema completo de gestão educacional e e-learning*
+>
+> <img width="1917" height="869" alt="image" src="https://github.com/user-attachments/assets/8eaa653f-c01d-472a-98ae-2d80eb782e52" />
+
 
 **Status:** 🟢 Em Desenvolvimento Ativo
 
@@ -293,3 +296,4 @@ Se você gosta do nosso trabalho e quer apoiar:
 [⬆ Voltar ao topo](#-visionvii---projetos-públicos--portfólio)
 
 </div>
+
