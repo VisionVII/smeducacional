@@ -1,0 +1,39 @@
+{
+  "folders": [
+    {
+      "path": ".",
+      "name": "SM Educacional"
+    }
+  ],
+  "settings": {
+    // GitHub Copilot MCP Integration
+    "github.copilot.enable": {
+      "*": true,
+      "plaintext": true,
+      "markdown": true
+    },
+    "github.copilot.chat.localeOverride": "pt-BR",
+    "github.copilot.chat.useProjectTemplates": true,
+    
+    // Editor configuration
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.codeActionsOnSave": {
+      "source.fixAll.eslint": "explicit"
+    },
+    
+    // TypeScript
+    "typescript.tsdk": "node_modules/typescript/lib",
+    "typescript.enablePromptUseWorkspaceTsdk": true
+  },
+  "extensions": {
+    "recommendations": [
+      "github.copilot",
+      "github.copilot-chat",
+      "dbaeumer.vscode-eslint",
+      "esbenp.prettier-vscode",
+      "prisma.prisma",
+      "bradlc.vscode-tailwindcss"
+    ]
+  }
+}
