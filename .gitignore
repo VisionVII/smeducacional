@@ -125,7 +125,9 @@ lerna-debug.log*
 pnpm-debug.log*
 
 # IDE and Editor Files (may contain sensitive paths)
-.vscode/settings.json
+# Note: .vscode/settings.json is tracked for GitHub Copilot configuration
+# Developers can override locally with .vscode/settings.local.json
+# .vscode/settings.json
 .idea/
 *.swp
 *.swo

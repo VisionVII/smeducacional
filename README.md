@@ -180,6 +180,9 @@ Validação:    Zod, React Hook Form
 - 🔐 [Configuração de Segurança](./SECURITY.md)
 - 📦 [Setup Supabase](./SUPABASE_STORAGE_VIDEO_SETUP.md)
 - 👥 [Apresentação para Cliente](./APRESENTACAO_CLIENTE.md)
+- 🤖 [GitHub Copilot + MCP Setup](./COPILOT_MCP_SETUP.md) - **NOVO!**
+- ⚡ [Guia Rápido Copilot](./COPILOT_QUICKSTART.md) - **NOVO!**
+- ✅ [Verificação Copilot](./COPILOT_VERIFICATION.md) - **NOVO!**
 
 ---
 
@@ -232,6 +235,48 @@ npm run dev
 ```
 
 Acesse em: `http://localhost:3000`
+
+### 🤖 Desenvolvimento com GitHub Copilot + MCP
+
+Este projeto está configurado para uso otimizado do **GitHub Copilot** com **Model Context Protocol (MCP)**!
+
+#### 🚀 Começar a usar
+
+1. **Instale as extensões no VSCode**:
+   ```bash
+   code --install-extension github.copilot
+   code --install-extension github.copilot-chat
+   ```
+
+2. **Abra o workspace**:
+   ```bash
+   code smeducacional.code-workspace
+   ```
+
+3. **Autentique com GitHub** (clique no ícone do Copilot na barra de status)
+
+#### 📚 Documentação Completa
+
+- 🔍 **[Guia Rápido](./COPILOT_QUICKSTART.md)** - Comece em 5 minutos
+- 📖 **[Documentação Completa](./COPILOT_MCP_SETUP.md)** - Tudo sobre o Copilot + MCP
+- 📝 **[Instruções do Projeto](./.github/copilot-instructions.md)** - Padrões e convenções
+
+#### ✨ Benefícios
+
+- ✅ Sugestões de código contextualizadas ao projeto
+- ✅ Chat em português (pt-BR) configurado
+- ✅ Reconhecimento automático da stack (Next.js, TypeScript, Prisma)
+- ✅ Seguimento automático dos padrões do projeto
+- ✅ Maior produtividade no desenvolvimento
+
+#### 💡 Exemplo Rápido
+
+```typescript
+// Criar componente de dashboard com gráfico de progresso
+// usando Recharts e Tailwind CSS
+```
+
+*O Copilot gerará código seguindo os padrões do projeto automaticamente!*
 
 ### 👤 Credenciais de Teste
 
