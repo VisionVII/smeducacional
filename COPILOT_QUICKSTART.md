@@ -198,6 +198,7 @@ export function calculateProgress(completedLessons: number, totalLessons: number
 ## 📚 Recursos
 
 - 📖 [Documentação Completa](./COPILOT_MCP_SETUP.md)
+- ✅ [Guia de Verificação](./COPILOT_VERIFICATION.md)
 - 🎓 [Instruções do Projeto](./.github/copilot-instructions.md)
 - 🔗 [GitHub Copilot Docs](https://docs.github.com/en/copilot)
 - 💡 [Dicas de Prompts](https://github.blog/2023-06-20-how-to-write-better-prompts-for-github-copilot/)
@@ -211,6 +212,8 @@ Antes de começar a programar:
 - [ ] Chat funcionando (teste com Ctrl+Shift+I)
 - [ ] Copilot-instructions.md revisado
 - [ ] `.env` configurado corretamente
+
+**Não está funcionando?** Consulte o [Guia de Verificação](./COPILOT_VERIFICATION.md)
 
 ---
 

@@ -293,14 +293,17 @@ Edite `.vscode/settings.json`:
 - [ ] Sugestões inline aparecendo
 - [ ] copilot-instructions.md lido e entendido
 
+**💡 Guia Completo de Verificação**: Consulte [COPILOT_VERIFICATION.md](./COPILOT_VERIFICATION.md) para um checklist detalhado de validação e testes.
+
 ## 🆘 Suporte
 
 Se encontrar problemas:
 
-1. Consulte a seção [Troubleshooting](#-troubleshooting)
-2. Verifique [GitHub Copilot Status](https://www.githubstatus.com/)
-3. Abra issue no repositório
-4. Contate o suporte do GitHub
+1. Consulte o [Guia de Verificação](./COPILOT_VERIFICATION.md) para testes detalhados
+2. Consulte a seção [Troubleshooting](#-troubleshooting)
+3. Verifique [GitHub Copilot Status](https://www.githubstatus.com/)
+4. Abra issue no repositório
+5. Contate o suporte do GitHub
 
 ---
 

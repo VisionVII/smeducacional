@@ -182,6 +182,7 @@ Validação:    Zod, React Hook Form
 - 👥 [Apresentação para Cliente](./APRESENTACAO_CLIENTE.md)
 - 🤖 [GitHub Copilot + MCP Setup](./COPILOT_MCP_SETUP.md) - **NOVO!**
 - ⚡ [Guia Rápido Copilot](./COPILOT_QUICKSTART.md) - **NOVO!**
+- ✅ [Verificação Copilot](./COPILOT_VERIFICATION.md) - **NOVO!**
 
 ---
 
