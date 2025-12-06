@@ -1,27 +1,78 @@
-"use client";
+'use client';
 
-import { useSession } from "next-auth/react";
-import { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { useToast } from "@/components/ui/use-toast";
-import { User, Mail, Lock, Save } from "lucide-react";
+import { useSession } from 'next-auth/react';
+import { useState } from 'react';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { useToast } from '@/components/ui/use-toast';
+import {
+  User,
+  Mail,
+  Lock,
+  Save,
+  GraduationCap,
+  Briefcase,
+  MessageSquare,
+  Star,
+  DollarSign,
+  Shield,
+  Upload,
+  Plus,
+  X,
+  AlertCircle,
+  CheckCircle2,
+} from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+
+type TabType =
+  | 'pessoais'
+  | 'formacao'
+  | 'atuacao'
+  | 'engajamento'
+  | 'avaliacoes'
+  | 'financeiro'
+  | 'seguranca';
 
 export default function TeacherProfilePage() {
   const { data: session, update } = useSession();
   const { toast } = useToast();
+  const [activeTab, setActiveTab] = useState<TabType>('pessoais');
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
-    name: session?.user?.name || "",
-    email: session?.user?.email || "",
-    bio: "",
+    name: session?.user?.name || '',
+    email: session?.user?.email || '',
+    bio: '',
+    phone: '',
+    cpf: '',
+    address: '',
   });
   const [passwordData, setPasswordData] = useState({
-    currentPassword: "",
-    newPassword: "",
-    confirmPassword: "",
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: '',
+  });
+  const [education, setEducation] = useState([
+    {
+      degree: 'Graduação',
+      institution: 'Universidade Federal',
+      field: 'Pedagogia',
+      year: 2015,
+    },
+  ]);
+  const [newEducation, setNewEducation] = useState({
+    degree: '',
+    institution: '',
+    field: '',
+    year: new Date().getFullYear(),
   });
 
   const handleProfileUpdate = async (e: React.FormEvent) => {
@@ -29,24 +80,24 @@ export default function TeacherProfilePage() {
     setIsLoading(true);
 
     try {
-      const res = await fetch("/api/teacher/profile", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
+      const res = await fetch('/api/teacher/profile', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
       });
 
-      if (!res.ok) throw new Error("Erro ao atualizar perfil");
+      if (!res.ok) throw new Error('Erro ao atualizar perfil');
 
       await update();
       toast({
-        title: "Perfil atualizado",
-        description: "Suas informações foram atualizadas com sucesso.",
+        title: 'Perfil atualizado',
+        description: 'Suas informações foram atualizadas com sucesso.',
       });
     } catch (error) {
       toast({
-        title: "Erro",
-        description: "Não foi possível atualizar o perfil.",
-        variant: "destructive",
+        title: 'Erro',
+        description: 'Não foi possível atualizar o perfil.',
+        variant: 'destructive',
       });
     } finally {
       setIsLoading(false);
@@ -58,9 +109,9 @@ export default function TeacherProfilePage() {
 
     if (passwordData.newPassword !== passwordData.confirmPassword) {
       toast({
-        title: "Erro",
-        description: "As senhas não coincidem.",
-        variant: "destructive",
+        title: 'Erro',
+        description: 'As senhas não coincidem.',
+        variant: 'destructive',
       });
       return;
     }
@@ -68,194 +119,565 @@ export default function TeacherProfilePage() {
     setIsLoading(true);
 
     try {
-      const res = await fetch("/api/teacher/password", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
+      const res = await fetch('/api/teacher/password', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           currentPassword: passwordData.currentPassword,
           newPassword: passwordData.newPassword,
         }),
       });
 
-      if (!res.ok) throw new Error("Erro ao alterar senha");
+      if (!res.ok) throw new Error('Erro ao alterar senha');
 
       setPasswordData({
-        currentPassword: "",
-        newPassword: "",
-        confirmPassword: "",
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: '',
       });
 
       toast({
-        title: "Senha alterada",
-        description: "Sua senha foi alterada com sucesso.",
+        title: 'Senha alterada',
+        description: 'Sua senha foi alterada com sucesso.',
       });
     } catch (error) {
       toast({
-        title: "Erro",
-        description: "Não foi possível alterar a senha.",
-        variant: "destructive",
+        title: 'Erro',
+        description: 'Não foi possível alterar a senha.',
+        variant: 'destructive',
       });
     } finally {
       setIsLoading(false);
     }
   };
 
+  const handleAddEducation = () => {
+    if (!newEducation.degree || !newEducation.institution) {
+      toast({
+        title: 'Campos obrigatórios',
+        description: 'Preencha grau e instituição',
+        variant: 'destructive',
+      });
+      return;
+    }
+    setEducation([...education, newEducation]);
+    setNewEducation({
+      degree: '',
+      institution: '',
+      field: '',
+      year: new Date().getFullYear(),
+    });
+    toast({
+      title: 'Qualificação adicionada',
+      description: 'Sua qualificação foi registrada com sucesso.',
+    });
+  };
+
   return (
-    <div className="container mx-auto py-8 max-w-4xl">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">Meu Perfil</h1>
-        <p className="text-muted-foreground">
-          Gerencie suas informações pessoais e configurações de conta
-        </p>
+    <div className="container mx-auto py-8 max-w-6xl">
+      {/* Hero Section do Perfil */}
+      <div className="mb-12">
+        <div className="flex flex-col md:flex-row gap-6 items-start">
+          {/* Avatar */}
+          <div className="relative">
+            <Avatar className="h-32 w-32 border-4 border-primary/10">
+              <AvatarImage src={session?.user?.image || undefined} />
+              <AvatarFallback className="text-4xl">
+                {session?.user?.name?.charAt(0) || 'P'}
+              </AvatarFallback>
+            </Avatar>
+            <button className="absolute bottom-0 right-0 bg-primary text-white p-2 rounded-full hover:bg-primary/90 transition-colors">
+              <Upload className="h-4 w-4" />
+            </button>
+          </div>
+
+          {/* Info Principal */}
+          <div className="flex-1">
+            <h1 className="text-4xl font-bold mb-1">{session?.user?.name}</h1>
+            <p className="text-lg text-muted-foreground mb-2">
+              Professor | Educador Digital
+            </p>
+            <div className="flex gap-2 mb-4">
+              <Badge className="bg-green-600">Ativo</Badge>
+              <Badge variant="outline">75% Completo</Badge>
+            </div>
+            <p className="text-muted-foreground max-w-2xl mb-4">
+              {session?.user?.email}
+            </p>
+            <p className="text-sm text-muted-foreground">
+              Membro desde{' '}
+              {new Date(session?.user?.createdAt || '').toLocaleDateString(
+                'pt-BR'
+              )}
+            </p>
+          </div>
+        </div>
       </div>
 
+      {/* Navegação de Tabs */}
+      <div className="flex gap-2 mb-8 border-b overflow-x-auto pb-0 -mx-4 px-4">
+        {[
+          { id: 'pessoais', label: 'Pessoais', icon: User },
+          { id: 'formacao', label: 'Formação', icon: GraduationCap },
+          { id: 'atuacao', label: 'Atuação', icon: Briefcase },
+          { id: 'engajamento', label: 'Engajamento', icon: MessageSquare },
+          { id: 'avaliacoes', label: 'Avaliações', icon: Star },
+          { id: 'financeiro', label: 'Financeiro', icon: DollarSign },
+          { id: 'seguranca', label: 'Segurança', icon: Shield },
+        ].map(({ id, label, icon: Icon }) => (
+          <button
+            key={id}
+            onClick={() => setActiveTab(id as TabType)}
+            className={`px-4 py-2 text-sm font-medium flex items-center gap-2 border-b-2 transition-colors whitespace-nowrap ${
+              activeTab === id
+                ? 'border-primary text-primary'
+                : 'border-transparent text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            <Icon className="h-4 w-4" />
+            {label}
+          </button>
+        ))}
+      </div>
+
+      {/* Conteúdo das Tabs */}
       <div className="space-y-6">
-        {/* Informações Pessoais */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <User className="h-5 w-5" />
-              Informações Pessoais
-            </CardTitle>
-            <CardDescription>
-              Atualize seu nome, email e biografia
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleProfileUpdate} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="name">Nome Completo</Label>
-                <Input
-                  id="name"
-                  value={formData.name}
-                  onChange={(e) =>
-                    setFormData({ ...formData, name: e.target.value })
-                  }
-                  required
-                />
-              </div>
+        {/* TAB: Pessoais */}
+        {activeTab === 'pessoais' && (
+          <>
+            <Card>
+              <CardHeader>
+                <CardTitle>Informações Pessoais</CardTitle>
+                <CardDescription>
+                  Atualize seu nome, email e informações de contato
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <form onSubmit={handleProfileUpdate} className="space-y-4">
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="name">Nome Completo</Label>
+                      <Input
+                        id="name"
+                        value={formData.name}
+                        onChange={(e) =>
+                          setFormData({ ...formData, name: e.target.value })
+                        }
+                        required
+                      />
+                    </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) =>
-                    setFormData({ ...formData, email: e.target.value })
-                  }
-                  required
-                />
-              </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="email">Email</Label>
+                      <Input
+                        id="email"
+                        type="email"
+                        value={formData.email}
+                        onChange={(e) =>
+                          setFormData({ ...formData, email: e.target.value })
+                        }
+                        required
+                      />
+                    </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="bio">Biografia</Label>
-                <Input
-                  id="bio"
-                  value={formData.bio}
-                  onChange={(e) =>
-                    setFormData({ ...formData, bio: e.target.value })
-                  }
-                  placeholder="Conte um pouco sobre você..."
-                />
-              </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="phone">Telefone</Label>
+                      <Input
+                        id="phone"
+                        type="tel"
+                        value={formData.phone}
+                        onChange={(e) =>
+                          setFormData({ ...formData, phone: e.target.value })
+                        }
+                        placeholder="(11) 99999-9999"
+                      />
+                    </div>
 
-              <Button type="submit" disabled={isLoading}>
+                    <div className="space-y-2">
+                      <Label htmlFor="cpf">CPF</Label>
+                      <Input
+                        id="cpf"
+                        value={formData.cpf}
+                        onChange={(e) =>
+                          setFormData({ ...formData, cpf: e.target.value })
+                        }
+                        placeholder="000.000.000-00"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="address">Endereço</Label>
+                    <Input
+                      id="address"
+                      value={formData.address}
+                      onChange={(e) =>
+                        setFormData({ ...formData, address: e.target.value })
+                      }
+                      placeholder="Rua, número, cidade, estado"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="bio">Biografia</Label>
+                    <textarea
+                      id="bio"
+                      value={formData.bio}
+                      onChange={(e) =>
+                        setFormData({ ...formData, bio: e.target.value })
+                      }
+                      placeholder="Conte um pouco sobre você..."
+                      className="w-full px-3 py-2 border rounded-md bg-background text-foreground h-24 resize-none"
+                    />
+                  </div>
+
+                  <Button type="submit" disabled={isLoading}>
+                    <Save className="h-4 w-4 mr-2" />
+                    Salvar Alterações
+                  </Button>
+                </form>
+              </CardContent>
+            </Card>
+          </>
+        )}
+
+        {/* TAB: Formação */}
+        {activeTab === 'formacao' && (
+          <>
+            <Card>
+              <CardHeader>
+                <CardTitle>Educação & Especializações</CardTitle>
+                <CardDescription>
+                  Adicione seus cursos, certificações e qualificações
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {education.map((edu, idx) => (
+                  <div key={idx} className="border rounded-lg p-4 space-y-2">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <p className="font-semibold">{edu.degree}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {edu.institution}
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          {edu.field} • {edu.year}
+                        </p>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          setEducation(education.filter((_, i) => i !== idx));
+                        }}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+
+                <div className="border-t pt-6">
+                  <h4 className="font-semibold mb-4">
+                    Adicionar Nova Qualificação
+                  </h4>
+                  <div className="grid md:grid-cols-2 gap-4 mb-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="degree">Tipo de Certificação</Label>
+                      <Input
+                        id="degree"
+                        value={newEducation.degree}
+                        onChange={(e) =>
+                          setNewEducation({
+                            ...newEducation,
+                            degree: e.target.value,
+                          })
+                        }
+                        placeholder="Graduação, Mestrado, Certificado..."
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="institution">Instituição</Label>
+                      <Input
+                        id="institution"
+                        value={newEducation.institution}
+                        onChange={(e) =>
+                          setNewEducation({
+                            ...newEducation,
+                            institution: e.target.value,
+                          })
+                        }
+                        placeholder="Nome da universidade/instituição"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="field">Área de Estudo</Label>
+                      <Input
+                        id="field"
+                        value={newEducation.field}
+                        onChange={(e) =>
+                          setNewEducation({
+                            ...newEducation,
+                            field: e.target.value,
+                          })
+                        }
+                        placeholder="Ex: Pedagogia, Matemática..."
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="year">Ano de Conclusão</Label>
+                      <Input
+                        id="year"
+                        type="number"
+                        value={newEducation.year}
+                        onChange={(e) =>
+                          setNewEducation({
+                            ...newEducation,
+                            year: parseInt(e.target.value),
+                          })
+                        }
+                      />
+                    </div>
+                  </div>
+                  <Button onClick={handleAddEducation}>
+                    <Plus className="h-4 w-4 mr-2" />
+                    Adicionar Qualificação
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </>
+        )}
+
+        {/* TAB: Atuação */}
+        {activeTab === 'atuacao' && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Atuação Pedagógica</CardTitle>
+              <CardDescription>
+                Informações sobre sua experiência e especialidades
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Disciplinas</Label>
+                  <Input placeholder="Ex: Matemática, Português..." />
+                </div>
+                <div className="space-y-2">
+                  <Label>Níveis de Ensino</Label>
+                  <Input placeholder="Ex: Ensino Fundamental, Médio..." />
+                </div>
+                <div className="space-y-2">
+                  <Label>Anos de Experiência</Label>
+                  <Input type="number" placeholder="Ex: 10" />
+                </div>
+                <div className="space-y-2">
+                  <Label>Modalidade</Label>
+                  <Input placeholder="Presencial, Online, Híbrido..." />
+                </div>
+              </div>
+              <Button>
                 <Save className="h-4 w-4 mr-2" />
-                Salvar Alterações
+                Salvar Atuação
               </Button>
-            </form>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        )}
 
-        {/* Alterar Senha */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Lock className="h-5 w-5" />
-              Segurança
-            </CardTitle>
-            <CardDescription>
-              Altere sua senha de acesso
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handlePasswordChange} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="currentPassword">Senha Atual</Label>
-                <Input
-                  id="currentPassword"
-                  type="password"
-                  value={passwordData.currentPassword}
-                  onChange={(e) =>
-                    setPasswordData({
-                      ...passwordData,
-                      currentPassword: e.target.value,
-                    })
-                  }
-                  required
-                />
+        {/* TAB: Engajamento */}
+        {activeTab === 'engajamento' && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Engajamento & Comunicação</CardTitle>
+              <CardDescription>
+                Métricas de interação com alunos
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <p className="text-sm text-muted-foreground">
+                    Tempo médio de resposta
+                  </p>
+                  <p className="text-3xl font-bold">-</p>
+                </div>
+                <div className="space-y-2">
+                  <p className="text-sm text-muted-foreground">
+                    Mensagens respondidas
+                  </p>
+                  <p className="text-3xl font-bold">0</p>
+                </div>
+                <div className="space-y-2">
+                  <p className="text-sm text-muted-foreground">
+                    Taxa de resposta
+                  </p>
+                  <p className="text-3xl font-bold">-</p>
+                </div>
+                <div className="space-y-2">
+                  <p className="text-sm text-muted-foreground">Fóruns ativos</p>
+                  <p className="text-3xl font-bold">0</p>
+                </div>
               </div>
+            </CardContent>
+          </Card>
+        )}
 
-              <div className="space-y-2">
-                <Label htmlFor="newPassword">Nova Senha</Label>
-                <Input
-                  id="newPassword"
-                  type="password"
-                  value={passwordData.newPassword}
-                  onChange={(e) =>
-                    setPasswordData({
-                      ...passwordData,
-                      newPassword: e.target.value,
-                    })
-                  }
-                  required
-                />
+        {/* TAB: Avaliações */}
+        {activeTab === 'avaliacoes' && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Avaliações & Reputação</CardTitle>
+              <CardDescription>
+                Veja avaliações e comentários dos alunos
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="text-center py-8">
+                <Star className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
+                <p className="text-muted-foreground">
+                  Ainda sem avaliações de alunos
+                </p>
               </div>
+            </CardContent>
+          </Card>
+        )}
 
-              <div className="space-y-2">
-                <Label htmlFor="confirmPassword">Confirmar Nova Senha</Label>
-                <Input
-                  id="confirmPassword"
-                  type="password"
-                  value={passwordData.confirmPassword}
-                  onChange={(e) =>
-                    setPasswordData({
-                      ...passwordData,
-                      confirmPassword: e.target.value,
-                    })
-                  }
-                  required
-                />
+        {/* TAB: Financeiro */}
+        {activeTab === 'financeiro' && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Informações Financeiras</CardTitle>
+              <CardDescription>
+                Dados bancários e configurações de pagamento
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Banco</Label>
+                  <Input placeholder="Ex: Banco do Brasil..." />
+                </div>
+                <div className="space-y-2">
+                  <Label>Agência</Label>
+                  <Input placeholder="Número da agência" />
+                </div>
+                <div className="space-y-2">
+                  <Label>Conta</Label>
+                  <Input placeholder="Número da conta" type="password" />
+                </div>
+                <div className="space-y-2">
+                  <Label>Tipo de Conta</Label>
+                  <Input placeholder="Corrente, Poupança..." />
+                </div>
               </div>
-
-              <Button type="submit" disabled={isLoading}>
-                <Lock className="h-4 w-4 mr-2" />
-                Alterar Senha
+              <Button>
+                <Save className="h-4 w-4 mr-2" />
+                Salvar Dados Bancários
               </Button>
-            </form>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        )}
 
-        {/* Informações da Conta */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Mail className="h-5 w-5" />
-              Informações da Conta
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2 text-sm">
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Tipo de conta:</span>
-              <span className="font-medium">Professor</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Tipo de conta:</span>
-              <span className="font-medium">Professor</span>
-            </div>
-          </CardContent>
-        </Card>
+        {/* TAB: Segurança */}
+        {activeTab === 'seguranca' && (
+          <>
+            <Card>
+              <CardHeader>
+                <CardTitle>Alterar Senha</CardTitle>
+                <CardDescription>
+                  Atualize sua senha de acesso para manter sua conta segura
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <form onSubmit={handlePasswordChange} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="currentPassword">Senha Atual</Label>
+                    <Input
+                      id="currentPassword"
+                      type="password"
+                      value={passwordData.currentPassword}
+                      onChange={(e) =>
+                        setPasswordData({
+                          ...passwordData,
+                          currentPassword: e.target.value,
+                        })
+                      }
+                      required
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="newPassword">Nova Senha</Label>
+                    <Input
+                      id="newPassword"
+                      type="password"
+                      value={passwordData.newPassword}
+                      onChange={(e) =>
+                        setPasswordData({
+                          ...passwordData,
+                          newPassword: e.target.value,
+                        })
+                      }
+                      required
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="confirmPassword">
+                      Confirmar Nova Senha
+                    </Label>
+                    <Input
+                      id="confirmPassword"
+                      type="password"
+                      value={passwordData.confirmPassword}
+                      onChange={(e) =>
+                        setPasswordData({
+                          ...passwordData,
+                          confirmPassword: e.target.value,
+                        })
+                      }
+                      required
+                    />
+                  </div>
+
+                  <Button type="submit" disabled={isLoading}>
+                    <Lock className="h-4 w-4 mr-2" />
+                    Alterar Senha
+                  </Button>
+                </form>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Shield className="h-5 w-5" />
+                  Autenticação de Dois Fatores
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Adicione uma camada extra de segurança à sua conta
+                </p>
+                <Button variant="outline">
+                  Ativar Autenticação de Dois Fatores
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Histórico de Acessos</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">
+                  Ainda nenhum acesso registrado
+                </p>
+              </CardContent>
+            </Card>
+          </>
+        )}
       </div>
     </div>
   );
