@@ -83,7 +83,11 @@ export default function StudentNotificationsPage() {
       WARNING: { label: "Aviso", variant: "default" as const },
       ERROR: { label: "Erro", variant: "destructive" as const },
     };
-    const { label, variant } = variants[type];
+    
+    // Fallback para tipos não reconhecidos
+    const typeConfig = variants[type] || variants.INFO;
+    const { label, variant } = typeConfig;
+    
     return <Badge variant={variant}>{label}</Badge>;
   };
 
