@@ -1,21 +1,21 @@
-import { NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
-import { prisma } from "@/lib/db";
-import bcrypt from "bcryptjs";
+import { NextResponse } from 'next/server';
+import { auth } from '@/lib/auth';
+import { prisma } from '@/lib/db';
+import bcrypt from 'bcryptjs';
 
 export async function GET(request: Request) {
   try {
     const session = await auth();
 
-    if (!session || session.user.role !== "ADMIN") {
-      return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
+    if (!session || session.user.role !== 'ADMIN') {
+      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     }
 
     const { searchParams } = new URL(request.url);
-    const role = searchParams.get("role");
-    const search = searchParams.get("search");
+    const role = searchParams.get('role');
+    const search = searchParams.get('search');
 
-    let where: any = {};
+    const where: any = {};
 
     if (role) {
       where.role = role;
@@ -23,8 +23,8 @@ export async function GET(request: Request) {
 
     if (search) {
       where.OR = [
-        { name: { contains: search, mode: "insensitive" } },
-        { email: { contains: search, mode: "insensitive" } },
+        { name: { contains: search, mode: 'insensitive' } },
+        { email: { contains: search, mode: 'insensitive' } },
       ];
     }
 
@@ -40,15 +40,15 @@ export async function GET(request: Request) {
         emailVerified: true,
       },
       orderBy: {
-        createdAt: "desc",
+        createdAt: 'desc',
       },
     });
 
     return NextResponse.json(users);
   } catch (error) {
-    console.error("Erro ao buscar usuários:", error);
+    console.error('Erro ao buscar usuários:', error);
     return NextResponse.json(
-      { error: "Erro ao buscar usuários" },
+      { error: 'Erro ao buscar usuários' },
       { status: 500 }
     );
   }
@@ -58,8 +58,8 @@ export async function POST(request: Request) {
   try {
     const session = await auth();
 
-    if (!session || session.user.role !== "ADMIN") {
-      return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
+    if (!session || session.user.role !== 'ADMIN') {
+      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     }
 
     const data = await request.json();
@@ -71,7 +71,7 @@ export async function POST(request: Request) {
 
     if (existingUser) {
       return NextResponse.json(
-        { error: "Este email já está cadastrado" },
+        { error: 'Este email já está cadastrado' },
         { status: 400 }
       );
     }
@@ -84,7 +84,7 @@ export async function POST(request: Request) {
         name: data.name,
         email: data.email,
         password: hashedPassword,
-        role: data.role || "STUDENT",
+        role: data.role || 'STUDENT',
         emailVerified: new Date(),
       },
       select: {
@@ -98,9 +98,9 @@ export async function POST(request: Request) {
 
     return NextResponse.json(user, { status: 201 });
   } catch (error) {
-    console.error("Erro ao criar usuário:", error);
+    console.error('Erro ao criar usuário:', error);
     return NextResponse.json(
-      { error: "Erro ao criar usuário" },
+      { error: 'Erro ao criar usuário' },
       { status: 500 }
     );
   }

@@ -13,20 +13,18 @@ const createModuleSchema = z.object({
 // POST /api/courses/[id]/modules - Criar módulo no curso
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await auth();
 
     if (!session?.user) {
-      return NextResponse.json(
-        { error: 'Não autenticado' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
     }
 
+    const { id } = await params;
     const course = await prisma.course.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         modules: {
           orderBy: { order: 'desc' },
@@ -62,10 +60,10 @@ export async function POST(
     }
 
     // Criar o módulo
-    const module = await prisma.module.create({
+    const moduleData = await prisma.module.create({
       data: {
         ...validatedData,
-        courseId: params.id,
+        courseId: id,
       },
       include: {
         lessons: true,
@@ -77,11 +75,11 @@ export async function POST(
       data: {
         userId: session.user.id,
         action: 'CREATE_MODULE',
-        details: `Adicionou o módulo "${module.title}" ao curso "${course.title}"`,
+        details: `Adicionou o módulo "${moduleData.title}" ao curso "${course.title}"`,
       },
     });
 
-    return NextResponse.json(module, { status: 201 });
+    return NextResponse.json(moduleData, { status: 201 });
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
@@ -101,11 +99,12 @@ export async function POST(
 // GET /api/courses/[id]/modules - Listar módulos do curso
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const modules = await prisma.module.findMany({
-      where: { courseId: params.id },
+      where: { courseId: id },
       include: {
         lessons: {
           orderBy: { order: 'asc' },

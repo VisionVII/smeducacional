@@ -4,27 +4,21 @@ import { prisma } from '@/lib/db';
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> | { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const session = await auth();
 
     if (!session?.user || session.user.role !== 'STUDENT') {
-      return NextResponse.json(
-        { error: 'Não autorizado' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     }
-
-    const resolvedParams = await Promise.resolve(params);
-    const lessonId = resolvedParams.id;
 
     const body = await request.json();
     const { isCompleted = true, watchTime = 0, lastPosition = 0 } = body;
-
     // Verificar se a aula existe
     const lesson = await prisma.lesson.findUnique({
-      where: { id: lessonId },
+      where: { id: id },
       include: {
         module: {
           include: {
@@ -130,8 +124,11 @@ export async function POST(
       });
 
       if (!existingCertificate) {
-        const certificateNumber = `CERT-${Date.now()}-${session.user.id.slice(0, 8)}`;
-        
+        const certificateNumber = `CERT-${Date.now()}-${session.user.id.slice(
+          0,
+          8
+        )}`;
+
         await prisma.certificate.create({
           data: {
             certificateNumber,
@@ -151,9 +148,9 @@ export async function POST(
       }
     }
 
-    return NextResponse.json({ 
+    return NextResponse.json({
       progress,
-      courseProgress: Math.round(courseProgress)
+      courseProgress: Math.round(courseProgress),
     });
   } catch (error) {
     console.error('Erro ao atualizar progresso:', error);
@@ -166,21 +163,20 @@ export async function POST(
 
 export async function GET(
   req: Request,
-  { params }: { params: Promise<{ id: string }> | { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const session = await auth();
     if (!session?.user) {
       return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
     }
 
-    const resolvedParams = await Promise.resolve(params);
-    const lessonId = resolvedParams.id;
-
     const progress = await prisma.progress.findUnique({
       where: {
         studentId_lessonId: {
           studentId: session.user.id,
+          lessonId: id,
           lessonId,
         },
       },

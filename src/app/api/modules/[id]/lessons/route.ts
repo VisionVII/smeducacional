@@ -17,20 +17,18 @@ const createLessonSchema = z.object({
 // POST /api/modules/[id]/lessons - Criar aula no módulo
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await auth();
 
     if (!session?.user) {
-      return NextResponse.json(
-        { error: 'Não autenticado' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
     }
 
-    const module = await prisma.module.findUnique({
-      where: { id: params.id },
+    const { id } = await params;
+    const moduleData = await prisma.module.findUnique({
+      where: { id },
       include: {
         course: true,
         lessons: {
@@ -40,7 +38,7 @@ export async function POST(
       },
     });
 
-    if (!module) {
+    if (!moduleData) {
       return NextResponse.json(
         { error: 'Módulo não encontrado' },
         { status: 404 }
@@ -49,7 +47,7 @@ export async function POST(
 
     // Verificar permissão
     if (
-      module.course.instructorId !== session.user.id &&
+      moduleData.course.instructorId !== session.user.id &&
       session.user.role !== 'ADMIN'
     ) {
       return NextResponse.json(
@@ -62,15 +60,15 @@ export async function POST(
     const validatedData = createLessonSchema.parse(body);
 
     // Se order não foi fornecida, usar a próxima ordem disponível
-    if (validatedData.order === 0 && module.lessons.length > 0) {
-      validatedData.order = (module.lessons[0]?.order || 0) + 1;
+    if (validatedData.order === 0 && moduleData.lessons.length > 0) {
+      validatedData.order = (moduleData.lessons[0]?.order || 0) + 1;
     }
 
     // Criar a aula
     const lesson = await prisma.lesson.create({
       data: {
         ...validatedData,
-        moduleId: params.id,
+        moduleId: id,
       },
     });
 
@@ -79,7 +77,7 @@ export async function POST(
       data: {
         userId: session.user.id,
         action: 'CREATE_LESSON',
-        details: `Adicionou a aula "${lesson.title}" ao módulo "${module.title}"`,
+        details: `Adicionou a aula "${lesson.title}" ao módulo "${moduleData.title}"`,
       },
     });
 
@@ -93,21 +91,19 @@ export async function POST(
     }
 
     console.error('Erro ao criar aula:', error);
-    return NextResponse.json(
-      { error: 'Erro ao criar aula' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Erro ao criar aula' }, { status: 500 });
   }
 }
 
 // GET /api/modules/[id]/lessons - Listar aulas do módulo
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const lessons = await prisma.lesson.findMany({
-      where: { moduleId: params.id },
+      where: { moduleId: id },
       orderBy: { order: 'asc' },
     });
 

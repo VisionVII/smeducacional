@@ -4,16 +4,13 @@ import { prisma } from '@/lib/db';
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await auth();
 
     if (!session?.user) {
-      return NextResponse.json(
-        { error: 'Não autorizado' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     }
 
     if (session.user.role !== 'STUDENT') {
@@ -23,9 +20,10 @@ export async function POST(
       );
     }
 
+    const { id } = await params;
     const course = await prisma.course.findUnique({
       where: {
-        id: params.id,
+        id,
         isPublished: true,
       },
     });
@@ -42,7 +40,7 @@ export async function POST(
       where: {
         studentId_courseId: {
           studentId: session.user.id,
-          courseId: params.id,
+          courseId: id,
         },
       },
     });
@@ -58,7 +56,7 @@ export async function POST(
     const enrollment = await prisma.enrollment.create({
       data: {
         studentId: session.user.id,
-        courseId: params.id,
+        courseId: id,
         status: 'ACTIVE',
         progress: 0,
       },

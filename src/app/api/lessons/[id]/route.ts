@@ -17,20 +17,18 @@ const updateLessonSchema = z.object({
 // PUT /api/lessons/[id] - Atualizar aula
 export async function PUT(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await auth();
 
     if (!session?.user) {
-      return NextResponse.json(
-        { error: 'Não autenticado' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
     }
 
+    const { id } = await params;
     const lesson = await prisma.lesson.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         module: {
           include: {
@@ -62,7 +60,7 @@ export async function PUT(
     const validatedData = updateLessonSchema.parse(body);
 
     const updatedLesson = await prisma.lesson.update({
-      where: { id: params.id },
+      where: { id },
       data: validatedData,
     });
 
@@ -95,20 +93,18 @@ export async function PUT(
 // DELETE /api/lessons/[id] - Deletar aula
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await auth();
 
     if (!session?.user) {
-      return NextResponse.json(
-        { error: 'Não autenticado' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
     }
 
+    const { id } = await params;
     const lesson = await prisma.lesson.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         module: {
           include: {
@@ -138,7 +134,7 @@ export async function DELETE(
 
     // Deletar a aula
     await prisma.lesson.delete({
-      where: { id: params.id },
+      where: { id },
     });
 
     // Registrar log

@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Teste de Variáveis CSS do Tema</title>
+  <style>
+    :root {
+      --primary: 221.2 83.2% 53.3%;
+      --secondary: 210 40% 96.1%;
+      --accent: 210 40% 96.1%;
+      --background: 0 0% 100%;
+      --foreground: 240 10% 3.9%;
+      --transition-duration: 200ms;
+      --transition-easing: ease-in-out;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: hsl(var(--background));
+      color: hsl(var(--foreground));
+      padding: 2rem;
+      margin: 0;
+      transition: all var(--transition-duration) var(--transition-easing);
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    .header h1 {
+      margin: 0;
+      margin-bottom: 0.5rem;
+    }
+
+    .header p {
+      margin: 0;
+      color: hsl(var(--foreground) / 0.7);
+      font-size: 0.95rem;
+    }
+
+    .test-section {
+      background: white;
+      border: 1px solid hsl(var(--secondary));
+      border-radius: 0.5rem;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      transition: all var(--transition-duration) var(--transition-easing);
+    }
+
+    .test-section h2 {
+      margin: 0 0 1rem 0;
+      font-size: 1.1rem;
+      color: hsl(var(--primary));
+    }
+
+    .color-box {
+      display: inline-block;
+      width: 100px;
+      height: 100px;
+      border-radius: 0.5rem;
+      margin-right: 1rem;
+      margin-bottom: 1rem;
+      border: 2px solid hsl(var(--secondary));
+      transition: all var(--transition-duration) var(--transition-easing);
+    }
+
+    .color-primary {
+      background: hsl(var(--primary));
+    }
+
+    .color-secondary {
+      background: hsl(var(--secondary));
+    }
+
+    .color-accent {
+      background: hsl(var(--accent));
+    }
+
+    .color-info {
+      font-family: 'Courier New', monospace;
+      font-size: 0.85rem;
+      color: hsl(var(--foreground) / 0.7);
+      margin-top: 0.5rem;
+    }
+
+    .button {
+      background: hsl(var(--primary));
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 500;
+      transition: all var(--transition-duration) var(--transition-easing);
+      margin-right: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .button:hover {
+      opacity: 0.9;
+      transform: translateY(-2px);
+    }
+
+    .console-output {
+      background: hsl(var(--foreground) / 0.05);
+      border-left: 4px solid hsl(var(--primary));
+      padding: 1rem;
+      border-radius: 0.25rem;
+      font-family: 'Courier New', monospace;
+      font-size: 0.85rem;
+      max-height: 300px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+
+    .status {
+      padding: 0.75rem 1rem;
+      border-radius: 0.5rem;
+      margin: 0.5rem 0;
+      font-weight: 500;
+    }
+
+    .status.ok {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+
+    .status.error {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+
+    .status.info {
+      background: #d1ecf1;
+      color: #0c5460;
+      border: 1px solid #bee5eb;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🧪 Teste de Variáveis CSS - Sistema de Tema</h1>
+      <p>Use esta página para testar se as variáveis CSS estão sendo injetadas corretamente</p>
+    </div>
+
+    <div class="test-section">
+      <h2>1. Verificar CSS Variables</h2>
+      <p>Clique no botão abaixo para verificar se as variáveis CSS estão sendo injetadas:</p>
+      <button class="button" onclick="checkCSSVariables()">Verificar CSS Variables</button>
+      <div id="cssVariablesOutput" class="console-output" style="display: none; margin-top: 1rem;"></div>
+    </div>
+
+    <div class="test-section">
+      <h2>2. Visualizar Cores</h2>
+      <p>Essas caixas mostram as cores atuais das variáveis CSS:</p>
+      <div>
+        <div>
+          <strong>Primary:</strong>
+          <div class="color-box color-primary"></div>
+          <div class="color-info" id="primaryValue">Carregando...</div>
+        </div>
+        <div style="margin-top: 1rem;">
+          <strong>Secondary:</strong>
+          <div class="color-box color-secondary"></div>
+          <div class="color-info" id="secondaryValue">Carregando...</div>
+        </div>
+        <div style="margin-top: 1rem;">
+          <strong>Accent:</strong>
+          <div class="color-box color-accent"></div>
+          <div class="color-info" id="accentValue">Carregando...</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="test-section">
+      <h2>3. Testar API de Tema</h2>
+      <p>Clique para buscar dados da API `/api/teacher/theme`:</p>
+      <button class="button" onclick="fetchThemeAPI()">Buscar Tema da API</button>
+      <div id="apiOutput" class="console-output" style="display: none; margin-top: 1rem;"></div>
+    </div>
+
+    <div class="test-section">
+      <h2>4. Status do Sistema</h2>
+      <div id="systemStatus"></div>
+    </div>
+
+    <div class="test-section">
+      <h2>5. Simulador de Mudança de Tema</h2>
+      <p>Altere as variáveis CSS abaixo para simular uma mudança de tema:</p>
+      <div style="margin-bottom: 1rem;">
+        <label>
+          Primary:
+          <input type="text" id="primaryInput" value="221.2 83.2% 53.3%" style="width: 200px;">
+          <button class="button" onclick="updatePrimary()">Atualizar</button>
+        </label>
+      </div>
+      <div>
+        <label>
+          Duration:
+          <input type="text" id="durationInput" value="200ms" style="width: 100px;">
+          <button class="button" onclick="updateDuration()">Atualizar</button>
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function checkCSSVariables() {
+      const root = document.documentElement;
+      const output = document.getElementById('cssVariablesOutput');
+
+      let result = '=== CSS VARIABLES INJETADAS ===\n\n';
+
+      const vars = [
+        '--primary',
+        '--secondary',
+        '--accent',
+        '--background',
+        '--foreground',
+        '--transition-duration',
+        '--transition-easing',
+        '--animations-enabled'
+      ];
+
+      vars.forEach(varName => {
+        const value = getComputedStyle(root).getPropertyValue(varName).trim();
+        result += `${varName}: ${value || 'NÃO INJETADA'}\n`;
+      });
+
+      result += '\n=== CLASSES ===\n';
+      result += `animations-enabled: ${root.classList.contains('animations-enabled')}\n`;
+
+      output.textContent = result;
+      output.style.display = 'block';
+    }
+
+    function fetchThemeAPI() {
+      const output = document.getElementById('apiOutput');
+      output.textContent = 'Carregando...';
+      output.style.display = 'block';
+
+      fetch('/api/teacher/theme')
+        .then(res => res.json())
+        .then(data => {
+          let result = 'Status: 200 OK\n\n';
+          result += 'Theme Name: ' + (data.themeName || 'default') + '\n';
+          result += 'Primary: ' + (data.palette?.primary || 'UNDEFINED') + '\n';
+          result += 'Secondary: ' + (data.palette?.secondary || 'UNDEFINED') + '\n';
+          result += 'Accent: ' + (data.palette?.accent || 'UNDEFINED') + '\n\n';
+          result += 'Resposta Completa:\n';
+          result += JSON.stringify(data, null, 2);
+
+          output.textContent = result;
+        })
+        .catch(err => {
+          output.textContent = 'ERRO: ' + err.message;
+        });
+    }
+
+    function updatePrimary() {
+      const value = document.getElementById('primaryInput').value;
+      document.documentElement.style.setProperty('--primary', value);
+      updateColorValues();
+    }
+
+    function updateDuration() {
+      const value = document.getElementById('durationInput').value;
+      document.documentElement.style.setProperty('--transition-duration', value);
+    }
+
+    function updateColorValues() {
+      const root = document.documentElement;
+      const primaryVar = getComputedStyle(root).getPropertyValue('--primary').trim();
+      const secondaryVar = getComputedStyle(root).getPropertyValue('--secondary').trim();
+      const accentVar = getComputedStyle(root).getPropertyValue('--accent').trim();
+
+      document.getElementById('primaryValue').textContent = `hsl(${primaryVar})`;
+      document.getElementById('secondaryValue').textContent = `hsl(${secondaryVar})`;
+      document.getElementById('accentValue').textContent = `hsl(${accentVar})`;
+    }
+
+    function updateSystemStatus() {
+      const root = document.documentElement;
+      const primary = getComputedStyle(root).getPropertyValue('--primary').trim();
+      const animationsEnabled = root.classList.contains('animations-enabled');
+      const transitionDuration = getComputedStyle(root).getPropertyValue('--transition-duration').trim();
+
+      let html = '';
+
+      // Primary
+      if (primary && primary !== '221.2 83.2% 53.3%') {
+        html += '<div class="status ok">✅ CSS Variables estão sendo injetadas</div>';
+      } else {
+        html += '<div class="status error">❌ CSS Variables não foram atualizadas</div>';
+      }
+
+      // Animations
+      if (animationsEnabled) {
+        html += '<div class="status ok">✅ Animações habilitadas</div>';
+      } else {
+        html += '<div class="status info">ℹ️  Animações desabilitadas</div>';
+      }
+
+      // Transition Duration
+      if (transitionDuration) {
+        html += '<div class="status ok">✅ Duração de transição: ' + transitionDuration + '</div>';
+      } else {
+        html += '<div class="status error">❌ Duração de transição não definida</div>';
+      }
+
+      document.getElementById('systemStatus').innerHTML = html;
+    }
+
+    // Inicializar
+    window.addEventListener('load', () => {
+      updateColorValues();
+      updateSystemStatus();
+    });
+
+    // Auto-atualizar status a cada 1 segundo
+    setInterval(updateSystemStatus, 1000);
+  </script>
+</body>
+
+</html>

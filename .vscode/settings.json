@@ -7,11 +7,9 @@
   },
   "editor.tabSize": 2,
   "editor.insertSpaces": true,
-  
   // TypeScript settings
   "typescript.tsdk": "node_modules/typescript/lib",
   "typescript.enablePromptUseWorkspaceTsdk": true,
-  
   // Files settings
   "files.exclude": {
     "**/.git": true,
@@ -19,7 +17,6 @@
     "**/node_modules": true,
     "**/.next": true
   },
-  
   // GitHub Copilot settings
   "github.copilot.enable": {
     "*": true,
@@ -28,11 +25,9 @@
     "scminput": false
   },
   "github.copilot.editor.enableAutoCompletions": true,
-  
   // GitHub Copilot Chat settings
   "github.copilot.chat.localeOverride": "pt-BR",
   "github.copilot.chat.useProjectTemplates": true,
-  
   // Workspace context for Copilot
   "github.copilot.advanced": {
     "debug.overrideEngine": "",
@@ -40,12 +35,10 @@
     "debug.overrideProxyUrl": "",
     "authProvider": "github"
   },
-  
   // Path intellisense
   "path-intellisense.mappings": {
     "@": "${workspaceFolder}/src"
   },
-  
   // ESLint settings
   "eslint.validate": [
     "javascript",
@@ -53,17 +46,16 @@
     "typescript",
     "typescriptreact"
   ],
-  
   // Prettier settings
   "prettier.singleQuote": true,
   "prettier.trailingComma": "es5",
   "prettier.semi": true,
-  
   // Search settings
   "search.exclude": {
     "**/node_modules": true,
     "**/package-lock.json": true,
     "**/.next": true,
     "**/dist": true
-  }
+  },
+  "prisma.pinToPrisma6": true
 }

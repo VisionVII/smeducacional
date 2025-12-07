@@ -13,26 +13,24 @@ const updateModuleSchema = z.object({
 // PUT /api/modules/[id] - Atualizar módulo
 export async function PUT(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await auth();
 
     if (!session?.user) {
-      return NextResponse.json(
-        { error: 'Não autenticado' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
     }
 
-    const module = await prisma.module.findUnique({
-      where: { id: params.id },
+    const { id } = await params;
+    const moduleData = await prisma.module.findUnique({
+      where: { id },
       include: {
         course: true,
       },
     });
 
-    if (!module) {
+    if (!moduleData) {
       return NextResponse.json(
         { error: 'Módulo não encontrado' },
         { status: 404 }
@@ -54,7 +52,7 @@ export async function PUT(
     const validatedData = updateModuleSchema.parse(body);
 
     const updatedModule = await prisma.module.update({
-      where: { id: params.id },
+      where: { id },
       data: validatedData,
       include: {
         lessons: true,
@@ -90,27 +88,25 @@ export async function PUT(
 // DELETE /api/modules/[id] - Deletar módulo
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await auth();
 
     if (!session?.user) {
-      return NextResponse.json(
-        { error: 'Não autenticado' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
     }
 
-    const module = await prisma.module.findUnique({
-      where: { id: params.id },
+    const { id } = await params;
+    const moduleData = await prisma.module.findUnique({
+      where: { id },
       include: {
         course: true,
         lessons: true,
       },
     });
 
-    if (!module) {
+    if (!moduleData) {
       return NextResponse.json(
         { error: 'Módulo não encontrado' },
         { status: 404 }
@@ -119,7 +115,7 @@ export async function DELETE(
 
     // Verificar permissão
     if (
-      module.course.instructorId !== session.user.id &&
+      moduleData.course.instructorId !== session.user.id &&
       session.user.role !== 'ADMIN'
     ) {
       return NextResponse.json(
@@ -138,7 +134,7 @@ export async function DELETE(
       data: {
         userId: session.user.id,
         action: 'DELETE_MODULE',
-        details: `Deletou o módulo "${module.title}" com ${module.lessons.length} aulas`,
+        details: `Deletou o módulo "${moduleData.title}" com ${moduleData.lessons.length} aulas`,
       },
     });
 

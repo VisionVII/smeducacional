@@ -76,8 +76,13 @@ export default async function TeacherDashboard() {
     },
   });
 
-  // Buscar mensagens não respondidas (placeholder - implementar depois)
-  const pendingMessages = 0;
+  // Buscar mensagens não lidas
+  const pendingMessages = await prisma.message.count({
+    where: {
+      receiverId: user.id,
+      isRead: false,
+    },
+  });
 
   // Calcular estatísticas
   const totalStudents = courses.reduce(
@@ -119,10 +124,10 @@ export default async function TeacherDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background transition-theme">
       <div className="container mx-auto px-4 py-8 space-y-8">
         {/* Hero Section - Perfil do Professor */}
-        <Card className="border-2">
+        <Card className="border-2 transition-theme">
           <CardContent className="pt-6">
             <div className="flex flex-col md:flex-row gap-6 items-start">
               {/* Avatar e Info Principal */}
@@ -195,12 +200,12 @@ export default async function TeacherDashboard() {
 
         {/* KPIs Principais */}
         <div className="grid md:grid-cols-4 gap-6">
-          <Card className="hover:shadow-lg transition-shadow">
+          <Card className="hover:shadow-lg transition-all transition-theme">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
                 Cursos Publicados
               </CardTitle>
-              <BookOpen className="h-4 w-4 text-primary" />
+              <BookOpen className="h-4 w-4 text-primary transition-theme" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{stats.publishedCourses}</div>
@@ -210,12 +215,12 @@ export default async function TeacherDashboard() {
             </CardContent>
           </Card>
 
-          <Card className="hover:shadow-lg transition-shadow">
+          <Card className="hover:shadow-lg transition-all transition-theme">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
                 Alunos Ativos
               </CardTitle>
-              <Users className="h-4 w-4 text-blue-600" />
+              <Users className="h-4 w-4 text-primary transition-theme" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{stats.totalStudents}</div>
@@ -225,10 +230,10 @@ export default async function TeacherDashboard() {
             </CardContent>
           </Card>
 
-          <Card className="hover:shadow-lg transition-shadow">
+          <Card className="hover:shadow-lg transition-all transition-theme">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Conteúdos</CardTitle>
-              <Video className="h-4 w-4 text-purple-600" />
+              <Video className="h-4 w-4 text-primary transition-theme" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{stats.totalLessons}</div>
@@ -236,10 +241,10 @@ export default async function TeacherDashboard() {
             </CardContent>
           </Card>
 
-          <Card className="hover:shadow-lg transition-shadow">
+          <Card className="hover:shadow-lg transition-all transition-theme">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Mensagens</CardTitle>
-              <MessageSquare className="h-4 w-4 text-orange-600" />
+              <MessageSquare className="h-4 w-4 text-primary transition-theme" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{stats.pendingMessages}</div>
@@ -255,7 +260,7 @@ export default async function TeacherDashboard() {
           {/* Coluna Esquerda - Atuação Pedagógica */}
           <div className="lg:col-span-2 space-y-6">
             {/* Meus Cursos */}
-            <Card>
+            <Card className="transition-theme">
               <CardHeader className="flex flex-row items-center justify-between">
                 <div>
                   <CardTitle>Atuação Pedagógica</CardTitle>
@@ -286,7 +291,7 @@ export default async function TeacherDashboard() {
                     {recentCourses.map((course) => (
                       <div
                         key={course.id}
-                        className="border rounded-lg p-4 hover:bg-accent/50 transition-colors"
+                        className="border rounded-lg p-4 hover:bg-accent/50 transition-colors transition-theme"
                       >
                         <div className="flex justify-between items-start mb-2">
                           <div className="flex-1">
@@ -363,7 +368,7 @@ export default async function TeacherDashboard() {
             </Card>
 
             {/* Atividades Recentes */}
-            <Card>
+            <Card className="transition-theme">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Target className="h-5 w-5" />
@@ -373,8 +378,8 @@ export default async function TeacherDashboard() {
               <CardContent>
                 <div className="space-y-3">
                   {stats.draftCourses > 0 && (
-                    <div className="flex items-start gap-3 p-3 border rounded-lg">
-                      <AlertCircle className="h-5 w-5 text-yellow-600 mt-0.5" />
+                    <div className="flex items-start gap-3 p-3 border rounded-lg transition-colors transition-theme">
+                      <AlertCircle className="h-5 w-5 text-primary mt-0.5 transition-theme" />
                       <div className="flex-1">
                         <p className="font-medium text-sm">
                           Cursos em rascunho
@@ -391,8 +396,8 @@ export default async function TeacherDashboard() {
                   )}
 
                   {stats.pendingMessages > 0 && (
-                    <div className="flex items-start gap-3 p-3 border rounded-lg">
-                      <MessageSquare className="h-5 w-5 text-blue-600 mt-0.5" />
+                    <div className="flex items-start gap-3 p-3 border rounded-lg transition-colors transition-theme">
+                      <MessageSquare className="h-5 w-5 text-primary mt-0.5 transition-theme" />
                       <div className="flex-1">
                         <p className="font-medium text-sm">
                           Mensagens pendentes
@@ -424,7 +429,7 @@ export default async function TeacherDashboard() {
           {/* Coluna Direita - Insights & Widgets */}
           <div className="space-y-6">
             {/* Perfil - Conclusão */}
-            <Card>
+            <Card className="transition-theme">
               <CardHeader>
                 <CardTitle className="text-base">
                   Completude do Perfil
@@ -436,9 +441,9 @@ export default async function TeacherDashboard() {
                     <span className="text-muted-foreground">Progresso</span>
                     <span className="font-semibold">{profileCompletion}%</span>
                   </div>
-                  <div className="h-2 bg-secondary rounded-full overflow-hidden">
+                  <div className="h-2 bg-secondary rounded-full overflow-hidden transition-theme">
                     <div
-                      className="h-full bg-primary transition-all"
+                      className="h-full bg-primary transition-all transition-theme"
                       style={{ width: `${profileCompletion}%` }}
                     />
                   </div>
@@ -466,7 +471,7 @@ export default async function TeacherDashboard() {
             </Card>
 
             {/* Performance */}
-            <Card>
+            <Card className="transition-theme">
               <CardHeader>
                 <CardTitle className="text-base flex items-center gap-2">
                   <Star className="h-4 w-4 text-yellow-500" />
@@ -480,7 +485,7 @@ export default async function TeacherDashboard() {
                     {[1, 2, 3, 4, 5].map((star) => (
                       <Star
                         key={star}
-                        className="h-4 w-4 fill-yellow-400 text-yellow-400"
+                        className="h-4 w-4 fill-yellow-400 text-yellow-400 transition-theme"
                       />
                     ))}
                   </div>
@@ -507,7 +512,7 @@ export default async function TeacherDashboard() {
             </Card>
 
             {/* Comunicação */}
-            <Card>
+            <Card className="transition-theme">
               <CardHeader>
                 <CardTitle className="text-base flex items-center gap-2">
                   <MessageSquare className="h-4 w-4" />
@@ -546,7 +551,7 @@ export default async function TeacherDashboard() {
             </Card>
 
             {/* Acesso Rápido */}
-            <Card>
+            <Card className="transition-theme">
               <CardHeader>
                 <CardTitle className="text-base">Acesso Rápido</CardTitle>
               </CardHeader>
@@ -554,7 +559,7 @@ export default async function TeacherDashboard() {
                 <Button
                   asChild
                   variant="outline"
-                  className="w-full justify-start"
+                  className="w-full justify-start transition-theme"
                   size="sm"
                 >
                   <Link href="/teacher/courses/new">
@@ -565,7 +570,7 @@ export default async function TeacherDashboard() {
                 <Button
                   asChild
                   variant="outline"
-                  className="w-full justify-start"
+                  className="w-full justify-start transition-theme"
                   size="sm"
                 >
                   <Link href="/teacher/profile">
@@ -576,7 +581,7 @@ export default async function TeacherDashboard() {
                 <Button
                   asChild
                   variant="outline"
-                  className="w-full justify-start"
+                  className="w-full justify-start transition-theme"
                   size="sm"
                 >
                   <Link href="/teacher/messages">
@@ -590,7 +595,7 @@ export default async function TeacherDashboard() {
         </div>
 
         {/* Footer - Insights Rápidos */}
-        <Card className="bg-accent/50">
+        <Card className="bg-accent/50 transition-theme">
           <CardContent className="py-4">
             <div className="grid md:grid-cols-4 gap-4 text-center text-sm">
               <div className="space-y-1">

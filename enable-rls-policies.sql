@@ -681,3 +681,84 @@ CREATE POLICY "support_tickets_admin_all" ON public.support_tickets
     EXISTS (SELECT 1 FROM public.users WHERE id = auth.uid()::text AND role = 'ADMIN')
   );
 
+-- ====================================
+-- POLÍTICAS PARA TEACHER_EDUCATION
+-- ====================================
+
+ALTER TABLE public.teacher_education ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "teacher_education_select_own" ON public.teacher_education;
+CREATE POLICY "teacher_education_select_own" ON public.teacher_education
+  FOR SELECT TO authenticated
+  USING ((SELECT auth.uid()::text) = "userId");
+
+DROP POLICY IF EXISTS "teacher_education_insert_own" ON public.teacher_education;
+CREATE POLICY "teacher_education_insert_own" ON public.teacher_education
+  FOR INSERT TO authenticated
+  WITH CHECK ((SELECT auth.uid()::text) = "userId");
+
+DROP POLICY IF EXISTS "teacher_education_update_own" ON public.teacher_education;
+CREATE POLICY "teacher_education_update_own" ON public.teacher_education
+  FOR UPDATE TO authenticated
+  USING ((SELECT auth.uid()::text) = "userId")
+  WITH CHECK ((SELECT auth.uid()::text) = "userId");
+
+DROP POLICY IF EXISTS "teacher_education_delete_own" ON public.teacher_education;
+CREATE POLICY "teacher_education_delete_own" ON public.teacher_education
+  FOR DELETE TO authenticated
+  USING ((SELECT auth.uid()::text) = "userId");
+
+-- ====================================
+-- POLÍTICAS PARA TEACHER_FINANCIAL
+-- ====================================
+
+ALTER TABLE public.teacher_financial ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "teacher_financial_select_own" ON public.teacher_financial;
+CREATE POLICY "teacher_financial_select_own" ON public.teacher_financial
+  FOR SELECT TO authenticated
+  USING ((SELECT auth.uid()::text) = "userId");
+
+DROP POLICY IF EXISTS "teacher_financial_insert_own" ON public.teacher_financial;
+CREATE POLICY "teacher_financial_insert_own" ON public.teacher_financial
+  FOR INSERT TO authenticated
+  WITH CHECK ((SELECT auth.uid()::text) = "userId");
+
+DROP POLICY IF EXISTS "teacher_financial_update_own" ON public.teacher_financial;
+CREATE POLICY "teacher_financial_update_own" ON public.teacher_financial
+  FOR UPDATE TO authenticated
+  USING ((SELECT auth.uid()::text) = "userId")
+  WITH CHECK ((SELECT auth.uid()::text) = "userId");
+
+DROP POLICY IF EXISTS "teacher_financial_delete_own" ON public.teacher_financial;
+CREATE POLICY "teacher_financial_delete_own" ON public.teacher_financial
+  FOR DELETE TO authenticated
+  USING ((SELECT auth.uid()::text) = "userId");
+
+-- ====================================
+-- POLÍTICAS PARA TEACHER_THEMES
+-- ====================================
+
+ALTER TABLE public.teacher_themes ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "teacher_themes_select_own" ON public.teacher_themes;
+CREATE POLICY "teacher_themes_select_own" ON public.teacher_themes
+  FOR SELECT TO authenticated
+  USING ((SELECT auth.uid()::text) = user_id);
+
+DROP POLICY IF EXISTS "teacher_themes_insert_own" ON public.teacher_themes;
+CREATE POLICY "teacher_themes_insert_own" ON public.teacher_themes
+  FOR INSERT TO authenticated
+  WITH CHECK ((SELECT auth.uid()::text) = user_id);
+
+DROP POLICY IF EXISTS "teacher_themes_update_own" ON public.teacher_themes;
+CREATE POLICY "teacher_themes_update_own" ON public.teacher_themes
+  FOR UPDATE TO authenticated
+  USING ((SELECT auth.uid()::text) = user_id)
+  WITH CHECK ((SELECT auth.uid()::text) = user_id);
+
+DROP POLICY IF EXISTS "teacher_themes_delete_own" ON public.teacher_themes;
+CREATE POLICY "teacher_themes_delete_own" ON public.teacher_themes
+  FOR DELETE TO authenticated
+  USING ((SELECT auth.uid()::text) = user_id);
+

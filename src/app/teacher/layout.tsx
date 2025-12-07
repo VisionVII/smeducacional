@@ -3,7 +3,16 @@ import { auth } from '@/lib/auth';
 import { Navbar } from '@/components/navbar';
 import { Footer } from '@/components/footer';
 import { Breadcrumbs } from '@/components/breadcrumbs';
-import { BookOpen, Plus, LayoutDashboard, Users, MessageSquare, User } from 'lucide-react';
+import { TeacherThemeProvider } from '@/components/teacher-theme-provider';
+import {
+  BookOpen,
+  Plus,
+  LayoutDashboard,
+  Users,
+  MessageSquare,
+  User,
+  Palette,
+} from 'lucide-react';
 
 export default async function TeacherLayout({
   children,
@@ -42,18 +51,25 @@ export default async function TeacherLayout({
       label: 'Perfil',
       icon: <User className="h-4 w-4" />,
     },
+    {
+      href: '/teacher/theme',
+      label: 'Tema',
+      icon: <Palette className="h-4 w-4" />,
+    },
   ];
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Navbar user={session.user} links={teacherLinks} />
-      <main className="flex-1">
-        <div className="container mx-auto px-4 py-6">
-          <Breadcrumbs />
-          {children}
-        </div>
-      </main>
-      <Footer />
-    </div>
+    <TeacherThemeProvider>
+      <div className="min-h-screen flex flex-col">
+        <Navbar user={session.user} links={teacherLinks} />
+        <main className="flex-1">
+          <div className="container mx-auto px-4 py-6">
+            <Breadcrumbs />
+            {children}
+          </div>
+        </main>
+        <Footer />
+      </div>
+    </TeacherThemeProvider>
   );
 }

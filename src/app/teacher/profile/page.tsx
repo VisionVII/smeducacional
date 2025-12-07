@@ -1,7 +1,7 @@
 'use client';
 
 import { useSession } from 'next-auth/react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Card,
   CardContent,
@@ -42,6 +42,14 @@ type TabType =
   | 'financeiro'
   | 'seguranca';
 
+type Education = {
+  id: string;
+  degree: string;
+  institution: string;
+  field: string;
+  year: number;
+};
+
 export default function TeacherProfilePage() {
   const { data: session, update } = useSession();
   const { toast } = useToast();
@@ -60,20 +68,81 @@ export default function TeacherProfilePage() {
     newPassword: '',
     confirmPassword: '',
   });
-  const [education, setEducation] = useState([
-    {
-      degree: 'Graduação',
-      institution: 'Universidade Federal',
-      field: 'Pedagogia',
-      year: 2015,
-    },
-  ]);
+  const [education, setEducation] = useState<Education[]>([]);
   const [newEducation, setNewEducation] = useState({
     degree: '',
     institution: '',
     field: '',
     year: new Date().getFullYear(),
   });
+  const [financialData, setFinancialData] = useState({
+    bank: '',
+    agency: '',
+    account: '',
+    accountType: '',
+    pixKey: '',
+  });
+  const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
+  const [qrCodeUrl, setQrCodeUrl] = useState('');
+  const [twoFactorToken, setTwoFactorToken] = useState('');
+
+  // Carregar dados do perfil ao montar o componente
+  useEffect(() => {
+    const loadProfileData = async () => {
+      try {
+        // Carregar dados pessoais
+        const profileRes = await fetch('/api/teacher/profile');
+        if (profileRes.ok) {
+          const profileData = await profileRes.json();
+          setFormData({
+            name: profileData.name || '',
+            email: profileData.email || '',
+            bio: profileData.bio || '',
+            phone: profileData.phone || '',
+            cpf: profileData.cpf || '',
+            address: profileData.address || '',
+          });
+        }
+
+        // Carregar formação acadêmica
+        const educationRes = await fetch('/api/teacher/education');
+        if (educationRes.ok) {
+          const educationData = await educationRes.json();
+          if (educationData.length > 0) {
+            setEducation(educationData);
+          }
+        }
+
+        // Carregar dados financeiros
+        const financialRes = await fetch('/api/teacher/financial');
+        if (financialRes.ok) {
+          const financialDataRes = await financialRes.json();
+          if (financialDataRes) {
+            setFinancialData({
+              bank: financialDataRes.bank || '',
+              agency: financialDataRes.agency || '',
+              account: financialDataRes.account || '',
+              accountType: financialDataRes.accountType || '',
+              pixKey: financialDataRes.pixKey || '',
+            });
+          }
+        }
+
+        // Verificar status 2FA
+        const twoFactorRes = await fetch('/api/teacher/2fa/status');
+        if (twoFactorRes.ok) {
+          const twoFactorData = await twoFactorRes.json();
+          setTwoFactorEnabled(twoFactorData.enabled || false);
+        }
+      } catch (error) {
+        console.error('Erro ao carregar dados:', error);
+      }
+    };
+
+    if (session?.user) {
+      loadProfileData();
+    }
+  }, [session]);
 
   const handleProfileUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -151,7 +220,7 @@ export default function TeacherProfilePage() {
     }
   };
 
-  const handleAddEducation = () => {
+  const handleAddEducation = async () => {
     if (!newEducation.degree || !newEducation.institution) {
       toast({
         title: 'Campos obrigatórios',
@@ -160,17 +229,230 @@ export default function TeacherProfilePage() {
       });
       return;
     }
-    setEducation([...education, newEducation]);
-    setNewEducation({
-      degree: '',
-      institution: '',
-      field: '',
-      year: new Date().getFullYear(),
-    });
-    toast({
-      title: 'Qualificação adicionada',
-      description: 'Sua qualificação foi registrada com sucesso.',
-    });
+
+    setIsLoading(true);
+    try {
+      const res = await fetch('/api/teacher/education', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newEducation),
+      });
+
+      if (!res.ok) throw new Error('Erro ao adicionar');
+
+      const savedEducation = await res.json();
+      setEducation([...education, savedEducation]);
+      setNewEducation({
+        degree: '',
+        institution: '',
+        field: '',
+        year: new Date().getFullYear(),
+      });
+
+      toast({
+        title: 'Qualificação adicionada',
+        description: 'Sua qualificação foi registrada com sucesso.',
+      });
+    } catch (error) {
+      toast({
+        title: 'Erro',
+        description: 'Não foi possível adicionar qualificação.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleRemoveEducation = async (id: string) => {
+    setIsLoading(true);
+    try {
+      const res = await fetch(`/api/teacher/education/${id}`, {
+        method: 'DELETE',
+      });
+
+      if (!res.ok) throw new Error('Erro ao remover');
+
+      setEducation(education.filter((edu) => edu.id !== id));
+
+      toast({
+        title: 'Qualificação removida',
+        description: 'Registro excluído com sucesso.',
+      });
+    } catch (error) {
+      toast({
+        title: 'Erro',
+        description: 'Não foi possível remover qualificação.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    setIsLoading(true);
+    try {
+      const res = await fetch('/api/teacher/avatar', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!res.ok) throw new Error('Erro ao fazer upload');
+
+      const data = await res.json();
+      await update();
+
+      toast({
+        title: 'Avatar atualizado',
+        description: 'Sua foto foi atualizada com sucesso.',
+      });
+    } catch (error) {
+      toast({
+        title: 'Erro',
+        description: 'Não foi possível fazer upload da imagem.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleFinancialUpdate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    try {
+      const res = await fetch('/api/teacher/financial', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(financialData),
+      });
+
+      if (!res.ok) throw new Error('Erro ao atualizar dados');
+
+      toast({
+        title: 'Dados atualizados',
+        description: 'Informações financeiras salvas com sucesso.',
+      });
+    } catch (error) {
+      toast({
+        title: 'Erro',
+        description: 'Não foi possível atualizar os dados.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleEnable2FA = async () => {
+    setIsLoading(true);
+    try {
+      const res = await fetch('/api/teacher/2fa/enable', {
+        method: 'POST',
+      });
+
+      if (!res.ok) throw new Error('Erro ao ativar 2FA');
+
+      const data = await res.json();
+      setQrCodeUrl(data.qrCode);
+
+      toast({
+        title: '2FA em configuração',
+        description: 'Escaneie o QR Code com seu aplicativo autenticador.',
+      });
+    } catch (error) {
+      toast({
+        title: 'Erro',
+        description: 'Não foi possível ativar 2FA.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleVerify2FA = async () => {
+    if (!twoFactorToken) {
+      toast({
+        title: 'Erro',
+        description: 'Digite o código do autenticador.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const res = await fetch('/api/teacher/2fa/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: twoFactorToken }),
+      });
+
+      if (!res.ok) throw new Error('Código inválido');
+
+      setTwoFactorEnabled(true);
+      setQrCodeUrl('');
+      setTwoFactorToken('');
+
+      toast({
+        title: '2FA ativado',
+        description: 'Autenticação de dois fatores configurada com sucesso.',
+      });
+    } catch (error) {
+      toast({
+        title: 'Erro',
+        description: 'Código inválido ou expirado.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleDisable2FA = async () => {
+    if (!twoFactorToken) {
+      toast({
+        title: 'Erro',
+        description: 'Digite o código do autenticador para desativar.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const res = await fetch('/api/teacher/2fa/disable', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: twoFactorToken }),
+      });
+
+      if (!res.ok) throw new Error('Erro ao desativar');
+
+      setTwoFactorEnabled(false);
+      setTwoFactorToken('');
+
+      toast({
+        title: '2FA desativado',
+        description: 'Autenticação de dois fatores foi removida.',
+      });
+    } catch (error) {
+      toast({
+        title: 'Erro',
+        description: 'Não foi possível desativar 2FA.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -186,9 +468,20 @@ export default function TeacherProfilePage() {
                 {session?.user?.name?.charAt(0) || 'P'}
               </AvatarFallback>
             </Avatar>
-            <button className="absolute bottom-0 right-0 bg-primary text-white p-2 rounded-full hover:bg-primary/90 transition-colors">
+            <label
+              htmlFor="avatar-upload"
+              className="absolute bottom-0 right-0 bg-primary text-white p-2 rounded-full hover:bg-primary/90 transition-colors cursor-pointer"
+            >
               <Upload className="h-4 w-4" />
-            </button>
+              <input
+                id="avatar-upload"
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleAvatarUpload}
+                disabled={isLoading}
+              />
+            </label>
           </div>
 
           {/* Info Principal */}
@@ -367,9 +660,8 @@ export default function TeacherProfilePage() {
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => {
-                          setEducation(education.filter((_, i) => i !== idx));
-                        }}
+                        onClick={() => handleRemoveEducation(edu.id)}
+                        disabled={isLoading}
                       >
                         <X className="h-4 w-4" />
                       </Button>
@@ -553,28 +845,79 @@ export default function TeacherProfilePage() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label>Banco</Label>
-                  <Input placeholder="Ex: Banco do Brasil..." />
+              <form onSubmit={handleFinancialUpdate}>
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Banco</Label>
+                    <Input
+                      placeholder="Ex: Banco do Brasil..."
+                      value={financialData.bank}
+                      onChange={(e) =>
+                        setFinancialData({
+                          ...financialData,
+                          bank: e.target.value,
+                        })
+                      }
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Agência</Label>
+                    <Input
+                      placeholder="Número da agência"
+                      value={financialData.agency}
+                      onChange={(e) =>
+                        setFinancialData({
+                          ...financialData,
+                          agency: e.target.value,
+                        })
+                      }
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Conta</Label>
+                    <Input
+                      placeholder="Número da conta"
+                      value={financialData.account}
+                      onChange={(e) =>
+                        setFinancialData({
+                          ...financialData,
+                          account: e.target.value,
+                        })
+                      }
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Tipo de Conta</Label>
+                    <Input
+                      placeholder="Corrente, Poupança..."
+                      value={financialData.accountType}
+                      onChange={(e) =>
+                        setFinancialData({
+                          ...financialData,
+                          accountType: e.target.value,
+                        })
+                      }
+                    />
+                  </div>
+                  <div className="space-y-2 md:col-span-2">
+                    <Label>Chave PIX (opcional)</Label>
+                    <Input
+                      placeholder="CPF, Email, Celular ou Chave aleatória"
+                      value={financialData.pixKey}
+                      onChange={(e) =>
+                        setFinancialData({
+                          ...financialData,
+                          pixKey: e.target.value,
+                        })
+                      }
+                    />
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  <Label>Agência</Label>
-                  <Input placeholder="Número da agência" />
-                </div>
-                <div className="space-y-2">
-                  <Label>Conta</Label>
-                  <Input placeholder="Número da conta" type="password" />
-                </div>
-                <div className="space-y-2">
-                  <Label>Tipo de Conta</Label>
-                  <Input placeholder="Corrente, Poupança..." />
-                </div>
-              </div>
-              <Button>
-                <Save className="h-4 w-4 mr-2" />
-                Salvar Dados Bancários
-              </Button>
+                <Button type="submit" disabled={isLoading} className="mt-4">
+                  <Save className="h-4 w-4 mr-2" />
+                  Salvar Dados Bancários
+                </Button>
+              </form>
             </CardContent>
           </Card>
         )}
@@ -656,13 +999,84 @@ export default function TeacherProfilePage() {
                   Autenticação de Dois Fatores
                 </CardTitle>
               </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground mb-4">
+              <CardContent className="space-y-4">
+                <p className="text-sm text-muted-foreground">
                   Adicione uma camada extra de segurança à sua conta
                 </p>
-                <Button variant="outline">
-                  Ativar Autenticação de Dois Fatores
-                </Button>
+
+                {!twoFactorEnabled && !qrCodeUrl && (
+                  <Button onClick={handleEnable2FA} disabled={isLoading}>
+                    <Shield className="h-4 w-4 mr-2" />
+                    Ativar Autenticação de Dois Fatores
+                  </Button>
+                )}
+
+                {qrCodeUrl && (
+                  <div className="space-y-4 border rounded-lg p-4">
+                    <div className="flex items-start gap-2">
+                      <AlertCircle className="h-5 w-5 text-orange-500 mt-0.5" />
+                      <div>
+                        <p className="font-medium">Escaneie o QR Code</p>
+                        <p className="text-sm text-muted-foreground">
+                          Use um app autenticador como Google Authenticator ou
+                          Authy
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex justify-center">
+                      <img
+                        src={qrCodeUrl}
+                        alt="QR Code 2FA"
+                        className="w-48 h-48"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Código do Autenticador</Label>
+                      <Input
+                        placeholder="000000"
+                        maxLength={6}
+                        value={twoFactorToken}
+                        onChange={(e) => setTwoFactorToken(e.target.value)}
+                      />
+                    </div>
+                    <Button onClick={handleVerify2FA} disabled={isLoading}>
+                      <CheckCircle2 className="h-4 w-4 mr-2" />
+                      Verificar e Ativar
+                    </Button>
+                  </div>
+                )}
+
+                {twoFactorEnabled && (
+                  <div className="space-y-4 border border-green-200 rounded-lg p-4 bg-green-50">
+                    <div className="flex items-start gap-2">
+                      <CheckCircle2 className="h-5 w-5 text-green-600 mt-0.5" />
+                      <div>
+                        <p className="font-medium text-green-900">2FA Ativo</p>
+                        <p className="text-sm text-green-700">
+                          Sua conta está protegida com autenticação de dois
+                          fatores
+                        </p>
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Código para desativar</Label>
+                      <Input
+                        placeholder="000000"
+                        maxLength={6}
+                        value={twoFactorToken}
+                        onChange={(e) => setTwoFactorToken(e.target.value)}
+                      />
+                    </div>
+                    <Button
+                      variant="destructive"
+                      onClick={handleDisable2FA}
+                      disabled={isLoading}
+                    >
+                      <X className="h-4 w-4 mr-2" />
+                      Desativar 2FA
+                    </Button>
+                  </div>
+                )}
               </CardContent>
             </Card>
 

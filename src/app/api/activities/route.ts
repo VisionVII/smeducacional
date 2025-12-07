@@ -1,22 +1,22 @@
-import { NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
-import { prisma } from "@/lib/db";
+import { NextResponse } from 'next/server';
+import { auth } from '@/lib/auth';
+import { prisma } from '@/lib/db';
 
 export async function GET(request: Request) {
   try {
     const session = await auth();
 
     if (!session) {
-      return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
+      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     }
 
     const { searchParams } = new URL(request.url);
-    const courseId = searchParams.get("courseId");
-    const moduleId = searchParams.get("moduleId");
+    const courseId = searchParams.get('courseId');
+    const moduleId = searchParams.get('moduleId');
 
-    let where: any = {};
+    const where: any = {};
 
-    if (session.user.role === "STUDENT") {
+    if (session.user.role === 'STUDENT') {
       // Buscar apenas atividades dos cursos matriculados
       const enrollments = await prisma.enrollment.findMany({
         where: { studentId: session.user.id },
@@ -36,22 +36,25 @@ export async function GET(request: Request) {
     const activities = await prisma.activity.findMany({
       where,
       include: {
-        submissions: session.user.role === "STUDENT" ? {
-          where: {
-            studentId: session.user.id,
-          },
-        } : true,
+        submissions:
+          session.user.role === 'STUDENT'
+            ? {
+                where: {
+                  studentId: session.user.id,
+                },
+              }
+            : true,
       },
       orderBy: {
-        dueDate: "asc",
+        dueDate: 'asc',
       },
     });
 
     return NextResponse.json(activities);
   } catch (error) {
-    console.error("Erro ao buscar atividades:", error);
+    console.error('Erro ao buscar atividades:', error);
     return NextResponse.json(
-      { error: "Erro ao buscar atividades" },
+      { error: 'Erro ao buscar atividades' },
       { status: 500 }
     );
   }
@@ -61,8 +64,11 @@ export async function POST(request: Request) {
   try {
     const session = await auth();
 
-    if (!session || (session.user.role !== "TEACHER" && session.user.role !== "ADMIN")) {
-      return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
+    if (
+      !session ||
+      (session.user.role !== 'TEACHER' && session.user.role !== 'ADMIN')
+    ) {
+      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     }
 
     const data = await request.json();
@@ -80,19 +86,19 @@ export async function POST(request: Request) {
     });
 
     // Buscar o módulo para pegar o curso
-    const module = await prisma.module.findUnique({
+    const moduleData = await prisma.module.findUnique({
       where: { id: data.moduleId },
       include: {
         course: true,
       },
     });
 
-    if (module) {
+    if (moduleData) {
       // Notificar alunos matriculados
       const enrollments = await prisma.enrollment.findMany({
         where: {
           courseId: module.courseId,
-          status: "ACTIVE",
+          status: 'ACTIVE',
         },
       });
 
@@ -101,9 +107,9 @@ export async function POST(request: Request) {
           prisma.notification.create({
             data: {
               userId: enrollment.studentId,
-              title: "Nova atividade disponível!",
+              title: 'Nova atividade disponível!',
               message: `Uma nova atividade foi adicionada ao curso ${module.course.title}`,
-              type: "ACTIVITY",
+              type: 'ACTIVITY',
             },
           })
         )
@@ -112,9 +118,9 @@ export async function POST(request: Request) {
 
     return NextResponse.json(activity, { status: 201 });
   } catch (error) {
-    console.error("Erro ao criar atividade:", error);
+    console.error('Erro ao criar atividade:', error);
     return NextResponse.json(
-      { error: "Erro ao criar atividade" },
+      { error: 'Erro ao criar atividade' },
       { status: 500 }
     );
   }

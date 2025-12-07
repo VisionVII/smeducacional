@@ -2,25 +2,36 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { getToken } from 'next-auth/jwt';
 
-const PUBLIC_ROUTES = new Set(['/', '/login', '/register', '/forgot-password', '/courses', '/about']);
+const PUBLIC_ROUTES = new Set([
+  '/',
+  '/login',
+  '/register',
+  '/forgot-password',
+  '/courses',
+  '/about',
+  '/contact',
+  '/faq',
+  '/privacy',
+  '/terms',
+]);
 
 // Security headers para todas as respostas
 function addSecurityHeaders(response: NextResponse): NextResponse {
   // Prevenir clickjacking
   response.headers.set('X-Frame-Options', 'DENY');
-  
+
   // Prevenir MIME type sniffing
   response.headers.set('X-Content-Type-Options', 'nosniff');
-  
+
   // Ativar proteção XSS do navegador
   response.headers.set('X-XSS-Protection', '1; mode=block');
-  
+
   // Referrer Policy
   response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
-  
+
   // Permissions Policy (anteriormente Feature Policy)
   response.headers.set(
-    'Permissions-Policy', 
+    'Permissions-Policy',
     'camera=(), microphone=(), geolocation=(), interest-cohort=()'
   );
 
@@ -29,7 +40,10 @@ function addSecurityHeaders(response: NextResponse): NextResponse {
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
+  const token = await getToken({
+    req: request,
+    secret: process.env.NEXTAUTH_SECRET,
+  });
 
   const isAuthRoute = pathname.startsWith('/api/auth');
   const isPublicRoute = PUBLIC_ROUTES.has(pathname) || isAuthRoute;

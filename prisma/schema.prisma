@@ -46,6 +46,10 @@ model User {
   avatar        String?
   phone         String?
   bio           String?
+  cpf           String?
+  address       String?
+  twoFactorEnabled Boolean @default(false)
+  twoFactorSecret String?
   emailVerified DateTime?
   resetCode     String?
   resetCodeExpires DateTime?
@@ -59,13 +63,15 @@ model User {
   createdCourses   Course[]        @relation("CourseCreator")
   activities       Activity[]      @relation("ActivityCreator")
   submissions      Submission[]
-  grades           Grade[]
-  gradedActivities Grade[]         @relation("GradedBy")
   notifications    Notification[]
   sentMessages     Message[]       @relation("MessageSender")
   receivedMessages Message[]       @relation("MessageReceiver")
   supportTickets   SupportTicket[]
   activityLogs     ActivityLog[]
+  teacherEducation TeacherEducation[]
+  teacherFinancial TeacherFinancial?
+  teacherTheme     TeacherTheme?
+  landingConfig    Json?
 
   @@map("users")
 }
@@ -282,9 +288,7 @@ model Grade {
 
   // Relações
   submission Submission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
-  student    User    @relation(fields: [studentId], references: [id], onDelete: Cascade)
   activity   Activity   @relation(fields: [activityId], references: [id], onDelete: Cascade)
-  gradedBy   User       @relation("GradedBy", fields: [gradedById], references: [id], onDelete: Cascade)
 
   @@index([studentId])
   @@index([activityId])
@@ -357,4 +361,64 @@ model ActivityLog {
   @@index([userId])
   @@index([createdAt])
   @@map("activity_logs")
+}
+
+model TeacherEducation {
+  id          String   @id @default(cuid())
+  degree      String   // Graduação, Pós-graduação, Mestrado, Doutorado
+  institution String
+  field       String   // Área de formação
+  year        Int
+  userId      String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relações
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("teacher_education")
+}
+
+model TeacherFinancial {
+  id          String   @id @default(cuid())
+  bank        String
+  agency      String
+  account     String
+  accountType String   // Corrente, Poupança
+  pixKey      String?
+  userId      String   @unique
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relações
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("teacher_financial")
+}
+
+model TeacherTheme {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  
+  // Paleta de cores (HSL values)
+  palette   Json     @default("{\"background\":\"0 0% 100%\",\"foreground\":\"240 10% 3.9%\",\"primary\":\"221.2 83.2% 53.3%\",\"primaryForeground\":\"210 40% 98%\",\"secondary\":\"210 40% 96.1%\",\"secondaryForeground\":\"222.2 47.4% 11.2%\",\"accent\":\"210 40% 96.1%\",\"accentForeground\":\"222.2 47.4% 11.2%\",\"card\":\"0 0% 100%\",\"cardForeground\":\"240 10% 3.9%\",\"muted\":\"210 40% 96.1%\",\"mutedForeground\":\"215.4 16.3% 46.9%\"}")
+  
+  // Layout e estilos
+  layout    Json     @default("{\"cardStyle\":\"default\",\"borderRadius\":\"0.5rem\",\"shadowIntensity\":\"medium\",\"spacing\":\"comfortable\"}")
+  
+  // Animações
+  animations Json   @default("{\"enabled\":true,\"duration\":\"normal\",\"easing\":\"ease-in-out\",\"transitions\":[\"all\"],\"hover\":true,\"focus\":true,\"pageTransitions\":true}")
+  
+  // Nome do tema (opcional, para presets)
+  themeName String?
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relações
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("teacher_themes")
 }

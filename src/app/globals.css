@@ -29,6 +29,20 @@
     --chart-3: 197 37% 24%;
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
+
+    /* Theme system custom properties */
+    --spacing: 1rem;
+    --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --card-shadow: var(--shadow);
+    --card-border: 1px solid hsl(var(--border));
+
+    /* Animation defaults */
+    --transition-duration: 200ms;
+    --transition-easing: ease-in-out;
+    --animations-enabled: 1;
+    --hover-animations: 1;
+    --focus-animations: 1;
+    --page-transitions: 1;
   }
 
   .dark {
@@ -68,6 +82,32 @@
   }
 }
 
+/* Animation utilities */
+@layer utilities {
+  .transition-theme {
+    @apply transition-all;
+    transition-duration: var(--transition-duration);
+    transition-timing-function: var(--transition-easing);
+  }
+
+  .transition-colors-theme {
+    @apply transition-colors;
+    transition-duration: var(--transition-duration);
+    transition-timing-function: var(--transition-easing);
+  }
+
+  .animations-enabled .hover\:shadow-lg:hover {
+    transition-duration: var(--transition-duration);
+    transition-timing-function: var(--transition-easing);
+  }
+
+  /* Disable animations when animations-enabled is 0 */
+  :root:not(.animations-enabled) * {
+    animation-duration: 0 !important;
+    transition-duration: 0 !important;
+  }
+}
+
 /* Custom styles for video player slider */
 input[type='range']::-webkit-slider-thumb {
   appearance: none;
@@ -78,6 +118,7 @@ input[type='range']::-webkit-slider-thumb {
   cursor: pointer;
   border: 2px solid white;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: all var(--transition-duration) var(--transition-easing);
 }
 
 input[type='range']::-moz-range-thumb {
@@ -88,6 +129,7 @@ input[type='range']::-moz-range-thumb {
   cursor: pointer;
   border: 2px solid white;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: all var(--transition-duration) var(--transition-easing);
 }
 
 input[type='range']::-webkit-slider-thumb:hover {

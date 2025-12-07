@@ -1,5 +1,6 @@
 import NextAuth from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
+import GoogleProvider from 'next-auth/providers/google';
 import bcrypt from 'bcryptjs';
 import { prisma } from '@/lib/db';
 
@@ -52,9 +53,32 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         };
       },
     }),
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+    }),
   ],
   callbacks: {
     async jwt({ token, user }) {
+      // Recarregar dados do usuário do banco se necessário
+      if (token.id && !user) {
+        const dbUser = await prisma.user.findUnique({
+          where: { id: token.id as string },
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            role: true,
+            avatar: true,
+          },
+        });
+        if (dbUser) {
+          token.name = dbUser.name;
+          token.email = dbUser.email;
+          token.role = dbUser.role;
+          token.avatar = dbUser.avatar;
+        }
+      }
       if (user) {
         token.id = user.id;
         token.role = user.role;
@@ -63,7 +87,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       return token;
     },
     async session({ session, token }) {
+      // Atualizar sessão com dados mais recentes do token
       if (session.user && token.id && token.role) {
+        session.user.name = token.name as string;
+        session.user.email = token.email as string;
         session.user.id = token.id as string;
         session.user.role = token.role as typeof session.user.role;
         session.user.avatar = token.avatar as string | null | undefined;

@@ -1,28 +1,29 @@
-import { NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
-import { prisma } from "@/lib/db";
+import { NextResponse } from 'next/server';
+import { auth } from '@/lib/auth';
+import { prisma } from '@/lib/db';
 
 export async function POST(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const session = await auth();
 
-    if (!session || session.user.role !== "STUDENT") {
-      return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
+    if (!session || session.user.role !== 'STUDENT') {
+      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     }
 
     const data = await request.json();
 
     // Verificar se a atividade existe
     const activity = await prisma.activity.findUnique({
-      where: { id: params.id },
+      where: { id: id },
     });
 
     if (!activity) {
       return NextResponse.json(
-        { error: "Atividade não encontrada" },
+        { error: 'Atividade não encontrada' },
         { status: 404 }
       );
     }
@@ -30,18 +31,18 @@ export async function POST(
     // Buscar o módulo para verificar matrícula
     if (!activity.moduleId) {
       return NextResponse.json(
-        { error: "Atividade sem módulo associado" },
+        { error: 'Atividade sem módulo associado' },
         { status: 400 }
       );
     }
 
-    const module = await prisma.module.findUnique({
+    const moduleData = await prisma.module.findUnique({
       where: { id: activity.moduleId },
     });
 
     if (!module) {
       return NextResponse.json(
-        { error: "Módulo não encontrado" },
+        { error: 'Módulo não encontrado' },
         { status: 404 }
       );
     }
@@ -58,7 +59,7 @@ export async function POST(
 
     if (!enrollment) {
       return NextResponse.json(
-        { error: "Você não está matriculado neste curso" },
+        { error: 'Você não está matriculado neste curso' },
         { status: 403 }
       );
     }
@@ -98,17 +99,17 @@ export async function POST(
     await prisma.notification.create({
       data: {
         userId: activity.createdById,
-        title: "Nova submissão de atividade",
+        title: 'Nova submissão de atividade',
         message: `${session.user.name} enviou a atividade "${activity.title}"`,
-        type: "ACTIVITY",
+        type: 'ACTIVITY',
       },
     });
 
     return NextResponse.json(submission, { status: 201 });
   } catch (error) {
-    console.error("Erro ao enviar atividade:", error);
+    console.error('Erro ao enviar atividade:', error);
     return NextResponse.json(
-      { error: "Erro ao enviar atividade" },
+      { error: 'Erro ao enviar atividade' },
       { status: 500 }
     );
   }
