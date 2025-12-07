@@ -4,20 +4,73 @@
 
 Este documento explica a configuração de Row Level Security (RLS) no Supabase para proteger os dados da plataforma educacional.
 
-## ⚠️ Problema Identificado
+## ⚠️ Problemas Identificados
+
+### Problema 1: RLS desabilitado em 16 tabelas (✅ RESOLVIDO)
 
 O Supabase detectou que 16 tabelas estavam públicas sem RLS habilitado:
-- `users`
-- `courses`
-- `categories`
-- `modules`
-- `lessons`
-- `enrollments`
-- `progress`
-- `certificates`
-- `activities`
-- `messages`
-- `notifications`
+
+- `users`, `courses`, `categories`, `modules`, `lessons`, `enrollments`
+- `progress`, `certificates`, `activities`, `messages`, `notifications`
+- `activity_logs`, `materials`, `submissions`, `grades`, `support_tickets`
+
+**Status:** Políticas RLS criadas em `enable-rls-policies.sql` ✅
+
+### Problema 2: RLS desabilitado em tabelas de TEACHER (🔴 CRÍTICO)
+
+Três tabelas novas não têm RLS:
+
+- `teacher_education` - Dados acadêmicos sensíveis
+- `teacher_financial` - Dados bancários e PIX (MUITO sensível!)
+- `teacher_themes` - Configurações de tema (menos crítico)
+
+**Status:** Políticas RLS adicionadas ao arquivo `enable-rls-policies.sql` ✅
+
+---
+
+## ✅ Solução Implementada
+
+### Para as 3 tabelas de TEACHER
+
+Foram adicionadas 12 políticas RLS (4 por tabela):
+
+```sql
+-- Enable RLS
+ALTER TABLE public.teacher_education ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.teacher_financial ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.teacher_themes ENABLE ROW LEVEL SECURITY;
+
+-- Criar políticas (SELECT, INSERT, UPDATE, DELETE)
+-- Cada uma verifica: auth.uid()::text = user_id
+```
+
+**Cada política garante:**
+
+- ✅ Usuários veem apenas seus dados
+- ✅ Usuários editam apenas seus dados
+- ✅ Usuários deletam apenas seus dados
+- ✅ Nenhum usuário acessa dados de outro
+
+---
+
+## 🚀 Como Aplicar
+
+### Opção 1: Copiar SQL completo
+
+Arquivo: `enable-rls-policies.sql` (já contém tudo)
+
+### Opção 2: Guia passo-a-passo
+
+Arquivo: `FIX_RLS_NOW.md` (instruções em português)
+
+### Passos:
+
+1. Abra: https://supabase.com/dashboard
+2. SQL Editor → New Query
+3. Cole o SQL
+4. Clique RUN
+5. Veja: "Success. No rows returned"
+
 - `activity_logs`
 
 ## 🔒 Solução Implementada
@@ -29,6 +82,7 @@ Todas as tabelas agora têm Row Level Security ativo, garantindo que apenas usu�
 ### 2. Políticas de Segurança por Tipo de Usuário
 
 #### **STUDENT (Aluno)**
+
 - ✅ Ver próprio perfil
 - ✅ Ver cursos publicados
 - ✅ Matricular-se em cursos
@@ -39,6 +93,7 @@ Todas as tabelas agora têm Row Level Security ativo, garantindo que apenas usu�
 - ✅ Ver próprias notificações
 
 #### **TEACHER (Professor)**
+
 - ✅ Ver próprio perfil
 - ✅ Criar e gerenciar próprios cursos
 - ✅ Criar módulos e aulas
@@ -48,6 +103,7 @@ Todas as tabelas agora têm Row Level Security ativo, garantindo que apenas usu�
 - ✅ Enviar e receber mensagens
 
 #### **ADMIN (Administrador)**
+
 - ✅ Acesso completo a todas as tabelas
 - ✅ Gerenciar categorias
 - ✅ Gerenciar todos os cursos
@@ -58,6 +114,7 @@ Todas as tabelas agora têm Row Level Security ativo, garantindo que apenas usu�
 ### 3. Políticas Públicas Específicas
 
 Algumas operações são públicas por necessidade:
+
 - Ver cursos publicados (catálogo público)
 - Ver perfis de professores (para exibir informações do instrutor)
 - Ver categorias (navegação pública)
@@ -67,17 +124,20 @@ Algumas operações são públicas por necessidade:
 ## 🚀 Como Aplicar
 
 ### Passo 1: Acessar Supabase
+
 1. Acesse [supabase.com](https://supabase.com)
 2. Entre no projeto **SM Educacional**
 3. Vá em **SQL Editor** no menu lateral
 
 ### Passo 2: Executar Script
+
 1. Clique em **New Query**
 2. Copie todo o conteúdo do arquivo `enable-rls-policies.sql`
 3. Cole no editor SQL
 4. Clique em **Run** (ou pressione Ctrl+Enter)
 
 ### Passo 3: Verificar
+
 1. Vá em **Authentication** > **Policies**
 2. Verifique se todas as políticas foram criadas
 3. Acesse **Table Editor** e confirme que RLS está habilitado (ícone de cadeado verde)
@@ -85,16 +145,18 @@ Algumas operações são públicas por necessidade:
 ## 📝 Notas Importantes
 
 ### Autenticação com Supabase
-As políticas usam `auth.uid()` que retorna o ID do usuário autenticado no Supabase. 
+
+As políticas usam `auth.uid()` que retorna o ID do usuário autenticado no Supabase.
 
 **Importante:** Atualmente o projeto usa NextAuth.js, então você tem duas opções:
 
 #### Opção A: Manter NextAuth + Adicionar Bypass Service Role
+
 Para usar NextAuth e acessar dados do Supabase, você precisa usar a **Service Role Key** nas chamadas do servidor:
 
 ```typescript
 // lib/db.ts
-import { createClient } from '@supabase/supabase-js'
+import { createClient } from '@supabase/supabase-js';
 
 export const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -102,32 +164,33 @@ export const supabaseAdmin = createClient(
   {
     auth: {
       autoRefreshToken: false,
-      persistSession: false
-    }
+      persistSession: false,
+    },
   }
-)
+);
 ```
 
 #### Opção B: Migrar para Supabase Auth (Recomendado)
+
 Para aproveitar totalmente o RLS, considere migrar de NextAuth para Supabase Auth:
 
 ```typescript
 // Exemplo de migração
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 
-const supabase = createClientComponentClient()
+const supabase = createClientComponentClient();
 
 // Login
 await supabase.auth.signInWithPassword({
   email,
   password,
-})
+});
 
 // As políticas RLS funcionarão automaticamente
 const { data } = await supabase
   .from('courses')
   .select('*')
-  .eq('instructorId', user.id)
+  .eq('instructorId', user.id);
 ```
 
 ### Para Este Projeto Específico
@@ -137,6 +200,7 @@ Como estamos usando NextAuth, vamos manter e adicionar suporte à Service Role K
 1. No Supabase Dashboard, vá em **Settings** > **API**
 2. Copie a **service_role key** (secret)
 3. Adicione no `.env`:
+
 ```
 SUPABASE_SERVICE_ROLE_KEY=eyJhbGc...
 ```
@@ -153,6 +217,7 @@ SUPABASE_SERVICE_ROLE_KEY=eyJhbGc...
 ## 🔄 Próximos Passos
 
 Após aplicar o RLS, você pode:
+
 1. ✅ Testar acesso com diferentes usuários
 2. ✅ Verificar logs de erro no Supabase
 3. ✅ Ajustar políticas se necessário
