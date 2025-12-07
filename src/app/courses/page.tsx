@@ -2,10 +2,29 @@
 
 import { Suspense, useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { BookOpen, Clock, Signal, Users, Search, GraduationCap, Loader2, TrendingUp, Star, Sun, Moon } from 'lucide-react';
+import {
+  BookOpen,
+  Clock,
+  Signal,
+  Users,
+  Search,
+  GraduationCap,
+  Loader2,
+  TrendingUp,
+  Star,
+  Sun,
+  Moon,
+} from 'lucide-react';
 import { useTheme } from 'next-themes';
 
 interface Course {
@@ -18,6 +37,7 @@ interface Course {
   level: string | null;
   price: number;
   isPaid: boolean;
+  isPublished: boolean;
   category: {
     id: string;
     name: string;
@@ -61,16 +81,18 @@ function CoursesClient() {
     try {
       const [coursesRes, categoriesRes] = await Promise.all([
         fetch('/api/courses'),
-        fetch('/api/categories')
+        fetch('/api/categories'),
       ]);
 
       if (coursesRes.ok) {
         const contentType = coursesRes.headers.get('content-type');
-        
+
         if (contentType && contentType.includes('application/json')) {
           try {
             const coursesData = await coursesRes.json();
-            const publishedCourses = coursesData.filter((c: Course) => c.isPublished);
+            const publishedCourses = coursesData.filter(
+              (c: Course) => c.isPublished
+            );
             setCourses(publishedCourses);
           } catch (jsonError) {
             console.error('Erro ao parsear cursos:', jsonError);
@@ -85,7 +107,7 @@ function CoursesClient() {
 
       if (categoriesRes.ok) {
         const contentType = categoriesRes.headers.get('content-type');
-        
+
         if (contentType && contentType.includes('application/json')) {
           try {
             const categoriesData = await categoriesRes.json();
@@ -112,12 +134,15 @@ function CoursesClient() {
 
   // Filtrar e ordenar cursos
   const filteredCourses = courses
-    .filter(course => {
-      const matchesSearch = course.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           course.description.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesCategory = selectedCategory === 'all' || course.category.id === selectedCategory;
-      const matchesLevel = selectedLevel === 'all' || course.level === selectedLevel;
-      
+    .filter((course) => {
+      const matchesSearch =
+        course.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        course.description.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesCategory =
+        selectedCategory === 'all' || course.category.id === selectedCategory;
+      const matchesLevel =
+        selectedLevel === 'all' || course.level === selectedLevel;
+
       return matchesSearch && matchesCategory && matchesLevel;
     })
     .sort((a, b) => {
@@ -150,12 +175,18 @@ function CoursesClient() {
           <Link href="/" className="flex items-center gap-2">
             <GraduationCap className="h-8 w-8 md:h-10 md:w-10 text-primary" />
           </Link>
-          
+
           <nav className="hidden sm:flex gap-4 md:gap-6 items-center">
-            <Link href="/courses" className="text-sm md:text-base font-medium text-primary">
+            <Link
+              href="/courses"
+              className="text-sm md:text-base font-medium text-primary"
+            >
               Cursos
             </Link>
-            <Link href="/about" className="text-sm md:text-base hover:text-primary transition-colors">
+            <Link
+              href="/about"
+              className="text-sm md:text-base hover:text-primary transition-colors"
+            >
               Sobre
             </Link>
           </nav>
@@ -218,8 +249,10 @@ function CoursesClient() {
                 className="w-full h-10 rounded-md border border-input bg-background px-3 py-2 text-sm"
               >
                 <option value="all">Todas as Categorias</option>
-                {categories.map(cat => (
-                  <option key={cat.id} value={cat.id}>{cat.name}</option>
+                {categories.map((cat) => (
+                  <option key={cat.id} value={cat.id}>
+                    {cat.name}
+                  </option>
                 ))}
               </select>
             </div>
@@ -281,8 +314,11 @@ function CoursesClient() {
               'Carregando...'
             ) : (
               <>
-                <span className="font-semibold text-foreground">{filteredCourses.length}</span>
-                {' '}curso{filteredCourses.length !== 1 ? 's' : ''} encontrado{filteredCourses.length !== 1 ? 's' : ''}
+                <span className="font-semibold text-foreground">
+                  {filteredCourses.length}
+                </span>{' '}
+                curso{filteredCourses.length !== 1 ? 's' : ''} encontrado
+                {filteredCourses.length !== 1 ? 's' : ''}
               </>
             )}
           </p>
@@ -296,22 +332,29 @@ function CoursesClient() {
         ) : filteredCourses.length === 0 ? (
           <div className="text-center py-20">
             <BookOpen className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
-            <h3 className="text-xl font-semibold mb-2">Nenhum curso encontrado</h3>
+            <h3 className="text-xl font-semibold mb-2">
+              Nenhum curso encontrado
+            </h3>
             <p className="text-muted-foreground mb-6">
               Tente ajustar seus filtros ou faça uma nova busca
             </p>
-            <Button onClick={() => {
-              setSearchTerm('');
-              setSelectedCategory('all');
-              setSelectedLevel('all');
-            }}>
+            <Button
+              onClick={() => {
+                setSearchTerm('');
+                setSelectedCategory('all');
+                setSelectedLevel('all');
+              }}
+            >
               Limpar Filtros
             </Button>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredCourses.map((course) => (
-              <Card key={course.id} className="flex flex-col hover:shadow-lg transition-shadow overflow-hidden">
+              <Card
+                key={course.id}
+                className="flex flex-col hover:shadow-lg transition-shadow overflow-hidden"
+              >
                 {/* Thumbnail */}
                 <div className="w-full h-48 relative overflow-hidden">
                   {course.thumbnail ? (
@@ -331,7 +374,7 @@ function CoursesClient() {
                     </div>
                   )}
                 </div>
-                
+
                 <CardHeader>
                   <div className="flex items-center gap-2 mb-2">
                     <span className="px-3 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary">
@@ -348,7 +391,7 @@ function CoursesClient() {
                     Por {course.instructor.name}
                   </CardDescription>
                 </CardHeader>
-                
+
                 <CardContent className="flex-1">
                   <p className="text-sm text-muted-foreground line-clamp-3 mb-4">
                     {course.description}
@@ -370,7 +413,7 @@ function CoursesClient() {
                     </div>
                   </div>
                 </CardContent>
-                
+
                 <CardFooter className="flex items-center justify-between border-t pt-4">
                   <div>
                     {course.isPaid ? (
@@ -396,7 +439,10 @@ function CoursesClient() {
       {/* Footer */}
       <footer className="mt-auto border-t py-8">
         <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
-          <p>© {new Date().getFullYear()} SM Educacional. Todos os direitos reservados.</p>
+          <p>
+            © {new Date().getFullYear()} SM Educacional. Todos os direitos
+            reservados.
+          </p>
         </div>
       </footer>
     </div>

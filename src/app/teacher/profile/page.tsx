@@ -55,6 +55,7 @@ export default function TeacherProfilePage() {
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState<TabType>('pessoais');
   const [isLoading, setIsLoading] = useState(false);
+  const [userCreatedAt, setUserCreatedAt] = useState<string>('');
   const [formData, setFormData] = useState({
     name: session?.user?.name || '',
     email: session?.user?.email || '',
@@ -94,6 +95,7 @@ export default function TeacherProfilePage() {
         const profileRes = await fetch('/api/teacher/profile');
         if (profileRes.ok) {
           const profileData = await profileRes.json();
+          setUserCreatedAt(profileData.createdAt || '');
           setFormData({
             name: profileData.name || '',
             email: profileData.email || '',
@@ -463,7 +465,7 @@ export default function TeacherProfilePage() {
           {/* Avatar */}
           <div className="relative">
             <Avatar className="h-32 w-32 border-4 border-primary/10">
-              <AvatarImage src={session?.user?.image || undefined} />
+              <AvatarImage src={session?.user?.avatar || undefined} />
               <AvatarFallback className="text-4xl">
                 {session?.user?.name?.charAt(0) || 'P'}
               </AvatarFallback>
@@ -499,9 +501,9 @@ export default function TeacherProfilePage() {
             </p>
             <p className="text-sm text-muted-foreground">
               Membro desde{' '}
-              {new Date(session?.user?.createdAt || '').toLocaleDateString(
-                'pt-BR'
-              )}
+              {userCreatedAt
+                ? new Date(userCreatedAt).toLocaleDateString('pt-BR')
+                : 'Data não disponível'}
             </p>
           </div>
         </div>

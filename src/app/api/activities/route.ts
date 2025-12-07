@@ -86,14 +86,14 @@ export async function POST(request: Request) {
     });
 
     // Buscar o módulo para pegar o curso
-    const moduleData = await prisma.module.findUnique({
+    const module = await prisma.module.findUnique({
       where: { id: data.moduleId },
       include: {
         course: true,
       },
     });
 
-    if (moduleData) {
+    if (module) {
       // Notificar alunos matriculados
       const enrollments = await prisma.enrollment.findMany({
         where: {

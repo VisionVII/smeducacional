@@ -39,7 +39,7 @@ export async function PUT(
 
     // Verificar permissão
     if (
-      module.course.instructorId !== session.user.id &&
+      moduleData.course.instructorId !== session.user.id &&
       session.user.role !== 'ADMIN'
     ) {
       return NextResponse.json(
@@ -126,7 +126,7 @@ export async function DELETE(
 
     // Deletar o módulo (Prisma deletará as aulas em cascata)
     await prisma.module.delete({
-      where: { id: params.id },
+      where: { id },
     });
 
     // Registrar log

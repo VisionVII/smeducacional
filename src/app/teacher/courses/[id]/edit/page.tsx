@@ -6,7 +6,13 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Save, Loader2, Trash2 } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { ImageUpload } from '@/components/image-upload';
@@ -33,7 +39,11 @@ interface Course {
   whatYouLearn: string | null;
 }
 
-export default function EditCoursePage({ params }: { params: Promise<{ id: string }> | { id: string } }) {
+export default function EditCoursePage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
   const router = useRouter();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
@@ -63,7 +73,7 @@ export default function EditCoursePage({ params }: { params: Promise<{ id: strin
         const resolvedParams = await Promise.resolve(params);
         const id = resolvedParams.id;
         setCourseId(id);
-        
+
         const [courseRes, categoriesRes] = await Promise.all([
           fetch(`/api/courses/${id}`),
           fetch('/api/categories'),
@@ -151,7 +161,11 @@ export default function EditCoursePage({ params }: { params: Promise<{ id: strin
   };
 
   const handleDelete = async () => {
-    if (!confirm('Tem certeza que deseja deletar este curso? Esta ação não pode ser desfeita.')) {
+    if (
+      !confirm(
+        'Tem certeza que deseja deletar este curso? Esta ação não pode ser desfeita.'
+      )
+    ) {
       return;
     }
 
@@ -220,9 +234,7 @@ export default function EditCoursePage({ params }: { params: Promise<{ id: strin
       <Card>
         <CardHeader>
           <CardTitle className="text-2xl">Editar Curso</CardTitle>
-          <CardDescription>
-            Atualize as informações do curso
-          </CardDescription>
+          <CardDescription>Atualize as informações do curso</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -234,7 +246,9 @@ export default function EditCoursePage({ params }: { params: Promise<{ id: strin
               <Input
                 id="title"
                 value={formData.title}
-                onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+                onChange={(e) =>
+                  setFormData((prev) => ({ ...prev, title: e.target.value }))
+                }
                 required
                 minLength={3}
               />
@@ -248,7 +262,9 @@ export default function EditCoursePage({ params }: { params: Promise<{ id: strin
               <Input
                 id="slug"
                 value={formData.slug}
-                onChange={(e) => setFormData(prev => ({ ...prev, slug: e.target.value }))}
+                onChange={(e) =>
+                  setFormData((prev) => ({ ...prev, slug: e.target.value }))
+                }
                 required
                 minLength={3}
               />
@@ -266,7 +282,12 @@ export default function EditCoursePage({ params }: { params: Promise<{ id: strin
                 id="description"
                 className="flex min-h-[120px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                 value={formData.description}
-                onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    description: e.target.value,
+                  }))
+                }
                 required
                 minLength={10}
               />
@@ -280,7 +301,12 @@ export default function EditCoursePage({ params }: { params: Promise<{ id: strin
                   id="categoryId"
                   className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                   value={formData.categoryId}
-                  onChange={(e) => setFormData(prev => ({ ...prev, categoryId: e.target.value }))}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      categoryId: e.target.value,
+                    }))
+                  }
                 >
                   {categories.map((cat) => (
                     <option key={cat.id} value={cat.id}>
@@ -296,7 +322,9 @@ export default function EditCoursePage({ params }: { params: Promise<{ id: strin
                   id="level"
                   className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                   value={formData.level}
-                  onChange={(e) => setFormData(prev => ({ ...prev, level: e.target.value }))}
+                  onChange={(e) =>
+                    setFormData((prev) => ({ ...prev, level: e.target.value }))
+                  }
                 >
                   <option value="Iniciante">Iniciante</option>
                   <option value="Intermediário">Intermediário</option>
@@ -310,7 +338,12 @@ export default function EditCoursePage({ params }: { params: Promise<{ id: strin
                   id="isPublished"
                   className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                   value={formData.isPublished.toString()}
-                  onChange={(e) => setFormData(prev => ({ ...prev, isPublished: e.target.value === 'true' }))}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      isPublished: e.target.value === 'true',
+                    }))
+                  }
                 >
                   <option value="false">Rascunho</option>
                   <option value="true">Publicado</option>
@@ -327,7 +360,12 @@ export default function EditCoursePage({ params }: { params: Promise<{ id: strin
                   type="number"
                   min="0"
                   value={formData.duration}
-                  onChange={(e) => setFormData(prev => ({ ...prev, duration: e.target.value }))}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      duration: e.target.value,
+                    }))
+                  }
                 />
               </div>
 
@@ -339,11 +377,13 @@ export default function EditCoursePage({ params }: { params: Promise<{ id: strin
                   min="0"
                   step="0.01"
                   value={formData.price}
-                  onChange={(e) => setFormData(prev => ({ 
-                    ...prev, 
-                    price: e.target.value,
-                    isPaid: parseFloat(e.target.value) > 0
-                  }))}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      price: e.target.value,
+                      isPaid: parseFloat(e.target.value) > 0,
+                    }))
+                  }
                 />
               </div>
             </div>
@@ -353,7 +393,9 @@ export default function EditCoursePage({ params }: { params: Promise<{ id: strin
               <Label>Imagem de Capa do Curso</Label>
               <ImageUpload
                 value={formData.thumbnail}
-                onChange={(url) => setFormData(prev => ({ ...prev, thumbnail: url }))}
+                onChange={(url) =>
+                  setFormData((prev) => ({ ...prev, thumbnail: url }))
+                }
                 path={`courses/${course?.slug || courseId}/thumbnail.jpg`}
                 disabled={isLoading}
               />
@@ -369,7 +411,12 @@ export default function EditCoursePage({ params }: { params: Promise<{ id: strin
                 id="whatYouLearn"
                 className="flex min-h-[100px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                 value={formData.whatYouLearn}
-                onChange={(e) => setFormData(prev => ({ ...prev, whatYouLearn: e.target.value }))}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    whatYouLearn: e.target.value,
+                  }))
+                }
               />
             </div>
 
@@ -380,7 +427,12 @@ export default function EditCoursePage({ params }: { params: Promise<{ id: strin
                 id="requirements"
                 className="flex min-h-[100px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                 value={formData.requirements}
-                onChange={(e) => setFormData(prev => ({ ...prev, requirements: e.target.value }))}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    requirements: e.target.value,
+                  }))
+                }
               />
             </div>
 

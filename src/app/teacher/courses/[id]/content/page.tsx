@@ -6,7 +6,13 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { VideoUploadEnhanced } from '@/components/video-upload-enhanced';
 import {
   Plus,
@@ -48,11 +54,17 @@ interface Course {
   modules: Module[];
 }
 
-export default function CourseContentPage({ params }: { params: Promise<{ id: string }> | { id: string } }) {
+export default function CourseContentPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
   const router = useRouter();
   const { toast } = useToast();
   const [course, setCourse] = useState<Course | null>(null);
-  const [expandedModules, setExpandedModules] = useState<Set<string>>(new Set());
+  const [expandedModules, setExpandedModules] = useState<Set<string>>(
+    new Set()
+  );
   const [isLoading, setIsLoading] = useState(true);
   const [courseId, setCourseId] = useState<string>('');
 
@@ -123,7 +135,10 @@ export default function CourseContentPage({ params }: { params: Promise<{ id: st
   const openModuleModal = (module?: Module) => {
     if (module) {
       setEditingModule(module);
-      setModuleForm({ title: module.title, description: module.description || '' });
+      setModuleForm({
+        title: module.title,
+        description: module.description || '',
+      });
     } else {
       setEditingModule(null);
       setModuleForm({ title: '', description: '' });
@@ -231,7 +246,9 @@ export default function CourseContentPage({ params }: { params: Promise<{ id: st
 
       const payload = {
         ...lessonForm,
-        duration: lessonForm.duration ? parseInt(lessonForm.duration) : undefined,
+        duration: lessonForm.duration
+          ? parseInt(lessonForm.duration)
+          : undefined,
       };
 
       const response = await fetch(url, {
@@ -275,7 +292,7 @@ export default function CourseContentPage({ params }: { params: Promise<{ id: st
       if (response.ok) {
         toast({ title: 'Aula deletada!' });
         fetchCourse(courseId);
-      } else{
+      } else {
         const data = await response.json();
         toast({
           title: 'Erro ao deletar aula',
@@ -474,7 +491,10 @@ export default function CourseContentPage({ params }: { params: Promise<{ id: st
                   id="module-title"
                   value={moduleForm.title}
                   onChange={(e) =>
-                    setModuleForm((prev) => ({ ...prev, title: e.target.value }))
+                    setModuleForm((prev) => ({
+                      ...prev,
+                      title: e.target.value,
+                    }))
                   }
                   placeholder="Ex: Introdução ao React"
                 />
@@ -486,13 +506,19 @@ export default function CourseContentPage({ params }: { params: Promise<{ id: st
                   className="flex min-h-[100px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                   value={moduleForm.description}
                   onChange={(e) =>
-                    setModuleForm((prev) => ({ ...prev, description: e.target.value }))
+                    setModuleForm((prev) => ({
+                      ...prev,
+                      description: e.target.value,
+                    }))
                   }
                   placeholder="Descreva o conteúdo deste módulo..."
                 />
               </div>
               <div className="flex gap-2 justify-end">
-                <Button variant="outline" onClick={() => setShowModuleModal(false)}>
+                <Button
+                  variant="outline"
+                  onClick={() => setShowModuleModal(false)}
+                >
                   Cancelar
                 </Button>
                 <Button onClick={saveModule} disabled={!moduleForm.title}>
@@ -521,7 +547,10 @@ export default function CourseContentPage({ params }: { params: Promise<{ id: st
                     id="lesson-title"
                     value={lessonForm.title}
                     onChange={(e) =>
-                      setLessonForm((prev) => ({ ...prev, title: e.target.value }))
+                      setLessonForm((prev) => ({
+                        ...prev,
+                        title: e.target.value,
+                      }))
                     }
                     placeholder="Ex: Componentes e Props"
                   />
@@ -533,7 +562,10 @@ export default function CourseContentPage({ params }: { params: Promise<{ id: st
                     className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                     value={lessonForm.description}
                     onChange={(e) =>
-                      setLessonForm((prev) => ({ ...prev, description: e.target.value }))
+                      setLessonForm((prev) => ({
+                        ...prev,
+                        description: e.target.value,
+                      }))
                     }
                     placeholder="Descreva o conteúdo da aula..."
                   />
@@ -547,7 +579,10 @@ export default function CourseContentPage({ params }: { params: Promise<{ id: st
                       min="0"
                       value={lessonForm.duration}
                       onChange={(e) =>
-                        setLessonForm((prev) => ({ ...prev, duration: e.target.value }))
+                        setLessonForm((prev) => ({
+                          ...prev,
+                          duration: e.target.value,
+                        }))
                       }
                       placeholder="600"
                     />
@@ -559,7 +594,10 @@ export default function CourseContentPage({ params }: { params: Promise<{ id: st
                       className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                       value={lessonForm.isFree.toString()}
                       onChange={(e) =>
-                        setLessonForm((prev) => ({ ...prev, isFree: e.target.value === 'true' }))
+                        setLessonForm((prev) => ({
+                          ...prev,
+                          isFree: e.target.value === 'true',
+                        }))
                       }
                     >
                       <option value="false">Apenas matriculados</option>
@@ -578,7 +616,8 @@ export default function CourseContentPage({ params }: { params: Promise<{ id: st
                     maxSizeMB={500}
                   />
                   <p className="text-xs text-gray-500">
-                    Faça upload de um vídeo (até 500MB) ou cole um link do YouTube/Vimeo
+                    Faça upload de um vídeo (até 500MB) ou cole um link do
+                    YouTube/Vimeo
                   </p>
                 </div>
                 <div className="space-y-2">
@@ -588,13 +627,19 @@ export default function CourseContentPage({ params }: { params: Promise<{ id: st
                     className="flex min-h-[150px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm font-mono"
                     value={lessonForm.content}
                     onChange={(e) =>
-                      setLessonForm((prev) => ({ ...prev, content: e.target.value }))
+                      setLessonForm((prev) => ({
+                        ...prev,
+                        content: e.target.value,
+                      }))
                     }
                     placeholder="Conteúdo adicional da aula em texto, código, etc..."
                   />
                 </div>
                 <div className="flex gap-2 justify-end">
-                  <Button variant="outline" onClick={() => setShowLessonModal(false)}>
+                  <Button
+                    variant="outline"
+                    onClick={() => setShowLessonModal(false)}
+                  >
                     Cancelar
                   </Button>
                   <Button onClick={saveLesson} disabled={!lessonForm.title}>

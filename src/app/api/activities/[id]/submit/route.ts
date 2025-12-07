@@ -36,7 +36,7 @@ export async function POST(
       );
     }
 
-    const moduleData = await prisma.module.findUnique({
+    const module = await prisma.module.findUnique({
       where: { id: activity.moduleId },
     });
 
@@ -68,7 +68,7 @@ export async function POST(
     const existingSubmission = await prisma.submission.findFirst({
       where: {
         studentId: session.user.id,
-        activityId: params.id,
+        activityId: id,
       },
     });
 
@@ -88,7 +88,7 @@ export async function POST(
       submission = await prisma.submission.create({
         data: {
           studentId: session.user.id,
-          activityId: params.id,
+          activityId: id,
           content: data.content,
           fileUrl: data.fileUrl,
         },

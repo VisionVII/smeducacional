@@ -57,7 +57,7 @@ export async function POST(
       where: {
         studentId_lessonId: {
           studentId: session.user.id,
-          lessonId: lessonId,
+          lessonId: id,
         },
       },
       update: {
@@ -68,7 +68,7 @@ export async function POST(
       },
       create: {
         studentId: session.user.id,
-        lessonId: lessonId,
+        lessonId: id,
         isCompleted,
         watchTime,
         lastPosition,
@@ -177,7 +177,6 @@ export async function GET(
         studentId_lessonId: {
           studentId: session.user.id,
           lessonId: id,
-          lessonId,
         },
       },
     });
