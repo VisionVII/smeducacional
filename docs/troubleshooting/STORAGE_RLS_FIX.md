@@ -28,31 +28,65 @@ O bucket `course-videos` do Supabase **não tem políticas RLS configuradas** ou
 
 ```sql
 -- REMOVER POLÍTICAS ANTIGAS
+DROP POLICY IF EXISTS "Permitir leitura pública de vídeos" ON storage.objects;
+DROP POLICY IF EXISTS "Permitir upload público de vídeos" ON storage.objects;
+DROP POLICY IF EXISTS "Permitir update público de vídeos" ON storage.objects;
+DROP POLICY IF EXISTS "Permitir delete público de vídeos" ON storage.objects;
 DROP POLICY IF EXISTS "Teachers can upload videos" ON storage.objects;
 DROP POLICY IF EXISTS "Teachers can update their videos" ON storage.objects;
 DROP POLICY IF EXISTS "Teachers can delete videos" ON storage.objects;
 DROP POLICY IF EXISTS "Anyone can view videos" ON storage.objects;
+DROP POLICY IF EXISTS "Public read access for course videos" ON storage.objects;
+DROP POLICY IF EXISTS "Public insert access for course videos" ON storage.objects;
+DROP POLICY IF EXISTS "Public update access for course videos" ON storage.objects;
+DROP POLICY IF EXISTS "Public delete access for course videos" ON storage.objects;
+DROP POLICY IF EXISTS "Teachers can update videos" ON storage.objects;
 
--- CRIAR POLÍTICAS PÚBLICAS (DESENVOLVIMENTO)
+-- CRIAR POLÍTICAS RESTRITAS (PRODUÇÃO)
+-- LEITURA: Público pode visualizar
 CREATE POLICY "Public read access for course videos"
 ON storage.objects FOR SELECT
 TO public
 USING (bucket_id = 'course-videos');
 
-CREATE POLICY "Public insert access for course videos"
+-- INSERT: Apenas TEACHER e ADMIN autenticados
+CREATE POLICY "Teachers can upload videos"
 ON storage.objects FOR INSERT
-TO public
-WITH CHECK (bucket_id = 'course-videos');
+TO authenticated
+WITH CHECK (
+  bucket_id = 'course-videos'
+  AND EXISTS (
+    SELECT 1 FROM public.users
+    WHERE id = auth.uid()::text
+    AND role IN ('TEACHER', 'ADMIN')
+  )
+);
 
-CREATE POLICY "Public update access for course videos"
+-- UPDATE: Apenas TEACHER e ADMIN autenticados
+CREATE POLICY "Teachers can update videos"
 ON storage.objects FOR UPDATE
-TO public
-USING (bucket_id = 'course-videos');
+TO authenticated
+USING (
+  bucket_id = 'course-videos'
+  AND EXISTS (
+    SELECT 1 FROM public.users
+    WHERE id = auth.uid()::text
+    AND role IN ('TEACHER', 'ADMIN')
+  )
+);
 
-CREATE POLICY "Public delete access for course videos"
+-- DELETE: Apenas TEACHER e ADMIN autenticados
+CREATE POLICY "Teachers can delete videos"
 ON storage.objects FOR DELETE
-TO public
-USING (bucket_id = 'course-videos');
+TO authenticated
+USING (
+  bucket_id = 'course-videos'
+  AND EXISTS (
+    SELECT 1 FROM public.users
+    WHERE id = auth.uid()::text
+    AND role IN ('TEACHER', 'ADMIN')
+  )
+);
 ```
 
 ### 3️⃣ Verificar Bucket
@@ -88,25 +122,29 @@ WHERE schemaname = 'storage'
 
 **Deve retornar 4 políticas:**
 
-- `Public read access for course videos` (SELECT)
-- `Public insert access for course videos` (INSERT)
-- `Public update access for course videos` (UPDATE)
-- `Public delete access for course videos` (DELETE)
+- `Public read access for course videos` (SELECT) - Todos podem visualizar
+- `Teachers can upload videos` (INSERT) - Apenas TEACHER/ADMIN
+- `Teachers can update videos` (UPDATE) - Apenas TEACHER/ADMIN
+- `Teachers can delete videos` (DELETE) - Apenas TEACHER/ADMIN
 
 ## ⚠️ **Observações**
 
-### Para Desenvolvimento
+### Políticas Atuais (Seguras para Produção)
 
-✅ As políticas públicas permitem qualquer um fazer upload (OK para dev/teste)
+✅ **Leitura (SELECT)**: Qualquer pessoa pode visualizar os vídeos (público)  
+🔒 **Upload (INSERT)**: Apenas usuários autenticados com perfil `TEACHER` ou `ADMIN`  
+🔒 **Atualização (UPDATE)**: Apenas usuários autenticados com perfil `TEACHER` ou `ADMIN`  
+🔒 **Exclusão (DELETE)**: Apenas usuários autenticados com perfil `TEACHER` ou `ADMIN`
 
-### Para Produção
+### Segurança
 
-⚠️ **IMPORTANTE**: Troque para políticas restritas (veja `fix-storage-rls.sql` seção de produção)
+✅ O sistema verifica:
 
-Políticas de produção apenas permitem:
+- Se o usuário está autenticado (`auth.uid()`)
+- Se o usuário existe na tabela `users`
+- Se o perfil (`role`) é `TEACHER` ou `ADMIN`
 
-- **Leitura**: Qualquer um (público)
-- **Upload/Update/Delete**: Apenas usuários `TEACHER` e `ADMIN` autenticados
+❌ Usuários `STUDENT` não podem fazer upload, editar ou deletar vídeos
 
 ## 🐛 **Troubleshooting**
 
