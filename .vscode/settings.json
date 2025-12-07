@@ -1,5 +1,4 @@
-{
-  // Editor settings
+﻿{
   "editor.formatOnSave": true,
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.codeActionsOnSave": {
@@ -7,17 +6,22 @@
   },
   "editor.tabSize": 2,
   "editor.insertSpaces": true,
-  // TypeScript settings
   "typescript.tsdk": "node_modules/typescript/lib",
   "typescript.enablePromptUseWorkspaceTsdk": true,
-  // Files settings
   "files.exclude": {
     "**/.git": true,
     "**/.DS_Store": true,
     "**/node_modules": true,
     "**/.next": true
   },
-  // GitHub Copilot settings
+  "files.encoding": "utf8",
+  "files.autoGuessEncoding": false,
+  "[json]": {
+    "files.encoding": "utf8"
+  },
+  "[jsonc]": {
+    "files.encoding": "utf8"
+  },
   "github.copilot.enable": {
     "*": true,
     "plaintext": true,
@@ -25,35 +29,29 @@
     "scminput": false
   },
   "github.copilot.editor.enableAutoCompletions": true,
-  // GitHub Copilot Chat settings
-  "github.copilot.chat.localeOverride": "pt-BR",
+  "github.copilot.chat.localeOverride": "auto",
   "github.copilot.chat.useProjectTemplates": true,
-  // Workspace context for Copilot
   "github.copilot.advanced": {
     "debug.overrideEngine": "",
     "debug.testOverrideProxyUrl": "",
     "debug.overrideProxyUrl": "",
     "authProvider": "github"
   },
-  // Path intellisense
   "path-intellisense.mappings": {
     "@": "${workspaceFolder}/src"
   },
-  // ESLint settings
   "eslint.validate": [
     "javascript",
     "javascriptreact",
     "typescript",
     "typescriptreact"
   ],
-  // Prettier settings
   "prettier.singleQuote": true,
   "prettier.trailingComma": "es5",
   "prettier.semi": true,
-  // Search settings
   "search.exclude": {
     "**/node_modules": true,
-    "**/package-lock.json": true,
+    "**/package-lock.json": false,
     "**/.next": true,
     "**/dist": true
   },
