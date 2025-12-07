@@ -14,6 +14,7 @@ package.json is not parseable: invalid JSON: expected value at line 1 column 1
 O arquivo `package.json` foi salvo com **BOM (Byte Order Mark)** - bytes invisíveis `EF BB BF` no início do arquivo que o Node.js não consegue interpretar.
 
 ### O que é BOM?
+
 - **BOM** = Marcador de ordem de bytes (Byte Order Mark)
 - Caractere invisível `U+FEFF` no início do arquivo
 - Comum em editores Windows com encoding UTF-8 com BOM
@@ -22,6 +23,7 @@ O arquivo `package.json` foi salvo com **BOM (Byte Order Mark)** - bytes invisí
 ## ✅ **Solução Aplicada**
 
 ### 1️⃣ Remover BOM do package.json
+
 ```powershell
 $content = [System.IO.File]::ReadAllText('package.json')
 $utf8NoBom = New-Object System.Text.UTF8Encoding $false
@@ -29,7 +31,9 @@ $utf8NoBom = New-Object System.Text.UTF8Encoding $false
 ```
 
 ### 2️⃣ Configurar VS Code
+
 Atualizado `.vscode/settings.json`:
+
 ```json
 {
   "files.encoding": "utf8",
@@ -41,7 +45,9 @@ Atualizado `.vscode/settings.json`:
 ```
 
 ### 3️⃣ Script Automático
+
 Criado `scripts/fix-bom.ps1`:
+
 ```powershell
 .\scripts\fix-bom.ps1
 ```
@@ -49,21 +55,25 @@ Criado `scripts/fix-bom.ps1`:
 ## 🔍 **Como Verificar**
 
 ### Método 1: PowerShell
+
 ```powershell
 Get-Content package.json -First 1 -Encoding Byte | Format-Hex
 ```
 
 **Correto (sem BOM):**
+
 ```
 00000000   7B    # 0x7B = '{'
 ```
 
 **Errado (com BOM):**
+
 ```
 00000000   EF BB BF 7B    # EF BB BF = BOM
 ```
 
 ### Método 2: Node.js
+
 ```bash
 node -e "console.log(require('./package.json'))"
 ```
@@ -71,6 +81,7 @@ node -e "console.log(require('./package.json'))"
 Se der erro, tem BOM.
 
 ### Método 3: Script Fix-BOM
+
 ```powershell
 .\scripts\fix-bom.ps1
 ```
@@ -88,6 +99,7 @@ Get-Content package.json -First 1 -Encoding Byte
 ## 📋 **Prevenção**
 
 ### VS Code Settings (já configurado)
+
 ```json
 {
   "files.encoding": "utf8",
@@ -96,12 +108,15 @@ Get-Content package.json -First 1 -Encoding Byte
 ```
 
 ### Git Config
+
 ```bash
 git config --global core.autocrlf input
 ```
 
 ### EditorConfig
+
 Adicionar ao `.editorconfig`:
+
 ```ini
 [*.json]
 charset = utf-8
@@ -124,6 +139,7 @@ insert_final_newline = false
 ## 🐛 **Troubleshooting**
 
 ### Erro persiste após fix?
+
 ```powershell
 # Deletar e recriar do git
 Remove-Item package.json
@@ -131,12 +147,14 @@ git checkout package.json
 ```
 
 ### Outros arquivos JSON com BOM?
+
 ```powershell
 # Corrigir todos de uma vez
 .\scripts\fix-bom.ps1
 ```
 
 ### PowerShell cria BOM novamente?
+
 ```powershell
 # Use .NET FileStream ao invés de Out-File
 $utf8NoBom = New-Object System.Text.UTF8Encoding $false
