@@ -20,7 +20,7 @@ A **VisionVII** é uma empresa focada em **desenvolvimento de software**, **inov
 
 ### 🌟 Nossa Visão
 
-> *"Ser referência em desenvolvimento de soluções tecnológicas inovadoras, construindo um futuro digital mais acessível, eficiente e conectado."*
+> _"Ser referência em desenvolvimento de soluções tecnológicas inovadoras, construindo um futuro digital mais acessível, eficiente e conectado."_
 
 ### 💡 Nossos Valores
 
@@ -36,10 +36,9 @@ A **VisionVII** é uma empresa focada em **desenvolvimento de software**, **inov
 
 ### 📚 SM Educacional - Plataforma de Ensino Online
 
-> *Sistema completo de gestão educacional e e-learning*
+> _Sistema completo de gestão educacional e e-learning_
 >
 > <img width="1917" height="869" alt="image" src="https://github.com/user-attachments/assets/8eaa653f-c01d-472a-98ae-2d80eb782e52" />
-
 
 **Status:** 🟢 Em Desenvolvimento Ativo
 
@@ -68,6 +67,7 @@ Validação:    Zod, React Hook Form
 #### 🚀 Status de Desenvolvimento
 
 **🟢 Fase 1 - COMPLETA**: UI/UX + Autenticação
+
 - ✅ 30 páginas funcionais (10 públicas, 8 aluno, 8 professor, 4 admin)
 - ✅ Sistema de autenticação NextAuth v5 com 3 perfis
 - ✅ Recuperação de senha com email (Resend)
@@ -75,6 +75,7 @@ Validação:    Zod, React Hook Form
 - ✅ Navegação completa em todos layouts
 
 **🟢 Fase 2 - COMPLETA**: Sistema de Conteúdo
+
 - ✅ CRUD completo de Cursos, Módulos e Aulas
 - ✅ Player de vídeo integrado com Supabase Storage
 - ✅ Sistema de matrículas e rastreamento de progresso
@@ -82,12 +83,14 @@ Validação:    Zod, React Hook Form
 - ✅ 15+ APIs REST implementadas e testadas
 
 **🟢 Fase 3 - COMPLETA**: Comunicação e Notificações
+
 - ✅ Sistema de mensagens entre usuários
 - ✅ Notificações automáticas
 - ✅ Centro de notificações
 - ✅ Avisos de novas aulas/atividades
 
 **🟢 Fase 4 - COMPLETA**: Área do Aluno
+
 - ✅ Dashboard com estatísticas
 - ✅ Meus cursos com progresso visual
 - ✅ Visualização de aulas e módulos
@@ -95,6 +98,7 @@ Validação:    Zod, React Hook Form
 - ✅ Histórico de atividades
 
 **🟢 Fase 5 - COMPLETA**: Área do Professor
+
 - ✅ Dashboard com métricas de alunos
 - ✅ Gerenciamento completo de cursos
 - ✅ Criação de atividades e avaliações
@@ -102,6 +106,7 @@ Validação:    Zod, React Hook Form
 - ✅ Acompanhamento de progresso
 
 **🟢 Fase 6 - COMPLETA**: Área do Administrador
+
 - ✅ Dashboard administrativo
 - ✅ CRUD de usuários com filtros
 - ✅ Gestão de cursos e categorias
@@ -109,6 +114,7 @@ Validação:    Zod, React Hook Form
 - ✅ Controle de acesso
 
 **🔄 Fase 7 - PRÓXIMA**: Funcionalidades Avançadas
+
 - 📋 Geração de Certificados em PDF
 - 🔔 Notificações em Tempo Real (WebSockets)
 - 💳 Sistema de Pagamentos (Stripe/Mercado Pago)
@@ -121,6 +127,7 @@ Validação:    Zod, React Hook Form
 #### 📋 Funcionalidades Implementadas
 
 **🎯 Números Impressionantes**
+
 - 📄 **30 páginas** funcionais e responsivas
 - 🔗 **15+ APIs** REST com autenticação
 - 🗄️ **15+ modelos** no banco de dados
@@ -129,6 +136,7 @@ Validação:    Zod, React Hook Form
 - 🚀 **100% pronto** para produção
 
 **Autenticação**
+
 - ✅ Login/Logout
 - ✅ Recuperação de senha com email
 - ✅ Sessões seguras com NextAuth v5
@@ -137,6 +145,7 @@ Validação:    Zod, React Hook Form
 - ✅ Proteção CSRF
 
 **Área do Aluno**
+
 - 📚 Dashboard com estatísticas de progresso
 - 📊 Cursos matriculados com progresso visual
 - 🎥 Player de vídeo com controle de conclusão
@@ -147,6 +156,7 @@ Validação:    Zod, React Hook Form
 - 👤 Perfil e configurações
 
 **Área do Professor**
+
 - 📈 Dashboard com métricas de alunos
 - ✏️ CRUD completo de cursos, módulos e aulas
 - 📤 Upload de vídeos e materiais
@@ -156,6 +166,7 @@ Validação:    Zod, React Hook Form
 - 👥 Lista de alunos por curso
 
 **Área do Administrador**
+
 - 👥 Gerenciamento completo de usuários
 - 📚 Gestão de cursos e categorias
 - 📊 Dashboard com KPIs
@@ -164,6 +175,7 @@ Validação:    Zod, React Hook Form
 - 📋 Logs de atividades
 
 **Interface & UX**
+
 - 🎨 Design moderno e profissional
 - 📱 100% responsivo (mobile, tablet, desktop)
 - 🌓 Tema claro/escuro
@@ -173,38 +185,40 @@ Validação:    Zod, React Hook Form
 
 #### 🔗 Links do Projeto
 
+- 📚 **Índice da Documentação**: [`docs/README.md`](./docs/README.md)
 - 📸 [Screenshots & Apresentação](./screenshots/README.md) - 30 páginas documentadas
-- 📊 [Status & Próximos Passos](./STATUS_E_PROXIMOS_PASSOS.md)
-- 📖 [Documentação Completa](./PHASE_2_COMPLETE.md)
+- 📊 [Status & Roadmap](./docs/status/README.md)
 - 🔧 [Guia de Setup](./SETUP.md)
 - 🔐 [Configuração de Segurança](./SECURITY.md)
 - 📦 [Setup Supabase](./SUPABASE_STORAGE_VIDEO_SETUP.md)
 - 👥 [Apresentação para Cliente](./APRESENTACAO_CLIENTE.md)
-- 🤖 [GitHub Copilot + MCP Setup](./COPILOT_MCP_SETUP.md) - **NOVO!**
-- ⚡ [Guia Rápido Copilot](./COPILOT_QUICKSTART.md) - **NOVO!**
-- ✅ [Verificação Copilot](./COPILOT_VERIFICATION.md) - **NOVO!**
+- 🤖 [GitHub Copilot + MCP Setup](./COPILOT_MCP_SETUP.md)
+- ⚡ [Guia Rápido Copilot](./COPILOT_QUICKSTART.md)
+- ✅ [Verificação Copilot](./COPILOT_VERIFICATION.md)
 
 ---
 
 ### 🚀 Como Começar
 
-
 > **✅ Sistema 100% funcional e pronto para produção!**
->
-> 
+
 #### 1. Fazer Clone do Repositório
+
 ```bash
 git clone https://github.com/VisionVII/smeducacional.git
 cd smeducacional
 ```
 
 #### 2. Instalar Dependências
+
 ```bash
 npm install
 ```
 
 #### 3. Configurar Variáveis de Ambiente
+
 Criar arquivo `.env.local`:
+
 ```env
 # Database
 DATABASE_URL=postgresql://user:password@host:5432/smeducacional
@@ -224,12 +238,14 @@ RESEND_FROM=noreply@smeducacional.com
 ```
 
 #### 4. Executar Migrations
+
 ```bash
 npx prisma migrate dev
 npx prisma db seed
 ```
 
 #### 5. Iniciar Servidor
+
 ```bash
 npm run dev
 ```
@@ -243,12 +259,14 @@ Este projeto está configurado para uso otimizado do **GitHub Copilot** com **Mo
 #### 🚀 Começar a usar
 
 1. **Instale as extensões no VSCode**:
+
    ```bash
    code --install-extension github.copilot
    code --install-extension github.copilot-chat
    ```
 
 2. **Abra o workspace**:
+
    ```bash
    code smeducacional.code-workspace
    ```
@@ -276,15 +294,15 @@ Este projeto está configurado para uso otimizado do **GitHub Copilot** com **Mo
 // usando Recharts e Tailwind CSS
 ```
 
-*O Copilot gerará código seguindo os padrões do projeto automaticamente!*
+_O Copilot gerará código seguindo os padrões do projeto automaticamente!_
 
 ### 👤 Credenciais de Teste
 
-| Perfil | Email | Senha |
-|--------|-------|-------|
-| 👨‍🎓 Aluno | aluno@smeducacional.com | student123 |
+| Perfil       | Email                       | Senha      |
+| ------------ | --------------------------- | ---------- |
+| 👨‍🎓 Aluno     | aluno@smeducacional.com     | student123 |
 | 👨‍🏫 Professor | professor@smeducacional.com | teacher123 |
-| 👨‍💼 Admin | admin@smeducacional.com | admin123 |
+| 👨‍💼 Admin     | admin@smeducacional.com     | admin123   |
 
 ### 📸 Screenshots Disponíveis
 
@@ -295,6 +313,7 @@ Ou acesse o guia detalhado:
 👉 **[Guia de Screenshots](./screenshots/README.md)** - 30 páginas documentadas
 
 As capturas incluem:
+
 - 10 Páginas Públicas
 - 8 Páginas da Área do Aluno
 - 8 Páginas da Área do Professor
@@ -302,26 +321,28 @@ As capturas incluem:
 
 ### 📊 Dashboard Rápido
 
-| Métrica | Valor |
-|---------|-------|
-| **Páginas** | 30 |
-| **APIs** | 15+ |
-| **Modelos BD** | 15+ |
-| **Perfis** | 3 |
-| **Erros TS** | 0 |
-| **Status** | ✅ Pronto |
+| Métrica        | Valor     |
+| -------------- | --------- |
+| **Páginas**    | 30        |
+| **APIs**       | 15+       |
+| **Modelos BD** | 15+       |
+| **Perfis**     | 3         |
+| **Erros TS**   | 0         |
+| **Status**     | ✅ Pronto |
 
 ---
 
 ## 🎯 Próximas Etapas
 
 ### Curto Prazo (1-2 semanas)
+
 1. ✅ Screenshots capturados
 2. 🔲 Deploy em Vercel
 3. 🔲 Configurar domínio customizado
 4. 🔲 Testes em ambiente de produção
 
 ### Médio Prazo (1-2 meses)
+
 1. 🔲 Geração de certificados em PDF
 2. 🔲 Sistema de pagamentos integrado
 3. 🔲 Notificações em tempo real
@@ -329,6 +350,7 @@ As capturas incluem:
 5. 🔲 Melhorias de performance
 
 ### Longo Prazo (3-6 meses)
+
 1. 🔲 Aplicativo mobile nativo
 2. 🔲 Gamificação completa
 3. 🔲 Calendário acadêmico
@@ -516,6 +538,3 @@ Se você gosta do nosso trabalho e quer apoiar:
 [⬆ Voltar ao topo](#-visionvii---projetos-públicos--portfólio)
 
 </div>
-
-
-

@@ -1,3 +1,9 @@
+# Status e Roadmap
+
+Este README consolida o estado atual (Phase 2) e os próximos passos. Consulte o índice geral em [`docs/README.md`](../README.md) para navegação completa.
+
+---
+
 # 🎊 PHASE 2 ESTÁ COMPLETA!
 
 ```
