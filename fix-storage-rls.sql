@@ -17,26 +17,20 @@
 -- ================================================================
 -- PASSO 2: Remover políticas antigas (se existirem)
 -- ================================================================
--- Execute cada DROP individualmente se der erro de permissão:
 
-DO $$ 
-BEGIN
-    DROP POLICY IF EXISTS "Permitir leitura pública de vídeos" ON storage.objects;
-    DROP POLICY IF EXISTS "Permitir upload público de vídeos" ON storage.objects;
-    DROP POLICY IF EXISTS "Permitir update público de vídeos" ON storage.objects;
-    DROP POLICY IF EXISTS "Permitir delete público de vídeos" ON storage.objects;
-    DROP POLICY IF EXISTS "Teachers can upload videos" ON storage.objects;
-    DROP POLICY IF EXISTS "Teachers can update their videos" ON storage.objects;
-    DROP POLICY IF EXISTS "Teachers can delete videos" ON storage.objects;
-    DROP POLICY IF EXISTS "Anyone can view videos" ON storage.objects;
-    DROP POLICY IF EXISTS "Public read access for course videos" ON storage.objects;
-    DROP POLICY IF EXISTS "Public insert access for course videos" ON storage.objects;
-    DROP POLICY IF EXISTS "Public update access for course videos" ON storage.objects;
-    DROP POLICY IF EXISTS "Public delete access for course videos" ON storage.objects;
-    DROP POLICY IF EXISTS "Teachers can update videos" ON storage.objects;
-EXCEPTION
-    WHEN OTHERS THEN NULL;
-END $$;
+DROP POLICY IF EXISTS "Permitir leitura pública de vídeos" ON storage.objects;
+DROP POLICY IF EXISTS "Permitir upload público de vídeos" ON storage.objects;
+DROP POLICY IF EXISTS "Permitir update público de vídeos" ON storage.objects;
+DROP POLICY IF EXISTS "Permitir delete público de vídeos" ON storage.objects;
+DROP POLICY IF EXISTS "Teachers can upload videos" ON storage.objects;
+DROP POLICY IF EXISTS "Teachers can update their videos" ON storage.objects;
+DROP POLICY IF EXISTS "Teachers can delete videos" ON storage.objects;
+DROP POLICY IF EXISTS "Anyone can view videos" ON storage.objects;
+DROP POLICY IF EXISTS "Public read access for course videos" ON storage.objects;
+DROP POLICY IF EXISTS "Public insert access for course videos" ON storage.objects;
+DROP POLICY IF EXISTS "Public update access for course videos" ON storage.objects;
+DROP POLICY IF EXISTS "Public delete access for course videos" ON storage.objects;
+DROP POLICY IF EXISTS "Teachers can update videos" ON storage.objects;
 
 -- ================================================================
 -- PASSO 3: Criar políticas restritas (PRODUÇÃO)
