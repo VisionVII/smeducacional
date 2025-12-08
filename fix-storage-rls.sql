@@ -38,10 +38,6 @@ EXCEPTION
     WHEN OTHERS THEN NULL;
 END $$;
 
-EXCEPTION
-    WHEN OTHERS THEN NULL;
-END $$;
-
 -- ================================================================
 -- PASSO 3: Criar políticas restritas (PRODUÇÃO)
 -- ================================================================
