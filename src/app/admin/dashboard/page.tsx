@@ -7,7 +7,6 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import {
   BookOpen,
   Users,
@@ -15,13 +14,11 @@ import {
   TrendingUp,
   DollarSign,
   AlertCircle,
-  GitBranch,
-  Database,
-  Activity,
   Clock,
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { DevTools } from '@/components/admin/dev-tools';
 
 export default async function AdminDashboard() {
   const session = await auth();
@@ -501,50 +498,7 @@ export default async function AdminDashboard() {
         {/* ==========================================
             FERRAMENTAS DO DESENVOLVEDOR
             ========================================== */}
-        <Card className="mt-6">
-          <CardHeader>
-            <CardTitle className="text-base flex items-center gap-2">
-              <Database className="h-4 w-4" />
-              Ferramentas do Desenvolvedor
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid md:grid-cols-4 gap-3">
-              <Button
-                variant="outline"
-                className="justify-start"
-                onClick={() => (window.location.href = '/admin/dev/database')}
-              >
-                <Database className="h-4 w-4 mr-2" />
-                Banco de Dados
-              </Button>
-              <Button
-                variant="outline"
-                className="justify-start"
-                onClick={() => (window.location.href = '/admin/dev/logs')}
-              >
-                <Activity className="h-4 w-4 mr-2" />
-                Logs do Sistema
-              </Button>
-              <Button
-                variant="outline"
-                className="justify-start"
-                onClick={() => (window.location.href = '/admin/dev/metrics')}
-              >
-                <TrendingUp className="h-4 w-4 mr-2" />
-                Métricas
-              </Button>
-              <Button
-                variant="outline"
-                className="justify-start"
-                onClick={() => (window.location.href = '/admin/dev/github')}
-              >
-                <GitBranch className="h-4 w-4 mr-2" />
-                GitHub
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+        <DevTools />
       </div>
     </div>
   );
