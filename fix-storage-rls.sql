@@ -18,53 +18,35 @@
 -- PASSO 2: Remover políticas antigas (se existirem)
 -- ================================================================
 
-DROP POLICY IF EXISTS "Permitir leitura pública de vídeos" ON storage.objects;
-DROP POLICY IF EXISTS "Permitir upload público de vídeos" ON storage.objects;
-DROP POLICY IF EXISTS "Permitir update público de vídeos" ON storage.objects;
-DROP POLICY IF EXISTS "Permitir delete público de vídeos" ON storage.objects;
-DROP POLICY IF EXISTS "Teachers can upload videos" ON storage.objects;
-DROP POLICY IF EXISTS "Teachers can update their videos" ON storage.objects;
-DROP POLICY IF EXISTS "Teachers can delete videos" ON storage.objects;
-DROP POLICY IF EXISTS "Anyone can view videos" ON storage.objects;
 DROP POLICY IF EXISTS "Public read access for course videos" ON storage.objects;
-DROP POLICY IF EXISTS "Public insert access for course videos" ON storage.objects;
-DROP POLICY IF EXISTS "Public update access for course videos" ON storage.objects;
-DROP POLICY IF EXISTS "Public delete access for course videos" ON storage.objects;
+DROP POLICY IF EXISTS "Teachers can upload videos" ON storage.objects;
 DROP POLICY IF EXISTS "Teachers can update videos" ON storage.objects;
+DROP POLICY IF EXISTS "Teachers can delete videos" ON storage.objects;
 
 -- ================================================================
--- PASSO 3: Criar políticas restritas (PRODUÇÃO)
+-- PASSO 3: Criar políticas PÚBLICAS (para testes)
 -- ================================================================
--- Apenas TEACHER e ADMIN autenticados podem gerenciar vídeos
+-- Qualquer pessoa pode ler, fazer upload, editar e deletar
 
--- LEITURA: Público (todos podem assistir os vídeos)
+-- LEITURA: Público
 CREATE POLICY "Public read access for course videos"
 ON storage.objects FOR SELECT
 USING (bucket_id = 'course-videos');
 
--- INSERT: Apenas TEACHER e ADMIN autenticados
-CREATE POLICY "Teachers can upload videos"
+-- INSERT: Público
+CREATE POLICY "Public insert access for course videos"
 ON storage.objects FOR INSERT
-WITH CHECK (
-  bucket_id = 'course-videos'
-  AND auth.uid() IS NOT NULL
-);
+WITH CHECK (bucket_id = 'course-videos');
 
--- UPDATE: Apenas TEACHER e ADMIN autenticados
-CREATE POLICY "Teachers can update videos"
+-- UPDATE: Público
+CREATE POLICY "Public update access for course videos"
 ON storage.objects FOR UPDATE
-USING (
-  bucket_id = 'course-videos'
-  AND auth.uid() IS NOT NULL
-);
+USING (bucket_id = 'course-videos');
 
--- DELETE: Apenas TEACHER e ADMIN autenticados
-CREATE POLICY "Teachers can delete videos"
+-- DELETE: Público
+CREATE POLICY "Public delete access for course videos"
 ON storage.objects FOR DELETE
-USING (
-  bucket_id = 'course-videos'
-  AND auth.uid() IS NOT NULL
-);
+USING (bucket_id = 'course-videos');
 
 -- ================================================================
 -- VERIFICAÇÃO
@@ -88,7 +70,153 @@ WHERE schemaname = 'storage'
 ORDER BY policyname;
 
 -- Deve retornar 4 políticas:
--- 1. Public read access for course videos (SELECT) - Todos podem visualizar
--- 2. Teachers can upload videos (INSERT) - Apenas TEACHER/ADMIN
--- 3. Teachers can update videos (UPDATE) - Apenas TEACHER/ADMIN
--- 4. Teachers can delete videos (DELETE) - Apenas TEACHER/ADMIN
+-- 1. Public read access for course videos (SELECT) - Qualquer pessoa
+-- 2. Public insert access for course videos (INSERT) - Qualquer pessoa
+-- 3. Public update access for course videos (UPDATE) - Qualquer pessoa
+-- 4. Public delete access for course videos (DELETE) - Qualquer pessoa
+
+-- ⚠️ DEPOIS DO TESTE, EXECUTE ISTO PARA RESTRIÇÃO DE PRODUÇÃO:
+/*
+==========================
+POLÍTICAS DE PRODUÇÃO
+Aplicar após concluir os testes.
+Regras: leitura pública, gravação somente TEACHER/ADMIN autenticados
+==========================
+
+-- 1) Limpar políticas públicas
+DROP POLICY IF EXISTS "Public read access for course videos" ON storage.objects;
+DROP POLICY IF EXISTS "Public insert access for course videos" ON storage.objects;
+DROP POLICY IF EXISTS "Public update access for course videos" ON storage.objects;
+DROP POLICY IF EXISTS "Public delete access for course videos" ON storage.objects;
+DROP POLICY IF EXISTS "Public read access for lesson videos" ON storage.objects;
+DROP POLICY IF EXISTS "Public insert access for lesson videos" ON storage.objects;
+DROP POLICY IF EXISTS "Public update access for lesson videos" ON storage.objects;
+DROP POLICY IF EXISTS "Public delete access for lesson videos" ON storage.objects;
+DROP POLICY IF EXISTS "Public read access for course materials" ON storage.objects;
+DROP POLICY IF EXISTS "Public insert access for course materials" ON storage.objects;
+DROP POLICY IF EXISTS "Public update access for course materials" ON storage.objects;
+DROP POLICY IF EXISTS "Public delete access for course materials" ON storage.objects;
+
+-- 2) COURSE VIDEOS (leitura pública, gravação TEACHER/ADMIN)
+CREATE POLICY "Course videos - read (public)"
+ON storage.objects FOR SELECT
+USING (bucket_id = 'course-videos');
+
+CREATE POLICY "Course videos - insert (teacher/admin)"
+ON storage.objects FOR INSERT
+WITH CHECK (
+  bucket_id = 'course-videos'
+  AND auth.uid() IS NOT NULL
+  AND EXISTS (
+    SELECT 1 FROM public.users
+    WHERE id = auth.uid()::text
+    AND role IN ('TEACHER', 'ADMIN')
+  )
+);
+
+CREATE POLICY "Course videos - update (teacher/admin)"
+ON storage.objects FOR UPDATE
+USING (
+  bucket_id = 'course-videos'
+  AND auth.uid() IS NOT NULL
+  AND EXISTS (
+    SELECT 1 FROM public.users
+    WHERE id = auth.uid()::text
+    AND role IN ('TEACHER', 'ADMIN')
+  )
+);
+
+CREATE POLICY "Course videos - delete (teacher/admin)"
+ON storage.objects FOR DELETE
+USING (
+  bucket_id = 'course-videos'
+  AND auth.uid() IS NOT NULL
+  AND EXISTS (
+    SELECT 1 FROM public.users
+    WHERE id = auth.uid()::text
+    AND role IN ('TEACHER', 'ADMIN')
+  )
+);
+
+-- 3) LESSON VIDEOS (leitura pública, gravação TEACHER/ADMIN)
+CREATE POLICY "Lesson videos - read (public)"
+ON storage.objects FOR SELECT
+USING (bucket_id = 'lesson-videos');
+
+CREATE POLICY "Lesson videos - insert (teacher/admin)"
+ON storage.objects FOR INSERT
+WITH CHECK (
+  bucket_id = 'lesson-videos'
+  AND auth.uid() IS NOT NULL
+  AND EXISTS (
+    SELECT 1 FROM public.users
+    WHERE id = auth.uid()::text
+    AND role IN ('TEACHER', 'ADMIN')
+  )
+);
+
+CREATE POLICY "Lesson videos - update (teacher/admin)"
+ON storage.objects FOR UPDATE
+USING (
+  bucket_id = 'lesson-videos'
+  AND auth.uid() IS NOT NULL
+  AND EXISTS (
+    SELECT 1 FROM public.users
+    WHERE id = auth.uid()::text
+    AND role IN ('TEACHER', 'ADMIN')
+  )
+);
+
+CREATE POLICY "Lesson videos - delete (teacher/admin)"
+ON storage.objects FOR DELETE
+USING (
+  bucket_id = 'lesson-videos'
+  AND auth.uid() IS NOT NULL
+  AND EXISTS (
+    SELECT 1 FROM public.users
+    WHERE id = auth.uid()::text
+    AND role IN ('TEACHER', 'ADMIN')
+  )
+);
+
+-- 4) COURSE MATERIALS (leitura pública, gravação TEACHER/ADMIN)
+CREATE POLICY "Course materials - read (public)"
+ON storage.objects FOR SELECT
+USING (bucket_id = 'course-materials');
+
+CREATE POLICY "Course materials - insert (teacher/admin)"
+ON storage.objects FOR INSERT
+WITH CHECK (
+  bucket_id = 'course-materials'
+  AND auth.uid() IS NOT NULL
+  AND EXISTS (
+    SELECT 1 FROM public.users
+    WHERE id = auth.uid()::text
+    AND role IN ('TEACHER', 'ADMIN')
+  )
+);
+
+CREATE POLICY "Course materials - update (teacher/admin)"
+ON storage.objects FOR UPDATE
+USING (
+  bucket_id = 'course-materials'
+  AND auth.uid() IS NOT NULL
+  AND EXISTS (
+    SELECT 1 FROM public.users
+    WHERE id = auth.uid()::text
+    AND role IN ('TEACHER', 'ADMIN')
+  )
+);
+
+CREATE POLICY "Course materials - delete (teacher/admin)"
+ON storage.objects FOR DELETE
+USING (
+  bucket_id = 'course-materials'
+  AND auth.uid() IS NOT NULL
+  AND EXISTS (
+    SELECT 1 FROM public.users
+    WHERE id = auth.uid()::text
+    AND role IN ('TEACHER', 'ADMIN')
+  )
+);
+*/

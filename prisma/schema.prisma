@@ -72,6 +72,14 @@ model User {
   teacherFinancial TeacherFinancial?
   teacherTheme     TeacherTheme?
   landingConfig    Json?
+  payments         Payment[]
+  invoices         Invoice[]
+  teacherSubscription TeacherSubscription?
+  studentSubscription StudentSubscription?
+  checkoutSessions CheckoutSession[]
+  githubIntegration GithubIntegration?
+  systemLogs       SystemLog[]
+  studentEnrollmentPayments StudentEnrollmentPayment[]
 
   @@map("users")
 }
@@ -98,9 +106,10 @@ model Course {
   thumbnail      String?
   duration       Int? // em minutos
   level          String? // Iniciante, Intermediário, Avançado
-  price          Float    @default(0)
+  price          Float?    // Preço em BRL (null = grátis)
   isPaid         Boolean  @default(false)
-  isPublished    Boolean  @default(false)
+  isPublished    Boolean @default(false)
+  publishedAt    DateTime?
   requirements   String?
   whatYouLearn   String?
   categoryId     String
@@ -114,6 +123,10 @@ model Course {
   modules      Module[]
   enrollments  Enrollment[]
   certificates Certificate[]
+  payments       Payment[]
+  invoices       Invoice[]
+  checkoutSessions CheckoutSession[]
+  studentEnrollmentPayments StudentEnrollmentPayment[]
 
   @@index([categoryId])
   @@index([instructorId])
@@ -391,6 +404,20 @@ model TeacherFinancial {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
+  // Subscription & Billing
+  subscriptionStatus String @default("inactive") // active, inactive, trial, suspended
+  plan               String @default("free")     // free, basic, premium, enterprise
+  subscriptionStartDate DateTime?
+  subscriptionExpiresAt  DateTime?
+  trialEndsAt        DateTime?
+  lastPaymentDate    DateTime?
+  paymentMethod      String?   // credit_card, pix, boleto
+  maxStudents        Int @default(10)
+  maxStorage         Int @default(1000) // MB
+  canUploadLogo      Boolean @default(false)
+  canCustomizeDomain Boolean @default(false)
+  canAccessAnalytics Boolean @default(false)
+
   // Relações
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -421,4 +448,323 @@ model TeacherTheme {
 
   @@index([userId])
   @@map("teacher_themes")
+}
+
+// ============================================
+// PAGAMENTOS E SUBSCRIPTIONS
+// ============================================
+
+model Payment {
+  id              String   @id @default(cuid())
+  
+  // Referências
+  userId          String
+  courseId        String?
+  stripePaymentId String?  @unique
+  checkoutSessionId String?
+  studentSubscriptionId String?
+  teacherSubscriptionId String?
+  
+  // Info de pagamento
+  amount          Float    // Valor em BRL
+  currency        String   @default("BRL")
+  type            String   @default("course") // course, teacher_subscription, student_subscription
+  paymentMethod   String   // credit_card, pix, boleto
+  status          String   @default("pending") // pending, completed, failed, refunded
+  
+  // Stripe
+  stripeIntentId  String?
+  stripeStatus    String?
+  
+  // Dados
+  metadata        Json?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  // Relações
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course          Course?  @relation(fields: [courseId], references: [id], onDelete: SetNull)
+  checkoutSession CheckoutSession? @relation(fields: [checkoutSessionId], references: [id], onDelete: SetNull)
+  studentSubscription StudentSubscription? @relation(fields: [studentSubscriptionId], references: [id], onDelete: SetNull)
+  teacherSubscription TeacherSubscription? @relation(fields: [teacherSubscriptionId], references: [id], onDelete: SetNull)
+  invoice         Invoice?
+  
+  @@index([userId])
+  @@index([courseId])
+  @@index([stripePaymentId])
+  @@index([checkoutSessionId])
+  @@index([studentSubscriptionId])
+  @@index([teacherSubscriptionId])
+  @@index([status])
+  @@map("payments")
+}
+
+model Invoice {
+  id            String   @id @default(cuid())
+  
+  // Referências
+  userId        String
+  paymentId     String   @unique
+  courseId      String?
+  
+  // Info
+  invoiceNumber String   @unique
+  amount        Float
+  currency      String   @default("BRL")
+  status        String   @default("pending") // pending, paid, overdue, cancelled
+  
+  // Datas
+  issuedAt      DateTime @default(now())
+  dueAt         DateTime
+  paidAt        DateTime?
+  
+  // Dados
+  description   String?
+  notes         String?
+  
+  // Timestamps
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  // Relações
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  payment       Payment  @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+  course        Course?  @relation(fields: [courseId], references: [id], onDelete: SetNull)
+  
+  @@index([userId])
+  @@index([paymentId])
+  @@index([invoiceNumber])
+  @@index([courseId])
+  @@index([status])
+  @@map("invoices")
+}
+
+model TeacherSubscription {
+  id              String   @id @default(cuid())
+  
+  // Referências
+  userId          String   @unique
+  stripeSubId     String?  @unique
+  
+  // Subscription info
+  plan            String   // free, basic, premium, enterprise
+  status          String   @default("inactive") // active, inactive, cancelled, past_due
+  startDate       DateTime @default(now())
+  renewDate       DateTime?
+  cancelDate      DateTime?
+  price           Float?
+  currency        String   @default("BRL")
+  interval        String   @default("month") // month, year
+  stripePriceId   String?
+  latestInvoiceId String?
+  
+  // Stripe
+  stripeCustomerId String?
+  stripeStatus    String?
+  
+  // Dados
+  metadata        Json?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  // Relações
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  payments        Payment[]
+  checkoutSessions CheckoutSession[]
+  
+  @@index([userId])
+  @@index([stripeSubId])
+  @@index([stripePriceId])
+  @@index([status])
+  @@map("teacher_subscriptions")
+}
+
+model StudentSubscription {
+  id              String   @id @default(cuid())
+  
+  // Referências
+  userId          String   @unique
+  stripeSubId     String?  @unique
+  stripeCustomerId String?
+  stripePriceId   String?
+
+  // Subscription info
+  plan            String   // basic, premium, etc
+  status          String   @default("inactive") // active, inactive, cancelled, past_due
+  price           Float
+  currency        String   @default("BRL")
+  interval        String   @default("month")
+  currentPeriodStart DateTime?
+  currentPeriodEnd   DateTime?
+  cancelAt         DateTime?
+  cancelAtPeriodEnd Boolean @default(false)
+  trialEndsAt      DateTime?
+
+  // Dados
+  metadata        Json?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relações
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  payments        Payment[]
+  checkoutSessions CheckoutSession[]
+
+  @@index([userId])
+  @@index([stripeSubId])
+  @@index([stripePriceId])
+  @@index([status])
+  @@map("student_subscriptions")
+}
+
+model StudentEnrollmentPayment {
+  id            String   @id @default(cuid())
+  
+  // Referências
+  enrollmentId  String   @unique
+  userId        String
+  courseId      String
+  
+  // Payment info
+  amount        Float
+  currency      String   @default("BRL")
+  paymentDate   DateTime @default(now())
+  
+  // Stripe
+  stripePaymentId String?
+  
+  // Status
+  status        String   @default("completed") // completed, failed, refunded
+  
+  // Timestamps
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  // Relações
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course        Course   @relation(fields: [courseId], references: [id])
+  
+  @@index([userId])
+  @@index([courseId])
+  @@index([enrollmentId])
+  @@map("student_enrollment_payments")
+}
+
+model CheckoutSession {
+  id              String   @id @default(cuid())
+
+  // Referências
+  userId          String
+  courseId        String?
+  studentSubscriptionId String?
+  teacherSubscriptionId String?
+
+  // Stripe
+  stripeSessionId String?  @unique
+  stripeCustomerId String?
+  paymentIntentId String?
+
+  // Info
+  mode            String   @default("payment") // payment, subscription
+  status          String   @default("pending") // pending, completed, failed, expired
+  amount          Float?
+  currency        String   @default("BRL")
+  url             String?
+  expiresAt       DateTime?
+  metadata        Json?
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relações
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course          Course?  @relation(fields: [courseId], references: [id], onDelete: SetNull)
+  studentSubscription StudentSubscription? @relation(fields: [studentSubscriptionId], references: [id], onDelete: SetNull)
+  teacherSubscription TeacherSubscription? @relation(fields: [teacherSubscriptionId], references: [id], onDelete: SetNull)
+  payments        Payment[]
+
+  @@index([userId])
+  @@index([courseId])
+  @@index([stripeSessionId])
+  @@index([status])
+  @@map("checkout_sessions")
+}
+
+model GithubIntegration {
+  id              String   @id @default(cuid())
+  
+  // Referências
+  userId          String   @unique
+  
+  // GitHub OAuth
+  githubUserId    String   @unique
+  githubUsername  String
+  accessToken     String
+  refreshToken    String?
+  tokenExpiresAt  DateTime?
+  
+  // Dados
+  connectedAt     DateTime @default(now())
+  lastSyncedAt    DateTime?
+  isConnected     Boolean  @default(true)
+  
+  // Metadados
+  repositories    Json?    // Cache de repos
+  
+  // Timestamps
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  // Relações
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([userId])
+  @@index([githubUserId])
+  @@map("github_integrations")
+}
+
+model SystemLog {
+  id              String   @id @default(cuid())
+  
+  // Info
+  level           String   // error, warn, info, debug
+  component       String   // auth, payment, database, api, stripe, github
+  message         String
+  description     String?
+  
+  // Dados
+  userId          String?  // Se relacionado a user
+  metadata        Json?
+  stackTrace      String?
+  user            User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  
+  // Timestamps
+  createdAt       DateTime @default(now())
+  
+  @@index([level])
+  @@index([component])
+  @@index([userId])
+  @@index([createdAt])
+  @@map("system_logs")
+}
+
+model DeveloperMetrics {
+  id              String   @id @default(cuid())
+  
+  // Component
+  component       String   // database, api, storage, payment
+  
+  // Métricas
+  responseTime    Int      // ms
+  statusCode      Int?
+  errorRate       Float?   // 0-100
+  successCount    Int @default(0)
+  errorCount      Int @default(0)
+  
+  // Período
+  createdAt       DateTime @default(now())
+  
+  @@index([component])
+  @@index([createdAt])
+  @@map("developer_metrics")
 }

@@ -4,11 +4,11 @@
 
 O projeto **SM Educacional** utiliza **3 buckets** diferentes no Supabase Storage, cada um com uma função específica:
 
-| Bucket | Função | Tamanho Máx | Uso | Componente |
-|--------|--------|------------|-----|-----------|
-| **`course-videos`** | Vídeos de conteúdo do curso | 500MB | Aulas e conteúdo educacional | `video-upload-enhanced.tsx` |
-| **`course-materials`** | Materiais complementares (PDFs, docs, etc) | 50MB | Materiais de apoio | `material-upload.tsx` |
-| **`lesson-videos`** | Vídeos de aulas (alternativa) | 500MB | Aulas e lições | `video-upload.tsx` |
+| Bucket                 | Função                                     | Tamanho Máx | Uso                          | Componente                  |
+| ---------------------- | ------------------------------------------ | ----------- | ---------------------------- | --------------------------- |
+| **`course-videos`**    | Vídeos de conteúdo do curso                | 500MB       | Aulas e conteúdo educacional | `video-upload-enhanced.tsx` |
+| **`course-materials`** | Materiais complementares (PDFs, docs, etc) | 50MB        | Materiais de apoio           | `material-upload.tsx`       |
+| **`lesson-videos`**    | Vídeos de aulas (alternativa)              | 500MB       | Aulas e lições               | `video-upload.tsx`          |
 
 ---
 
@@ -19,11 +19,13 @@ O projeto **SM Educacional** utiliza **3 buckets** diferentes no Supabase Storag
 **Localização:** `src/components/video-upload-enhanced.tsx`
 
 **Função:**
+
 - Armazena vídeos de conteúdo de cursos
 - Usado para aulas e lições principais
 - Componente mais moderno e completo
 
 **Estrutura de Pastas:**
+
 ```
 course-videos/
 └── videos/
@@ -31,11 +33,13 @@ course-videos/
 ```
 
 **Exemplo de caminho:**
+
 ```
 videos/lesson-123-a1b2c3.mp4
 ```
 
 **Recursos:**
+
 - ✅ Validação de tipo (apenas vídeos)
 - ✅ Limite: 500MB
 - ✅ Progresso de upload
@@ -44,6 +48,7 @@ videos/lesson-123-a1b2c3.mp4
 - ✅ Barra de progresso com porcentagem
 
 **Código:**
+
 ```tsx
 const { data, error } = await supabase.storage
   .from('course-videos')
@@ -60,11 +65,13 @@ const { data, error } = await supabase.storage
 **Localização:** `src/components/material-upload.tsx`
 
 **Função:**
+
 - Armazena materiais de apoio
 - PDFs, documentos, apresentações, etc
 - Arquivos adicionais para lições
 
 **Estrutura de Pastas:**
+
 ```
 course-materials/
 └── materials/
@@ -72,11 +79,13 @@ course-materials/
 ```
 
 **Exemplo de caminho:**
+
 ```
 materials/lesson-456-1702050000000-apostila.pdf
 ```
 
 **Recursos:**
+
 - ✅ Suporta qualquer tipo de arquivo
 - ✅ Limite: 50MB
 - ✅ Lista de múltiplos materiais
@@ -85,6 +94,7 @@ materials/lesson-456-1702050000000-apostila.pdf
 - ✅ Remoção individual
 
 **Código:**
+
 ```tsx
 const { data, error } = await supabase.storage
   .from('course-materials')
@@ -101,11 +111,13 @@ const { data, error } = await supabase.storage
 **Localização:** `src/components/video-upload.tsx`
 
 **Função:**
+
 - Alternativa ao `course-videos`
 - Vídeos de lições específicas
 - Componente legado/original
 
 **Estrutura de Pastas:**
+
 ```
 lesson-videos/
 ├── lessons/
@@ -116,12 +128,14 @@ lesson-videos/
 ```
 
 **Exemplo de caminho:**
+
 ```
 lessons/lesson-789/1702050000000.mp4
 temp/1702050000000.mp4
 ```
 
 **Recursos:**
+
 - ✅ Validação de tipo (apenas vídeos)
 - ✅ Limite: 500MB
 - ✅ Progresso simulado
@@ -129,6 +143,7 @@ temp/1702050000000.mp4
 - ✅ Função `uploadFile()` reutilizável
 
 **Código:**
+
 ```tsx
 const { url, error: uploadError } = await uploadFile(
   file,
@@ -141,16 +156,16 @@ const { url, error: uploadError } = await uploadFile(
 
 ## 🔄 Diferenças Entre `course-videos` vs `lesson-videos`
 
-| Aspecto | `course-videos` | `lesson-videos` |
-|--------|-----------------|-----------------|
-| **Componente** | `video-upload-enhanced.tsx` | `video-upload.tsx` |
-| **Tamanho máx** | 500MB | 500MB |
-| **Estrutura** | `videos/{name}` | `lessons/{id}/{name}` |
-| **Tipo de Upload** | Direto no Supabase | Via função `uploadFile()` |
-| **Features** | Mais recursos | Mais simples |
-| **URL Externa** | ✅ Sim | ❌ Não |
-| **Progresso** | Real | Simulado |
-| **Status** | Atual | Legado |
+| Aspecto            | `course-videos`             | `lesson-videos`           |
+| ------------------ | --------------------------- | ------------------------- |
+| **Componente**     | `video-upload-enhanced.tsx` | `video-upload.tsx`        |
+| **Tamanho máx**    | 500MB                       | 500MB                     |
+| **Estrutura**      | `videos/{name}`             | `lessons/{id}/{name}`     |
+| **Tipo de Upload** | Direto no Supabase          | Via função `uploadFile()` |
+| **Features**       | Mais recursos               | Mais simples              |
+| **URL Externa**    | ✅ Sim                      | ❌ Não                    |
+| **Progresso**      | Real                        | Simulado                  |
+| **Status**         | Atual                       | Legado                    |
 
 ### 📌 Qual Usar?
 
@@ -254,11 +269,13 @@ USING (bucket_id = 'course-materials' AND auth.uid() IS NOT NULL);
 ## 🔍 Como Verificar
 
 ### 1. Buckets existem?
+
 ```sql
 SELECT name, public FROM storage.buckets;
 ```
 
 Deve retornar:
+
 ```
 course-videos    | true
 course-materials | true
@@ -266,14 +283,16 @@ lesson-videos    | true
 ```
 
 ### 2. Políticas configuradas?
+
 ```sql
 SELECT policyname, cmd, roles FROM pg_policies
-WHERE schemaname = 'storage' 
+WHERE schemaname = 'storage'
 AND tablename = 'objects'
 ORDER BY tablename, policyname;
 ```
 
 ### 3. Testar upload?
+
 ```bash
 node diagnose-storage.js
 ```
@@ -282,13 +301,13 @@ node diagnose-storage.js
 
 ## 📞 Troubleshooting
 
-| Problema | Solução |
-|----------|---------|
-| "bucket does not exist" | Criar bucket em Storage → New bucket |
-| "violates row-level security" | Criar 4 políticas RLS por bucket |
-| Bucket não está público | Storage → bucket → Settings → ✅ Public |
-| Upload lento | Verificar tamanho do arquivo (máx 500MB) |
-| Tipo de arquivo inválido | Verificar MIME type (apenas video/* para vídeos) |
+| Problema                      | Solução                                           |
+| ----------------------------- | ------------------------------------------------- |
+| "bucket does not exist"       | Criar bucket em Storage → New bucket              |
+| "violates row-level security" | Criar 4 políticas RLS por bucket                  |
+| Bucket não está público       | Storage → bucket → Settings → ✅ Public           |
+| Upload lento                  | Verificar tamanho do arquivo (máx 500MB)          |
+| Tipo de arquivo inválido      | Verificar MIME type (apenas video/\* para vídeos) |
 
 ---
 

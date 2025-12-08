@@ -26,6 +26,8 @@ import {
   Moon,
 } from 'lucide-react';
 import { useTheme } from 'next-themes';
+import { useSearchParams } from 'next/navigation';
+import { PublicThemeProvider } from '@/components/public-theme-provider';
 
 interface Course {
   id: string;
@@ -449,6 +451,27 @@ function CoursesClient() {
   );
 }
 
+function CoursesPageContent() {
+  const searchParams = useSearchParams();
+  const teacherId = searchParams.get('teacherId') || undefined;
+
+  return (
+    <PublicThemeProvider teacherId={teacherId}>
+      <CoursesClient />
+    </PublicThemeProvider>
+  );
+}
+
 export default function CoursesPage() {
-  return <CoursesClient />;
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin" />
+        </div>
+      }
+    >
+      <CoursesPageContent />
+    </Suspense>
+  );
 }

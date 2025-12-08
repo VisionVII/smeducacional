@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { Suspense, useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -12,10 +12,9 @@ import {
   HelpCircle,
 } from 'lucide-react';
 import { ThemeProvider } from '@/components/theme-provider';
-import {
-  TeacherThemeProvider,
-  useTeacherTheme,
-} from '@/components/teacher-theme-provider';
+import { PublicThemeProvider } from '@/components/public-theme-provider';
+import { useTeacherTheme } from '@/components/teacher-theme-provider';
+import { useSearchParams } from 'next/navigation';
 
 interface FAQItem {
   question: string;
@@ -346,7 +345,10 @@ function LandingPageContent() {
   );
 }
 
-export default function LandingPreviewPage() {
+function LandingPreviewContent() {
+  const searchParams = useSearchParams();
+  const teacherId = searchParams.get('teacherId') || undefined;
+
   return (
     <ThemeProvider
       attribute="class"
@@ -354,9 +356,23 @@ export default function LandingPreviewPage() {
       enableSystem
       disableTransitionOnChange
     >
-      <TeacherThemeProvider>
+      <PublicThemeProvider teacherId={teacherId}>
         <LandingPageContent />
-      </TeacherThemeProvider>
+      </PublicThemeProvider>
     </ThemeProvider>
+  );
+}
+
+export default function LandingPreviewPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center">
+          Carregando...
+        </div>
+      }
+    >
+      <LandingPreviewContent />
+    </Suspense>
   );
 }

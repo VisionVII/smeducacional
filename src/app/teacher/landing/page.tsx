@@ -31,6 +31,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useTeacherTheme } from '@/components/teacher-theme-provider';
+import { useThemeSync } from '@/hooks/useThemeSync';
 
 interface FAQItem {
   question: string;
@@ -64,7 +65,9 @@ interface LandingConfig {
 }
 
 export default function TeacherLandingBuilder() {
-  const { theme } = useTeacherTheme();
+  const { theme, loadTheme } = useTeacherTheme();
+  useThemeSync(); // Sincronizar tema em tempo real
+
   const [config, setConfig] = useState<LandingConfig | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);

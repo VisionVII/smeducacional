@@ -65,6 +65,9 @@ interface ThemeContextType {
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
+const DEFAULT_THEME =
+  THEME_PRESETS.find((preset) => preset.id === 'default') ?? THEME_PRESETS[0];
+
 type HslValue = {
   h: number;
   s: number;
@@ -257,17 +260,15 @@ export function TeacherThemeProvider({ children }: { children: ReactNode }) {
         console.warn('[loadTheme] Failed to load theme, using fallback');
 
         // Fallback para tema padrão quando não autenticado ou erro
-        const defaultPreset = THEME_PRESETS.find(
-          (preset) => preset.id === 'default'
-        );
-        if (defaultPreset) {
+        if (DEFAULT_THEME) {
           const fallback = {
-            palette: defaultPreset.palette,
-            layout: defaultPreset.layout,
-            themeName: defaultPreset.name,
+            palette: DEFAULT_THEME.palette,
+            layout: DEFAULT_THEME.layout,
+            animations: DEFAULT_THEME.animations,
+            themeName: DEFAULT_THEME.name,
           };
-          setTheme(fallback);
-          applyTheme(fallback, resolvedTheme ?? themeMode);
+          setTheme(fallback as TeacherTheme);
+          applyTheme(fallback as TeacherTheme, resolvedTheme ?? themeMode);
         }
       }
     } catch (error) {
@@ -470,6 +471,25 @@ export function TeacherThemeProvider({ children }: { children: ReactNode }) {
       loadTheme();
     }
   }, [mounted]);
+
+  // Ao desmontar (navegar para rotas fora de /teacher), restaura CSS vars para o tema padrão
+  useEffect(() => {
+    return () => {
+      if (!DEFAULT_THEME) return;
+
+      const fallback = {
+        palette: DEFAULT_THEME.palette,
+        layout: DEFAULT_THEME.layout,
+        animations: DEFAULT_THEME.animations,
+        themeName: DEFAULT_THEME.name,
+      };
+
+      applyTheme(
+        fallback as TeacherTheme,
+        resolvedTheme ?? themeMode ?? 'light'
+      );
+    };
+  }, [resolvedTheme, themeMode]);
 
   // Reaplicar tema quando o modo (claro/escuro) mudar
   useEffect(() => {

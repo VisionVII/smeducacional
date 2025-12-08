@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/db';
+import { sendWelcomeEmail } from '@/lib/emails';
 import bcrypt from 'bcryptjs';
 
 export async function GET(request: Request) {
@@ -95,6 +96,13 @@ export async function POST(request: Request) {
         createdAt: true,
       },
     });
+
+    // Enviar email de boas-vindas
+    await sendWelcomeEmail({
+      email: user.email,
+      name: user.name,
+      role: user.role,
+    }).catch((err) => console.error('Error sending welcome email:', err));
 
     return NextResponse.json(user, { status: 201 });
   } catch (error) {

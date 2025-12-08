@@ -1,20 +1,28 @@
 import { NextRequest, NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 import { prisma } from '@/lib/db';
+import { sendWelcomeEmail } from '@/lib/emails';
 import { z } from 'zod';
-import { checkRateLimit, getClientIP, RateLimitPresets } from '@/lib/rate-limit';
+import {
+  checkRateLimit,
+  getClientIP,
+  RateLimitPresets,
+} from '@/lib/rate-limit';
 
 // Schema de validação para registro
 const registerSchema = z.object({
-  name: z.string()
+  name: z
+    .string()
     .min(2, 'Nome deve ter no mínimo 2 caracteres')
     .max(100, 'Nome deve ter no máximo 100 caracteres')
     .regex(/^[a-zA-ZÀ-ÿ\s]+$/, 'Nome deve conter apenas letras'),
-  email: z.string()
+  email: z
+    .string()
     .email('Email inválido')
     .max(255, 'Email deve ter no máximo 255 caracteres')
     .toLowerCase(),
-  password: z.string()
+  password: z
+    .string()
     .min(8, 'Senha deve ter no mínimo 8 caracteres')
     .max(128, 'Senha deve ter no máximo 128 caracteres')
     .regex(
@@ -27,17 +35,22 @@ export async function POST(request: NextRequest) {
   try {
     // Rate limiting
     const clientIP = getClientIP(request);
-    const rateLimitResult = checkRateLimit(`register:${clientIP}`, RateLimitPresets.auth);
-    
+    const rateLimitResult = checkRateLimit(
+      `register:${clientIP}`,
+      RateLimitPresets.auth
+    );
+
     if (!rateLimitResult.success) {
       return NextResponse.json(
         { error: 'Muitas tentativas. Tente novamente em alguns minutos.' },
-        { 
+        {
           status: 429,
           headers: {
-            'Retry-After': String(Math.ceil((rateLimitResult.resetTime - Date.now()) / 1000)),
+            'Retry-After': String(
+              Math.ceil((rateLimitResult.resetTime - Date.now()) / 1000)
+            ),
             'X-RateLimit-Remaining': '0',
-          }
+          },
         }
       );
     }
@@ -46,13 +59,10 @@ export async function POST(request: NextRequest) {
 
     // Validação com Zod
     const validationResult = registerSchema.safeParse(body);
-    
+
     if (!validationResult.success) {
-      const errors = validationResult.error.errors.map(err => err.message);
-      return NextResponse.json(
-        { error: errors[0] },
-        { status: 400 }
-      );
+      const errors = validationResult.error.errors.map((err) => err.message);
+      return NextResponse.json({ error: errors[0] }, { status: 400 });
     }
 
     const { name, email, password } = validationResult.data;
@@ -88,12 +98,16 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    // Enviar email de boas-vindas
+    await sendWelcomeEmail({
+      email: user.email,
+      name: user.name,
+      role: user.role,
+    }).catch((err) => console.error('Error sending welcome email:', err));
+
     return NextResponse.json({ user }, { status: 201 });
   } catch (error) {
     console.error('Erro ao criar usuário:', error);
-    return NextResponse.json(
-      { error: 'Erro ao criar conta' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Erro ao criar conta' }, { status: 500 });
   }
 }
