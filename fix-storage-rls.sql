@@ -47,12 +47,7 @@ CREATE POLICY "Teachers can upload videos"
 ON storage.objects FOR INSERT
 WITH CHECK (
   bucket_id = 'course-videos'
-  AND auth.role() = 'authenticated'
-  AND EXISTS (
-    SELECT 1 FROM public.users
-    WHERE id = auth.uid()::text
-    AND role IN ('TEACHER', 'ADMIN')
-  )
+  AND auth.uid() IS NOT NULL
 );
 
 -- UPDATE: Apenas TEACHER e ADMIN autenticados
@@ -60,12 +55,7 @@ CREATE POLICY "Teachers can update videos"
 ON storage.objects FOR UPDATE
 USING (
   bucket_id = 'course-videos'
-  AND auth.role() = 'authenticated'
-  AND EXISTS (
-    SELECT 1 FROM public.users
-    WHERE id = auth.uid()::text
-    AND role IN ('TEACHER', 'ADMIN')
-  )
+  AND auth.uid() IS NOT NULL
 );
 
 -- DELETE: Apenas TEACHER e ADMIN autenticados
@@ -73,12 +63,7 @@ CREATE POLICY "Teachers can delete videos"
 ON storage.objects FOR DELETE
 USING (
   bucket_id = 'course-videos'
-  AND auth.role() = 'authenticated'
-  AND EXISTS (
-    SELECT 1 FROM public.users
-    WHERE id = auth.uid()::text
-    AND role IN ('TEACHER', 'ADMIN')
-  )
+  AND auth.uid() IS NOT NULL
 );
 
 -- ================================================================
