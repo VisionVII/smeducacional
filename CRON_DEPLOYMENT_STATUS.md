@@ -10,23 +10,27 @@
 ### O que foi entregue:
 
 1. **GitHub Actions Workflow** ✅
+
    - Arquivo: `.github/workflows/cron-remarketing.yml`
    - Schedule: 4x por dia (0, 6, 12, 18 UTC)
    - Autenticação: Bearer token com CRON_SECRET
    - Status: Pronto para ativar
 
 2. **Endpoint de Cron** ✅
+
    - URL: `POST /api/cron/remarketing`
    - Arquivo: `src/app/api/cron/remarketing/route.ts`
    - Autenticação: CRON_SECRET obrigatório
    - Status: ✅ **TESTADO E FUNCIONANDO LOCALMENTE**
 
 3. **Script de Teste Local** ✅
+
    - Arquivo: `scripts/test-cron.js`
    - Comando: `npm run test:cron`
    - Status: ✅ **TESTADO COM SUCESSO CONTRA LOCALHOST**
 
 4. **Variáveis de Ambiente** ✅
+
    - CRON_SECRET adicionado ao `.env`
    - `.env.local` criado para desenvolvimento local
    - Status: ✅ **CONFIGURADO**
@@ -41,6 +45,7 @@
 ## ✅ Testes Realizados
 
 ### Teste Local (Localhost)
+
 ```bash
 npm run test:cron
 # ✅ Status: 200 OK
@@ -49,6 +54,7 @@ npm run test:cron
 ```
 
 ### Teste contra Vercel
+
 ```bash
 npm run test:cron
 # ⏳ Status: 404 DEPLOYMENT_NOT_FOUND
@@ -61,6 +67,7 @@ npm run test:cron
 ## 📋 Próximas Ações (3 Passos)
 
 ### ✅ Passo 1: Verificar Build no Vercel (3-5 min)
+
 - Acesse: https://vercel.com/dashboard/projects
 - Procure por "smeducacional"
 - Verifique se a build está:
@@ -69,6 +76,7 @@ npm run test:cron
   - 🔴 Failed (verifique os logs)
 
 **Testes:**
+
 ```bash
 # Depois que build completar:
 npm run test:cron
@@ -76,6 +84,7 @@ npm run test:cron
 ```
 
 ### 2️⃣ Passo 2: Ativar CRON_SECRET no GitHub (2 min)
+
 1. Acesse: https://github.com/VisionVII/smeducacional/settings/secrets/actions
 2. Clique em "New repository secret"
 3. Nome: `CRON_SECRET`
@@ -83,6 +92,7 @@ npm run test:cron
 5. Clique em "Add secret"
 
 ### 3️⃣ Passo 3: Monitorar Execução (diário)
+
 - URL: https://github.com/VisionVII/smeducacional/actions
 - Workflow: "Cron Remarketing Jobs"
 - Próximas execuções: 0, 6, 12, 18 UTC
@@ -94,11 +104,13 @@ npm run test:cron
 A cada execução (4x por dia), o cron:
 
 1. **Envia Lembranças de Inscrição Expirada**
+
    - Identifica alunos com inscrições expiradas
    - Envia email de renovação
    - Atualiza log de sistema
 
 2. **Avisa sobre Renovação de Pagamento**
+
    - Monitora assinaturas próximas do vencimento
    - Envia alerta 7 dias antes
    - Registra tentativa
@@ -122,12 +134,12 @@ A cada execução (4x por dia), o cron:
 
 ## 💰 Custo
 
-| Solução | Custo | Status |
-|---------|-------|--------|
-| GitHub Actions | $0/mês | ✅ Escolhido |
-| Vercel Hobby Cron | $0/mês (1x/dia) | ❌ Limitado |
-| Railway | $5-10/mês | ❌ Alternativa |
-| Vercel Pro | $20/mês | ❌ Caro |
+| Solução           | Custo           | Status         |
+| ----------------- | --------------- | -------------- |
+| GitHub Actions    | $0/mês          | ✅ Escolhido   |
+| Vercel Hobby Cron | $0/mês (1x/dia) | ❌ Limitado    |
+| Railway           | $5-10/mês       | ❌ Alternativa |
+| Vercel Pro        | $20/mês         | ❌ Caro        |
 
 **Economizando: $240/ano em relação ao Vercel Pro!** 💰
 
@@ -136,23 +148,26 @@ A cada execução (4x por dia), o cron:
 ## 🔍 Monitoramento
 
 ### Verificar Logs Localmente
+
 ```bash
 npm run dev
 # Busque por "🔔 Iniciando job de cron de remarketing"
 ```
 
 ### Verificar Logs no GitHub Actions
+
 1. https://github.com/VisionVII/smeducacional/actions
 2. Clique na execução mais recente
 3. Expanda "Run Cron Job"
 4. Veja output do curl (sucesso ou erro)
 
 ### Verificar Logs em Produção
+
 ```bash
 # Supabase Dashboard → Logs
 # Busque por tabela "system_logs"
-SELECT * FROM system_logs 
-WHERE message LIKE '%cron%' 
+SELECT * FROM system_logs
+WHERE message LIKE '%cron%'
 ORDER BY created_at DESC
 LIMIT 10;
 ```
@@ -162,15 +177,18 @@ LIMIT 10;
 ## 🚨 Troubleshooting
 
 ### Teste falha com 401 Unauthorized
+
 - Verifique se CRON_SECRET está em `.env`
 - Certifique-se que o valor está correto
 - Reinicie o servidor: Ctrl+C e `npm run dev`
 
 ### Teste falha com 404 Deployment Not Found
+
 - Verifique build no Vercel (aguarde completar)
 - Faça novo push se needed: `git push`
 
 ### GitHub Actions não dispara
+
 - Verifique se workflow file está em `.github/workflows/`
 - Confirme CRON_SECRET foi adicionado ao repositório
 - Manual trigger: Actions tab → "Cron Remarketing Jobs" → "Run workflow"
@@ -218,6 +236,7 @@ LIMIT 10;
 ## 🎯 Próximo Marco
 
 **Quando a build completar no Vercel:**
+
 1. Teste: `npm run test:cron` (esperado: 200 OK)
 2. Ative CRON_SECRET no GitHub
 3. Monitore as execuções automáticas em https://github.com/VisionVII/smeducacional/actions
