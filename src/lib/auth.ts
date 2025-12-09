@@ -117,15 +117,5 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       // O signIn retorna para callbackUrl ou baseUrl por padrão
       return baseUrl;
     },
-    async signIn({ user, account }) {
-      // Permitir login se é credentials ou google
-      if (
-        account?.provider === 'credentials' ||
-        account?.provider === 'google'
-      ) {
-        return true;
-      }
-      return false;
-    },
   },
 });
