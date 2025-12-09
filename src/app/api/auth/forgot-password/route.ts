@@ -2,22 +2,27 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { Resend } from 'resend';
 import crypto from 'crypto';
-import { checkRateLimit, getClientIP, RateLimitPresets } from '@/lib/rate-limit';
+import {
+  checkRateLimit,
+  getClientIP,
+  RateLimitPresets,
+} from '@/lib/rate-limit';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const resendApiKey = process.env.RESEND_API_KEY;
+const resendClient = resendApiKey ? new Resend(resendApiKey) : null;
 
 // Gerar código aleatório seguro de 6 dígitos (100000-999999)
 // Usa rejection sampling para evitar viés do módulo
 function generateCode(): string {
   const range = 900000; // 999999 - 100000 + 1
-  const maxUnbiased = Math.floor(0xFFFFFFFF / range) * range;
-  
+  const maxUnbiased = Math.floor(0xffffffff / range) * range;
+
   let value: number;
   do {
     const bytes = crypto.randomBytes(4);
     value = bytes.readUInt32BE(0);
   } while (value >= maxUnbiased);
-  
+
   return String(100000 + (value % range));
 }
 
@@ -116,16 +121,21 @@ export async function POST(request: NextRequest) {
   try {
     // Rate limiting - mais restritivo para prevenir abuso
     const clientIP = getClientIP(request);
-    const rateLimitResult = checkRateLimit(`forgot-password:${clientIP}`, RateLimitPresets.passwordReset);
-    
+    const rateLimitResult = checkRateLimit(
+      `forgot-password:${clientIP}`,
+      RateLimitPresets.passwordReset
+    );
+
     if (!rateLimitResult.success) {
       return NextResponse.json(
         { error: 'Muitas tentativas. Tente novamente em alguns minutos.' },
-        { 
+        {
           status: 429,
           headers: {
-            'Retry-After': String(Math.ceil((rateLimitResult.resetTime - Date.now()) / 1000)),
-          }
+            'Retry-After': String(
+              Math.ceil((rateLimitResult.resetTime - Date.now()) / 1000)
+            ),
+          },
         }
       );
     }
@@ -142,10 +152,7 @@ export async function POST(request: NextRequest) {
     // Validar formato do email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      return NextResponse.json(
-        { error: 'Email inválido' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Email inválido' }, { status: 400 });
     }
 
     // Verificar se o usuário existe
@@ -155,8 +162,9 @@ export async function POST(request: NextRequest) {
     });
 
     // SEGURANÇA: Sempre retornar a mesma resposta para evitar enumeração de usuários
-    const successResponse = { 
-      message: 'Se o email estiver cadastrado, você receberá um código de recuperação.' 
+    const successResponse = {
+      message:
+        'Se o email estiver cadastrado, você receberá um código de recuperação.',
     };
 
     if (!user) {
@@ -181,9 +189,9 @@ export async function POST(request: NextRequest) {
     });
 
     // Enviar email
-    if (process.env.RESEND_API_KEY) {
+    if (resendClient) {
       try {
-        await resend.emails.send({
+        await resendClient.emails.send({
           from: 'SM Educacional <onboarding@resend.dev>',
           to: user.email,
           subject: 'Código de Recuperação de Senha - SM Educacional',
@@ -200,7 +208,6 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json(successResponse);
-
   } catch (error) {
     console.error('Erro ao processar recuperação de senha:', error);
     return NextResponse.json(
