@@ -70,10 +70,35 @@ export default function LoginPage() {
         });
 
         // Aguardar um momento para garantir que a sessão foi criada
-        await new Promise((resolve) => setTimeout(resolve, 500));
+        await new Promise((resolve) => setTimeout(resolve, 800));
 
-        // Usar window.location para forçar reload completo e carregar a sessão
-        window.location.href = '/student/dashboard';
+        // Buscar a sessão para obter o role do usuário
+        try {
+          const sessionResponse = await fetch('/api/auth/session');
+          const session = await sessionResponse.json();
+
+          console.log('Sessão obtida:', session);
+
+          if (session?.user?.role) {
+            const roleRoutes: Record<string, string> = {
+              ADMIN: '/admin/dashboard',
+              TEACHER: '/teacher/dashboard',
+              STUDENT: '/student/dashboard',
+            };
+
+            const dashboardRoute =
+              roleRoutes[session.user.role] || '/student/dashboard';
+            console.log('Redirecionando para:', dashboardRoute);
+            window.location.href = dashboardRoute;
+          } else {
+            // Fallback se não conseguir obter o role
+            window.location.href = '/student/dashboard';
+          }
+        } catch (error) {
+          console.error('Erro ao buscar sessão:', error);
+          // Fallback em caso de erro
+          window.location.href = '/student/dashboard';
+        }
       } else {
         toast({
           title: 'Erro',
