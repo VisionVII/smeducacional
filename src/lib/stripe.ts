@@ -1,9 +1,16 @@
 import Stripe from 'stripe';
 
-// Inicializar cliente Stripe
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
-  apiVersion: '2025-11-17.clover' as any,
-});
+// Lazy init para não quebrar build quando STRIPE_SECRET_KEY não existe
+export function getStripeClient() {
+  const key = process.env.STRIPE_SECRET_KEY;
+  if (!key) {
+    throw new Error('Stripe secret key not configured');
+  }
+
+  return new Stripe(key, {
+    apiVersion: '2025-11-17.clover' as any,
+  });
+}
 
 /**
  * Preços padrão do Stripe para Subscriptions
@@ -36,6 +43,7 @@ export async function createCourseCheckoutSession({
   successUrl: string;
   cancelUrl: string;
 }) {
+  const stripe = getStripeClient();
   const session = await stripe.checkout.sessions.create({
     customer_email: userEmail,
     mode: 'payment',
@@ -90,6 +98,7 @@ export async function createStudentSubscriptionCheckoutSession({
     throw new Error(`Stripe price ID not configured for student ${plan} plan`);
   }
 
+  const stripe = getStripeClient();
   const session = await stripe.checkout.sessions.create({
     customer_email: userEmail,
     mode: 'subscription',
@@ -145,6 +154,7 @@ export async function createTeacherSubscriptionCheckoutSession({
     throw new Error(`Stripe price ID not configured for teacher ${plan} plan`);
   }
 
+  const stripe = getStripeClient();
   const session = await stripe.checkout.sessions.create({
     customer_email: userEmail,
     mode: 'subscription',

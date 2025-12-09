@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { stripe, processStripeWebhook } from '@/lib/stripe';
+import { getStripeClient, processStripeWebhook } from '@/lib/stripe';
 import { prisma } from '@/lib/db';
 import { sendPaymentSuccessEmail, sendPaymentFailedEmail } from '@/lib/emails';
 import Stripe from 'stripe';
@@ -14,6 +14,7 @@ export async function POST(request: Request) {
   try {
     const body = await request.text();
     const signature = request.headers.get('stripe-signature');
+    const stripe = getStripeClient();
 
     if (!signature) {
       console.error('Stripe webhook: Missing signature');
