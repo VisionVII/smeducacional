@@ -41,7 +41,7 @@ function addSecurityHeaders(response: NextResponse): NextResponse {
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Log de diagnóstico para entender cookies/host em produção
+  // === DIAGNÓSTICO COMPLETO DE COOKIES ===
   const host = request.headers.get('host');
   const protocol = request.headers.get('x-forwarded-proto');
   const allCookies = request.cookies.getAll();
@@ -50,7 +50,7 @@ export async function middleware(request: NextRequest) {
     c.name.includes('next-auth.session-token')
   );
 
-  console.log(`[middleware][debug] FULL DIAGNOSTICS:`, {
+  console.log(`🔍 [MIDDLEWARE DEBUG] FULL DIAGNOSTICS:`, {
     host,
     protocol,
     origin: request.nextUrl.origin,
@@ -68,7 +68,7 @@ export async function middleware(request: NextRequest) {
     secret: process.env.NEXTAUTH_SECRET,
   });
 
-  console.log(`[middleware][debug] getToken result:`, {
+  console.log(`🔍 [MIDDLEWARE DEBUG] getToken result:`, {
     hasToken: !!token,
     tokenId: token?.id,
     tokenRole: token?.role,
