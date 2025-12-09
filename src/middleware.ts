@@ -40,6 +40,7 @@ function addSecurityHeaders(response: NextResponse): NextResponse {
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
   const token = await getToken({
     req: request,
     secret: process.env.NEXTAUTH_SECRET,
@@ -48,41 +49,59 @@ export async function middleware(request: NextRequest) {
   const isAuthRoute = pathname.startsWith('/api/auth');
   const isPublicRoute = PUBLIC_ROUTES.has(pathname) || isAuthRoute;
 
+  console.log(
+    `[middleware] path: ${pathname}, hasToken: ${!!token}, role: ${token?.role}`
+  );
+
+  // Se não tem token e não é rota pública, redirecionar para login
   if (!token && !isPublicRoute) {
+    console.log(`[middleware] Sem token, redirecionando para /login`);
     const response = NextResponse.redirect(new URL('/login', request.url));
     return addSecurityHeaders(response);
   }
 
-  if (token?.role) {
+  // Se tem token, validar permissões de rota
+  if (token) {
     const userRole = token.role as string;
+    console.log(`[middleware] Token válido com role: ${userRole}`);
 
-    // Proteção de rotas por role
+    // Validar rotas protegidas por role
     if (pathname.startsWith('/student') && userRole !== 'STUDENT') {
+      console.log(`[middleware] Acesso negado /student para role ${userRole}`);
       const response = NextResponse.redirect(new URL('/', request.url));
       return addSecurityHeaders(response);
     }
 
     if (pathname.startsWith('/teacher') && userRole !== 'TEACHER') {
+      console.log(`[middleware] Acesso negado /teacher para role ${userRole}`);
       const response = NextResponse.redirect(new URL('/', request.url));
       return addSecurityHeaders(response);
     }
 
     if (pathname.startsWith('/admin') && userRole !== 'ADMIN') {
+      console.log(`[middleware] Acesso negado /admin para role ${userRole}`);
       const response = NextResponse.redirect(new URL('/', request.url));
       return addSecurityHeaders(response);
     }
 
-    // Redirecionar para dashboard apropriado se já estiver logado
+    // Se já está logado e tenta acessar /login ou /register, redirecionar para dashboard
     if (pathname === '/login' || pathname === '/register') {
-      let redirectUrl = '/';
-      if (userRole === 'STUDENT') {
-        redirectUrl = '/student/dashboard';
+      console.log(
+        `[middleware] Usuário logado tentando acessar ${pathname}, redirecionando para dashboard`
+      );
+
+      let dashboardUrl = '/';
+      if (userRole === 'ADMIN') {
+        dashboardUrl = '/admin/dashboard';
       } else if (userRole === 'TEACHER') {
-        redirectUrl = '/teacher/dashboard';
-      } else if (userRole === 'ADMIN') {
-        redirectUrl = '/admin/dashboard';
+        dashboardUrl = '/teacher/dashboard';
+      } else if (userRole === 'STUDENT') {
+        dashboardUrl = '/student/dashboard';
       }
-      const response = NextResponse.redirect(new URL(redirectUrl, request.url));
+
+      const response = NextResponse.redirect(
+        new URL(dashboardUrl, request.url)
+      );
       return addSecurityHeaders(response);
     }
   }

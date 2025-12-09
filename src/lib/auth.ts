@@ -63,6 +63,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   secret: process.env.NEXTAUTH_SECRET,
   session: {
     strategy: 'jwt',
+    maxAge: 30 * 24 * 60 * 60, // 30 dias
   },
   pages: {
     signIn: '/login',
@@ -70,51 +71,55 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   },
   providers,
   callbacks: {
-    async jwt({ token, user }) {
-      // Recarregar dados do usuário do banco se necessário
-      if (token.id && !user) {
-        const dbUser = await prisma.user.findUnique({
-          where: { id: token.id as string },
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            role: true,
-            avatar: true,
-          },
-        });
-        if (dbUser) {
-          token.name = dbUser.name;
-          token.email = dbUser.email;
-          token.role = dbUser.role;
-          token.avatar = dbUser.avatar;
-        }
-      }
+    async jwt({ token, user, account }) {
+      // Quando usuário faz login (tem user)
       if (user) {
         token.id = user.id;
         token.role = user.role;
         token.avatar = user.avatar;
+        token.name = user.name;
+        token.email = user.email;
       }
+
+      // Se não tem user mas tem token.id, recarregar do banco
+      if (token.id && !user) {
+        try {
+          const dbUser = await prisma.user.findUnique({
+            where: { id: token.id as string },
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              role: true,
+              avatar: true,
+            },
+          });
+          if (dbUser) {
+            token.name = dbUser.name;
+            token.email = dbUser.email;
+            token.role = dbUser.role;
+            token.avatar = dbUser.avatar;
+          }
+        } catch (error) {
+          console.error('Erro ao recarregar usuário no JWT:', error);
+        }
+      }
+
       return token;
     },
     async session({ session, token }) {
-      // Atualizar sessão com dados mais recentes do token
-      if (session.user && token.id && token.role) {
-        session.user.name = token.name as string;
-        session.user.email = token.email as string;
+      // Adicionar todas as informações do token na sessão
+      if (session?.user) {
         session.user.id = token.id as string;
-        session.user.role = token.role as typeof session.user.role;
-        session.user.avatar = token.avatar as string | null | undefined;
+        session.user.role = token.role as string as typeof session.user.role;
+        session.user.avatar = token.avatar as string | null;
       }
       return session;
     },
     async redirect({ url, baseUrl }) {
-      // Se está tentando acessar a página de login/register após autenticado, redireciona para dashboard
-      if (url.startsWith(baseUrl)) {
-        return url;
-      }
-      // Após login bem-sucedido, redireciona baseado no papel do usuário
-      // O signIn retorna para callbackUrl ou baseUrl por padrão
+      // Redirecionar para a URL solicitada se estiver no mesmo domínio
+      if (url.startsWith(baseUrl)) return url;
+      // Fallback para home
       return baseUrl;
     },
   },
