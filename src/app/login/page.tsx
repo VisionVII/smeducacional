@@ -31,20 +31,39 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
+      console.log('Iniciando login com:', formData.email);
+
       const result = await signIn('credentials', {
         email: formData.email,
         password: formData.password,
         redirect: false,
       });
 
-      if (result?.error) {
+      console.log('Resultado do signIn:', result);
+
+      if (!result) {
         toast({
-          title: 'Erro ao fazer login',
-          description: 'Email ou senha inválidos',
+          title: 'Erro',
+          description: 'Resposta inválida do servidor',
           variant: 'destructive',
         });
         setIsLoading(false);
-      } else if (result?.ok) {
+        return;
+      }
+
+      if (result.error) {
+        console.error('Login error:', result.error);
+        toast({
+          title: 'Erro ao fazer login',
+          description: result.error || 'Email ou senha inválidos',
+          variant: 'destructive',
+        });
+        setIsLoading(false);
+        return;
+      }
+
+      if (result.ok) {
+        console.log('Login bem-sucedido, redirecionando...');
         toast({
           title: 'Login realizado com sucesso!',
           description: 'Redirecionando...',
@@ -55,12 +74,22 @@ export default function LoginPage() {
 
         // Usar window.location para forçar reload completo e carregar a sessão
         window.location.href = '/student/dashboard';
+      } else {
+        toast({
+          title: 'Erro',
+          description: 'Falha ao fazer login',
+          variant: 'destructive',
+        });
+        setIsLoading(false);
       }
     } catch (error) {
-      console.error('Login error:', error);
+      console.error('Login exception:', error);
       toast({
         title: 'Erro',
-        description: 'Ocorreu um erro ao fazer login',
+        description:
+          error instanceof Error
+            ? error.message
+            : 'Ocorreu um erro ao fazer login',
         variant: 'destructive',
       });
       setIsLoading(false);
