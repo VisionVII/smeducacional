@@ -33,22 +33,57 @@ export default function LoginPage() {
     try {
       console.log('Iniciando login com:', formData.email);
 
-      // Usar signIn com redirect: true para deixar NextAuth gerenciar redirecionamento
+      // Usar signIn com redirect: false para controlar o fluxo
       const result = await signIn('credentials', {
         email: formData.email,
         password: formData.password,
-        // callbackUrl será definido pelo middleware baseado no role
-        redirect: true,
+        redirect: false,
       });
 
-      // Se chegar aqui com redirect: true, é erro
-      console.error('Login retornou com resultado:', result);
-      toast({
-        title: 'Erro ao fazer login',
-        description: 'Falha ao processar login',
-        variant: 'destructive',
-      });
-      setIsLoading(false);
+      console.log('Resultado do signIn:', result);
+
+      if (!result) {
+        toast({
+          title: 'Erro',
+          description: 'Resposta inválida do servidor',
+          variant: 'destructive',
+        });
+        setIsLoading(false);
+        return;
+      }
+
+      if (result.error) {
+        console.error('Login error:', result.error);
+        toast({
+          title: 'Erro ao fazer login',
+          description: result.error || 'Credenciais inválidas',
+          variant: 'destructive',
+        });
+        setIsLoading(false);
+        return;
+      }
+
+      if (result.ok) {
+        console.log('✅ Login bem-sucedido! Aguardando cookie...');
+        toast({
+          title: 'Login realizado com sucesso!',
+          description: 'Redirecionando...',
+        });
+
+        // CRÍTICO: Aguardar 2 segundos para garantir que o cookie foi definido no navegador
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+
+        console.log('Redirecionando para /student/dashboard');
+        // Usar window.location para forçar reload completo e garantir que middleware processe o cookie
+        window.location.href = '/student/dashboard';
+      } else {
+        toast({
+          title: 'Erro',
+          description: 'Falha ao fazer login',
+          variant: 'destructive',
+        });
+        setIsLoading(false);
+      }
     } catch (error) {
       console.error('Login exception:', error);
       toast({
