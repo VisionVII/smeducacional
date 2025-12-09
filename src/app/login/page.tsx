@@ -70,12 +70,14 @@ export default function LoginPage() {
           description: 'Redirecionando...',
         });
 
-        // CRÍTICO: Aguardar um pouco para garantir que o cookie foi definido
-        await new Promise((resolve) => setTimeout(resolve, 500));
+        // CRÍTICO: Aguardar 1.5s para garantir que o cookie foi definido no browser e server
+        await new Promise((resolve) => setTimeout(resolve, 1500));
 
         // Buscar sessão para obter o role do usuário
         try {
-          const sessionRes = await fetch('/api/auth/session');
+          const sessionRes = await fetch('/api/auth/session', {
+            cache: 'no-store',
+          });
           const session = await sessionRes.json();
 
           console.log('Session obtida:', session);
@@ -90,19 +92,21 @@ export default function LoginPage() {
             console.log(
               `Redirecionando para ${dashboardUrl} (role: ${session.user.role})`
             );
-            router.push(dashboardUrl);
+            // Usar window.location.href para forçar full page reload e garantir cookies
+            window.location.href = dashboardUrl;
           } else {
             // Se não conseguir obter role, redireciona para student como fallback
             console.log(
-              'Role não encontrado, redirecionando para student/dashboard'
+              'Role não encontrado na sessão, redirecionando para student/dashboard'
             );
-            router.push('/student/dashboard');
+            window.location.href = '/student/dashboard';
           }
         } catch (error) {
           console.error('Erro ao obter sessão:', error);
-          // Fallback para student dashboard se houver erro
-          router.push('/student/dashboard');
+          // Fallback: tentar redirecionar mesmo sem sessão, middleware vai redirecionar se necessário
+          window.location.href = '/student/dashboard';
         }
+        // Não chamar setIsLoading(false) porque estamos redirecionando
       } else {
         toast({
           title: 'Erro',

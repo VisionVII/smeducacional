@@ -69,11 +69,30 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     signIn: '/login',
     error: '/login',
   },
+  cookies: {
+    sessionToken: {
+      name: `next-auth.session-token`,
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        secure: process.env.NODE_ENV === 'production',
+      },
+    },
+  },
   providers,
   callbacks: {
     async jwt({ token, user, account }) {
       // Quando usuário faz login (tem user)
       if (user) {
+        console.log(
+          '[auth][jwt] Login bem-sucedido, salvando dados no token:',
+          {
+            id: user.id,
+            email: user.email,
+            role: user.role,
+          }
+        );
         token.id = user.id;
         token.role = user.role;
         token.avatar = user.avatar;
@@ -110,6 +129,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     async session({ session, token }) {
       // Adicionar todas as informações do token na sessão
       if (session?.user) {
+        console.log('[auth][session] Criando sessão para:', {
+          id: token.id,
+          email: token.email,
+          role: token.role,
+        });
         session.user.id = token.id as string;
         session.user.role = token.role as string as typeof session.user.role;
         session.user.avatar = token.avatar as string | null;

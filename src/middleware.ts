@@ -59,6 +59,14 @@ export async function middleware(request: NextRequest) {
   const token = await getToken({
     req: request,
     secret: process.env.NEXTAUTH_SECRET,
+    secureCookie: process.env.NODE_ENV === 'production',
+  });
+
+  console.log(`[middleware][debug] getToken result:`, {
+    hasToken: !!token,
+    tokenId: token?.id,
+    tokenRole: token?.role,
+    tokenEmail: token?.email,
   });
 
   const isAuthRoute = pathname.startsWith('/api/auth');
