@@ -43,34 +43,26 @@ export default function LoginPage() {
           description: 'Email ou senha inválidos',
           variant: 'destructive',
         });
-      } else {
+        setIsLoading(false);
+      } else if (result?.ok) {
         toast({
           title: 'Login realizado com sucesso!',
           description: 'Redirecionando...',
         });
 
-        // Buscar sessão para obter o papel do usuário
-        const response = await fetch('/api/auth/session');
-        const session = await response.json();
+        // Aguardar um momento para garantir que a sessão foi criada
+        await new Promise((resolve) => setTimeout(resolve, 500));
 
-        // Redirecionar baseado no papel
-        if (session?.user?.role === 'ADMIN') {
-          router.push('/admin/dashboard');
-        } else if (session?.user?.role === 'TEACHER') {
-          router.push('/teacher/dashboard');
-        } else if (session?.user?.role === 'STUDENT') {
-          router.push('/student/dashboard');
-        } else {
-          router.push('/');
-        }
+        // Usar window.location para forçar reload completo e carregar a sessão
+        window.location.href = '/student/dashboard';
       }
-    } catch {
+    } catch (error) {
+      console.error('Login error:', error);
       toast({
         title: 'Erro',
         description: 'Ocorreu um erro ao fazer login',
         variant: 'destructive',
       });
-    } finally {
       setIsLoading(false);
     }
   };
@@ -80,6 +72,7 @@ export default function LoginPage() {
     try {
       await signIn('google', { callbackUrl: '/student/dashboard' });
     } catch (error) {
+      console.error('Google sign-in error:', error);
       toast({
         title: 'Erro',
         description: 'Não foi possível fazer login com Google',
@@ -87,8 +80,6 @@ export default function LoginPage() {
       });
       setIsLoading(false);
     }
-
-    router.refresh();
   };
 
   return (
