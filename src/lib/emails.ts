@@ -1,6 +1,16 @@
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const resendApiKey = process.env.RESEND_API_KEY;
+const resendClient = resendApiKey ? new Resend(resendApiKey) : null;
+
+function getResendClient() {
+  if (!resendClient) {
+    console.warn('RESEND_API_KEY não configurada; email não será enviado.');
+    return null;
+  }
+
+  return resendClient;
+}
 
 /**
  * Email de sucesso de pagamento
@@ -83,6 +93,9 @@ export async function sendPaymentSuccessEmail({
       </body>
       </html>
     `;
+
+    const resend = getResendClient();
+    if (!resend) return { skipped: true };
 
     const response = await resend.emails.send({
       from: 'SMEducacional <noreply@smeducacional.com>',
@@ -187,6 +200,9 @@ export async function sendPendingInvoiceEmail({
       </body>
       </html>
     `;
+
+    const resend = getResendClient();
+    if (!resend) return { skipped: true };
 
     const response = await resend.emails.send({
       from: 'SMEducacional <noreply@smeducacional.com>',
@@ -294,6 +310,9 @@ export async function sendSubscriptionRenewalEmail({
       </html>
     `;
 
+    const resend = getResendClient();
+    if (!resend) return { skipped: true };
+
     const response = await resend.emails.send({
       from: 'SMEducacional <noreply@smeducacional.com>',
       to: email,
@@ -393,6 +412,9 @@ export async function sendPaymentFailedEmail({
       </body>
       </html>
     `;
+
+    const resend = getResendClient();
+    if (!resend) return { skipped: true };
 
     const response = await resend.emails.send({
       from: 'SMEducacional <noreply@smeducacional.com>',
@@ -496,6 +518,9 @@ export async function sendWelcomeEmail({
       </body>
       </html>
     `;
+
+    const resend = getResendClient();
+    if (!resend) return { skipped: true };
 
     const response = await resend.emails.send({
       from: 'SMEducacional <noreply@smeducacional.com>',
