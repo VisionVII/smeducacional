@@ -16,6 +16,7 @@ Este workflow executa automaticamente o cron job de remarketing **4 vezes por di
 ```
 
 **No horário de São Paulo (UTC-3):**
+
 - 21:00 (dia anterior)
 - 03:00
 - 09:00
@@ -47,6 +48,7 @@ Este workflow executa automaticamente o cron job de remarketing **4 vezes por di
 ## 📊 O que Acontece?
 
 Cada execução:
+
 1. ✅ GitHub Actions dispara à hora agendada
 2. ✅ Faz curl POST para seu endpoint: `https://smeducacional.vercel.app/api/cron/remarketing`
 3. ✅ Envia header: `Authorization: Bearer <CRON_SECRET>`
@@ -70,6 +72,7 @@ Cada execução:
 ### Alertas de Falha
 
 Se o curl falhar 3x consecutivas:
+
 - ❌ Você pode receber notificação (opcional configurar)
 - 🔍 Verificar logs do GitHub Actions
 - 🔧 Testar endpoint localmente
@@ -81,10 +84,11 @@ Quer executar em outros horários? Edite `.github/workflows/cron-remarketing.yml
 ```yaml
 on:
   schedule:
-    - cron: '0 0,6,12,18 * * *'  # ← Modifique aqui
+    - cron: '0 0,6,12,18 * * *' # ← Modifique aqui
 ```
 
 **Exemplos:**
+
 ```yaml
 # Uma vez por dia (meia-noite)
 - cron: '0 0 * * *'
@@ -112,14 +116,17 @@ Referência: https://crontab.guru
 ## 🚨 Troubleshooting
 
 ### "Authorization failed" ou "401"
+
 - Verificar se `CRON_SECRET` no GitHub é idêntico ao do `.env`
 - Testar: `echo $CRON_SECRET` no terminal
 
 ### "Connection refused" ou "404"
+
 - Verificar se Vercel site está online: https://smeducacional.vercel.app
 - Checar se endpoint `/api/cron/remarketing` existe
 
 ### "Logs não aparecem"
+
 - Pode levar até 2 minutos após execução
 - Atualizar página do GitHub Actions
 

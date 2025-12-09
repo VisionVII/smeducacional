@@ -4,14 +4,14 @@ on:
   schedule:
     # Roda a cada 6 horas (4x/dia)
     - cron: '0 0,6,12,18 * * *'
-  
+
   # Permite disparo manual no GitHub Actions
   workflow_dispatch:
 
 jobs:
   run-cron:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: 📌 Checkout código
         uses: actions/checkout@v4
@@ -19,21 +19,21 @@ jobs:
       - name: 🔄 Executar Cron Job - Remarketing
         run: |
           echo "🚀 Iniciando cron job de remarketing..."
-          
+
           # Fazer call HTTP para o endpoint de cron
           RESPONSE=$(curl -s -w "\n%{http_code}" -X POST \
             https://smeducacional.vercel.app/api/cron/remarketing \
             -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
             -H "Content-Type: application/json" \
             -H "User-Agent: GitHub-Actions")
-          
+
           # Separar status code da response
           HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
           BODY=$(echo "$RESPONSE" | head -n-1)
-          
+
           echo "📊 Status HTTP: $HTTP_CODE"
           echo "📝 Response: $BODY"
-          
+
           # Validar resposta
           if [ "$HTTP_CODE" = "200" ]; then
             echo "✅ Cron job executado com sucesso!"
