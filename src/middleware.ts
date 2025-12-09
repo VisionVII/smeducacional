@@ -44,17 +44,23 @@ export async function middleware(request: NextRequest) {
   // Log de diagnóstico para entender cookies/host em produção
   const host = request.headers.get('host');
   const protocol = request.headers.get('x-forwarded-proto');
-  const cookieNames = request.cookies
-    .getAll()
-    .map((cookie) => cookie.name)
-    .join(', ');
-  console.log(
-    `[middleware][debug] host=${host} proto=${protocol} origin=${
-      request.nextUrl.origin
-    } NEXTAUTH_URL=${process.env.NEXTAUTH_URL} cookies=[${
-      cookieNames || 'none'
-    }]`
+  const allCookies = request.cookies.getAll();
+  const cookieNames = allCookies.map((c) => c.name).join(', ');
+  const secureCookie = allCookies.find((c) =>
+    c.name.includes('next-auth.session-token')
   );
+
+  console.log(`[middleware][debug] FULL DIAGNOSTICS:`, {
+    host,
+    protocol,
+    origin: request.nextUrl.origin,
+    NEXTAUTH_URL: process.env.NEXTAUTH_URL,
+    NODE_ENV: process.env.NODE_ENV,
+    cookieCount: allCookies.length,
+    cookieNames: cookieNames || 'NONE',
+    foundAuthCookie: !!secureCookie,
+    authCookieName: secureCookie?.name,
+  });
 
   // getToken detecta automaticamente se deve usar cookie seguro baseado no protocolo
   const token = await getToken({

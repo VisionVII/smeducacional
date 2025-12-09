@@ -69,8 +69,20 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     signIn: '/login',
     error: '/login',
   },
-  // Remover configuração customizada de cookies - deixar NextAuth usar defaults
-  // Em HTTPS usa __Secure-next-auth.session-token automaticamente
+  cookies: {
+    sessionToken: {
+      name:
+        process.env.NODE_ENV === 'production'
+          ? `__Secure-next-auth.session-token`
+          : `next-auth.session-token`,
+      options: {
+        httpOnly: true,
+        sameSite: 'lax', // Tentar lax primeiro
+        path: '/',
+        secure: process.env.NODE_ENV === 'production',
+      },
+    },
+  },
   providers,
   callbacks: {
     async jwt({ token, user, account }) {
