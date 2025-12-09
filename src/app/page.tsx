@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Footer } from '@/components/footer';
 import { BookOpen, GraduationCap, Award, Users, Moon, Sun, TrendingUp, Clock, CheckCircle, Star } from 'lucide-react';
 import { useTheme } from 'next-themes';
+import { AuthRedirectCheck } from '@/components/auth-redirect-check';
 
 export default function HomePage() {
   const { theme, setTheme } = useTheme();
@@ -17,6 +18,9 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-800">
+      {/* Verificar e redirecionar usuários logados */}
+      <AuthRedirectCheck />
+
       {/* Header */}
       <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
         <div className="container mx-auto px-4 py-3 md:py-4 flex justify-between items-center">

@@ -31,6 +31,8 @@ export default function RegisterPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (isLoading) return;
+
     if (formData.password !== formData.confirmPassword) {
       toast({
         title: 'Erro',
@@ -38,20 +40,6 @@ export default function RegisterPage() {
         variant: 'destructive',
       });
       return;
-    }
-  };
-
-  const handleGoogleSignIn = async () => {
-    setIsLoading(true);
-    try {
-      await signIn('google', { callbackUrl: '/student/dashboard' });
-    } catch (error) {
-      toast({
-        title: 'Erro',
-        description: 'Não foi possível fazer login com Google',
-        variant: 'destructive',
-      });
-      setIsLoading(false);
     }
 
     setIsLoading(true);
@@ -89,6 +77,20 @@ export default function RegisterPage() {
         variant: 'destructive',
       });
     } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    setIsLoading(true);
+    try {
+      await signIn('google', { callbackUrl: '/student/dashboard' });
+    } catch (error) {
+      toast({
+        title: 'Erro',
+        description: 'Não foi possível fazer login com Google',
+        variant: 'destructive',
+      });
       setIsLoading(false);
     }
   };
@@ -185,7 +187,7 @@ export default function RegisterPage() {
                   setFormData({ ...formData, password: e.target.value })
                 }
                 required
-                minLength={6}
+                minLength={8}
               />
             </div>
             <div className="space-y-2">
@@ -199,7 +201,7 @@ export default function RegisterPage() {
                   setFormData({ ...formData, confirmPassword: e.target.value })
                 }
                 required
-                minLength={6}
+                minLength={8}
               />
             </div>
           </CardContent>

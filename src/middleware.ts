@@ -41,6 +41,21 @@ function addSecurityHeaders(response: NextResponse): NextResponse {
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  // Log de diagnóstico para entender cookies/host em produção
+  const host = request.headers.get('host');
+  const protocol = request.headers.get('x-forwarded-proto');
+  const cookieNames = request.cookies
+    .getAll()
+    .map((cookie) => cookie.name)
+    .join(', ');
+  console.log(
+    `[middleware][debug] host=${host} proto=${protocol} origin=${
+      request.nextUrl.origin
+    } NEXTAUTH_URL=${process.env.NEXTAUTH_URL} cookies=[${
+      cookieNames || 'none'
+    }]`
+  );
+
   const token = await getToken({
     req: request,
     secret: process.env.NEXTAUTH_SECRET,

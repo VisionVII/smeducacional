@@ -70,12 +70,39 @@ export default function LoginPage() {
           description: 'Redirecionando...',
         });
 
-        // CRÍTICO: Aguardar 2 segundos para garantir que o cookie foi definido no navegador
-        await new Promise((resolve) => setTimeout(resolve, 2000));
+        // CRÍTICO: Aguardar um pouco para garantir que o cookie foi definido
+        await new Promise((resolve) => setTimeout(resolve, 500));
 
-        console.log('Redirecionando para /student/dashboard');
-        // Usar window.location para forçar reload completo e garantir que middleware processe o cookie
-        window.location.href = '/student/dashboard';
+        // Buscar sessão para obter o role do usuário
+        try {
+          const sessionRes = await fetch('/api/auth/session');
+          const session = await sessionRes.json();
+
+          console.log('Session obtida:', session);
+
+          if (session?.user?.role) {
+            let dashboardUrl = '/student/dashboard'; // padrão
+            if (session.user.role === 'ADMIN') {
+              dashboardUrl = '/admin/dashboard';
+            } else if (session.user.role === 'TEACHER') {
+              dashboardUrl = '/teacher/dashboard';
+            }
+            console.log(
+              `Redirecionando para ${dashboardUrl} (role: ${session.user.role})`
+            );
+            router.push(dashboardUrl);
+          } else {
+            // Se não conseguir obter role, redireciona para student como fallback
+            console.log(
+              'Role não encontrado, redirecionando para student/dashboard'
+            );
+            router.push('/student/dashboard');
+          }
+        } catch (error) {
+          console.error('Erro ao obter sessão:', error);
+          // Fallback para student dashboard se houver erro
+          router.push('/student/dashboard');
+        }
       } else {
         toast({
           title: 'Erro',
@@ -101,7 +128,8 @@ export default function LoginPage() {
   const handleGoogleSignIn = async () => {
     setIsLoading(true);
     try {
-      await signIn('google', { callbackUrl: '/student/dashboard' });
+      // Redirecionar para endpoint que detectará o role após Google login
+      await signIn('google', { callbackUrl: '/' });
     } catch (error) {
       console.error('Google sign-in error:', error);
       toast({
