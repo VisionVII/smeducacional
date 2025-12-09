@@ -33,6 +33,7 @@ export default function LoginPage() {
     try {
       console.log('Iniciando login com:', formData.email);
 
+      // Primeiro, fazemos o signIn SEM redirect para validar
       const result = await signIn('credentials', {
         email: formData.email,
         password: formData.password,
@@ -63,42 +64,17 @@ export default function LoginPage() {
       }
 
       if (result.ok) {
-        console.log('Login bem-sucedido, redirecionando...');
+        console.log('Login bem-sucedido!');
         toast({
           title: 'Login realizado com sucesso!',
           description: 'Redirecionando...',
         });
 
-        // Aguardar um momento para garantir que a sessão foi criada
-        await new Promise((resolve) => setTimeout(resolve, 800));
+        // Aguardar para garantir que o cookie foi definido
+        await new Promise((resolve) => setTimeout(resolve, 1000));
 
-        // Buscar a sessão para obter o role do usuário
-        try {
-          const sessionResponse = await fetch('/api/auth/session');
-          const session = await sessionResponse.json();
-
-          console.log('Sessão obtida:', session);
-
-          if (session?.user?.role) {
-            const roleRoutes: Record<string, string> = {
-              ADMIN: '/admin/dashboard',
-              TEACHER: '/teacher/dashboard',
-              STUDENT: '/student/dashboard',
-            };
-
-            const dashboardRoute =
-              roleRoutes[session.user.role] || '/student/dashboard';
-            console.log('Redirecionando para:', dashboardRoute);
-            window.location.href = dashboardRoute;
-          } else {
-            // Fallback se não conseguir obter o role
-            window.location.href = '/student/dashboard';
-          }
-        } catch (error) {
-          console.error('Erro ao buscar sessão:', error);
-          // Fallback em caso de erro
-          window.location.href = '/student/dashboard';
-        }
+        // Recarregar a página - o middleware vai redirecionar automaticamente
+        window.location.href = '/login';
       } else {
         toast({
           title: 'Erro',
