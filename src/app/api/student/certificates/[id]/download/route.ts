@@ -14,8 +14,10 @@ export async function GET(
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     }
 
-    // Gerar PDF e converter para Uint8Array para ser BodyInit válido
+    // Gerar PDF
     const pdfBuffer = await generateCertificatePDF(id);
+
+    // Converter Buffer para Uint8Array para compatibilidade com NextResponse
     const pdfBytes = new Uint8Array(pdfBuffer);
 
     // Retornar PDF como download
@@ -24,7 +26,7 @@ export async function GET(
       headers: {
         'Content-Type': 'application/pdf',
         'Content-Disposition': `attachment; filename="certificado-${id}.pdf"`,
-        'Content-Length': pdfBytes.byteLength.toString(),
+        'Content-Length': pdfBytes.length.toString(),
       },
     });
   } catch (error) {
