@@ -6,7 +6,14 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { toast } from '@/components/ui/use-toast';
 import { Shield, ArrowLeft, Mail } from 'lucide-react';
 
@@ -47,7 +54,8 @@ export default function AdminForgotPasswordPage() {
     } catch (error) {
       toast({
         title: 'Erro',
-        description: error instanceof Error ? error.message : 'Erro ao enviar código',
+        description:
+          error instanceof Error ? error.message : 'Erro ao enviar código',
         variant: 'destructive',
       });
     } finally {
@@ -116,10 +124,10 @@ export default function AdminForgotPasswordPage() {
       const response = await fetch('/api/auth/reset-password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          email, 
-          code, 
-          password: formData.password 
+        body: JSON.stringify({
+          email,
+          code,
+          password: formData.password,
         }),
       });
 
@@ -140,7 +148,8 @@ export default function AdminForgotPasswordPage() {
     } catch (error) {
       toast({
         title: 'Erro',
-        description: error instanceof Error ? error.message : 'Erro ao redefinir senha',
+        description:
+          error instanceof Error ? error.message : 'Erro ao redefinir senha',
         variant: 'destructive',
       });
     } finally {
@@ -163,8 +172,10 @@ export default function AdminForgotPasswordPage() {
             {step === 'newPassword' && 'Nova Senha'}
           </CardTitle>
           <CardDescription className="text-sm">
-            {step === 'email' && 'Digite seu email de administrador para receber o código de recuperação'}
-            {step === 'code' && 'Digite o código de 6 dígitos enviado para seu email'}
+            {step === 'email' &&
+              'Digite seu email de administrador para receber o código de recuperação'}
+            {step === 'code' &&
+              'Digite o código de 6 dígitos enviado para seu email'}
             {step === 'newPassword' && 'Crie uma nova senha para sua conta'}
           </CardDescription>
         </CardHeader>
@@ -189,7 +200,11 @@ export default function AdminForgotPasswordPage() {
               </div>
             </CardContent>
             <CardFooter className="flex flex-col space-y-4">
-              <Button type="submit" className="w-full bg-red-600 hover:bg-red-700" disabled={isLoading}>
+              <Button
+                type="submit"
+                className="w-full bg-red-600 hover:bg-red-700"
+                disabled={isLoading}
+              >
                 {isLoading ? 'Enviando...' : 'Enviar Código'}
               </Button>
               <Button asChild variant="ghost" className="w-full" size="sm">
@@ -212,7 +227,9 @@ export default function AdminForgotPasswordPage() {
                   type="text"
                   placeholder="000000"
                   value={code}
-                  onChange={(e) => setCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                  onChange={(e) =>
+                    setCode(e.target.value.replace(/\D/g, '').slice(0, 6))
+                  }
                   className="text-center text-2xl tracking-widest font-mono"
                   maxLength={6}
                   required
@@ -223,13 +240,17 @@ export default function AdminForgotPasswordPage() {
               </div>
             </CardContent>
             <CardFooter className="flex flex-col space-y-4">
-              <Button type="submit" className="w-full bg-red-600 hover:bg-red-700" disabled={isLoading || code.length !== 6}>
+              <Button
+                type="submit"
+                className="w-full bg-red-600 hover:bg-red-700"
+                disabled={isLoading || code.length !== 6}
+              >
                 {isLoading ? 'Verificando...' : 'Verificar Código'}
               </Button>
-              <Button 
+              <Button
                 type="button"
-                variant="ghost" 
-                className="w-full" 
+                variant="ghost"
+                className="w-full"
                 size="sm"
                 onClick={() => setStep('email')}
               >
@@ -250,7 +271,9 @@ export default function AdminForgotPasswordPage() {
                   type="password"
                   placeholder="••••••••"
                   value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, password: e.target.value })
+                  }
                   required
                   minLength={6}
                 />
@@ -262,14 +285,23 @@ export default function AdminForgotPasswordPage() {
                   type="password"
                   placeholder="••••••••"
                   value={formData.confirmPassword}
-                  onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      confirmPassword: e.target.value,
+                    })
+                  }
                   required
                   minLength={6}
                 />
               </div>
             </CardContent>
             <CardFooter className="flex flex-col space-y-4">
-              <Button type="submit" className="w-full bg-red-600 hover:bg-red-700" disabled={isLoading}>
+              <Button
+                type="submit"
+                className="w-full bg-red-600 hover:bg-red-700"
+                disabled={isLoading}
+              >
                 {isLoading ? 'Salvando...' : 'Redefinir Senha'}
               </Button>
             </CardFooter>
