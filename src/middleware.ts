@@ -13,6 +13,8 @@ const PUBLIC_ROUTES = new Set([
   '/faq',
   '/privacy',
   '/terms',
+  '/teacher',
+  '/admin',
 ]);
 
 // Security headers para todas as respostas

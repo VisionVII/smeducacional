@@ -236,8 +236,24 @@ export default function TeacherLoginPage() {
             </Button>
 
             <div className="pt-4 border-t text-center text-xs text-muted-foreground space-y-2">
-              <p>É aluno? <Link href="/login" className="text-emerald-600 hover:underline font-medium">Fazer login</Link></p>
-              <p>Esqueceu sua senha? <Link href="/teacher/forgot-password" className="text-emerald-600 hover:underline font-medium">Recuperar acesso</Link></p>
+              <p>
+                É aluno?{' '}
+                <Link
+                  href="/login"
+                  className="text-emerald-600 hover:underline font-medium"
+                >
+                  Fazer login
+                </Link>
+              </p>
+              <p>
+                Esqueceu sua senha?{' '}
+                <Link
+                  href="/teacher/forgot-password"
+                  className="text-emerald-600 hover:underline font-medium"
+                >
+                  Recuperar acesso
+                </Link>
+              </p>
             </div>
           </CardFooter>
         </form>
