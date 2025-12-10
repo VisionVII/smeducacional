@@ -33,8 +33,14 @@ export const authOptions: NextAuthOptions = {
           },
         });
 
-        if (!user || !user.password) {
-          throw new Error('Credenciais inválidas');
+        if (!user) {
+          throw new Error('Usuário não encontrado');
+        }
+
+        if (!user.password) {
+          throw new Error(
+            'Este usuário foi criado via OAuth. Use o provedor original para fazer login.'
+          );
         }
 
         const isPasswordValid = await bcrypt.compare(
