@@ -14,16 +14,17 @@ export async function GET(
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     }
 
-    // Gerar PDF
+    // Gerar PDF e converter para Uint8Array para ser BodyInit válido
     const pdfBuffer = await generateCertificatePDF(id);
+    const pdfBytes = new Uint8Array(pdfBuffer);
 
     // Retornar PDF como download
-    return new NextResponse(pdfBuffer, {
+    return new NextResponse(pdfBytes, {
       status: 200,
       headers: {
         'Content-Type': 'application/pdf',
         'Content-Disposition': `attachment; filename="certificado-${id}.pdf"`,
-        'Content-Length': pdfBuffer.length.toString(),
+        'Content-Length': pdfBytes.byteLength.toString(),
       },
     });
   } catch (error) {
