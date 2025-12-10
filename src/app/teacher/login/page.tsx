@@ -16,9 +16,9 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { toast } from '@/components/ui/use-toast';
-import { GraduationCap, Mail } from 'lucide-react';
+import { BookOpen } from 'lucide-react';
 
-export default function LoginPage() {
+export default function TeacherLoginPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -31,9 +31,8 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      console.log('Iniciando login com:', formData.email);
+      console.log('Iniciando login de professor com:', formData.email);
 
-      // Usar signIn com redirect: false para controlar o fluxo
       const result = await signIn('credentials', {
         email: formData.email,
         password: formData.password,
@@ -64,16 +63,16 @@ export default function LoginPage() {
       }
 
       if (result.ok) {
-        console.log('✅ Login bem-sucedido! Aguardando cookie...');
+        console.log('✅ Login de professor bem-sucedido! Aguardando cookie...');
         toast({
           title: 'Login realizado com sucesso!',
-          description: 'Redirecionando...',
+          description: 'Redirecionando para seu painel...',
         });
 
-        // CRÍTICO: Aguardar 1.5s para garantir que o cookie foi definido no browser e server
+        // Aguardar o cookie ser definido
         await new Promise((resolve) => setTimeout(resolve, 1500));
 
-        // Buscar sessão para obter o role do usuário
+        // Verificar se o usuário é professor
         try {
           const sessionRes = await fetch('/api/auth/session', {
             cache: 'no-store',
@@ -82,31 +81,22 @@ export default function LoginPage() {
 
           console.log('Session obtida:', session);
 
-          if (session?.user?.role) {
-            let dashboardUrl = '/student/dashboard'; // padrão
-            if (session.user.role === 'ADMIN') {
-              dashboardUrl = '/admin/dashboard';
-            } else if (session.user.role === 'TEACHER') {
-              dashboardUrl = '/teacher/dashboard';
-            }
-            console.log(
-              `Redirecionando para ${dashboardUrl} (role: ${session.user.role})`
-            );
-            // Usar window.location.href para forçar full page reload e garantir cookies
-            window.location.href = dashboardUrl;
+          if (session?.user?.role === 'TEACHER') {
+            console.log('Redirecionando para dashboard do professor');
+            window.location.href = '/teacher/dashboard';
           } else {
-            // Se não conseguir obter role, redireciona para student como fallback
-            console.log(
-              'Role não encontrado na sessão, redirecionando para student/dashboard'
-            );
-            window.location.href = '/student/dashboard';
+            toast({
+              title: 'Acesso negado',
+              description:
+                'Esta conta não tem permissão de professor. Use o login correto.',
+              variant: 'destructive',
+            });
+            setIsLoading(false);
           }
         } catch (error) {
           console.error('Erro ao obter sessão:', error);
-          // Fallback: tentar redirecionar mesmo sem sessão, middleware vai redirecionar se necessário
-          window.location.href = '/student/dashboard';
+          window.location.href = '/teacher/dashboard';
         }
-        // Não chamar setIsLoading(false) porque estamos redirecionando
       } else {
         toast({
           title: 'Erro',
@@ -132,8 +122,7 @@ export default function LoginPage() {
   const handleGoogleSignIn = async () => {
     setIsLoading(true);
     try {
-      // Redirecionar para endpoint que detectará o role após Google login
-      await signIn('google', { callbackUrl: '/' });
+      await signIn('google', { callbackUrl: '/teacher/dashboard' });
     } catch (error) {
       console.error('Google sign-in error:', error);
       toast({
@@ -146,19 +135,19 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-800 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-emerald-50 to-white dark:from-gray-900 dark:to-gray-800 p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1 text-center">
           <div className="flex justify-center mb-4">
-            <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
-              <GraduationCap className="h-7 w-7 text-primary" />
+            <div className="h-12 w-12 rounded-full bg-emerald-100 flex items-center justify-center">
+              <BookOpen className="h-7 w-7 text-emerald-600" />
             </div>
           </div>
           <CardTitle className="text-2xl font-bold">
-            Bem-vindo de volta
+            Portal do Professor
           </CardTitle>
           <CardDescription className="text-sm">
-            Entre com suas credenciais para acessar sua conta
+            Acesse sua área restrita com suas credenciais
           </CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit}>
@@ -191,8 +180,8 @@ export default function LoginPage() {
             </div>
             <div className="flex justify-end">
               <Link
-                href="/forgot-password"
-                className="text-sm text-primary hover:underline"
+                href="/teacher/forgot-password"
+                className="text-sm text-emerald-600 hover:underline"
               >
                 Esqueceu sua senha?
               </Link>
@@ -238,32 +227,27 @@ export default function LoginPage() {
               </div>
             </div>
 
-            <Button type="submit" className="w-full" disabled={isLoading}>
+            <Button
+              type="submit"
+              className="w-full bg-emerald-600 hover:bg-emerald-700"
+              disabled={isLoading}
+            >
               {isLoading ? 'Entrando...' : 'Entrar'}
             </Button>
-            <p className="text-sm text-center text-muted-foreground">
-              Não tem uma conta?{' '}
-              <Link
-                href="/register"
-                className="text-primary hover:underline font-medium"
-              >
-                Cadastre-se
-              </Link>
-            </p>
 
             <div className="space-y-2 pt-2 border-t">
               <p className="text-xs text-center text-muted-foreground">
-                Outro tipo de acesso?
+                Não é professor?
               </p>
               <div className="flex gap-2">
-                <Link href="/teacher/login" className="flex-1">
+                <Link href="/login" className="flex-1">
                   <Button variant="ghost" className="w-full text-xs">
-                    Professor
+                    Entrar como Aluno
                   </Button>
                 </Link>
                 <Link href="/admin/login" className="flex-1">
                   <Button variant="ghost" className="w-full text-xs">
-                    Admin
+                    Entrar como Admin
                   </Button>
                 </Link>
               </div>
