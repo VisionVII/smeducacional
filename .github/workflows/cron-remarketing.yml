@@ -20,27 +20,35 @@ jobs:
         run: |
           echo "🚀 Iniciando cron job de remarketing..."
 
-          # Fazer call HTTP para o endpoint de cron
+          # Fazer call HTTP para o endpoint de cron com tratamento de erro
           RESPONSE=$(curl -s -w "\n%{http_code}" -X POST \
             https://smeducacional.vercel.app/api/cron/remarketing \
             -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
             -H "Content-Type: application/json" \
-            -H "User-Agent: GitHub-Actions")
+            -H "User-Agent: GitHub-Actions" \
+            --connect-timeout 10 \
+            --max-time 30)
 
           # Separar status code da response
           HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
-          BODY=$(echo "$RESPONSE" | head -n-1)
+          BODY=$(echo "$RESPONSE" | sed '$d')
 
           echo "📊 Status HTTP: $HTTP_CODE"
-          echo "📝 Response: $BODY"
+          echo "📝 Response Body:"
+          echo "$BODY"
 
           # Validar resposta
-          if [ "$HTTP_CODE" = "200" ]; then
+          if [ "$HTTP_CODE" = "200" ] || [ "$HTTP_CODE" = "201" ]; then
             echo "✅ Cron job executado com sucesso!"
             exit 0
+          elif [ "$HTTP_CODE" = "401" ]; then
+            echo "⚠️ Erro de autenticação - verifique CRON_SECRET no GitHub"
+            exit 1
+          elif [ "$HTTP_CODE" = "404" ]; then
+            echo "⚠️ Endpoint não encontrado"
+            exit 1
           else
-            echo "❌ Erro ao executar cron job!"
-            echo "Body: $BODY"
+            echo "❌ Erro ao executar cron job (HTTP $HTTP_CODE)!"
             exit 1
           fi
 

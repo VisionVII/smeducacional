@@ -2,12 +2,10 @@ import { NextAuthOptions } from 'next-auth';
 import { getServerSession } from 'next-auth/next';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import GoogleProvider from 'next-auth/providers/google';
-import { PrismaAdapter } from '@auth/prisma-adapter';
 import bcrypt from 'bcryptjs';
 import { prisma } from '@/lib/db';
 
 export const authOptions: NextAuthOptions = {
-  adapter: PrismaAdapter(prisma) as any,
   secret: process.env.NEXTAUTH_SECRET,
   session: {
     strategy: 'jwt',
@@ -50,11 +48,13 @@ export const authOptions: NextAuthOptions = {
 
         return {
           id: user.id,
-          email: user.email,
+          email: user.email!,
           name: user.name,
           role: user.role,
           avatar: user.avatar,
-        };
+          password: user.password,
+          emailVerified: user.emailVerified,
+        } as any;
       },
     }),
     // Adicionar Google Provider apenas se credenciais estiverem configuradas
@@ -68,9 +68,41 @@ export const authOptions: NextAuthOptions = {
       : []),
   ],
   callbacks: {
-    async jwt({ token, user }) {
-      // Quando usuário faz login (tem user)
-      if (user) {
+    async jwt({ token, user, account, profile }) {
+      // Login com Google OAuth
+      if (account?.provider === 'google' && profile?.email) {
+        try {
+          // Buscar ou criar usuário no banco
+          let dbUser = await prisma.user.findUnique({
+            where: { email: profile.email },
+          });
+
+          if (!dbUser) {
+            // Criar novo usuário
+            dbUser = await prisma.user.create({
+              data: {
+                email: profile.email,
+                name: profile.name || profile.email.split('@')[0],
+                avatar: (profile as any).picture || null,
+                emailVerified: new Date(),
+                role: 'STUDENT', // Padrão para novos usuários
+              },
+            });
+            console.log('[auth][jwt] Novo usuário Google criado:', dbUser.id);
+          }
+
+          token.id = dbUser.id;
+          token.role = dbUser.role;
+          token.avatar = dbUser.avatar;
+          token.name = dbUser.name;
+          token.email = dbUser.email;
+        } catch (error) {
+          console.error('[auth][jwt] Erro ao criar usuário Google:', error);
+        }
+      }
+
+      // Login com credenciais (tem user)
+      if (user && !account) {
         console.log(
           '[auth][jwt] Login bem-sucedido, salvando dados no token:',
           {
@@ -82,12 +114,12 @@ export const authOptions: NextAuthOptions = {
         token.id = user.id;
         token.role = (user as any).role;
         token.avatar = (user as any).avatar;
-        token.name = user.name;
-        token.email = user.email;
+        token.name = user.name || '';
+        token.email = user.email || '';
       }
 
       // Se não tem user mas tem token.id, recarregar do banco
-      if (token.id && !user) {
+      if (token.id && !user && !account) {
         try {
           const dbUser = await prisma.user.findUnique({
             where: { id: token.id as string },
