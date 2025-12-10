@@ -86,18 +86,18 @@ export async function POST(request: Request) {
     });
 
     // Buscar o módulo para pegar o curso
-    const module = await prisma.module.findUnique({
+    const courseModule = await prisma.module.findUnique({
       where: { id: data.moduleId },
       include: {
         course: true,
       },
     });
 
-    if (module) {
+    if (courseModule) {
       // Notificar alunos matriculados
       const enrollments = await prisma.enrollment.findMany({
         where: {
-          courseId: module.courseId,
+          courseId: courseModule.courseId,
           status: 'ACTIVE',
         },
       });
@@ -108,7 +108,7 @@ export async function POST(request: Request) {
             data: {
               userId: enrollment.studentId,
               title: 'Nova atividade disponível!',
-              message: `Uma nova atividade foi adicionada ao curso ${module.course.title}`,
+              message: `Uma nova atividade foi adicionada ao curso ${courseModule.course.title}`,
               type: 'ACTIVITY',
             },
           })
