@@ -74,16 +74,66 @@ export const authOptions: NextAuthOptions = {
       : []),
   ],
   callbacks: {
+    async signIn({ user, account, profile }) {
+      console.log('[auth][signIn] Iniciando sign in:', {
+        provider: account?.provider,
+        userEmail: user?.email,
+      });
+
+      // Google OAuth
+      if (account?.provider === 'google') {
+        try {
+          console.log('[auth][signIn] Validando conta Google:', profile?.email);
+
+          // Validar que email existe
+          if (!profile?.email) {
+            console.error('[auth][signIn] Google profile sem email');
+            return false;
+          }
+
+          console.log('[auth][signIn] ✅ Google sign in permitido');
+          return true;
+        } catch (error) {
+          console.error('[auth][signIn] Erro no Google sign in:', error);
+          return false;
+        }
+      }
+
+      // Credentials provider
+      if (account?.provider === 'credentials') {
+        console.log('[auth][signIn] ✅ Credentials sign in permitido');
+        return true;
+      }
+
+      console.log('[auth][signIn] Provider desconhecido:', account?.provider);
+      return true;
+    },
     async jwt({ token, user, account, profile }) {
+      console.log('[auth][jwt] Iniciando JWT callback:', {
+        hasUser: !!user,
+        hasAccount: !!account,
+        accountProvider: account?.provider,
+        profileEmail: profile?.email,
+      });
+
       // Login com Google OAuth
       if (account?.provider === 'google' && profile?.email) {
         try {
+          console.log(
+            '[auth][jwt] Processando login Google para:',
+            profile.email
+          );
+
           // Buscar ou criar usuário no banco
           let dbUser = await prisma.user.findUnique({
             where: { email: profile.email },
           });
 
           if (!dbUser) {
+            console.log(
+              '[auth][jwt] Usuário não existe, criando novo:',
+              profile.email
+            );
             // Criar novo usuário
             dbUser = await prisma.user.create({
               data: {
@@ -95,6 +145,8 @@ export const authOptions: NextAuthOptions = {
               },
             });
             console.log('[auth][jwt] Novo usuário Google criado:', dbUser.id);
+          } else {
+            console.log('[auth][jwt] Usuário existente encontrado:', dbUser.id);
           }
 
           token.id = dbUser.id;
@@ -102,8 +154,16 @@ export const authOptions: NextAuthOptions = {
           token.avatar = dbUser.avatar;
           token.name = dbUser.name;
           token.email = dbUser.email;
+          console.log(
+            '[auth][jwt] Token atualizado com sucesso para:',
+            dbUser.email
+          );
         } catch (error) {
-          console.error('[auth][jwt] Erro ao criar usuário Google:', error);
+          console.error('[auth][jwt] Erro ao processar login Google:', {
+            error: error instanceof Error ? error.message : String(error),
+            stack: error instanceof Error ? error.stack : undefined,
+          });
+          throw error;
         }
       }
 
