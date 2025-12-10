@@ -38,7 +38,13 @@ export const authOptions: NextAuthOptions = {
         password: { label: 'Password', type: 'password' },
       },
       async authorize(credentials) {
+        console.log('[auth][authorize] Iniciando autorização:', {
+          email: credentials?.email,
+          hasPassword: !!credentials?.password,
+        });
+
         if (!credentials?.email || !credentials?.password) {
+          console.error('[auth][authorize] Credenciais faltando');
           throw new Error('Email e senha são obrigatórios');
         }
 
@@ -48,11 +54,20 @@ export const authOptions: NextAuthOptions = {
           },
         });
 
+        console.log('[auth][authorize] Usuário encontrado:', {
+          found: !!user,
+          email: user?.email,
+          hasPassword: !!user?.password,
+          role: user?.role,
+        });
+
         if (!user) {
+          console.error('[auth][authorize] Usuário não encontrado');
           throw new Error('Usuário não encontrado');
         }
 
         if (!user.password) {
+          console.error('[auth][authorize] Usuário sem senha (OAuth)');
           throw new Error(
             'Este usuário foi criado via OAuth. Use o provedor original para fazer login.'
           );
@@ -63,9 +78,22 @@ export const authOptions: NextAuthOptions = {
           user.password
         );
 
+        console.log('[auth][authorize] Validação de senha:', {
+          isValid: isPasswordValid,
+          passwordLength: credentials.password.length,
+          hashLength: user.password.length,
+        });
+
         if (!isPasswordValid) {
+          console.error('[auth][authorize] Senha inválida');
           throw new Error('Credenciais inválidas');
         }
+
+        console.log('[auth][authorize] Login autorizado com sucesso:', {
+          id: user.id,
+          email: user.email,
+          role: user.role,
+        });
 
         return {
           id: user.id,
@@ -183,13 +211,14 @@ export const authOptions: NextAuthOptions = {
       }
 
       // Login com credenciais (tem user)
-      if (user && !account) {
+      if (user) {
         console.log(
           '[auth][jwt] Login bem-sucedido, salvando dados no token:',
           {
             id: user.id,
             email: user.email,
             role: (user as any).role,
+            hasAccount: !!account,
           }
         );
         token.id = user.id;
@@ -200,7 +229,7 @@ export const authOptions: NextAuthOptions = {
       }
 
       // Se não tem user mas tem token.id, recarregar do banco
-      if (token.id && !user && !account) {
+      if (token.id && !user) {
         try {
           const dbUser = await prisma.user.findUnique({
             where: { id: token.id as string },

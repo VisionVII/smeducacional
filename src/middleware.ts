@@ -37,6 +37,27 @@ function addSecurityHeaders(response: NextResponse): NextResponse {
     'camera=(), microphone=(), geolocation=(), interest-cohort=()'
   );
 
+  // Content Security Policy - Permitir Next.js HMR e scripts inline
+  const nonce = Buffer.from(crypto.randomUUID()).toString('base64');
+  const cspHeader = `
+    default-src 'self';
+    script-src 'self' 'unsafe-eval' 'unsafe-inline' https://cdn.jsdelivr.net https://www.googletagmanager.com;
+    style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+    img-src 'self' blob: data: https: http:;
+    font-src 'self' https://fonts.gstatic.com data:;
+    connect-src 'self' https: http: ws: wss:;
+    frame-src 'self';
+    object-src 'none';
+    base-uri 'self';
+    form-action 'self';
+    frame-ancestors 'none';
+    upgrade-insecure-requests;
+  `
+    .replace(/\s{2,}/g, ' ')
+    .trim();
+
+  response.headers.set('Content-Security-Policy', cspHeader);
+
   return response;
 }
 
