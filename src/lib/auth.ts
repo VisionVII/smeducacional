@@ -11,6 +11,21 @@ export const authOptions: NextAuthOptions = {
     strategy: 'jwt',
     maxAge: 30 * 24 * 60 * 60, // 30 dias
   },
+  cookies: {
+    sessionToken: {
+      name:
+        process.env.NODE_ENV === 'production'
+          ? '__Secure-next-auth.session-token'
+          : 'next-auth.session-token',
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        secure: process.env.NODE_ENV === 'production',
+      },
+    },
+  },
+  useSecureCookies: process.env.NODE_ENV === 'production',
   pages: {
     signIn: '/login',
     error: '/login',
@@ -209,6 +224,20 @@ export const authOptions: NextAuthOptions = {
       }
 
       return token;
+    },
+    async redirect({ url, baseUrl }) {
+      console.log('[auth][redirect] Processando redirect:', { url, baseUrl });
+
+      // Se URL é relativa, usar baseUrl
+      if (url.startsWith('/')) {
+        return `${baseUrl}${url}`;
+      }
+      // Se URL já começa com baseUrl, usar direto
+      else if (new URL(url).origin === baseUrl) {
+        return url;
+      }
+      // Caso contrário, voltar para baseUrl
+      return baseUrl;
     },
     async session({ session, token }) {
       // Adicionar todas as informações do token na sessão

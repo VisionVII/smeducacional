@@ -46,8 +46,12 @@ export async function middleware(request: NextRequest) {
   const protocol = request.headers.get('x-forwarded-proto');
   const allCookies = request.cookies.getAll();
   const cookieNames = allCookies.map((c) => c.name).join(', ');
-  const secureCookie = allCookies.find((c) =>
-    c.name.includes('next-auth.session-token')
+
+  // Procurar por ambos os tipos de cookie (seguro e não seguro)
+  const secureCookie = allCookies.find(
+    (c) =>
+      c.name === '__Secure-next-auth.session-token' ||
+      c.name === 'next-auth.session-token'
   );
 
   console.log(`🔍 [MIDDLEWARE DEBUG] FULL DIAGNOSTICS:`, {
@@ -60,12 +64,18 @@ export async function middleware(request: NextRequest) {
     cookieNames: cookieNames || 'NONE',
     foundAuthCookie: !!secureCookie,
     authCookieName: secureCookie?.name,
+    authCookieValue: secureCookie?.value ? 'EXISTS' : 'MISSING',
   });
 
   // getToken detecta automaticamente se deve usar cookie seguro baseado no protocolo
   const token = await getToken({
     req: request,
     secret: process.env.NEXTAUTH_SECRET,
+    // Importante: especificar cookieName baseado no ambiente
+    cookieName:
+      process.env.NODE_ENV === 'production'
+        ? '__Secure-next-auth.session-token'
+        : 'next-auth.session-token',
   });
 
   console.log(`🔍 [MIDDLEWARE DEBUG] getToken result:`, {
