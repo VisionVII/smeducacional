@@ -17,13 +17,16 @@ export async function GET(
     // Gerar PDF
     const pdfBuffer = await generateCertificatePDF(id);
 
+    // Converter Buffer para Uint8Array para compatibilidade com NextResponse
+    const pdfBytes = new Uint8Array(pdfBuffer);
+
     // Retornar PDF como download
-    return new NextResponse(pdfBuffer, {
+    return new NextResponse(pdfBytes, {
       status: 200,
       headers: {
         'Content-Type': 'application/pdf',
         'Content-Disposition': `attachment; filename="certificado-${id}.pdf"`,
-        'Content-Length': pdfBuffer.length.toString(),
+        'Content-Length': pdfBytes.length.toString(),
       },
     });
   } catch (error) {
