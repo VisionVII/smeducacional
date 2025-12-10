@@ -237,22 +237,9 @@ export default function AdminLoginPage() {
               {isLoading ? 'Entrando...' : 'Entrar'}
             </Button>
 
-            <div className="space-y-2 pt-2 border-t">
-              <p className="text-xs text-center text-muted-foreground">
-                Não é administrador?
-              </p>
-              <div className="flex gap-2">
-                <Link href="/login" className="flex-1">
-                  <Button variant="ghost" className="w-full text-xs">
-                    Entrar como Aluno
-                  </Button>
-                </Link>
-                <Link href="/teacher/login" className="flex-1">
-                  <Button variant="ghost" className="w-full text-xs">
-                    Entrar como Prof
-                  </Button>
-                </Link>
-              </div>
+            <div className="pt-4 border-t text-center text-xs text-muted-foreground space-y-2">
+              <p>É aluno? <Link href="/login" className="text-red-600 hover:underline font-medium">Fazer login</Link></p>
+              <p>Esqueceu sua senha? <Link href="/admin/forgot-password" className="text-red-600 hover:underline font-medium">Recuperar acesso</Link></p>
             </div>
           </CardFooter>
         </form>

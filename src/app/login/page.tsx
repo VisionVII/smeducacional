@@ -251,22 +251,25 @@ export default function LoginPage() {
               </Link>
             </p>
 
-            <div className="space-y-2 pt-2 border-t">
-              <p className="text-xs text-center text-muted-foreground">
-                Outro tipo de acesso?
+            <div className="pt-4 border-t text-center text-xs text-muted-foreground space-y-2">
+              <p>
+                É professor?{' '}
+                <Link
+                  href="/teacher"
+                  className="text-primary hover:underline font-medium"
+                >
+                  Conheça nosso programa
+                </Link>
               </p>
-              <div className="flex gap-2">
-                <Link href="/teacher/login" className="flex-1">
-                  <Button variant="ghost" className="w-full text-xs">
-                    Professor
-                  </Button>
+              <p className="text-muted-foreground/70">
+                Esqueceu sua senha?{' '}
+                <Link
+                  href="/forgot-password"
+                  className="text-primary hover:underline"
+                >
+                  Recuperar acesso
                 </Link>
-                <Link href="/admin/login" className="flex-1">
-                  <Button variant="ghost" className="w-full text-xs">
-                    Admin
-                  </Button>
-                </Link>
-              </div>
+              </p>
             </div>
           </CardFooter>
         </form>
