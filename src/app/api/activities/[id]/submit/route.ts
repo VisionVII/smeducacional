@@ -36,11 +36,11 @@ export async function POST(
       );
     }
 
-    const module = await prisma.module.findUnique({
+    const activityModule = await prisma.module.findUnique({
       where: { id: activity.moduleId },
     });
 
-    if (!module) {
+    if (!activityModule) {
       return NextResponse.json(
         { error: 'Módulo não encontrado' },
         { status: 404 }
@@ -52,7 +52,7 @@ export async function POST(
       where: {
         studentId_courseId: {
           studentId: session.user.id,
-          courseId: module.courseId,
+          courseId: activityModule.courseId,
         },
       },
     });

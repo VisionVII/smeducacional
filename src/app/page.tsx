@@ -4,7 +4,18 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Footer } from '@/components/footer';
-import { BookOpen, GraduationCap, Award, Users, Moon, Sun, TrendingUp, Clock, CheckCircle, Star } from 'lucide-react';
+import {
+  BookOpen,
+  GraduationCap,
+  Award,
+  Users,
+  Moon,
+  Sun,
+  TrendingUp,
+  Clock,
+  CheckCircle,
+  Star,
+} from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { AuthRedirectCheck } from '@/components/auth-redirect-check';
 
@@ -27,12 +38,18 @@ export default function HomePage() {
           <Link href="/" className="flex items-center gap-2 flex-shrink-0">
             <GraduationCap className="h-8 w-8 md:h-10 md:w-10 text-primary" />
           </Link>
-          
+
           <nav className="hidden sm:flex gap-4 md:gap-6 items-center">
-            <Link href="/courses" className="text-sm md:text-base hover:text-primary transition-colors">
+            <Link
+              href="/courses"
+              className="text-sm md:text-base hover:text-primary transition-colors"
+            >
               Cursos
             </Link>
-            <Link href="/about" className="text-sm md:text-base hover:text-primary transition-colors">
+            <Link
+              href="/about"
+              className="text-sm md:text-base hover:text-primary transition-colors"
+            >
               Sobre
             </Link>
           </nav>
@@ -65,16 +82,24 @@ export default function HomePage() {
       {/* Hero Section */}
       <section className="container mx-auto px-4 py-12 md:py-20 text-center flex-1">
         <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 md:mb-6 leading-tight">
-          Aprenda no seu ritmo,<br />conquiste seus objetivos
+          Aprenda no seu ritmo,
+          <br />
+          conquiste seus objetivos
         </h1>
         <p className="text-base sm:text-lg md:text-xl text-muted-foreground mb-6 md:mb-8 max-w-2xl mx-auto leading-relaxed px-4">
-          Plataforma completa de ensino com cursos, certificados e acompanhamento personalizado
+          Plataforma completa de ensino com cursos, certificados e
+          acompanhamento personalizado
         </p>
         <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center items-center px-4">
           <Button asChild size="lg" className="w-full sm:w-auto min-w-[160px]">
             <Link href="/courses">Explorar Cursos</Link>
           </Button>
-          <Button asChild size="lg" variant="outline" className="w-full sm:w-auto min-w-[160px]">
+          <Button
+            asChild
+            size="lg"
+            variant="outline"
+            className="w-full sm:w-auto min-w-[160px]"
+          >
             <Link href="/about">Saiba Mais</Link>
           </Button>
         </div>
@@ -88,21 +113,27 @@ export default function HomePage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
           <div className="text-center p-6 rounded-lg border bg-card hover:shadow-lg transition-shadow">
             <BookOpen className="h-10 w-10 md:h-12 md:w-12 mx-auto mb-3 md:mb-4 text-primary" />
-            <h3 className="text-lg md:text-xl font-semibold mb-2">Cursos Completos</h3>
+            <h3 className="text-lg md:text-xl font-semibold mb-2">
+              Cursos Completos
+            </h3>
             <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
               Aulas em vídeo, materiais extras e exercícios práticos
             </p>
           </div>
           <div className="text-center p-6 rounded-lg border bg-card hover:shadow-lg transition-shadow">
             <Award className="h-10 w-10 md:h-12 md:w-12 mx-auto mb-3 md:mb-4 text-primary" />
-            <h3 className="text-lg md:text-xl font-semibold mb-2">Certificados</h3>
+            <h3 className="text-lg md:text-xl font-semibold mb-2">
+              Certificados
+            </h3>
             <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
               Certificado digital ao concluir cada curso
             </p>
           </div>
           <div className="text-center p-6 rounded-lg border bg-card hover:shadow-lg transition-shadow sm:col-span-2 lg:col-span-1">
             <Users className="h-10 w-10 md:h-12 md:w-12 mx-auto mb-3 md:mb-4 text-primary" />
-            <h3 className="text-lg md:text-xl font-semibold mb-2">Suporte Dedicado</h3>
+            <h3 className="text-lg md:text-xl font-semibold mb-2">
+              Suporte Dedicado
+            </h3>
             <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
               Professores disponíveis para tirar suas dúvidas
             </p>
@@ -115,20 +146,36 @@ export default function HomePage() {
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
             <div className="text-center">
-              <div className="text-3xl md:text-4xl font-bold text-primary mb-2">100+</div>
-              <p className="text-sm md:text-base text-muted-foreground">Cursos Disponíveis</p>
+              <div className="text-3xl md:text-4xl font-bold text-primary mb-2">
+                100+
+              </div>
+              <p className="text-sm md:text-base text-muted-foreground">
+                Cursos Disponíveis
+              </p>
             </div>
             <div className="text-center">
-              <div className="text-3xl md:text-4xl font-bold text-primary mb-2">5.000+</div>
-              <p className="text-sm md:text-base text-muted-foreground">Alunos Ativos</p>
+              <div className="text-3xl md:text-4xl font-bold text-primary mb-2">
+                5.000+
+              </div>
+              <p className="text-sm md:text-base text-muted-foreground">
+                Alunos Ativos
+              </p>
             </div>
             <div className="text-center">
-              <div className="text-3xl md:text-4xl font-bold text-primary mb-2">50+</div>
-              <p className="text-sm md:text-base text-muted-foreground">Professores</p>
+              <div className="text-3xl md:text-4xl font-bold text-primary mb-2">
+                50+
+              </div>
+              <p className="text-sm md:text-base text-muted-foreground">
+                Professores
+              </p>
             </div>
             <div className="text-center">
-              <div className="text-3xl md:text-4xl font-bold text-primary mb-2">98%</div>
-              <p className="text-sm md:text-base text-muted-foreground">Satisfação</p>
+              <div className="text-3xl md:text-4xl font-bold text-primary mb-2">
+                98%
+              </div>
+              <p className="text-sm md:text-base text-muted-foreground">
+                Satisfação
+              </p>
             </div>
           </div>
         </div>
@@ -146,9 +193,12 @@ export default function HomePage() {
                 <Clock className="h-5 w-5 text-primary" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold mb-2">Aprenda no seu tempo</h3>
+                <h3 className="text-lg font-semibold mb-2">
+                  Aprenda no seu tempo
+                </h3>
                 <p className="text-muted-foreground">
-                  Acesse os cursos quando quiser, de onde estiver. Aprenda no seu ritmo, sem pressão.
+                  Acesse os cursos quando quiser, de onde estiver. Aprenda no
+                  seu ritmo, sem pressão.
                 </p>
               </div>
             </div>
@@ -157,9 +207,12 @@ export default function HomePage() {
                 <TrendingUp className="h-5 w-5 text-primary" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold mb-2">Acompanhe seu progresso</h3>
+                <h3 className="text-lg font-semibold mb-2">
+                  Acompanhe seu progresso
+                </h3>
                 <p className="text-muted-foreground">
-                  Sistema completo de acompanhamento com estatísticas e relatórios detalhados.
+                  Sistema completo de acompanhamento com estatísticas e
+                  relatórios detalhados.
                 </p>
               </div>
             </div>
@@ -168,9 +221,12 @@ export default function HomePage() {
                 <CheckCircle className="h-5 w-5 text-primary" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold mb-2">Certificação reconhecida</h3>
+                <h3 className="text-lg font-semibold mb-2">
+                  Certificação reconhecida
+                </h3>
                 <p className="text-muted-foreground">
-                  Certificados digitais válidos que comprovam seu conhecimento e habilidades.
+                  Certificados digitais válidos que comprovam seu conhecimento e
+                  habilidades.
                 </p>
               </div>
             </div>
@@ -192,10 +248,13 @@ export default function HomePage() {
                 ))}
               </div>
               <p className="text-muted-foreground mb-4">
-                "Excelente plataforma! Os cursos são muito bem estruturados e os professores são atenciosos."
+                &ldquo;Excelente plataforma! Os cursos são muito bem
+                estruturados e os professores são atenciosos.&rdquo;
               </p>
               <p className="font-semibold">Maria Silva</p>
-              <p className="text-sm text-muted-foreground">Desenvolvedora Web</p>
+              <p className="text-sm text-muted-foreground">
+                Desenvolvedora Web
+              </p>
             </div>
             <div className="bg-card p-6 rounded-lg border">
               <div className="flex gap-1 mb-4">
@@ -204,7 +263,8 @@ export default function HomePage() {
                 ))}
               </div>
               <p className="text-muted-foreground mb-4">
-                "Consegui mudar de carreira graças aos cursos da plataforma. Recomendo muito!"
+                &ldquo;Consegui mudar de carreira graças aos cursos da
+                plataforma. Recomendo muito!&rdquo;
               </p>
               <p className="font-semibold">João Santos</p>
               <p className="text-sm text-muted-foreground">Analista de Dados</p>
@@ -216,7 +276,8 @@ export default function HomePage() {
                 ))}
               </div>
               <p className="text-muted-foreground mb-4">
-                "Material de qualidade e certificados que realmente agregam valor ao currículo."
+                &ldquo;Material de qualidade e certificados que realmente
+                agregam valor ao currículo.&rdquo;
               </p>
               <p className="font-semibold">Ana Costa</p>
               <p className="text-sm text-muted-foreground">Designer UX/UI</p>

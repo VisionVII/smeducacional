@@ -257,7 +257,7 @@ function LandingPageContent() {
           <div className="max-w-2xl mx-auto text-center">
             <MessageCircle className="h-12 w-12 text-primary mx-auto mb-4" />
             <blockquote className="text-2xl font-semibold mb-4 leading-relaxed">
-              "{config.testimonial}"
+              &ldquo;{config.testimonial}&rdquo;
             </blockquote>
             <p className="text-lg text-muted-foreground font-medium">
               — {config.testimonialAuthor}
