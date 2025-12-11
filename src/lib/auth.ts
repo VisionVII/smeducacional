@@ -112,6 +112,7 @@ export const authOptions: NextAuthOptions = {
           GoogleProvider({
             clientId: process.env.GOOGLE_CLIENT_ID,
             clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+            allowDangerousEmailAccountLinking: true,
           }),
         ]
       : []),
@@ -152,36 +153,43 @@ export const authOptions: NextAuthOptions = {
       return true;
     },
     async jwt({ token, user, account, profile }) {
-      console.log('[auth][jwt] Iniciando JWT callback:', {
+      console.log('[auth][jwt] ========== INICIANDO JWT CALLBACK ==========');
+      console.log('[auth][jwt] Estado:', {
         hasUser: !!user,
         hasAccount: !!account,
         accountProvider: account?.provider,
         profileEmail: profile?.email,
+        userEmail: user?.email,
+        tokenId: token.id,
+        tokenRole: token.role,
       });
 
       // Login com Google OAuth
-      if (account?.provider === 'google' && profile?.email) {
+      // Em produção, alguns provedores podem não preencher profile.email.
+      // Garantimos usando user.email como fallback.
+      if (account?.provider === 'google' && (profile?.email || user?.email)) {
         try {
-          console.log(
-            '[auth][jwt] Processando login Google para:',
-            profile.email
-          );
+          const oauthEmail = profile?.email || user?.email!;
+          console.log('[auth][jwt] Processando login Google para:', oauthEmail);
 
           // Buscar ou criar usuário no banco
           let dbUser = await prisma.user.findUnique({
-            where: { email: profile.email },
+            where: { email: oauthEmail },
           });
 
           if (!dbUser) {
             console.log(
               '[auth][jwt] Usuário não existe, criando novo:',
-              profile.email
+              oauthEmail
             );
             // Criar novo usuário
             dbUser = await prisma.user.create({
               data: {
-                email: profile.email,
-                name: profile.name || profile.email.split('@')[0],
+                email: oauthEmail,
+                name:
+                  (profile as any)?.name ||
+                  (user as any)?.name ||
+                  oauthEmail.split('@')[0],
                 avatar: (profile as any).picture || null,
                 emailVerified: new Date(),
                 role: 'STUDENT', // Padrão para novos usuários
@@ -197,21 +205,29 @@ export const authOptions: NextAuthOptions = {
           token.avatar = dbUser.avatar;
           token.name = dbUser.name;
           token.email = dbUser.email;
+          console.log('[auth][jwt] ✅ Token Google preenchido com sucesso:', {
+            id: dbUser.id,
+            email: dbUser.email,
+            role: dbUser.role,
+          });
           console.log(
-            '[auth][jwt] Token atualizado com sucesso para:',
-            dbUser.email
+            '[auth][jwt] ========== FIM JWT CALLBACK (GOOGLE) =========='
           );
+          return token;
         } catch (error) {
-          console.error('[auth][jwt] Erro ao processar login Google:', {
+          console.error('[auth][jwt] ❌ Erro ao processar login Google:', {
             error: error instanceof Error ? error.message : String(error),
             stack: error instanceof Error ? error.stack : undefined,
           });
+          console.log(
+            '[auth][jwt] ========== FIM JWT CALLBACK (ERRO) =========='
+          );
           throw error;
         }
       }
 
-      // Login com credenciais (tem user)
-      if (user) {
+      // Login com credenciais (tem user e não é OAuth já processado)
+      if (user && account?.provider !== 'google') {
         console.log(
           '[auth][jwt] Login bem-sucedido, salvando dados no token:',
           {
@@ -246,12 +262,22 @@ export const authOptions: NextAuthOptions = {
             token.email = dbUser.email;
             token.role = dbUser.role;
             token.avatar = dbUser.avatar;
+            console.log('[auth][jwt] Recarregado do banco:', {
+              id: dbUser.id,
+              role: dbUser.role,
+            });
           }
         } catch (error) {
           console.error('Erro ao recarregar usuário no JWT:', error);
         }
       }
 
+      console.log('[auth][jwt] ========== FIM JWT CALLBACK (FINAL) ==========');
+      console.log('[auth][jwt] Token retornado:', {
+        id: token.id,
+        role: token.role,
+        email: token.email,
+      });
       return token;
     },
     async redirect({ url, baseUrl }) {
@@ -300,7 +326,22 @@ export const authOptions: NextAuthOptions = {
       }
       // Caso contrário, voltar para baseUrl
       return baseUrl;
-    },
+      async redirect({ url, baseUrl }) {
+        console.log('[auth][redirect] Processando redirect:', { url, baseUrl });
+
+        // Se URL é relativa e começa com /, usar direto com baseUrl
+        if (url.startsWith('/')) {
+          return `${baseUrl}${url}`;
+        }
+
+        // Se URL já tem baseUrl, usar direto
+        if (new URL(url).origin === baseUrl) {
+          return url;
+        }
+
+        // Fallback: voltar para baseUrl
+        return baseUrl;
+      },
     async session({ session, token }) {
       // Adicionar todas as informações do token na sessão
       if (session?.user) {
