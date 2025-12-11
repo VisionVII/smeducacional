@@ -163,6 +163,23 @@ export async function PUT(
     }
     console.log('[API] Dados normalizados para update:', dataToUpdate);
     validatedData = dataToUpdate;
+    // ✅ CRÍTICO: Derivar isPaid automaticamente baseado no preço
+    if (validatedData.price !== undefined) {
+      validatedData.isPaid = validatedData.price > 0;
+      console.log('[API] isPaid derivado:', validatedData.isPaid, 'baseado em price:', validatedData.price);
+    }
+
+    // ✅ Validar compareAtPrice > price (se ambos estiverem presentes)
+    if (validatedData.compareAtPrice !== undefined && validatedData.compareAtPrice !== null) {
+      const priceToCompare = validatedData.price !== undefined ? validatedData.price : course.price;
+      if (validatedData.compareAtPrice <= priceToCompare) {
+        return NextResponse.json(
+          { error: 'Preço comparativo deve ser maior que o preço atual' },
+          { status: 400 }
+        );
+      }
+    }
+
 
     // Se estiver alterando o slug, verificar se não existe outro curso com esse slug
     if (validatedData.slug && validatedData.slug !== course.slug) {

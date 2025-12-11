@@ -206,6 +206,20 @@ export default async function TeacherCoursesPage() {
                             <span className="flex items-center gap-1">
                               <Users className="h-4 w-4" />
                               {course._count.enrollments} alunos
+                                                        <span className="flex items-center gap-1 font-semibold">
+                                                          {course.isPaid ? (
+                                                            <span className="text-green-600">
+                                                              R$ {course.price?.toFixed(2)}
+                                                              {course.compareAtPrice && (
+                                                                <span className="ml-2 text-xs text-gray-400 line-through">
+                                                                  R$ {course.compareAtPrice.toFixed(2)}
+                                                                </span>
+                                                              )}
+                                                            </span>
+                                                          ) : (
+                                                            <span className="text-blue-600">Gratuito</span>
+                                                          )}
+                                                        </span>
                             </span>
                             {course.level && (
                               <span className="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded text-xs">
