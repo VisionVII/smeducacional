@@ -122,17 +122,49 @@ export default function EditCoursePage({
     setIsLoading(true);
 
     try {
-      const payload = {
-        ...formData,
-        duration: formData.duration ? parseInt(formData.duration) : undefined,
-        price: parseFloat(formData.price),
-        compareAtPrice: formData.compareAtPrice
-          ? parseFloat(formData.compareAtPrice)
-          : undefined,
-        thumbnail: formData.thumbnail || undefined,
-        requirements: formData.requirements || undefined,
-        whatYouLearn: formData.whatYouLearn || undefined,
+      // Sanitizar dados antes de enviar
+      const duration = formData.duration?.trim();
+      const price = formData.price?.trim();
+      const compareAtPrice = formData.compareAtPrice?.trim();
+
+      const payload: any = {
+        title: formData.title,
+        slug: formData.slug,
+        description: formData.description,
+        level: formData.level,
+        isPaid: formData.isPaid,
+        isPublished: formData.isPublished,
+        categoryId: formData.categoryId,
       };
+
+      // Adicionar campos opcionais apenas se tiverem valor válido
+      if (duration && !isNaN(parseInt(duration))) {
+        payload.duration = parseInt(duration);
+      }
+
+      if (price && !isNaN(parseFloat(price))) {
+        payload.price = parseFloat(price);
+      }
+
+      if (compareAtPrice && !isNaN(parseFloat(compareAtPrice))) {
+        payload.compareAtPrice = parseFloat(compareAtPrice);
+      } else {
+        payload.compareAtPrice = null; // Explicitamente null se vazio
+      }
+
+      if (formData.thumbnail?.trim()) {
+        payload.thumbnail = formData.thumbnail.trim();
+      }
+
+      if (formData.requirements?.trim()) {
+        payload.requirements = formData.requirements.trim();
+      }
+
+      if (formData.whatYouLearn?.trim()) {
+        payload.whatYouLearn = formData.whatYouLearn.trim();
+      }
+
+      console.log('[EDIT] Payload enviado:', payload);
 
       const response = await fetch(`/api/courses/${courseId}`, {
         method: 'PUT',
@@ -149,11 +181,23 @@ export default function EditCoursePage({
         });
         router.push('/teacher/courses');
       } else {
+        const errorText = await response.text();
+        let errorMessage = 'Tente novamente mais tarde.';
+
+        try {
+          const errorData = JSON.parse(errorText);
+          errorMessage = errorData.error || errorMessage;
+          console.error('[EDIT] Erro do servidor:', errorData);
+        } catch {
+          console.error('[EDIT] Resposta de erro:', errorText);
+        }
+
         toast({
           title: 'Erro ao atualizar curso',
-          description: data.error || 'Tente novamente mais tarde.',
+          description: errorMessage,
           variant: 'destructive',
         });
+        console.error('[EDIT] Erro na requisição:', error);
       }
     } catch (error) {
       toast({
@@ -420,20 +464,29 @@ export default function EditCoursePage({
                     }))
                   }
                 />
-                {formData.compareAtPrice &&
-                  parseFloat(formData.compareAtPrice) >
-                    parseFloat(formData.price) && (
-                    <p className="text-xs text-green-600 font-medium">
-                      💰 Desconto:{' '}
-                      {(
-                        ((parseFloat(formData.compareAtPrice) -
-                          parseFloat(formData.price)) /
-                          parseFloat(formData.compareAtPrice)) *
-                        100
-                      ).toFixed(0)}
-                      % OFF
-                    </p>
-                  )}
+                {(() => {
+                  const comparePrice = parseFloat(
+                    formData.compareAtPrice || '0'
+                  );
+                  const currentPrice = parseFloat(formData.price || '0');
+
+                  if (
+                    !isNaN(comparePrice) &&
+                    !isNaN(currentPrice) &&
+                    comparePrice > 0 &&
+                    currentPrice > 0 &&
+                    comparePrice > currentPrice
+                  ) {
+                    const discount =
+                      ((comparePrice - currentPrice) / comparePrice) * 100;
+                    return (
+                      <p className="text-xs text-green-600 font-medium">
+                        💰 Desconto: {discount.toFixed(0)}% OFF
+                      </p>
+                    );
+                  }
+                  return null;
+                })()}
               </div>
             </div>
 

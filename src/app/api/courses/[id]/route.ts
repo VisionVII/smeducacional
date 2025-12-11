@@ -5,18 +5,37 @@ import { z } from 'zod';
 
 // Schema de validação para atualização de curso
 const updateCourseSchema = z.object({
-  title: z.string().min(3).optional(),
-  slug: z.string().min(3).optional(),
-  description: z.string().min(10).optional(),
-  thumbnail: z.string().url().optional(),
-  duration: z.number().positive().optional(),
-  level: z.enum(['Iniciante', 'Intermediário', 'Avançado']).optional(),
-  price: z.number().min(0).optional(),
-  compareAtPrice: z.number().min(0).optional().nullable(),
+  title: z.string().min(3, 'Título deve ter no mínimo 3 caracteres').optional(),
+  slug: z.string().min(3, 'Slug deve ter no mínimo 3 caracteres').optional(),
+  description: z
+    .string()
+    .min(10, 'Descrição deve ter no mínimo 10 caracteres')
+    .optional(),
+  thumbnail: z
+    .union([
+      z.string().url('URL da thumbnail inválida'),
+      z.string().length(0),
+      z.undefined(),
+    ])
+    .optional(),
+  duration: z.number().positive('Duração deve ser positiva').optional(),
+  level: z
+    .enum(['Iniciante', 'Intermediário', 'Avançado'], {
+      errorMap: () => ({ message: 'Nível inválido' }),
+    })
+    .optional(),
+  price: z.number().min(0, 'Preço não pode ser negativo').optional(),
+  compareAtPrice: z
+    .union([
+      z.number().min(0, 'Preço comparativo não pode ser negativo'),
+      z.null(),
+      z.undefined(),
+    ])
+    .optional(),
   isPaid: z.boolean().optional(),
   isPublished: z.boolean().optional(),
-  requirements: z.string().optional(),
-  whatYouLearn: z.string().optional(),
+  requirements: z.union([z.string(), z.undefined()]).optional(),
+  whatYouLearn: z.union([z.string(), z.undefined()]).optional(),
   categoryId: z.string().optional(),
 });
 
@@ -109,7 +128,24 @@ export async function PUT(
     }
 
     const body = await req.json();
-    const validatedData = updateCourseSchema.parse(body);
+
+    console.log('[API] Dados recebidos:', body);
+
+    const validation = updateCourseSchema.safeParse(body);
+
+    if (!validation.success) {
+      console.error('[API] Erro de validação:', validation.error.errors);
+      const firstError = validation.error.errors[0];
+      return NextResponse.json(
+        {
+          error: `${firstError.path.join('.')}: ${firstError.message}`,
+          details: validation.error.errors,
+        },
+        { status: 400 }
+      );
+    }
+
+    const validatedData = validation.data;
 
     // Se estiver alterando o slug, verificar se não existe outro curso com esse slug
     if (validatedData.slug && validatedData.slug !== course.slug) {
