@@ -353,89 +353,93 @@ function CoursesClient() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredCourses.map((course) => {
-              const isPaid = typeof course.price === 'number' && course.price > 0;
+              const isPaid =
+                typeof course.price === 'number' && course.price > 0;
               return (
-              <Card
-                key={course.id}
-                className="flex flex-col hover:shadow-lg transition-shadow overflow-hidden"
-              >
-                {/* Thumbnail */}
-                <div className="w-full h-48 relative overflow-hidden">
-                  {course.thumbnail ? (
-                    <img
-                      src={course.thumbnail}
-                      alt={course.title}
-                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                    />
-                  ) : (
-                    <div className="w-full h-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
-                      <BookOpen className="h-16 w-16 text-primary/40" />
-                    </div>
-                  )}
-                  {!isPaid && (
-                    <div className="absolute top-2 right-2 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-semibold">
-                      GRATUITO
-                    </div>
-                  )}
-                </div>
-
-                <CardHeader>
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="px-3 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary">
-                      {course.category.name}
-                    </span>
-                    {course.level && (
-                      <span className="px-2 py-1 rounded-full text-xs bg-muted text-muted-foreground">
-                        {course.level}
-                      </span>
-                    )}
-                  </div>
-                  <CardTitle className="line-clamp-2">{course.title}</CardTitle>
-                  <CardDescription>
-                    Por {course.instructor.name}
-                  </CardDescription>
-                </CardHeader>
-
-                <CardContent className="flex-1">
-                  <p className="text-sm text-muted-foreground line-clamp-3 mb-4">
-                    {course.description}
-                  </p>
-                  <div className="flex flex-wrap gap-3 text-sm text-muted-foreground">
-                    {course.duration && (
-                      <div className="flex items-center gap-1">
-                        <Clock className="h-4 w-4" />
-                        <span>{Math.floor(course.duration / 60)}h</span>
+                <Card
+                  key={course.id}
+                  className="flex flex-col hover:shadow-lg transition-shadow overflow-hidden"
+                >
+                  {/* Thumbnail */}
+                  <div className="w-full h-48 relative overflow-hidden">
+                    {course.thumbnail ? (
+                      <img
+                        src={course.thumbnail}
+                        alt={course.title}
+                        className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
+                        <BookOpen className="h-16 w-16 text-primary/40" />
                       </div>
                     )}
-                    <div className="flex items-center gap-1">
-                      <Users className="h-4 w-4" />
-                      <span>{course._count.enrollments}</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <BookOpen className="h-4 w-4" />
-                      <span>{course._count.modules} módulos</span>
-                    </div>
-                  </div>
-                </CardContent>
-
-                <CardFooter className="flex items-center justify-between border-t pt-4">
-                  <div>
-                    {isPaid ? (
-                      <span className="text-2xl font-bold text-primary">
-                        {formatPrice(course.price)}
-                      </span>
-                    ) : (
-                      <span className="text-2xl font-bold text-green-600 dark:text-green-500">
-                        Grátis
-                      </span>
+                    {!isPaid && (
+                      <div className="absolute top-2 right-2 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-semibold">
+                        GRATUITO
+                      </div>
                     )}
                   </div>
-                  <Button asChild>
-                    <Link href={`/courses/${course.slug}`}>Ver Curso</Link>
-                  </Button>
-                </CardFooter>
-              </Card>
-            ))}
+
+                  <CardHeader>
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="px-3 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary">
+                        {course.category.name}
+                      </span>
+                      {course.level && (
+                        <span className="px-2 py-1 rounded-full text-xs bg-muted text-muted-foreground">
+                          {course.level}
+                        </span>
+                      )}
+                    </div>
+                    <CardTitle className="line-clamp-2">
+                      {course.title}
+                    </CardTitle>
+                    <CardDescription>
+                      Por {course.instructor.name}
+                    </CardDescription>
+                  </CardHeader>
+
+                  <CardContent className="flex-1">
+                    <p className="text-sm text-muted-foreground line-clamp-3 mb-4">
+                      {course.description}
+                    </p>
+                    <div className="flex flex-wrap gap-3 text-sm text-muted-foreground">
+                      {course.duration && (
+                        <div className="flex items-center gap-1">
+                          <Clock className="h-4 w-4" />
+                          <span>{Math.floor(course.duration / 60)}h</span>
+                        </div>
+                      )}
+                      <div className="flex items-center gap-1">
+                        <Users className="h-4 w-4" />
+                        <span>{course._count.enrollments}</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <BookOpen className="h-4 w-4" />
+                        <span>{course._count.modules} módulos</span>
+                      </div>
+                    </div>
+                  </CardContent>
+
+                  <CardFooter className="flex items-center justify-between border-t pt-4">
+                    <div>
+                      {isPaid ? (
+                        <span className="text-2xl font-bold text-primary">
+                          {formatPrice(course.price)}
+                        </span>
+                      ) : (
+                        <span className="text-2xl font-bold text-green-600 dark:text-green-500">
+                          Grátis
+                        </span>
+                      )}
+                    </div>
+                    <Button asChild>
+                      <Link href={`/courses/${course.slug}`}>Ver Curso</Link>
+                    </Button>
+                  </CardFooter>
+                </Card>
+              );
+            })}
           </div>
         )}
       </section>
