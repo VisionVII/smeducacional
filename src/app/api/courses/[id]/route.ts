@@ -24,7 +24,7 @@ const updateCourseSchema = z.object({
       errorMap: () => ({ message: 'Nível inválido' }),
     })
     .optional(),
-  price: z.number().min(0, 'Preço não pode ser negativo').optional(),
+  price: z.number().min(0, 'Preço não pode ser negativo'),
   compareAtPrice: z
     .union([
       z.number().min(0, 'Preço comparativo não pode ser negativo'),
@@ -32,7 +32,6 @@ const updateCourseSchema = z.object({
       z.undefined(),
     ])
     .optional(),
-  isPaid: z.boolean().optional(),
   isPublished: z.boolean().optional(),
   requirements: z.union([z.string(), z.undefined()]).optional(),
   whatYouLearn: z.union([z.string(), z.undefined()]).optional(),
@@ -145,7 +144,25 @@ export async function PUT(
       );
     }
 
-    const validatedData = validation.data;
+    let validatedData = validation.data as Record<string, any>;
+    // Sanitizar: remover strings vazias e normalizar campos opcionais
+    const dataToUpdate: Record<string, any> = {};
+    for (const [key, value] of Object.entries(validatedData)) {
+      if (value === undefined) continue;
+      if (typeof value === 'string' && value.trim() === '') continue;
+      // Evitar enviar categoryId vazio
+      if (
+        key === 'categoryId' &&
+        typeof value === 'string' &&
+        value.trim() === ''
+      )
+        continue;
+      // Garantir números válidos
+      if (typeof value === 'number' && Number.isNaN(value)) continue;
+      dataToUpdate[key] = value;
+    }
+    console.log('[API] Dados normalizados para update:', dataToUpdate);
+    validatedData = dataToUpdate;
 
     // Se estiver alterando o slug, verificar se não existe outro curso com esse slug
     if (validatedData.slug && validatedData.slug !== course.slug) {
@@ -215,12 +232,9 @@ export async function PUT(
         { status: 400 }
       );
     }
-
     console.error('Erro ao atualizar curso:', error);
-    return NextResponse.json(
-      { error: 'Erro ao atualizar curso' },
-      { status: 500 }
-    );
+    const message = (error as any)?.message || 'Erro ao atualizar curso';
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
 

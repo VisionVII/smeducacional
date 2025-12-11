@@ -132,7 +132,6 @@ export default function EditCoursePage({
         slug: formData.slug,
         description: formData.description,
         level: formData.level,
-        isPaid: formData.isPaid,
         isPublished: formData.isPublished,
         categoryId: formData.categoryId,
       };
@@ -142,10 +141,18 @@ export default function EditCoursePage({
         payload.duration = parseInt(duration);
       }
 
-      if (price && !isNaN(parseFloat(price))) {
+      // Price é obrigatório - sempre enviar
+      if (
+        price !== undefined &&
+        price !== null &&
+        price !== '' &&
+        !isNaN(parseFloat(price))
+      ) {
         payload.price = parseFloat(price);
+      } else {
+        // Fallback para 0 se vazio (curso gratuito)
+        payload.price = 0;
       }
-
       if (compareAtPrice && !isNaN(parseFloat(compareAtPrice))) {
         payload.compareAtPrice = parseFloat(compareAtPrice);
       } else {
@@ -197,7 +204,6 @@ export default function EditCoursePage({
           description: errorMessage,
           variant: 'destructive',
         });
-        console.error('[EDIT] Erro na requisição:', error);
       }
     } catch (error) {
       toast({
@@ -454,7 +460,7 @@ export default function EditCoursePage({
                   type="number"
                   min="0"
                   step="0.01"
-                  placeholder="Ex: 197.90"
+                  placeholder="Ex: 197.90 ou 0 para curso gratuito"
                   value={formData.price}
                   onChange={(e) =>
                     setFormData((prev) => ({
@@ -463,7 +469,11 @@ export default function EditCoursePage({
                       isPaid: parseFloat(e.target.value) > 0,
                     }))
                   }
+                  required
                 />
+                <p className="text-xs text-muted-foreground">
+                  💡 Use <strong>0</strong> para curso gratuito
+                </p>
                 {(() => {
                   const comparePrice = parseFloat(
                     formData.compareAtPrice || '0'
