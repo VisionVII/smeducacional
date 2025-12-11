@@ -272,6 +272,35 @@ export const authOptions: NextAuthOptions = {
         }
       }
 
+      // Fallback adicional: se ainda não há role mas temos email, recarregar por email
+      if (!token.role && token.email) {
+        try {
+          const dbUserByEmail = await prisma.user.findUnique({
+            where: { email: token.email as string },
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              role: true,
+              avatar: true,
+            },
+          });
+          if (dbUserByEmail) {
+            token.id = dbUserByEmail.id;
+            token.name = dbUserByEmail.name;
+            token.email = dbUserByEmail.email;
+            token.role = dbUserByEmail.role;
+            token.avatar = dbUserByEmail.avatar;
+            console.log('[auth][jwt] Fallback por email aplicado:', {
+              id: dbUserByEmail.id,
+              role: dbUserByEmail.role,
+            });
+          }
+        } catch (error) {
+          console.error('[auth][jwt] Erro no fallback por email:', error);
+        }
+      }
+
       console.log('[auth][jwt] ========== FIM JWT CALLBACK (FINAL) ==========');
       console.log('[auth][jwt] Token retornado:', {
         id: token.id,
