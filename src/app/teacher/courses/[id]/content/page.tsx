@@ -102,6 +102,24 @@ export default function CourseContentPage({
       const response = await fetch(`/api/courses/${id}`);
       if (response.ok) {
         const data = await response.json();
+
+        // Validar estrutura dos dados
+        if (!data || !data.id) {
+          throw new Error('Dados do curso inválidos');
+        }
+
+        // Garantir que modules existe e é um array
+        if (!Array.isArray(data.modules)) {
+          data.modules = [];
+        }
+
+        // Garantir que cada módulo tem um array de lessons
+        data.modules.forEach((module: any) => {
+          if (!Array.isArray(module.lessons)) {
+            module.lessons = [];
+          }
+        });
+
         setCourse(data);
         setExpandedModules(new Set(data.modules.map((m: Module) => m.id)));
       } else {
@@ -113,7 +131,12 @@ export default function CourseContentPage({
         router.push('/teacher/courses');
       }
     } catch (error) {
-      console.error('Erro ao buscar curso:', error);
+      console.error('[CONTENT] Erro ao buscar curso:', error);
+      toast({
+        title: 'Erro ao carregar curso',
+        description: error instanceof Error ? error.message : 'Erro inesperado',
+        variant: 'destructive',
+      });
     } finally {
       setIsLoading(false);
     }
@@ -409,7 +432,7 @@ export default function CourseContentPage({
 
               {expandedModules.has(module.id) && (
                 <CardContent>
-                  {module.lessons.length === 0 ? (
+                  {!module.lessons || module.lessons.length === 0 ? (
                     <div className="text-center py-8 text-gray-500">
                       <p className="mb-4">Nenhuma aula neste módulo</p>
                       <Button
