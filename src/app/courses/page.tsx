@@ -352,7 +352,9 @@ function CoursesClient() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredCourses.map((course) => (
+            {filteredCourses.map((course) => {
+              const isPaid = typeof course.price === 'number' && course.price > 0;
+              return (
               <Card
                 key={course.id}
                 className="flex flex-col hover:shadow-lg transition-shadow overflow-hidden"
@@ -370,7 +372,7 @@ function CoursesClient() {
                       <BookOpen className="h-16 w-16 text-primary/40" />
                     </div>
                   )}
-                  {!course.isPaid && (
+                  {!isPaid && (
                     <div className="absolute top-2 right-2 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-semibold">
                       GRATUITO
                     </div>
@@ -418,7 +420,7 @@ function CoursesClient() {
 
                 <CardFooter className="flex items-center justify-between border-t pt-4">
                   <div>
-                    {course.isPaid ? (
+                    {isPaid ? (
                       <span className="text-2xl font-bold text-primary">
                         {formatPrice(course.price)}
                       </span>

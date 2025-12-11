@@ -60,7 +60,10 @@ export default async function TeacherCoursesPage() {
   const totalCourses = courses.length;
   const publishedCourses = courses.filter((c) => c.isPublished).length;
   const draftCourses = courses.filter((c) => !c.isPublished).length;
-  const totalStudents = courses.reduce((acc, c) => acc + c._count.enrollments, 0);
+  const totalStudents = courses.reduce(
+    (acc, c) => acc + c._count.enrollments,
+    0
+  );
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -84,7 +87,9 @@ export default async function TeacherCoursesPage() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total de Cursos</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Total de Cursos
+            </CardTitle>
             <BookOpen className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -102,7 +107,9 @@ export default async function TeacherCoursesPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{publishedCourses}</div>
-            <p className="text-xs text-muted-foreground">Disponíveis para alunos</p>
+            <p className="text-xs text-muted-foreground">
+              Disponíveis para alunos
+            </p>
           </CardContent>
         </Card>
 
@@ -119,7 +126,9 @@ export default async function TeacherCoursesPage() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total de Alunos</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Total de Alunos
+            </CardTitle>
             <Users className="h-4 w-4 text-blue-600" />
           </CardHeader>
           <CardContent>
@@ -134,7 +143,9 @@ export default async function TeacherCoursesPage() {
         <Card>
           <CardContent className="py-16 text-center">
             <BookOpen className="h-16 w-16 mx-auto mb-4 text-gray-400" />
-            <h3 className="text-xl font-semibold mb-2">Nenhum curso criado ainda</h3>
+            <h3 className="text-xl font-semibold mb-2">
+              Nenhum curso criado ainda
+            </h3>
             <p className="text-gray-600 dark:text-gray-400 mb-6">
               Comece criando seu primeiro curso e compartilhe seu conhecimento!
             </p>
@@ -153,6 +164,7 @@ export default async function TeacherCoursesPage() {
               (acc, m) => acc + m._count.lessons,
               0
             );
+            const isPaid = typeof course.price === 'number' && course.price > 0;
 
             return (
               <Card key={course.id}>
@@ -178,7 +190,9 @@ export default async function TeacherCoursesPage() {
                       <div className="flex items-start justify-between">
                         <div>
                           <div className="flex items-center gap-3 mb-2">
-                            <h3 className="text-xl font-bold">{course.title}</h3>
+                            <h3 className="text-xl font-bold">
+                              {course.title}
+                            </h3>
                             {course.isPublished ? (
                               <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
                                 <CheckCircle className="h-3 w-3 mr-1" />
@@ -206,20 +220,22 @@ export default async function TeacherCoursesPage() {
                             <span className="flex items-center gap-1">
                               <Users className="h-4 w-4" />
                               {course._count.enrollments} alunos
-                                                        <span className="flex items-center gap-1 font-semibold">
-                                                          {course.isPaid ? (
-                                                            <span className="text-green-600">
-                                                              R$ {course.price?.toFixed(2)}
-                                                              {course.compareAtPrice && (
-                                                                <span className="ml-2 text-xs text-gray-400 line-through">
-                                                                  R$ {course.compareAtPrice.toFixed(2)}
-                                                                </span>
-                                                              )}
-                                                            </span>
-                                                          ) : (
-                                                            <span className="text-blue-600">Gratuito</span>
-                                                          )}
-                                                        </span>
+                              <span className="flex items-center gap-1 font-semibold">
+                                {isPaid ? (
+                                  <span className="text-green-600">
+                                    R$ {course.price?.toFixed(2)}
+                                    {course.compareAtPrice && (
+                                      <span className="ml-2 text-xs text-gray-400 line-through">
+                                        R$ {course.compareAtPrice.toFixed(2)}
+                                      </span>
+                                    )}
+                                  </span>
+                                ) : (
+                                  <span className="text-blue-600">
+                                    Gratuito
+                                  </span>
+                                )}
+                              </span>
                             </span>
                             {course.level && (
                               <span className="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded text-xs">
@@ -231,7 +247,10 @@ export default async function TeacherCoursesPage() {
 
                         {/* Ações */}
                         <div className="flex items-center gap-2">
-                          <Link href={`/courses/${course.slug}`} target="_blank">
+                          <Link
+                            href={`/courses/${course.slug}`}
+                            target="_blank"
+                          >
                             <Button variant="outline" size="sm">
                               <Eye className="h-4 w-4" />
                             </Button>

@@ -69,7 +69,13 @@ export async function GET(req: NextRequest) {
       },
     });
 
-    return NextResponse.json(courses, {
+    // Normalizar isPaid em tempo de resposta (compatibilidade com registros antigos)
+    const normalized = courses.map((c) => ({
+      ...c,
+      isPaid: typeof c.price === 'number' ? c.price > 0 : Boolean(c.isPaid),
+    }));
+
+    return NextResponse.json(normalized, {
       headers: {
         'Content-Type': 'application/json',
       },
