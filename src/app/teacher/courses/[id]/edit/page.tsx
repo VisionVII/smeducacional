@@ -32,6 +32,7 @@ interface Course {
   duration: number | null;
   level: string | null;
   price: number;
+  compareAtPrice: number | null;
   isPaid: boolean;
   isPublished: boolean;
   categoryId: string;
@@ -59,6 +60,7 @@ export default function EditCoursePage({
     duration: '',
     level: 'Iniciante',
     price: '0',
+    compareAtPrice: '',
     isPaid: false,
     isPublished: false,
     categoryId: '',
@@ -90,6 +92,7 @@ export default function EditCoursePage({
             duration: courseData.duration?.toString() || '',
             level: courseData.level || 'Iniciante',
             price: courseData.price.toString(),
+            compareAtPrice: courseData.compareAtPrice?.toString() || '',
             isPaid: courseData.isPaid,
             isPublished: courseData.isPublished,
             categoryId: courseData.categoryId,
@@ -123,6 +126,9 @@ export default function EditCoursePage({
         ...formData,
         duration: formData.duration ? parseInt(formData.duration) : undefined,
         price: parseFloat(formData.price),
+        compareAtPrice: formData.compareAtPrice
+          ? parseFloat(formData.compareAtPrice)
+          : undefined,
         thumbnail: formData.thumbnail || undefined,
         requirements: formData.requirements || undefined,
         whatYouLearn: formData.whatYouLearn || undefined,
@@ -352,7 +358,7 @@ export default function EditCoursePage({
             </div>
 
             {/* Duração e Preço */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="duration">Duração (minutos)</Label>
                 <Input
@@ -370,12 +376,41 @@ export default function EditCoursePage({
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="price">Preço (R$)</Label>
+                <Label htmlFor="compareAtPrice">
+                  Preço Original (R$)
+                  <span className="text-xs text-muted-foreground ml-1">
+                    (opcional)
+                  </span>
+                </Label>
+                <Input
+                  id="compareAtPrice"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  placeholder="Ex: 299.90"
+                  value={formData.compareAtPrice}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      compareAtPrice: e.target.value,
+                    }))
+                  }
+                />
+                <p className="text-xs text-muted-foreground">
+                  Aparece como "De R$ X"
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="price">
+                  Preço Atual (R$) <span className="text-red-500">*</span>
+                </Label>
                 <Input
                   id="price"
                   type="number"
                   min="0"
                   step="0.01"
+                  placeholder="Ex: 197.90"
                   value={formData.price}
                   onChange={(e) =>
                     setFormData((prev) => ({
@@ -385,6 +420,20 @@ export default function EditCoursePage({
                     }))
                   }
                 />
+                {formData.compareAtPrice &&
+                  parseFloat(formData.compareAtPrice) >
+                    parseFloat(formData.price) && (
+                    <p className="text-xs text-green-600 font-medium">
+                      💰 Desconto:{' '}
+                      {(
+                        ((parseFloat(formData.compareAtPrice) -
+                          parseFloat(formData.price)) /
+                          parseFloat(formData.compareAtPrice)) *
+                        100
+                      ).toFixed(0)}
+                      % OFF
+                    </p>
+                  )}
               </div>
             </div>
 

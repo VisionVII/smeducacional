@@ -12,6 +12,7 @@ const updateCourseSchema = z.object({
   duration: z.number().positive().optional(),
   level: z.enum(['Iniciante', 'Intermediário', 'Avançado']).optional(),
   price: z.number().min(0).optional(),
+  compareAtPrice: z.number().min(0).optional().nullable(),
   isPaid: z.boolean().optional(),
   isPublished: z.boolean().optional(),
   requirements: z.string().optional(),
@@ -81,10 +82,7 @@ export async function PUT(
     const session = await auth();
 
     if (!session?.user) {
-      return NextResponse.json(
-        { error: 'Não autenticado' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
     }
 
     const resolvedParams = await params;
@@ -199,10 +197,7 @@ export async function DELETE(
     const session = await auth();
 
     if (!session?.user) {
-      return NextResponse.json(
-        { error: 'Não autenticado' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
     }
 
     const resolvedParams = await params;
@@ -234,9 +229,9 @@ export async function DELETE(
     // Não permitir deletar curso com alunos matriculados
     if (course.enrollments.length > 0) {
       return NextResponse.json(
-        { 
+        {
           error: 'Não é possível deletar um curso com alunos matriculados',
-          enrollmentsCount: course.enrollments.length 
+          enrollmentsCount: course.enrollments.length,
         },
         { status: 400 }
       );

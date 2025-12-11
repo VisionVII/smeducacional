@@ -107,6 +107,7 @@ model Course {
   duration       Int? // em minutos
   level          String? // Iniciante, Intermediário, Avançado
   price          Float?    // Preço em BRL (null = grátis)
+  compareAtPrice Float?    // Preço "De" para mostrar desconto
   isPaid         Boolean  @default(false)
   isPublished    Boolean @default(false)
   publishedAt    DateTime?

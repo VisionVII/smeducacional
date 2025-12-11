@@ -12,6 +12,7 @@ import {
   MessageSquare,
   User,
   Palette,
+  DollarSign,
 } from 'lucide-react';
 
 export default async function TeacherLayout({
@@ -40,6 +41,11 @@ export default async function TeacherLayout({
       href: '/teacher/courses/new',
       label: 'Novo Curso',
       icon: <Plus className="h-4 w-4" />,
+    },
+    {
+      href: '/teacher/earnings',
+      label: 'Ganhos',
+      icon: <DollarSign className="h-4 w-4" />,
     },
     {
       href: '/teacher/messages',
