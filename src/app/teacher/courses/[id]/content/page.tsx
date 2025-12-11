@@ -361,7 +361,7 @@ export default function CourseContentPage({
       </div>
 
       {/* Lista de Módulos */}
-      {course.modules.length === 0 ? (
+      {!course.modules || course.modules.length === 0 ? (
         <Card>
           <CardContent className="py-16 text-center">
             <FileText className="h-16 w-16 mx-auto mb-4 text-gray-400" />
@@ -377,7 +377,7 @@ export default function CourseContentPage({
         </Card>
       ) : (
         <div className="space-y-4">
-          {course.modules.map((module, index) => (
+          {course.modules?.map((module, index) => (
             <Card key={module.id}>
               <CardHeader>
                 <div className="flex items-center justify-between">
