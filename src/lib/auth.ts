@@ -152,157 +152,112 @@ export const authOptions: NextAuthOptions = {
       console.log('[auth][signIn] Provider desconhecido:', account?.provider);
       return true;
     },
-    async jwt({ token, user, account, profile }) {
-      console.log('[auth][jwt] ========== INICIANDO JWT CALLBACK ==========');
-      console.log('[auth][jwt] Estado:', {
-        hasUser: !!user,
-        hasAccount: !!account,
-        accountProvider: account?.provider,
-        profileEmail: profile?.email,
-        userEmail: user?.email,
-        tokenId: token.id,
-        tokenRole: token.role,
-      });
+    async jwt({ token, user, account, profile, trigger }) {
+      console.log('[auth][jwt] ========== JWT CALLBACK ==========');
+      console.log(
+        '[auth][jwt] trigger:',
+        trigger,
+        'hasUser:',
+        !!user,
+        'hasAccount:',
+        !!account
+      );
 
-      // Login com Google OAuth
-      // Em produção, alguns provedores podem não preencher profile.email.
-      // Garantimos usando user.email como fallback.
-      if (account?.provider === 'google' && (profile?.email || user?.email)) {
-        try {
-          const oauthEmail = profile?.email || user?.email!;
-          console.log('[auth][jwt] Processando login Google para:', oauthEmail);
+      // PRIMEIRO LOGIN - account existe (Google ou Credentials)
+      if (account?.provider === 'google') {
+        const email = (profile?.email || user?.email) as string;
+        console.log('[auth][jwt] 🔵 Google login inicial para:', email);
 
-          // Buscar ou criar usuário no banco
-          let dbUser = await prisma.user.findUnique({
-            where: { email: oauthEmail },
+        let dbUser = await prisma.user.findUnique({
+          where: { email },
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            role: true,
+            avatar: true,
+          },
+        });
+
+        if (!dbUser) {
+          console.log('[auth][jwt] Criando novo usuário Google');
+          dbUser = await prisma.user.create({
+            data: {
+              email,
+              name: (profile as any)?.name || user?.name || email.split('@')[0],
+              avatar: (profile as any)?.picture || null,
+              emailVerified: new Date(),
+              role: 'STUDENT',
+            },
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              role: true,
+              avatar: true,
+            },
           });
-
-          if (!dbUser) {
-            console.log(
-              '[auth][jwt] Usuário não existe, criando novo:',
-              oauthEmail
-            );
-            // Criar novo usuário
-            dbUser = await prisma.user.create({
-              data: {
-                email: oauthEmail,
-                name:
-                  (profile as any)?.name ||
-                  (user as any)?.name ||
-                  oauthEmail.split('@')[0],
-                avatar: (profile as any).picture || null,
-                emailVerified: new Date(),
-                role: 'STUDENT', // Padrão para novos usuários
-              },
-            });
-            console.log('[auth][jwt] Novo usuário Google criado:', dbUser.id);
-          } else {
-            console.log('[auth][jwt] Usuário existente encontrado:', dbUser.id);
-          }
-
-          token.id = dbUser.id;
-          token.role = dbUser.role;
-          token.avatar = dbUser.avatar;
-          token.name = dbUser.name;
-          token.email = dbUser.email;
-          console.log('[auth][jwt] ✅ Token Google preenchido com sucesso:', {
-            id: dbUser.id,
-            email: dbUser.email,
-            role: dbUser.role,
-          });
-          console.log(
-            '[auth][jwt] ========== FIM JWT CALLBACK (GOOGLE) =========='
-          );
-          return token;
-        } catch (error) {
-          console.error('[auth][jwt] ❌ Erro ao processar login Google:', {
-            error: error instanceof Error ? error.message : String(error),
-            stack: error instanceof Error ? error.stack : undefined,
-          });
-          console.log(
-            '[auth][jwt] ========== FIM JWT CALLBACK (ERRO) =========='
-          );
-          throw error;
         }
+
+        token.id = dbUser.id;
+        token.email = dbUser.email;
+        token.name = dbUser.name;
+        token.role = dbUser.role;
+        token.avatar = dbUser.avatar;
+        console.log('[auth][jwt] ✅ Token Google populado:', {
+          id: dbUser.id,
+          role: dbUser.role,
+        });
+        return token;
       }
 
-      // Login com credenciais (tem user e não é OAuth já processado)
-      if (user && account?.provider !== 'google') {
-        console.log(
-          '[auth][jwt] Login bem-sucedido, salvando dados no token:',
-          {
-            id: user.id,
-            email: user.email,
-            role: (user as any).role,
-            hasAccount: !!account,
-          }
-        );
+      // Credentials login
+      if (account?.provider === 'credentials' && user) {
         token.id = user.id;
+        token.email = user.email!;
+        token.name = user.name || '';
         token.role = (user as any).role;
         token.avatar = (user as any).avatar;
-        token.name = user.name || '';
-        token.email = user.email || '';
+        console.log('[auth][jwt] ✅ Token Credentials populado:', {
+          id: user.id,
+          role: (user as any).role,
+        });
+        return token;
       }
 
-      // Se não tem user mas tem token.id, recarregar do banco
-      if (token.id && !user) {
-        try {
-          const dbUser = await prisma.user.findUnique({
-            where: { id: token.id as string },
-            select: {
-              id: true,
-              name: true,
-              email: true,
-              role: true,
-              avatar: true,
-            },
+      // REQUISIÇÕES SUBSEQUENTES - account é null, recarregar do banco
+      // NextAuth v4 não passa account/profile em cada request, só no primeiro login
+      if (!account && token.email) {
+        const dbUser = await prisma.user.findUnique({
+          where: { email: token.email as string },
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            role: true,
+            avatar: true,
+          },
+        });
+
+        if (dbUser) {
+          token.id = dbUser.id;
+          token.email = dbUser.email;
+          token.name = dbUser.name;
+          token.role = dbUser.role;
+          token.avatar = dbUser.avatar;
+          console.log('[auth][jwt] 🔄 Token recarregado do banco:', {
+            id: dbUser.id,
+            role: dbUser.role,
           });
-          if (dbUser) {
-            token.name = dbUser.name;
-            token.email = dbUser.email;
-            token.role = dbUser.role;
-            token.avatar = dbUser.avatar;
-            console.log('[auth][jwt] Recarregado do banco:', {
-              id: dbUser.id,
-              role: dbUser.role,
-            });
-          }
-        } catch (error) {
-          console.error('Erro ao recarregar usuário no JWT:', error);
+        } else {
+          console.error(
+            '[auth][jwt] ❌ Usuário não encontrado no banco:',
+            token.email
+          );
         }
       }
 
-      // Fallback adicional: se ainda não há role mas temos email, recarregar por email
-      if (!token.role && token.email) {
-        try {
-          const dbUserByEmail = await prisma.user.findUnique({
-            where: { email: token.email as string },
-            select: {
-              id: true,
-              name: true,
-              email: true,
-              role: true,
-              avatar: true,
-            },
-          });
-          if (dbUserByEmail) {
-            token.id = dbUserByEmail.id;
-            token.name = dbUserByEmail.name;
-            token.email = dbUserByEmail.email;
-            token.role = dbUserByEmail.role;
-            token.avatar = dbUserByEmail.avatar;
-            console.log('[auth][jwt] Fallback por email aplicado:', {
-              id: dbUserByEmail.id,
-              role: dbUserByEmail.role,
-            });
-          }
-        } catch (error) {
-          console.error('[auth][jwt] Erro no fallback por email:', error);
-        }
-      }
-
-      console.log('[auth][jwt] ========== FIM JWT CALLBACK (FINAL) ==========');
-      console.log('[auth][jwt] Token retornado:', {
+      console.log('[auth][jwt] Token final:', {
         id: token.id,
         role: token.role,
         email: token.email,
