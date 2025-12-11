@@ -283,65 +283,19 @@ export const authOptions: NextAuthOptions = {
     async redirect({ url, baseUrl }) {
       console.log('[auth][redirect] Processando redirect:', { url, baseUrl });
 
-      // Lista de rotas públicas que não devem fazer redirect
-      const publicRoutes = [
-        '/',
-        '/login',
-        '/register',
-        '/forgot-password',
-        '/courses',
-        '/about',
-        '/contact',
-        '/faq',
-        '/privacy',
-        '/terms',
-        '/teacher',
-        '/admin',
-      ];
-
-      // Extrair pathname da URL
-      let pathname = '/';
-      try {
-        if (url.startsWith('/')) {
-          pathname = url.split('?')[0]; // Remove query params
-        } else {
-          pathname = new URL(url).pathname;
-        }
-      } catch (e) {
-        pathname = url;
-      }
-
-      // Se é rota pública, não fazer redirect
-      if (publicRoutes.includes(pathname)) {
-        return url.startsWith('/') ? `${baseUrl}${url}` : url;
-      }
-
-      // Se URL é relativa, usar baseUrl
+      // Se URL é relativa e começa com /, usar direto com baseUrl
       if (url.startsWith('/')) {
         return `${baseUrl}${url}`;
       }
-      // Se URL já começa com baseUrl, usar direto
-      else if (new URL(url).origin === baseUrl) {
+
+      // Se URL já tem baseUrl, usar direto
+      if (new URL(url).origin === baseUrl) {
         return url;
       }
-      // Caso contrário, voltar para baseUrl
+
+      // Fallback: voltar para baseUrl
       return baseUrl;
-      async redirect({ url, baseUrl }) {
-        console.log('[auth][redirect] Processando redirect:', { url, baseUrl });
-
-        // Se URL é relativa e começa com /, usar direto com baseUrl
-        if (url.startsWith('/')) {
-          return `${baseUrl}${url}`;
-        }
-
-        // Se URL já tem baseUrl, usar direto
-        if (new URL(url).origin === baseUrl) {
-          return url;
-        }
-
-        // Fallback: voltar para baseUrl
-        return baseUrl;
-      },
+    },
     async session({ session, token }) {
       // Adicionar todas as informações do token na sessão
       if (session?.user) {
@@ -360,6 +314,4 @@ export const authOptions: NextAuthOptions = {
 };
 
 // Helper para obter sessão nos Server Components e API Routes
-export const auth = () => getServerSession(authOptions);
-// Helper function para usar nos Server Components
 export const auth = () => getServerSession(authOptions);
