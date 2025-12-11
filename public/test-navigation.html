@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Teste de Navegação - SM Educacional</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+
+    .card {
+      background: white;
+      border-radius: 8px;
+      padding: 30px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      color: #3b82f6;
+      margin-top: 0;
+    }
+
+    .test-section {
+      margin: 20px 0;
+      padding: 15px;
+      background: #f8fafc;
+      border-radius: 4px;
+      border-left: 4px solid #3b82f6;
+    }
+
+    button,
+    a {
+      display: inline-block;
+      padding: 10px 20px;
+      margin: 5px;
+      background: #3b82f6;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      text-decoration: none;
+      font-size: 14px;
+    }
+
+    button:hover,
+    a:hover {
+      background: #2563eb;
+    }
+
+    .result {
+      margin-top: 10px;
+      padding: 10px;
+      background: #e0f2fe;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 12px;
+    }
+
+    .success {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .error {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="card">
+    <h1>🔧 Teste de Navegação</h1>
+    <p>Use este arquivo para testar se a navegação está funcionando corretamente.</p>
+
+    <div class="test-section">
+      <h3>Teste 1: Link direto (âncora HTML)</h3>
+      <p>Clique para ir direto para /login usando tag &lt;a&gt;</p>
+      <a href="/login">Ir para /login (âncora)</a>
+      <div id="result1" class="result" style="display: none;"></div>
+    </div>
+
+    <div class="test-section">
+      <h3>Teste 2: window.location</h3>
+      <p>Navegar usando JavaScript window.location</p>
+      <button onclick="testWindowLocation()">Ir para /login (window.location)</button>
+      <div id="result2" class="result" style="display: none;"></div>
+    </div>
+
+    <div class="test-section">
+      <h3>Teste 3: fetch API</h3>
+      <p>Verificar se a rota /login responde</p>
+      <button onclick="testFetch()">Testar rota /login</button>
+      <div id="result3" class="result"></div>
+    </div>
+
+    <div class="test-section">
+      <h3>Teste 4: Verificar NextAuth</h3>
+      <p>Verificar configuração do NextAuth</p>
+      <button onclick="testNextAuth()">Verificar /api/auth/providers</button>
+      <div id="result4" class="result"></div>
+    </div>
+
+    <div class="test-section">
+      <h3>Informações do Ambiente</h3>
+      <div class="result">
+        <strong>URL atual:</strong> <span id="currentUrl"></span><br>
+        <strong>User Agent:</strong> <span id="userAgent"></span><br>
+        <strong>Cookies:</strong> <span id="cookies"></span><br>
+        <strong>Protocol:</strong> <span id="protocol"></span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Mostrar informações do ambiente
+    document.getElementById('currentUrl').textContent = window.location.href;
+    document.getElementById('userAgent').textContent = navigator.userAgent;
+    document.getElementById('cookies').textContent = document.cookie || '(nenhum cookie)';
+    document.getElementById('protocol').textContent = window.location.protocol;
+
+    function testWindowLocation() {
+      const result = document.getElementById('result2');
+      result.style.display = 'block';
+      result.textContent = 'Redirecionando em 2 segundos...';
+      setTimeout(() => {
+        window.location.href = '/login';
+      }, 2000);
+    }
+
+    async function testFetch() {
+      const result = document.getElementById('result3');
+      result.textContent = 'Testando...';
+
+      try {
+        const response = await fetch('/login', { method: 'HEAD' });
+        result.className = 'result ' + (response.ok ? 'success' : 'error');
+        result.textContent = `Status: ${response.status} ${response.statusText}\nURL: ${response.url}`;
+      } catch (error) {
+        result.className = 'result error';
+        result.textContent = 'Erro: ' + error.message;
+      }
+    }
+
+    async function testNextAuth() {
+      const result = document.getElementById('result4');
+      result.textContent = 'Testando...';
+
+      try {
+        const response = await fetch('/api/auth/providers');
+        const data = await response.json();
+        result.className = 'result ' + (response.ok ? 'success' : 'error');
+        result.textContent = `Status: ${response.status}\nProviders: ${JSON.stringify(data, null, 2)}`;
+      } catch (error) {
+        result.className = 'result error';
+        result.textContent = 'Erro: ' + error.message;
+      }
+    }
+  </script>
+</body>
+
+</html>
