@@ -56,7 +56,8 @@ export default function StudentCertificatesPage() {
       // Criar link temporário e clicar
       const a = document.createElement('a');
       a.href = url;
-      a.download = `certificado-${courseTitle
+      const safeCourseTitle = courseTitle || 'curso';
+      a.download = `certificado-${safeCourseTitle
         .replace(/\s+/g, '-')
         .toLowerCase()}.pdf`;
       document.body.appendChild(a);
