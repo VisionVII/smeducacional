@@ -359,5 +359,7 @@ export const authOptions: NextAuthOptions = {
   },
 };
 
+// Helper para obter sessão nos Server Components e API Routes
+export const auth = () => getServerSession(authOptions);
 // Helper function para usar nos Server Components
 export const auth = () => getServerSession(authOptions);
