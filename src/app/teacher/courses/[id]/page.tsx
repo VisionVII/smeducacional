@@ -1,10 +1,11 @@
 import { redirect } from 'next/navigation';
 
-export default function TeacherCoursePage({
+export default async function TeacherCoursePage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
+  const { id } = await params;
   // Redireciona para a página de conteúdo do curso
-  redirect(`/teacher/courses/${params.id}/content`);
+  redirect(`/teacher/courses/${id}/content`);
 }
