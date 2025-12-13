@@ -15,6 +15,9 @@ const PUBLIC_ROUTES = new Set([
   '/terms',
   '/teacher',
   '/admin',
+  '/become-instructor',
+  '/help',
+  '/cookies',
 ]);
 
 // Security headers para todas as respostas

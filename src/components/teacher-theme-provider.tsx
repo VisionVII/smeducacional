@@ -252,7 +252,7 @@ export function TeacherThemeProvider({ children }: { children: ReactNode }) {
 
       if (response.ok) {
         const data = await response.json();
-        console.debug('[loadTheme] Loaded theme:', data.themeName || 'default');
+        // Theme loaded successfully
 
         setTheme(data);
         applyTheme(data, resolvedTheme ?? themeMode);
@@ -284,8 +284,7 @@ export function TeacherThemeProvider({ children }: { children: ReactNode }) {
 
   const updateTheme = async (updates: Partial<TeacherTheme>) => {
     try {
-      console.debug('[updateTheme] Updating theme with:', updates);
-      console.debug('[updateTheme] Sending payload:', JSON.stringify(updates));
+      // Updating theme
 
       const response = await fetch('/api/teacher/theme', {
         method: 'PUT',
@@ -293,16 +292,12 @@ export function TeacherThemeProvider({ children }: { children: ReactNode }) {
         body: JSON.stringify(updates),
       });
 
-      console.debug('[updateTheme] Response status:', response.status);
+      // Response received
 
       if (response.ok) {
         const data = await response.json();
-        console.debug('[updateTheme] API Response:', data);
-
         setTheme(data);
         applyTheme(data, resolvedTheme ?? themeMode);
-
-        console.debug('[updateTheme] Theme applied successfully');
       } else {
         const error = await response.json();
         console.error('[updateTheme] API Error:', error);
@@ -467,7 +462,6 @@ export function TeacherThemeProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (mounted) {
-      console.debug('[TeacherThemeProvider] Mounted, loading theme...');
       loadTheme();
     }
   }, [mounted]);
@@ -494,11 +488,6 @@ export function TeacherThemeProvider({ children }: { children: ReactNode }) {
   // Reaplicar tema quando o modo (claro/escuro) mudar
   useEffect(() => {
     if (theme && mounted) {
-      console.debug('[TeacherThemeProvider] Applying theme:', {
-        themeName: theme.themeName,
-        mode: resolvedTheme ?? themeMode,
-        primary: theme.palette.primary,
-      });
       applyTheme(theme, resolvedTheme ?? themeMode);
     }
   }, [resolvedTheme, themeMode, theme, mounted]);

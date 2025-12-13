@@ -28,9 +28,6 @@ export function AuthRedirectCheck() {
         dashboardUrl = '/teacher/dashboard';
       }
 
-      console.log(
-        `[AuthRedirectCheck] Redirecionando usuário ${session.user.email} (${role}) para ${dashboardUrl}`
-      );
       router.push(dashboardUrl);
     } else {
       setIsChecking(false);
