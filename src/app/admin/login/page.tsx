@@ -178,6 +178,7 @@ export default function AdminLoginPage() {
                   setFormData({ ...formData, password: e.target.value })
                 }
                 required
+                autoComplete="current-password"
               />
             </div>
             <div className="flex justify-end">
