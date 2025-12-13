@@ -16,7 +16,8 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { toast } from '@/components/ui/use-toast';
-import { GraduationCap } from 'lucide-react';
+import { GraduationCap, Home } from 'lucide-react';
+import { PasswordInput } from '@/components/password-input';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -176,48 +177,52 @@ export default function RegisterPage() {
                 required
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">Senha</Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="••••••••"
-                value={formData.password}
-                onChange={(e) =>
-                  setFormData({ ...formData, password: e.target.value })
-                }
-                required
-                minLength={8}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirmar senha</Label>
-              <Input
-                id="confirmPassword"
-                type="password"
-                placeholder="••••••••"
-                value={formData.confirmPassword}
-                onChange={(e) =>
-                  setFormData({ ...formData, confirmPassword: e.target.value })
-                }
-                required
-                minLength={8}
-              />
-            </div>
+
+            <PasswordInput
+              id="password"
+              label="Senha"
+              placeholder="Mínimo 8 caracteres"
+              value={formData.password}
+              onChange={(value) =>
+                setFormData({ ...formData, password: value })
+              }
+              showStrength
+              showGenerator
+            />
+
+            <PasswordInput
+              id="confirmPassword"
+              label="Confirmar senha"
+              placeholder="Digite a senha novamente"
+              value={formData.confirmPassword}
+              onChange={(value) =>
+                setFormData({ ...formData, confirmPassword: value })
+              }
+              showStrength={false}
+            />
           </CardContent>
           <CardFooter className="flex flex-col space-y-4">
             <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading ? 'Criando conta...' : 'Criar conta'}
             </Button>
-            <p className="text-sm text-center text-muted-foreground">
-              Já tem uma conta?{' '}
+            <div className="flex items-center justify-between w-full text-sm">
               <Link
-                href="/login"
-                className="text-primary hover:underline font-medium"
+                href="/"
+                className="text-muted-foreground hover:text-primary flex items-center gap-1"
               >
-                Faça login
+                <Home className="h-4 w-4" />
+                Voltar ao início
               </Link>
-            </p>
+              <p className="text-muted-foreground">
+                Já tem uma conta?{' '}
+                <Link
+                  href="/login"
+                  className="text-primary hover:underline font-medium"
+                >
+                  Fazer login
+                </Link>
+              </p>
+            </div>
           </CardFooter>
         </form>
       </Card>

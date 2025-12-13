@@ -16,7 +16,9 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { toast } from '@/components/ui/use-toast';
-import { GraduationCap, Mail } from 'lucide-react';
+import { GraduationCap, Mail, Home } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
+import { PasswordInput } from '@/components/password-input';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -24,6 +26,7 @@ export default function LoginPage() {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
+    rememberMe: false,
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -176,25 +179,39 @@ export default function LoginPage() {
                 required
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">Senha</Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="••••••••"
-                value={formData.password}
-                onChange={(e) =>
-                  setFormData({ ...formData, password: e.target.value })
-                }
-                required
-              />
-            </div>
-            <div className="flex justify-end">
+
+            <PasswordInput
+              id="password"
+              label="Senha"
+              placeholder="Digite sua senha"
+              value={formData.password}
+              onChange={(value) =>
+                setFormData({ ...formData, password: value })
+              }
+              showStrength={false}
+            />
+
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="rememberMe"
+                  checked={formData.rememberMe}
+                  onCheckedChange={(checked) =>
+                    setFormData({ ...formData, rememberMe: checked as boolean })
+                  }
+                />
+                <label
+                  htmlFor="rememberMe"
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                >
+                  Lembrar-me
+                </label>
+              </div>
               <Link
                 href="/forgot-password"
                 className="text-sm text-primary hover:underline"
               >
-                Esqueceu sua senha?
+                Esqueceu a senha?
               </Link>
             </div>
           </CardContent>
@@ -241,15 +258,25 @@ export default function LoginPage() {
             <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading ? 'Entrando...' : 'Entrar'}
             </Button>
-            <p className="text-sm text-center text-muted-foreground">
-              Não tem uma conta?{' '}
+
+            <div className="flex items-center justify-between w-full text-sm">
               <Link
-                href="/register"
-                className="text-primary hover:underline font-medium"
+                href="/"
+                className="text-muted-foreground hover:text-primary flex items-center gap-1"
               >
-                Cadastre-se
+                <Home className="h-4 w-4" />
+                Voltar ao início
               </Link>
-            </p>
+              <p className="text-muted-foreground">
+                Não tem uma conta?{' '}
+                <Link
+                  href="/register"
+                  className="text-primary hover:underline font-medium"
+                >
+                  Cadastre-se
+                </Link>
+              </p>
+            </div>
 
             <div className="pt-4 border-t text-center text-xs text-muted-foreground space-y-2">
               <p>
