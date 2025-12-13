@@ -17,7 +17,7 @@ export async function GET(
     // Verificar se o usuário está matriculado no curso
     const enrollment = await prisma.enrollment.findFirst({
       where: {
-        userId: session.user.id,
+        studentId: session.user.id,
         courseId,
       },
     });
@@ -32,7 +32,7 @@ export async function GET(
     // Buscar progresso do aluno nas lições
     const progress = await prisma.progress.findMany({
       where: {
-        userId: session.user.id,
+        studentId: session.user.id,
         lesson: {
           module: {
             courseId,
@@ -41,19 +41,21 @@ export async function GET(
       },
       select: {
         lessonId: true,
-        completed: true,
-        lastWatchedAt: true,
+        isCompleted: true,
+        completedAt: true,
+        updatedAt: true,
       },
     });
 
     // Transformar em um map para fácil lookup
     const progressMap = progress.reduce((acc, p) => {
       acc[p.lessonId] = {
-        completed: p.completed,
-        lastWatchedAt: p.lastWatchedAt,
+        isCompleted: p.isCompleted,
+        completedAt: p.completedAt,
+        updatedAt: p.updatedAt,
       };
       return acc;
-    }, {} as Record<string, { completed: boolean; lastWatchedAt: Date | null }>);
+    }, {} as Record<string, { isCompleted: boolean; completedAt: Date | null; updatedAt: Date }>);
 
     return NextResponse.json({ data: progressMap });
   } catch (error) {
