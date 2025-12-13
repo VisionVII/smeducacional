@@ -1,26 +1,32 @@
-"use client";
+'use client';
 
-import { useSession } from "next-auth/react";
-import { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { useToast } from "@/components/ui/use-toast";
-import { User, Mail, Lock, Save } from "lucide-react";
+import { useSession } from 'next-auth/react';
+import { useState } from 'react';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { useToast } from '@/components/ui/use-toast';
+import { User, Mail, Lock, Save } from 'lucide-react';
 
 export default function StudentProfilePage() {
   const { data: session, update } = useSession();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
-    name: session?.user?.name || "",
-    email: session?.user?.email || "",
+    name: session?.user?.name || '',
+    email: session?.user?.email || '',
   });
   const [passwordData, setPasswordData] = useState({
-    currentPassword: "",
-    newPassword: "",
-    confirmPassword: "",
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: '',
   });
 
   const handleProfileUpdate = async (e: React.FormEvent) => {
@@ -28,24 +34,24 @@ export default function StudentProfilePage() {
     setIsLoading(true);
 
     try {
-      const res = await fetch("/api/student/profile", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
+      const res = await fetch('/api/student/profile', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
       });
 
-      if (!res.ok) throw new Error("Erro ao atualizar perfil");
+      if (!res.ok) throw new Error('Erro ao atualizar perfil');
 
       await update();
       toast({
-        title: "Perfil atualizado",
-        description: "Suas informações foram atualizadas com sucesso.",
+        title: 'Perfil atualizado',
+        description: 'Suas informações foram atualizadas com sucesso.',
       });
     } catch (error) {
       toast({
-        title: "Erro",
-        description: "Não foi possível atualizar o perfil.",
-        variant: "destructive",
+        title: 'Erro',
+        description: 'Não foi possível atualizar o perfil.',
+        variant: 'destructive',
       });
     } finally {
       setIsLoading(false);
@@ -57,9 +63,9 @@ export default function StudentProfilePage() {
 
     if (passwordData.newPassword !== passwordData.confirmPassword) {
       toast({
-        title: "Erro",
-        description: "As senhas não coincidem.",
-        variant: "destructive",
+        title: 'Erro',
+        description: 'As senhas não coincidem.',
+        variant: 'destructive',
       });
       return;
     }
@@ -67,32 +73,32 @@ export default function StudentProfilePage() {
     setIsLoading(true);
 
     try {
-      const res = await fetch("/api/student/password", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
+      const res = await fetch('/api/student/password', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           currentPassword: passwordData.currentPassword,
           newPassword: passwordData.newPassword,
         }),
       });
 
-      if (!res.ok) throw new Error("Erro ao alterar senha");
+      if (!res.ok) throw new Error('Erro ao alterar senha');
 
       setPasswordData({
-        currentPassword: "",
-        newPassword: "",
-        confirmPassword: "",
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: '',
       });
 
       toast({
-        title: "Senha alterada",
-        description: "Sua senha foi alterada com sucesso.",
+        title: 'Senha alterada',
+        description: 'Sua senha foi alterada com sucesso.',
       });
     } catch (error) {
       toast({
-        title: "Erro",
-        description: "Não foi possível alterar a senha.",
-        variant: "destructive",
+        title: 'Erro',
+        description: 'Não foi possível alterar a senha.',
+        variant: 'destructive',
       });
     } finally {
       setIsLoading(false);
@@ -116,9 +122,7 @@ export default function StudentProfilePage() {
               <User className="h-5 w-5" />
               Informações Pessoais
             </CardTitle>
-            <CardDescription>
-              Atualize seu nome e email
-            </CardDescription>
+            <CardDescription>Atualize seu nome e email</CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleProfileUpdate} className="space-y-4">
@@ -162,9 +166,7 @@ export default function StudentProfilePage() {
               <Lock className="h-5 w-5" />
               Segurança
             </CardTitle>
-            <CardDescription>
-              Altere sua senha de acesso
-            </CardDescription>
+            <CardDescription>Altere sua senha de acesso</CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handlePasswordChange} className="space-y-4">
@@ -216,7 +218,6 @@ export default function StudentProfilePage() {
                   }
                   required
                   autoComplete="new-password"
-                />
                 />
               </div>
 

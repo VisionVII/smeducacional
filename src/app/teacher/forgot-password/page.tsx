@@ -296,7 +296,6 @@ export default function TeacherForgotPasswordPage() {
                   minLength={6}
                   autoComplete="new-password"
                 />
-                />
               </div>
             </CardContent>
             <CardFooter className="flex flex-col space-y-4">
