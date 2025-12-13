@@ -1,4 +1,4 @@
-﻿{
+{
   "editor.formatOnSave": true,
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.codeActionsOnSave": {
@@ -55,5 +55,6 @@
     "**/.next": true,
     "**/dist": true
   },
-  "prisma.pinToPrisma6": true
+  "prisma.pinToPrisma6": true,
+  "inlineChat.notebookAgent": true
 }

@@ -11,9 +11,15 @@ async function getCourseWithProgress(courseId: string, studentId: string) {
         courseId,
       },
     },
-    include: {
+    select: {
+      id: true,
+      progress: true,
       course: {
-        include: {
+        select: {
+          id: true,
+          title: true,
+          price: true,
+          isPaid: true,
           modules: {
             include: {
               lessons: {
@@ -47,14 +53,12 @@ async function getCourseWithProgress(courseId: string, studentId: string) {
     },
   });
 
-  const progressMap = new Map(
-    progress.map(p => [p.lessonId, p])
-  );
+  const progressMap = new Map(progress.map((p) => [p.lessonId, p]));
 
   // Adicionar informação de conclusão nas aulas
-  const modulesWithProgress = enrollment.course.modules.map(module => ({
+  const modulesWithProgress = enrollment.course.modules.map((module) => ({
     ...module,
-    lessons: module.lessons.map(lesson => ({
+    lessons: module.lessons.map((lesson) => ({
       ...lesson,
       isCompleted: progressMap.get(lesson.id)?.isCompleted || false,
     })),
@@ -69,10 +73,10 @@ async function getCourseWithProgress(courseId: string, studentId: string) {
   };
 }
 
-export default async function StudentCoursePage({ 
-  params 
-}: { 
-  params: Promise<{ id: string }> 
+export default async function StudentCoursePage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
 }) {
   const session = await auth();
 
@@ -88,6 +92,7 @@ export default async function StudentCoursePage({
   }
 
   const { course, enrollment } = data;
+  const isCoursePaid = course.isPaid ?? (course.price || 0) > 0;
 
   return (
     <CoursePlayer
@@ -95,6 +100,8 @@ export default async function StudentCoursePage({
       courseTitle={course.title}
       modules={course.modules}
       progress={enrollment.progress}
+      isEnrolled
+      isCoursePaid={isCoursePaid}
     />
   );
 }

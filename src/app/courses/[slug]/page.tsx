@@ -4,6 +4,7 @@ import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 import { Button } from '@/components/ui/button';
 import { PublicThemeBoundary } from '@/components/public-theme-boundary';
+import { LockedCourseCard } from '@/components/LockedCourseCard';
 import {
   Card,
   CardContent,
@@ -73,6 +74,9 @@ export default async function CourseDetailPage({
   if (!course) {
     notFound();
   }
+
+  // Normaliza isPaid para garantir consistência (price > 0)
+  const isPaidCourse = typeof course.price === 'number' && course.price > 0;
 
   // Verificar se o usuário está matriculado
   let isEnrolled = false;
@@ -306,14 +310,35 @@ export default async function CourseDetailPage({
                         </Link>
                       </Button>
                     ) : session?.user ? (
-                      <form
-                        action={`/api/courses/${course.id}/enroll`}
-                        method="POST"
-                      >
-                        <Button type="submit" className="w-full" size="lg">
-                          Matricular-se Agora
-                        </Button>
-                      </form>
+                      isPaidCourse ? (
+                        <>
+                          <form action="/api/checkout/course" method="POST">
+                            <input
+                              type="hidden"
+                              name="courseId"
+                              value={course.id}
+                            />
+                            <Button type="submit" className="w-full" size="lg">
+                              Comprar Curso
+                            </Button>
+                          </form>
+                          <LockedCourseCard
+                            variant="banner"
+                            title={course.title}
+                            price={course.price || 0}
+                            compareAtPrice={course.compareAtPrice || undefined}
+                          />
+                        </>
+                      ) : (
+                        <form
+                          action={`/api/courses/${course.id}/enroll`}
+                          method="POST"
+                        >
+                          <Button type="submit" className="w-full" size="lg">
+                            Matricular-se Agora
+                          </Button>
+                        </form>
+                      )
                     ) : (
                       <Button asChild className="w-full" size="lg">
                         <Link href="/login">Fazer Login para Matricular</Link>

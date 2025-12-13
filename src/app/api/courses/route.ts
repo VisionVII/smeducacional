@@ -95,10 +95,7 @@ export async function POST(req: NextRequest) {
     const session = await auth();
 
     if (!session?.user) {
-      return NextResponse.json(
-        { error: 'Não autenticado' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
     }
 
     // Apenas professores e admins podem criar cursos
@@ -175,9 +172,6 @@ export async function POST(req: NextRequest) {
     }
 
     console.error('Erro ao criar curso:', error);
-    return NextResponse.json(
-      { error: 'Erro ao criar curso' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Erro ao criar curso' }, { status: 500 });
   }
 }
