@@ -324,9 +324,14 @@ export default async function CourseDetailPage({
                           </form>
                           <LockedCourseCard
                             variant="banner"
-                            title={course.title}
-                            price={course.price || 0}
-                            compareAtPrice={course.compareAtPrice || undefined}
+                            course={{
+                              id: course.id,
+                              title: course.title,
+                              price: course.price || 0,
+                              compareAtPrice: course.compareAtPrice,
+                              thumbnail: course.thumbnail,
+                              description: course.description,
+                            }}
                           />
                         </>
                       ) : (
