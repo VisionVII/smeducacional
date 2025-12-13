@@ -181,6 +181,7 @@ export default function StudentProfilePage() {
                     })
                   }
                   required
+                  autoComplete="current-password"
                 />
               </div>
 
@@ -197,6 +198,7 @@ export default function StudentProfilePage() {
                     })
                   }
                   required
+                  autoComplete="new-password"
                 />
               </div>
 
@@ -213,6 +215,8 @@ export default function StudentProfilePage() {
                     })
                   }
                   required
+                  autoComplete="new-password"
+                />
                 />
               </div>
 

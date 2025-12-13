@@ -276,6 +276,7 @@ export default function TeacherForgotPasswordPage() {
                   }
                   required
                   minLength={6}
+                  autoComplete="new-password"
                 />
               </div>
               <div className="space-y-2">
@@ -293,6 +294,8 @@ export default function TeacherForgotPasswordPage() {
                   }
                   required
                   minLength={6}
+                  autoComplete="new-password"
+                />
                 />
               </div>
             </CardContent>

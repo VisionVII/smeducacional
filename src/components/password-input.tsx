@@ -20,6 +20,7 @@ interface PasswordInputProps {
   showGenerator?: boolean;
   id?: string;
   required?: boolean;
+  autoComplete?: 'current-password' | 'new-password';
 }
 
 export function PasswordInput({
@@ -31,6 +32,7 @@ export function PasswordInput({
   showGenerator = false,
   id = 'password',
   required = true,
+  autoComplete = 'new-password',
 }: PasswordInputProps) {
   const [showPassword, setShowPassword] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -78,6 +80,7 @@ export function PasswordInput({
           placeholder={placeholder}
           required={required}
           className="pr-20"
+          autoComplete={autoComplete}
         />
         <div className="absolute right-2 top-1/2 -translate-y-1/2 flex gap-1">
           {value && (

@@ -949,6 +949,7 @@ export default function TeacherProfilePage() {
                         })
                       }
                       required
+                      autoComplete="current-password"
                     />
                   </div>
 
@@ -965,6 +966,7 @@ export default function TeacherProfilePage() {
                         })
                       }
                       required
+                      autoComplete="new-password"
                     />
                   </div>
 
@@ -983,6 +985,7 @@ export default function TeacherProfilePage() {
                         })
                       }
                       required
+                      autoComplete="new-password"
                     />
                   </div>
 

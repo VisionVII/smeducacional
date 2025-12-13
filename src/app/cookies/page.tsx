@@ -149,6 +149,78 @@ export default function CookiesPage() {
 
         <section>
           <h2 className="text-2xl font-semibold mb-4">
+            Cookies de Publicidade e Anúncios
+          </h2>
+          <p className="text-muted-foreground leading-relaxed mb-4">
+            Para oferecer cursos de qualidade com preços acessíveis, utilizamos
+            anúncios estratégicos em contas de plano free. Estes cookies ajudam
+            a personalizar sua experiência e medir a eficácia de campanhas.
+          </p>
+          <div className="border-l-4 border-orange-500 pl-4">
+            <h3 className="text-lg font-semibold mb-2">
+              Cookies de Anúncios (Plano Free)
+            </h3>
+            <ul className="list-disc list-inside mt-2 text-muted-foreground space-y-2">
+              <li>
+                <strong>ad_preference:</strong> Personaliza anúncios com base em
+                seu comportamento
+              </li>
+              <li>
+                <strong>ad_session:</strong> Acompanha sessão de visualização de
+                anúncios
+              </li>
+              <li>
+                <strong>ad_frequency:</strong> Controla frequência de exibição
+                para evitar excesso
+              </li>
+              <li>
+                <strong>ad_consent:</strong> Registra consentimento para
+                publicidade personalizada
+              </li>
+            </ul>
+            <p className="text-sm text-muted-foreground mt-3">
+              <strong>Como desativar:</strong> Se você é professor com plano
+              premium ou aluno premium, estes cookies não serão carregados.
+              Alunos free podem desativar publicidade personalizada nas
+              configurações da conta.
+            </p>
+          </div>
+        </section>
+
+        <section>
+          <h2 className="text-2xl font-semibold mb-4">
+            Sistema de Bloqueio de Anúncios para Premium
+          </h2>
+          <p className="text-muted-foreground leading-relaxed mb-4">
+            Oferecemos a opção de plano premium para eliminar completamente os
+            anúncios:
+          </p>
+          <div className="grid md:grid-cols-2 gap-4">
+            <div className="border rounded-lg p-4 bg-red-50 dark:bg-red-950">
+              <h4 className="font-semibold mb-2">📱 Plano Free</h4>
+              <ul className="text-sm text-muted-foreground space-y-1">
+                <li>✓ Acesso a todos os cursos</li>
+                <li>
+                  ✗ <strong>Com anúncios</strong> antes/durante vídeos
+                </li>
+                <li>✗ Banners publicitários</li>
+              </ul>
+            </div>
+            <div className="border rounded-lg p-4 bg-green-50 dark:bg-green-950">
+              <h4 className="font-semibold mb-2">⭐ Plano Premium</h4>
+              <ul className="text-sm text-muted-foreground space-y-1">
+                <li>✓ Acesso a todos os cursos</li>
+                <li>
+                  ✓ <strong>SEM anúncios</strong>
+                </li>
+                <li>✓ Certificados digitais</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h2 className="text-2xl font-semibold mb-4">
             Atualizações desta política
           </h2>
           <p className="text-muted-foreground leading-relaxed">

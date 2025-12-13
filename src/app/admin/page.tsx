@@ -172,6 +172,7 @@ export default function AdminAccessPage() {
                         setError('');
                       }}
                       required
+                      autoComplete="current-password"
                     />
                   </div>
 

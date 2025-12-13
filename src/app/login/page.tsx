@@ -189,6 +189,7 @@ export default function LoginPage() {
                 setFormData({ ...formData, password: value })
               }
               showStrength={false}
+              autoComplete="current-password"
             />
 
             <div className="flex items-center justify-between">
