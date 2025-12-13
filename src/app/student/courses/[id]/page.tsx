@@ -99,7 +99,6 @@ export default async function StudentCoursePage({
       courseId={course.id}
       courseTitle={course.title}
       modules={course.modules}
-      progress={enrollment.progress}
       isEnrolled
       isCoursePaid={isCoursePaid}
     />

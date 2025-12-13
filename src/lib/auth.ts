@@ -204,10 +204,9 @@ export const authOptions: NextAuthOptions = {
         token.name = dbUser.name;
         token.role = dbUser.role;
         token.avatar = dbUser.avatar;
-        console.log('[auth][jwt] ✅ Token Google populado:', {
-          id: dbUser.id,
-          role: dbUser.role,
-        });
+        if (process.env.NODE_ENV === 'development') {
+          console.log('[auth][jwt] ✅ Token Google populado');
+        }
         return token;
       }
 
@@ -218,10 +217,9 @@ export const authOptions: NextAuthOptions = {
         token.name = user.name || '';
         token.role = (user as any).role;
         token.avatar = (user as any).avatar;
-        console.log('[auth][jwt] ✅ Token Credentials populado:', {
-          id: user.id,
-          role: (user as any).role,
-        });
+        if (process.env.NODE_ENV === 'development') {
+          console.log('[auth][jwt] ✅ Token Credentials populado');
+        }
         return token;
       }
 
@@ -245,10 +243,9 @@ export const authOptions: NextAuthOptions = {
           token.name = dbUser.name;
           token.role = dbUser.role;
           token.avatar = dbUser.avatar;
-          console.log('[auth][jwt] 🔄 Token recarregado do banco:', {
-            id: dbUser.id,
-            role: dbUser.role,
-          });
+          if (process.env.NODE_ENV === 'development') {
+            console.log('[auth][jwt] 🔄 Token recarregado do banco');
+          }
         } else {
           console.error(
             '[auth][jwt] ❌ Usuário não encontrado no banco:',
@@ -257,11 +254,9 @@ export const authOptions: NextAuthOptions = {
         }
       }
 
-      console.log('[auth][jwt] Token final:', {
-        id: token.id,
-        role: token.role,
-        email: token.email,
-      });
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[auth][jwt] Token final');
+      }
       return token;
     },
     async redirect({ url, baseUrl }) {
