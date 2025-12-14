@@ -195,6 +195,7 @@ export default function TeacherForgotPasswordPage() {
                     onChange={(e) => setEmail(e.target.value)}
                     className="pl-10"
                     required
+                    autoComplete="email"
                   />
                 </div>
               </div>

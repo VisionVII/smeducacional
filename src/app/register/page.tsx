@@ -175,6 +175,7 @@ export default function RegisterPage() {
                   setFormData({ ...formData, email: e.target.value })
                 }
                 required
+                autoComplete="email"
               />
             </div>
 

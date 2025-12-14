@@ -1,7 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -141,7 +147,9 @@ export default function TestEmailPage() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 py-12 px-4">
       <div className="container max-w-2xl mx-auto">
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold mb-2">🧪 Teste de Email - Resend</h1>
+          <h1 className="text-4xl font-bold mb-2">
+            🧪 Teste de Email - Resend
+          </h1>
           <p className="text-gray-600 dark:text-gray-400">
             Teste o sistema de envio de emails de recuperação de senha
           </p>
@@ -156,10 +164,16 @@ export default function TestEmailPage() {
             <div className="space-y-2">
               <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
                 <span className="font-medium">RESEND_API_KEY</span>
-                <span className={`px-3 py-1 rounded-full text-sm font-semibold ${
-                  process.env.NEXT_PUBLIC_SUPABASE_URL ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
-                }`}>
-                  {process.env.NEXT_PUBLIC_SUPABASE_URL ? 'Configurada' : 'Não configurada'}
+                <span
+                  className={`px-3 py-1 rounded-full text-sm font-semibold ${
+                    process.env.NEXT_PUBLIC_SUPABASE_URL
+                      ? 'bg-green-100 text-green-700'
+                      : 'bg-red-100 text-red-700'
+                  }`}
+                >
+                  {process.env.NEXT_PUBLIC_SUPABASE_URL
+                    ? 'Configurada'
+                    : 'Não configurada'}
                 </span>
               </div>
               <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
@@ -179,10 +193,9 @@ export default function TestEmailPage() {
               {step === 'send' ? 'Enviar Código' : 'Verificar Código'}
             </CardTitle>
             <CardDescription>
-              {step === 'send' 
+              {step === 'send'
                 ? 'Digite um email cadastrado no sistema para receber o código'
-                : 'Digite o código de 6 dígitos recebido no email'
-              }
+                : 'Digite o código de 6 dígitos recebido no email'}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
@@ -197,14 +210,15 @@ export default function TestEmailPage() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     disabled={isLoading}
+                    autoComplete="email"
                   />
                   <p className="text-xs text-gray-500">
                     Use um email cadastrado no sistema (ex: aluno@teste.com)
                   </p>
                 </div>
 
-                <Button 
-                  onClick={handleSendCode} 
+                <Button
+                  onClick={handleSendCode}
                   className="w-full"
                   disabled={isLoading}
                 >
@@ -240,8 +254,8 @@ export default function TestEmailPage() {
                 </div>
 
                 <div className="flex gap-3">
-                  <Button 
-                    onClick={handleVerifyCode} 
+                  <Button
+                    onClick={handleVerifyCode}
                     className="flex-1"
                     disabled={isLoading}
                   >
@@ -254,8 +268,8 @@ export default function TestEmailPage() {
                       'Verificar Código'
                     )}
                   </Button>
-                  <Button 
-                    onClick={resetTest} 
+                  <Button
+                    onClick={resetTest}
                     variant="outline"
                     disabled={isLoading}
                   >
@@ -266,11 +280,13 @@ export default function TestEmailPage() {
             )}
 
             {result && (
-              <div className={`p-4 rounded-lg border-2 ${
-                result.success 
-                  ? 'bg-green-50 border-green-200 dark:bg-green-900/20 dark:border-green-800'
-                  : 'bg-red-50 border-red-200 dark:bg-red-900/20 dark:border-red-800'
-              }`}>
+              <div
+                className={`p-4 rounded-lg border-2 ${
+                  result.success
+                    ? 'bg-green-50 border-green-200 dark:bg-green-900/20 dark:border-green-800'
+                    : 'bg-red-50 border-red-200 dark:bg-red-900/20 dark:border-red-800'
+                }`}
+              >
                 <div className="flex items-start gap-3">
                   {result.success ? (
                     <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
@@ -278,14 +294,22 @@ export default function TestEmailPage() {
                     <XCircle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
                   )}
                   <div className="flex-1">
-                    <p className={`font-semibold ${
-                      result.success ? 'text-green-800 dark:text-green-200' : 'text-red-800 dark:text-red-200'
-                    }`}>
+                    <p
+                      className={`font-semibold ${
+                        result.success
+                          ? 'text-green-800 dark:text-green-200'
+                          : 'text-red-800 dark:text-red-200'
+                      }`}
+                    >
                       {result.success ? 'Sucesso!' : 'Erro'}
                     </p>
-                    <p className={`text-sm mt-1 ${
-                      result.success ? 'text-green-700 dark:text-green-300' : 'text-red-700 dark:text-red-300'
-                    }`}>
+                    <p
+                      className={`text-sm mt-1 ${
+                        result.success
+                          ? 'text-green-700 dark:text-green-300'
+                          : 'text-red-700 dark:text-red-300'
+                      }`}
+                    >
                       {result.message}
                     </p>
                     {result.code && (

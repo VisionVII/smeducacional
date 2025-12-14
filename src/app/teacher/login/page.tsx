@@ -163,6 +163,7 @@ export default function TeacherLoginPage() {
                   setFormData({ ...formData, email: e.target.value })
                 }
                 required
+                autoComplete="username"
               />
             </div>
             <div className="space-y-2">

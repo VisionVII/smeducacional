@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
 import {
@@ -15,7 +16,22 @@ import {
 
 export function Footer() {
   const { data: session } = useSession();
-  const currentYear = new Date().getFullYear();
+  const [currentYear, setCurrentYear] = useState<number | null>(null);
+  const [accessAt, setAccessAt] = useState('');
+
+  useEffect(() => {
+    const now = new Date();
+    setCurrentYear(now.getFullYear());
+    setAccessAt(
+      now.toLocaleString('pt-BR', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      })
+    );
+  }, []);
 
   // Links que requerem autenticação
   const requiresAuth = (path: string) => {
@@ -233,16 +249,12 @@ export function Footer() {
           <div className="flex flex-col md:flex-row justify-between items-center gap-3 md:gap-4 text-xs md:text-sm text-muted-foreground">
             <div className="text-center md:text-left">
               <p>
-                © {currentYear} VisionVII. Todos os direitos reservados.
+                <span suppressHydrationWarning>
+                  © {currentYear ?? ''} VisionVII. Todos os direitos reservados.
+                </span>
                 <br />
-                <span>
-                  {`Acesso em: ${new Date().toLocaleString('pt-BR', {
-                    day: '2-digit',
-                    month: '2-digit',
-                    year: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                  })}`}
+                <span suppressHydrationWarning>
+                  {accessAt ? `Acesso em: ${accessAt}` : ''}
                 </span>
               </p>
               <p className="mt-1 text-[11px] text-red-600 font-semibold">

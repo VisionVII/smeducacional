@@ -148,6 +148,7 @@ export default function StudentProfilePage() {
                     setFormData({ ...formData, email: e.target.value })
                   }
                   required
+                  autoComplete="email"
                 />
               </div>
 

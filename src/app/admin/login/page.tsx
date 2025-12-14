@@ -165,6 +165,7 @@ export default function AdminLoginPage() {
                   setFormData({ ...formData, email: e.target.value })
                 }
                 required
+                autoComplete="username"
               />
             </div>
             <div className="space-y-2">
