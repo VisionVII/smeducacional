@@ -33,10 +33,10 @@ export default function HelpPage() {
             Envie suas dúvidas por email
           </p>
           <a
-            href="mailto:suporte@visionvii.com"
+            href="mailto:visiondevgrid@proton.me"
             className="text-primary hover:underline"
           >
-            suporte@visionvii.com
+            visiondevgrid@proton.me
           </a>
         </div>
 

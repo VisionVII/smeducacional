@@ -624,13 +624,13 @@ export default function LGPDPage() {
 
                   <div>
                     <p className="font-semibold text-foreground mb-2">
-                      📧 Suporte Geral
+                      📧 Suporte Técnico
                     </p>
                     <a
-                      href="mailto:suporte@smeducacional.com.br"
+                      href="mailto:visiondevgrid@proton.me"
                       className="text-primary hover:underline"
                     >
-                      suporte@smeducacional.com.br
+                      visiondevgrid@proton.me
                     </a>
                   </div>
                 </div>

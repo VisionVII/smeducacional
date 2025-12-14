@@ -98,7 +98,7 @@ export default function ContactPage() {
                     <div>
                       <h3 className="font-bold mb-1">E-mail</h3>
                       <p className="text-gray-600">contato@smeducacional.com</p>
-                      <p className="text-gray-600">suporte@smeducacional.com</p>
+                      <p className="text-gray-600">visiondevgrid@proton.me</p>
                     </div>
                   </div>
                 </Card>

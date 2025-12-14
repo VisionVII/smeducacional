@@ -5,6 +5,7 @@ import { ThemeProvider } from '@/components/theme-provider';
 import { Toaster } from '@/components/ui/toaster';
 import { QueryProvider } from '@/components/query-provider';
 import { AuthProvider } from '@/components/auth-provider';
+import { CookieBanner } from '@/components/cookie-banner';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -31,6 +32,7 @@ export default function RootLayout({
             <QueryProvider>
               {children}
               <Toaster />
+              <CookieBanner />
             </QueryProvider>
           </AuthProvider>
         </ThemeProvider>
