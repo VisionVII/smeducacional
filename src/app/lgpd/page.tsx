@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import { Card } from '@/components/ui/card';
-import { PublicNavbar } from '@/components/public-navbar';
+import { AdaptiveNavbar } from '@/components/adaptive-navbar';
 import { Footer } from '@/components/footer';
 import { Shield, Database, User, Eye } from 'lucide-react';
 
@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 export default function LGPDPage() {
   return (
     <div className="min-h-screen flex flex-col">
-      <PublicNavbar />
+      <AdaptiveNavbar />
 
       <main className="flex-1">
         {/* Hero Section */}

@@ -1,11 +1,11 @@
 import { Card } from '@/components/ui/card';
-import { PublicNavbar } from '@/components/public-navbar';
+import { AdaptiveNavbar } from '@/components/adaptive-navbar';
 import { Footer } from '@/components/footer';
 
 export default function PrivacyPage() {
   return (
     <div className="min-h-screen flex flex-col">
-      <PublicNavbar />
+      <AdaptiveNavbar />
 
       <main className="flex-1">
         <section className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-16">

@@ -13,6 +13,8 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion';
+import { AdaptiveNavbar } from '@/components/adaptive-navbar';
+import { Footer } from '@/components/footer';
 import { HelpCircle } from 'lucide-react';
 
 const faqs = [
@@ -100,63 +102,71 @@ const faqs = [
 
 export default function FAQPage() {
   return (
-    <div className="container mx-auto py-16 max-w-4xl">
-      <div className="text-center mb-12">
-        <div className="flex items-center justify-center mb-4">
-          <HelpCircle className="h-12 w-12 text-primary" />
-        </div>
-        <h1 className="text-4xl font-bold mb-4">Perguntas Frequentes</h1>
-        <p className="text-xl text-muted-foreground">
-          Encontre respostas para as dúvidas mais comuns
-        </p>
-      </div>
+    <div className="min-h-screen flex flex-col">
+      <AdaptiveNavbar />
 
-      <div className="space-y-8">
-        {faqs.map((section, idx) => (
-          <Card key={idx}>
-            <CardHeader>
-              <CardTitle>{section.category}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Accordion type="single" collapsible className="w-full">
-                {section.questions.map((faq, qIdx) => (
-                  <AccordionItem key={qIdx} value={`item-${idx}-${qIdx}`}>
-                    <AccordionTrigger className="text-left">
-                      {faq.question}
-                    </AccordionTrigger>
-                    <AccordionContent className="text-muted-foreground">
-                      {faq.answer}
-                    </AccordionContent>
-                  </AccordionItem>
-                ))}
-              </Accordion>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      <Card className="mt-12">
-        <CardHeader>
-          <CardTitle>Não encontrou sua resposta?</CardTitle>
-          <CardDescription>
-            Entre em contato com nossa equipe de suporte
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-2 text-sm">
-            <p>
-              <strong>Email:</strong> visiondevgrid@proton.me
-            </p>
-            <p>
-              <strong>Horário de atendimento:</strong> Segunda a Sexta, 9h às
-              18h
-            </p>
-            <p className="text-muted-foreground">
-              Respondemos todas as mensagens em até 24 horas úteis
+      <main className="flex-1">
+        <div className="container mx-auto py-16 max-w-4xl">
+          <div className="text-center mb-12">
+            <div className="flex items-center justify-center mb-4">
+              <HelpCircle className="h-12 w-12 text-primary" />
+            </div>
+            <h1 className="text-4xl font-bold mb-4">Perguntas Frequentes</h1>
+            <p className="text-xl text-muted-foreground">
+              Encontre respostas para as dúvidas mais comuns
             </p>
           </div>
-        </CardContent>
-      </Card>
+
+          <div className="space-y-8">
+            {faqs.map((section, idx) => (
+              <Card key={idx}>
+                <CardHeader>
+                  <CardTitle>{section.category}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <Accordion type="single" collapsible className="w-full">
+                    {section.questions.map((faq, qIdx) => (
+                      <AccordionItem key={qIdx} value={`item-${idx}-${qIdx}`}>
+                        <AccordionTrigger className="text-left">
+                          {faq.question}
+                        </AccordionTrigger>
+                        <AccordionContent className="text-muted-foreground">
+                          {faq.answer}
+                        </AccordionContent>
+                      </AccordionItem>
+                    ))}
+                  </Accordion>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          <Card className="mt-12">
+            <CardHeader>
+              <CardTitle>Não encontrou sua resposta?</CardTitle>
+              <CardDescription>
+                Entre em contato com nossa equipe de suporte
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2 text-sm">
+                <p>
+                  <strong>Email:</strong> visiondevgrid@proton.me
+                </p>
+                <p>
+                  <strong>Horário de atendimento:</strong> Segunda a Sexta, 9h
+                  às 18h
+                </p>
+                <p className="text-muted-foreground">
+                  Respondemos todas as mensagens em até 24 horas úteis
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </main>
+
+      <Footer />
     </div>
   );
 }

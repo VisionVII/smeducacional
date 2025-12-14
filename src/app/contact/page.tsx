@@ -2,14 +2,14 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { PublicNavbar } from '@/components/public-navbar';
+import { AdaptiveNavbar } from '@/components/adaptive-navbar';
 import { Footer } from '@/components/footer';
 import { Mail, Phone, MapPin } from 'lucide-react';
 
 export default function ContactPage() {
   return (
     <div className="min-h-screen flex flex-col">
-      <PublicNavbar />
+      <AdaptiveNavbar />
 
       <main className="flex-1">
         {/* Hero Section */}

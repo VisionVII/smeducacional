@@ -4,80 +4,27 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Footer } from '@/components/footer';
+import { AdaptiveNavbar } from '@/components/adaptive-navbar';
 import {
   BookOpen,
   GraduationCap,
   Award,
   Users,
-  Moon,
-  Sun,
   TrendingUp,
   Clock,
   CheckCircle,
   Star,
 } from 'lucide-react';
-import { useTheme } from 'next-themes';
 import { AuthRedirectCheck } from '@/components/auth-redirect-check';
 
 export default function HomePage() {
-  const { theme, setTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-800">
       {/* Verificar e redirecionar usuários logados */}
       <AuthRedirectCheck />
 
-      {/* Header */}
-      <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-3 md:py-4 flex justify-between items-center">
-          <Link href="/" className="flex items-center gap-2 flex-shrink-0">
-            <GraduationCap className="h-8 w-8 md:h-10 md:w-10 text-primary" />
-          </Link>
-
-          <nav className="hidden sm:flex gap-4 md:gap-6 items-center">
-            <Link
-              href="/courses"
-              className="text-sm md:text-base hover:text-primary transition-colors"
-            >
-              Cursos
-            </Link>
-            <Link
-              href="/about"
-              className="text-sm md:text-base hover:text-primary transition-colors"
-            >
-              Sobre
-            </Link>
-          </nav>
-
-          <div className="flex items-center gap-2">
-            {/* Theme Toggle */}
-            {mounted && (
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-9 w-9"
-                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-              >
-                <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-                <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-                <span className="sr-only">Alternar tema</span>
-              </Button>
-            )}
-
-            <Button asChild variant="ghost" size="sm" className="text-sm">
-              <Link href="/login">Entrar</Link>
-            </Button>
-            <Button asChild size="sm" className="text-sm">
-              <Link href="/register">Cadastrar</Link>
-            </Button>
-          </div>
-        </div>
-      </header>
+      {/* Menu adaptativo - simples para não logados, completo para logados */}
+      <AdaptiveNavbar />
 
       {/* Hero Section */}
       <section className="container mx-auto px-4 py-12 md:py-20 text-center flex-1">

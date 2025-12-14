@@ -12,20 +12,18 @@ import {
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { AdaptiveNavbar } from '@/components/adaptive-navbar';
+import { Footer } from '@/components/footer';
 import {
   BookOpen,
   Clock,
   Signal,
   Users,
   Search,
-  GraduationCap,
   Loader2,
   TrendingUp,
   Star,
-  Sun,
-  Moon,
 } from 'lucide-react';
-import { useTheme } from 'next-themes';
 import { useSearchParams } from 'next/navigation';
 import { PublicThemeProvider } from '@/components/public-theme-provider';
 
@@ -63,7 +61,6 @@ interface Category {
 }
 
 function CoursesClient() {
-  const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const [courses, setCourses] = useState<Course[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -171,48 +168,8 @@ function CoursesClient() {
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-800">
-      {/* Header */}
-      <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-3 md:py-4 flex justify-between items-center">
-          <Link href="/" className="flex items-center gap-2">
-            <GraduationCap className="h-8 w-8 md:h-10 md:w-10 text-primary" />
-          </Link>
-
-          <nav className="hidden sm:flex gap-4 md:gap-6 items-center">
-            <Link
-              href="/courses"
-              className="text-sm md:text-base font-medium text-primary"
-            >
-              Cursos
-            </Link>
-            <Link
-              href="/about"
-              className="text-sm md:text-base hover:text-primary transition-colors"
-            >
-              Sobre
-            </Link>
-          </nav>
-
-          <div className="flex items-center gap-2">
-            {mounted && (
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-              >
-                <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-                <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-              </Button>
-            )}
-            <Button asChild variant="ghost" size="sm">
-              <Link href="/login">Entrar</Link>
-            </Button>
-            <Button asChild size="sm">
-              <Link href="/register">Cadastrar</Link>
-            </Button>
-          </div>
-        </div>
-      </header>
+      {/* Menu adaptativo */}
+      <AdaptiveNavbar />
 
       {/* Hero Section */}
       <section className="bg-primary/5 dark:bg-primary/10 py-12 md:py-16">
@@ -445,14 +402,7 @@ function CoursesClient() {
       </section>
 
       {/* Footer */}
-      <footer className="mt-auto border-t py-8">
-        <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
-          <p>
-            © {new Date().getFullYear()} SM Educacional. Todos os direitos
-            reservados.
-          </p>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }
