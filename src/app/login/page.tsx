@@ -16,7 +16,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { toast } from '@/components/ui/use-toast';
-import { GraduationCap, Mail, Home } from 'lucide-react';
+import { GraduationCap, Mail, Home, ShieldCheck } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { PasswordInput } from '@/components/password-input';
 
@@ -28,6 +28,8 @@ export default function LoginPage() {
     password: '',
     rememberMe: false,
   });
+  const [require2FA, setRequire2FA] = useState(false);
+  const [twofaCode, setTwofaCode] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -85,40 +87,11 @@ export default function LoginPage() {
 
           console.log('Session obtida:', session);
 
-          // Gate de 2FA: se habilitado para o usuário, solicitar código antes de redirecionar
+          // Gate de 2FA: se habilitado para o usuário, solicitar código inline antes de redirecionar
           if (session?.user?.twoFactorEnabled) {
-            let code = '';
-            // prompt simples para código TOTP (6 dígitos)
-            code =
-              window.prompt(
-                'Autenticação em duas etapas: informe o código de 6 dígitos do seu app (Google Authenticator, Authy)'
-              ) || '';
-            if (!code || code.length !== 6) {
-              toast({
-                title: 'Código 2FA inválido',
-                description: 'Informe os 6 dígitos para continuar.',
-                variant: 'destructive',
-              });
-              setIsLoading(false);
-              return;
-            }
-            // verificar 2FA usando endpoint já autenticado
-            const verifyRes = await fetch('/api/student/2fa/verify', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ code }),
-            });
-            const verifyJson = await verifyRes.json();
-            if (!verifyRes.ok) {
-              console.error('2FA verify error:', verifyJson);
-              toast({
-                title: 'Falha no 2FA',
-                description: verifyJson?.error || 'Código incorreto',
-                variant: 'destructive',
-              });
-              setIsLoading(false);
-              return;
-            }
+            setRequire2FA(true);
+            setIsLoading(false);
+            return; // aguarda usuário informar código na UI
           }
 
           if (session?.user?.role) {
@@ -337,7 +310,89 @@ export default function LoginPage() {
               </p>
             </div>
           </CardFooter>
+          </CardFooter>
         </form>
+
+        {require2FA && (
+          <Card className="mt-6">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <ShieldCheck className="h-5 w-5" />
+                Verificação 2FA necessária
+              </CardTitle>
+              <CardDescription>
+                Digite o código de 6 dígitos do seu app de autenticação para continuar.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <form
+                onSubmit={async (e) => {
+                  e.preventDefault();
+                  if (!twofaCode || twofaCode.length !== 6) {
+                    toast({ title: 'Código inválido', description: 'Informe os 6 dígitos.', variant: 'destructive' });
+                    return;
+                  }
+                  setIsLoading(true);
+                  try {
+                    const verifyRes = await fetch('/api/student/2fa/verify', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ code: twofaCode }),
+                    });
+                    const verifyJson = await verifyRes.json();
+                    if (!verifyRes.ok) {
+                      toast({ title: 'Falha no 2FA', description: verifyJson?.error || 'Código incorreto', variant: 'destructive' });
+                      setIsLoading(false);
+                      return;
+                    }
+                    // Após verificar 2FA, buscar sessão novamente e redirecionar
+                    const sessionRes = await fetch('/api/auth/session', { cache: 'no-store' });
+                    const session = await sessionRes.json();
+                    if (session?.user?.role) {
+                      let dashboardUrl = '/student/dashboard';
+                      if (session.user.role === 'ADMIN') dashboardUrl = '/admin/dashboard';
+                      else if (session.user.role === 'TEACHER') dashboardUrl = '/teacher/dashboard';
+                      window.location.href = dashboardUrl;
+                    } else {
+                      window.location.href = '/student/dashboard';
+                    }
+                  } catch (err) {
+                    toast({ title: 'Erro', description: 'Não foi possível verificar 2FA.', variant: 'destructive' });
+                    setIsLoading(false);
+                  }
+                }}
+                className="space-y-3"
+              >
+                <div className="space-y-2">
+                  <Label htmlFor="twofaCode">Código 2FA</Label>
+                  <Input
+                    id="twofaCode"
+                    inputMode="numeric"
+                    pattern="\\d{6}"
+                    placeholder="000000"
+                    value={twofaCode}
+                    onChange={(e) => setTwofaCode(e.target.value)}
+                  />
+                </div>
+                <div className="flex gap-2">
+                  <Button type="submit" disabled={isLoading}>
+                    Verificar 2FA
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => {
+                      setRequire2FA(false);
+                      setTwofaCode('');
+                    }}
+                  >
+                    Cancelar
+                  </Button>
+                </div>
+              </form>
+            </CardContent>
+          </Card>
+        )}
       </Card>
     </div>
   );
