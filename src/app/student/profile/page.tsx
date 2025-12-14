@@ -13,7 +13,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/ui/use-toast';
-import { User, Mail, Lock, Save, Upload } from 'lucide-react';
+import { User, Mail, Lock, Save, Upload, ShieldCheck, ShieldOff, QrCode } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 export default function StudentProfilePage() {
@@ -28,6 +28,9 @@ export default function StudentProfilePage() {
     currentPassword: '',
     newPassword: '',
     confirmPassword: '',
+  });
+  const [twoFA, setTwoFA] = useState<{ secret?: string; otpauth?: string; code?: string; enabled?: boolean }>({
+    enabled: (session?.user as any)?.twoFactorEnabled ?? false,
   });
 
   const handleProfileUpdate = async (e: React.FormEvent) => {
@@ -278,6 +281,129 @@ export default function StudentProfilePage() {
                 Alterar Senha
               </Button>
             </form>
+          </CardContent>
+        </Card>
+
+        {/* 2FA */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <ShieldCheck className="h-5 w-5" />
+              Autenticação em Duas Etapas (2FA)
+            </CardTitle>
+            <CardDescription>Proteja sua conta com TOTP (Google Authenticator, Authy)</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {twoFA.enabled ? (
+              <div className="space-y-3">
+                <p className="text-green-600">2FA está habilitado nesta conta.</p>
+                <Button
+                  type="button"
+                  variant="destructive"
+                  onClick={async () => {
+                    setIsLoading(true);
+                    try {
+                      const res = await fetch('/api/student/2fa/disable', { method: 'POST' });
+                      if (!res.ok) throw new Error('Erro ao desabilitar 2FA');
+                      setTwoFA({ enabled: false });
+                      await update();
+                      toast({ title: '2FA desabilitado', description: 'Você pode habilitar novamente quando quiser.' });
+                    } catch (e) {
+                      toast({ title: 'Erro', description: 'Não foi possível desabilitar o 2FA.', variant: 'destructive' });
+                    } finally {
+                      setIsLoading(false);
+                    }
+                  }}
+                  disabled={isLoading}
+                >
+                  <ShieldOff className="h-4 w-4 mr-2" />
+                  Desabilitar 2FA
+                </Button>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {!twoFA.secret ? (
+                  <Button
+                    type="button"
+                    onClick={async () => {
+                      setIsLoading(true);
+                      try {
+                        const res = await fetch('/api/student/2fa/setup', { method: 'POST' });
+                        const json = await res.json();
+                        if (!res.ok) throw new Error(json?.error || 'Falha ao gerar segredo');
+                        setTwoFA({ ...twoFA, secret: json.data.secret, otpauth: json.data.otpauth });
+                        toast({ title: '2FA iniciado', description: 'Escaneie o QR com seu app de autenticação.' });
+                      } catch (e) {
+                        toast({ title: 'Erro', description: 'Não foi possível iniciar o 2FA.', variant: 'destructive' });
+                      } finally {
+                        setIsLoading(false);
+                      }
+                    }}
+                    disabled={isLoading}
+                  >
+                    <QrCode className="h-4 w-4 mr-2" />
+                    Gerar QR Code 2FA
+                  </Button>
+                ) : (
+                  <div className="space-y-3">
+                    <p className="text-sm text-muted-foreground">Abra seu app de autenticação e escaneie este QR:</p>
+                    <div className="flex items-center gap-4">
+                      {/* Para exibir QR sem lib extra, usamos uma URL para um gerador externo confiável */}
+                      <img
+                        alt="QR Code 2FA"
+                        className="w-40 h-40 rounded border"
+                        src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(twoFA.otpauth!)}`}
+                      />
+                      <div className="text-xs break-all">
+                        <div className="font-medium mb-1">otpauth URL</div>
+                        <div className="p-2 bg-secondary rounded">{twoFA.otpauth}</div>
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="twofa-code">Digite o código de 6 dígitos</Label>
+                      <Input
+                        id="twofa-code"
+                        inputMode="numeric"
+                        pattern="\\d{6}"
+                        placeholder="000000"
+                        value={twoFA.code || ''}
+                        onChange={(e) => setTwoFA({ ...twoFA, code: e.target.value })}
+                      />
+                    </div>
+                    <Button
+                      type="button"
+                      onClick={async () => {
+                        if (!twoFA.code || twoFA.code.length !== 6) {
+                          toast({ title: 'Código inválido', description: 'Informe os 6 dígitos do app de autenticação.', variant: 'destructive' });
+                          return;
+                        }
+                        setIsLoading(true);
+                        try {
+                          const res = await fetch('/api/student/2fa/verify', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ code: twoFA.code }),
+                          });
+                          const json = await res.json();
+                          if (!res.ok) throw new Error(json?.error || 'Falha ao verificar 2FA');
+                          setTwoFA({ enabled: true });
+                          await update();
+                          toast({ title: '2FA habilitado', description: 'Sua conta agora requer 2FA no login.' });
+                        } catch (e) {
+                          toast({ title: 'Erro', description: 'Código incorreto. Tente novamente.', variant: 'destructive' });
+                        } finally {
+                          setIsLoading(false);
+                        }
+                      }}
+                      disabled={isLoading}
+                    >
+                      <ShieldCheck className="h-4 w-4 mr-2" />
+                      Verificar e Habilitar
+                    </Button>
+                  </div>
+                )}
+              </div>
+            )}
           </CardContent>
         </Card>
 
