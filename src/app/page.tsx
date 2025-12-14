@@ -15,13 +15,12 @@ import {
   CheckCircle,
   Star,
 } from 'lucide-react';
-import { AuthRedirectCheck } from '@/components/auth-redirect-check';
+// Removido redirecionamento automático para permitir navegação livre em páginas públicas
 
 export default function HomePage() {
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-800">
-      {/* Verificar e redirecionar usuários logados */}
-      <AuthRedirectCheck />
+      {/* Não redirecionar automaticamente usuários logados na Home */}
 
       {/* Menu adaptativo - simples para não logados, completo para logados */}
       <AdaptiveNavbar />
