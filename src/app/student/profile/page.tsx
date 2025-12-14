@@ -112,7 +112,9 @@ export default function StudentProfilePage() {
       <div className="mb-6 flex items-center gap-4">
         <Avatar className="h-16 w-16 ring-1 ring-primary/20 shadow-sm">
           <AvatarImage src={session?.user?.avatar || undefined} />
-          <AvatarFallback>{session?.user?.name?.charAt(0) || 'A'}</AvatarFallback>
+          <AvatarFallback>
+            {session?.user?.name?.charAt(0) || 'A'}
+          </AvatarFallback>
         </Avatar>
         <label
           htmlFor="student-avatar-upload"
@@ -132,12 +134,22 @@ export default function StudentProfilePage() {
               fd.append('file', file);
               setIsLoading(true);
               try {
-                const res = await fetch('/api/student/avatar', { method: 'POST', body: fd });
+                const res = await fetch('/api/student/avatar', {
+                  method: 'POST',
+                  body: fd,
+                });
                 if (!res.ok) throw new Error('Erro ao enviar avatar');
                 await update();
-                toast({ title: 'Avatar atualizado', description: 'Sua foto foi atualizada com sucesso.' });
+                toast({
+                  title: 'Avatar atualizado',
+                  description: 'Sua foto foi atualizada com sucesso.',
+                });
               } catch (err) {
-                toast({ title: 'Erro', description: 'Não foi possível atualizar a foto.', variant: 'destructive' });
+                toast({
+                  title: 'Erro',
+                  description: 'Não foi possível atualizar a foto.',
+                  variant: 'destructive',
+                });
               } finally {
                 setIsLoading(false);
               }
