@@ -334,7 +334,7 @@ export default function LoginPage() {
                   }
                   setIsLoading(true);
                   try {
-                    const verifyRes = await fetch('/api/student/2fa/verify', {
+                  const verifyRes = await fetch('/api/2fa/verify', {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/json' },
                       body: JSON.stringify({ code: twofaCode }),

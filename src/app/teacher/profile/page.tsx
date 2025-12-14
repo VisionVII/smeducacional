@@ -356,14 +356,14 @@ export default function TeacherProfilePage() {
   const handleEnable2FA = async () => {
     setIsLoading(true);
     try {
-      const res = await fetch('/api/teacher/2fa/enable', {
+      const res = await fetch('/api/2fa/setup', {
         method: 'POST',
       });
 
       if (!res.ok) throw new Error('Erro ao ativar 2FA');
 
       const data = await res.json();
-      setQrCodeUrl(data.qrCode);
+      setQrCodeUrl(`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(data.data.otpauth)}`);
 
       toast({
         title: '2FA em configuração',
@@ -392,10 +392,10 @@ export default function TeacherProfilePage() {
 
     setIsLoading(true);
     try {
-      const res = await fetch('/api/teacher/2fa/verify', {
+      const res = await fetch('/api/2fa/verify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token: twoFactorToken }),
+        body: JSON.stringify({ code: twoFactorToken }),
       });
 
       if (!res.ok) throw new Error('Código inválido');
@@ -420,21 +420,10 @@ export default function TeacherProfilePage() {
   };
 
   const handleDisable2FA = async () => {
-    if (!twoFactorToken) {
-      toast({
-        title: 'Erro',
-        description: 'Digite o código do autenticador para desativar.',
-        variant: 'destructive',
-      });
-      return;
-    }
-
     setIsLoading(true);
     try {
-      const res = await fetch('/api/teacher/2fa/disable', {
+      const res = await fetch('/api/2fa/disable', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token: twoFactorToken }),
       });
 
       if (!res.ok) throw new Error('Erro ao desativar');

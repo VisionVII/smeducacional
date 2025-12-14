@@ -439,7 +439,7 @@ export default function StudentProfilePage() {
                         }
                         setIsLoading(true);
                         try {
-                          const res = await fetch('/api/student/2fa/verify', {
+                          const res = await fetch('/api/2fa/verify', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ code: twoFA.code }),
