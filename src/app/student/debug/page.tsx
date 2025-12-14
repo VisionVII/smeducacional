@@ -14,7 +14,11 @@ import Link from 'next/link';
 
 interface DebugData {
   session: any;
+  user?: any;
   enrollments: any[];
+  enrollmentCount?: number;
+  totalEnrollmentsInDB?: number;
+  totalCoursesInDB?: number;
   error?: string;
 }
 
