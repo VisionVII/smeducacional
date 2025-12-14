@@ -36,11 +36,13 @@ export const authOptions: NextAuthOptions = {
       credentials: {
         email: { label: 'Email', type: 'email' },
         password: { label: 'Password', type: 'password' },
+        twoFactorCode: { label: '2FA Code', type: 'text', optional: true },
       },
       async authorize(credentials) {
         console.log('[auth][authorize] Iniciando autorização:', {
           email: credentials?.email,
           hasPassword: !!credentials?.password,
+          has2FA: !!credentials?.twoFactorCode,
         });
 
         if (!credentials?.email || !credentials?.password) {
@@ -51,6 +53,17 @@ export const authOptions: NextAuthOptions = {
         const user = await prisma.user.findUnique({
           where: {
             email: credentials.email,
+          },
+          select: {
+            id: true,
+            email: true,
+            name: true,
+            role: true,
+            avatar: true,
+            password: true,
+            emailVerified: true,
+            twoFactorEnabled: true,
+            twoFactorSecret: true,
           },
         });
 
@@ -89,10 +102,38 @@ export const authOptions: NextAuthOptions = {
           throw new Error('Credenciais inválidas');
         }
 
+        // 🔐 VALIDAÇÃO 2FA OBRIGATÓRIA
+        if (user.twoFactorEnabled && user.twoFactorSecret) {
+          console.log('[auth][authorize] 🔐 Usuário possui 2FA habilitado');
+
+          if (!credentials.twoFactorCode) {
+            console.log(
+              '[auth][authorize] ⚠️ 2FA requerido mas código não fornecido'
+            );
+            throw new Error('2FA_REQUIRED');
+          }
+
+          // Importar função de verificação TOTP
+          const { verifyTOTP } = await import('@/lib/totp');
+          const isValid = verifyTOTP(
+            user.twoFactorSecret,
+            credentials.twoFactorCode,
+            2
+          );
+
+          if (!isValid) {
+            console.error('[auth][authorize] ❌ Código 2FA inválido');
+            throw new Error('Código 2FA inválido ou expirado');
+          }
+
+          console.log('[auth][authorize] ✅ Código 2FA validado com sucesso');
+        }
+
         console.log('[auth][authorize] Login autorizado com sucesso:', {
           id: user.id,
           email: user.email,
           role: user.role,
+          twoFactorValidated: user.twoFactorEnabled,
         });
 
         return {
@@ -103,6 +144,7 @@ export const authOptions: NextAuthOptions = {
           avatar: user.avatar,
           password: user.password,
           emailVerified: user.emailVerified,
+          twoFactorEnabled: user.twoFactorEnabled,
         } as any;
       },
     }),
@@ -176,6 +218,7 @@ export const authOptions: NextAuthOptions = {
             email: true,
             role: true,
             avatar: true,
+            twoFactorEnabled: true,
           },
         });
 
@@ -195,6 +238,7 @@ export const authOptions: NextAuthOptions = {
               email: true,
               role: true,
               avatar: true,
+              twoFactorEnabled: true,
             },
           });
         }
@@ -204,6 +248,7 @@ export const authOptions: NextAuthOptions = {
         token.name = dbUser.name;
         token.role = dbUser.role;
         token.avatar = dbUser.avatar;
+        token.twoFactorEnabled = dbUser.twoFactorEnabled;
         if (process.env.NODE_ENV === 'development') {
           console.log('[auth][jwt] ✅ Token Google populado');
         }
@@ -217,6 +262,7 @@ export const authOptions: NextAuthOptions = {
         token.name = user.name || '';
         token.role = (user as any).role;
         token.avatar = (user as any).avatar;
+        token.twoFactorEnabled = (user as any).twoFactorEnabled || false;
         if (process.env.NODE_ENV === 'development') {
           console.log('[auth][jwt] ✅ Token Credentials populado');
         }
@@ -234,12 +280,17 @@ export const authOptions: NextAuthOptions = {
             email: true,
             role: true,
             avatar: true,
+            twoFactorEnabled: true,
           },
         });
 
         if (dbUser) {
           token.id = dbUser.id;
           token.email = dbUser.email;
+          token.name = dbUser.name;
+          token.role = dbUser.role;
+          token.avatar = dbUser.avatar;
+          token.twoFactorEnabled = dbUser.twoFactorEnabled;
           token.name = dbUser.name;
           token.role = dbUser.role;
           token.avatar = dbUser.avatar;
@@ -282,10 +333,13 @@ export const authOptions: NextAuthOptions = {
           id: token.id,
           email: token.email,
           role: token.role,
+          twoFactorEnabled: token.twoFactorEnabled,
         });
         (session.user as any).id = token.id;
         (session.user as any).role = token.role;
         (session.user as any).avatar = token.avatar;
+        (session.user as any).twoFactorEnabled =
+          token.twoFactorEnabled || false;
       }
       return session;
     },

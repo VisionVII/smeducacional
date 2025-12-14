@@ -15,10 +15,27 @@ import {
   DollarSign,
   AlertCircle,
   Clock,
+  Database,
+  Shield,
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { DevTools } from '@/components/admin/dev-tools';
+
+type QueryResult<T> = { ok: true; data: T[] } | { ok: false; error: string };
+
+async function safeQuery<T>(
+  label: string,
+  sql: string
+): Promise<QueryResult<T>> {
+  try {
+    const data = await prisma.$queryRawUnsafe<T[]>(sql);
+    return { ok: true, data };
+  } catch (error) {
+    console.error(`[admin][db][${label}]`, error);
+    return { ok: false, error: 'Não foi possível recuperar estes dados' };
+  }
+}
 
 export default async function AdminDashboard() {
   const session = await auth();
@@ -120,6 +137,73 @@ export default async function AdminDashboard() {
     orderBy: { createdAt: 'desc' },
     distinct: ['component'],
   });
+
+  // ==========================================
+  // Diagnóstico do Banco de Dados
+  // ==========================================
+  const [tablesRes, rolesRes, functionsRes, rlsRes, bucketsRes] =
+    await Promise.all([
+      safeQuery<{ table_schema: string; table_name: string }>(
+        'tables',
+        `
+        SELECT table_schema, table_name
+        FROM information_schema.tables
+        WHERE table_schema NOT IN ('pg_catalog', 'information_schema')
+        ORDER BY table_schema, table_name
+        LIMIT 50;
+        `
+      ),
+      safeQuery<{
+        rolname: string;
+        rolsuper: boolean;
+        rolcreatedb: boolean;
+        rolcreaterole: boolean;
+        rolcanlogin: boolean;
+      }>(
+        'roles',
+        `
+        SELECT rolname, rolsuper, rolcreatedb, rolcreaterole, rolcanlogin
+        FROM pg_roles
+        ORDER BY rolname
+        LIMIT 20;
+        `
+      ),
+      safeQuery<{ oid: number; schema: string; name: string }>(
+        'functions',
+        `
+        SELECT p.oid AS oid, n.nspname AS schema, p.proname AS name
+        FROM pg_proc p
+        JOIN pg_namespace n ON p.pronamespace = n.oid
+        WHERE n.nspname NOT IN ('pg_catalog', 'information_schema')
+        ORDER BY n.nspname, p.proname
+        LIMIT 50;
+        `
+      ),
+      safeQuery<{ schema: string; name: string }>(
+        'rls',
+        `
+        SELECT schemaname AS schema, tablename AS name
+        FROM pg_tables
+        WHERE rowsecurity = true
+        ORDER BY schemaname, tablename;
+        `
+      ),
+      safeQuery<{ id: string; name: string; public: boolean }>(
+        'buckets',
+        `
+        SELECT id, name, public
+        FROM storage.buckets
+        ORDER BY name
+        LIMIT 20;
+        `
+      ),
+    ]);
+
+  const dbTables = tablesRes.ok ? tablesRes.data : [];
+  const dbRoles = rolesRes.ok ? rolesRes.data : [];
+  const dbFunctions = functionsRes.ok ? functionsRes.data : [];
+  const dbRls = rlsRes.ok ? rlsRes.data : [];
+  const storageBuckets = bucketsRes.ok ? bucketsRes.data : [];
 
   // ==========================================
   // Integrações GitHub
@@ -412,6 +496,124 @@ export default async function AdminDashboard() {
                   ))}
                 </tbody>
               </table>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* ==========================================
+            DIAGNÓSTICO DO BANCO DE DADOS
+            ========================================== */}
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle className="text-base flex items-center gap-2">
+              <Database className="h-4 w-4" />
+              Diagnóstico do Banco de Dados
+            </CardTitle>
+            <CardDescription>
+              Visão rápida de tabelas, roles, funções, segurança e buckets
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="border rounded-md p-3">
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-sm font-medium">Tabelas</p>
+                  <Database className="h-4 w-4 text-muted-foreground" />
+                </div>
+                {tablesRes.ok ? (
+                  <ul className="space-y-1 text-xs text-muted-foreground max-h-44 overflow-auto">
+                    {dbTables.slice(0, 12).map((t) => (
+                      <li key={`${t.table_schema}.${t.table_name}`}>
+                        {t.table_schema}.{t.table_name}
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-xs text-red-600">{tablesRes.error}</p>
+                )}
+              </div>
+
+              <div className="border rounded-md p-3">
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-sm font-medium">Roles</p>
+                  <Shield className="h-4 w-4 text-muted-foreground" />
+                </div>
+                {rolesRes.ok ? (
+                  <ul className="space-y-1 text-xs text-muted-foreground max-h-44 overflow-auto">
+                    {dbRoles.slice(0, 12).map((r) => (
+                      <li key={r.rolname}>
+                        {r.rolname} {r.rolcanlogin ? '(login)' : ''}
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-xs text-red-600">{rolesRes.error}</p>
+                )}
+              </div>
+
+              <div className="border rounded-md p-3">
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-sm font-medium">Funções</p>
+                  <AlertCircle className="h-4 w-4 text-muted-foreground" />
+                </div>
+                {functionsRes.ok ? (
+                  <ul className="space-y-1 text-xs text-muted-foreground max-h-44 overflow-auto">
+                    {dbFunctions.slice(0, 12).map((f) => (
+                      <li key={f.oid ?? `${f.schema}.${f.name}`}>
+                        {f.schema}.{f.name}
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-xs text-red-600">{functionsRes.error}</p>
+                )}
+              </div>
+
+              <div className="border rounded-md p-3">
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-sm font-medium">Security (RLS)</p>
+                  <Shield className="h-4 w-4 text-muted-foreground" />
+                </div>
+                {rlsRes.ok ? (
+                  <ul className="space-y-1 text-xs text-muted-foreground max-h-44 overflow-auto">
+                    {dbRls.length === 0 && (
+                      <li className="text-muted-foreground">
+                        Nenhuma tabela com RLS
+                      </li>
+                    )}
+                    {dbRls.slice(0, 12).map((r) => (
+                      <li key={`${r.schema}.${r.name}`}>
+                        {r.schema}.{r.name}
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-xs text-red-600">{rlsRes.error}</p>
+                )}
+              </div>
+
+              <div className="border rounded-md p-3">
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-sm font-medium">Buckets</p>
+                  <Database className="h-4 w-4 text-muted-foreground" />
+                </div>
+                {bucketsRes.ok ? (
+                  <ul className="space-y-1 text-xs text-muted-foreground max-h-44 overflow-auto">
+                    {storageBuckets.length === 0 && (
+                      <li className="text-muted-foreground">
+                        Nenhum bucket encontrado
+                      </li>
+                    )}
+                    {storageBuckets.slice(0, 12).map((b) => (
+                      <li key={b.id}>
+                        {b.name} {b.public ? '(público)' : '(privado)'}
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-xs text-red-600">{bucketsRes.error}</p>
+                )}
+              </div>
             </div>
           </CardContent>
         </Card>

@@ -36,12 +36,16 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      console.log('Iniciando login com:', formData.email);
+      console.log('Iniciando login com:', {
+        email: formData.email,
+        has2FA: !!twofaCode,
+      });
 
       // Usar signIn com redirect: false para controlar o fluxo
       const result = await signIn('credentials', {
         email: formData.email,
         password: formData.password,
+        twoFactorCode: twofaCode || undefined,
         redirect: false,
       });
 
@@ -57,11 +61,19 @@ export default function LoginPage() {
         return;
       }
 
+      // 🔐 Detectar necessidade de 2FA
+      if (result.error === '2FA_REQUIRED') {
+        console.log('⚠️ 2FA requerido, exibindo UI para código');
+        setRequire2FA(true);
+        setIsLoading(false);
+        return;
+      }
+
       if (result.error) {
         console.error('Login error:', result.error);
         toast({
           title: 'Erro ao fazer login',
-          description: result.error || 'Credenciais inválidas',
+          description: result.error,
           variant: 'destructive',
         });
         setIsLoading(false);
@@ -69,7 +81,7 @@ export default function LoginPage() {
       }
 
       if (result.ok) {
-        console.log('✅ Login bem-sucedido! Aguardando cookie...');
+        console.log('✅ Login bem-sucedido (com 2FA validado se aplicável)');
         toast({
           title: 'Login realizado com sucesso!',
           description: 'Redirecionando...',
@@ -86,13 +98,6 @@ export default function LoginPage() {
           const session = await sessionRes.json();
 
           console.log('Session obtida:', session);
-
-          // Gate de 2FA: se habilitado para o usuário, solicitar código inline antes de redirecionar
-          if (session?.user?.twoFactorEnabled) {
-            setRequire2FA(true);
-            setIsLoading(false);
-            return; // aguarda usuário informar código na UI
-          }
 
           if (session?.user?.role) {
             let dashboardUrl = '/student/dashboard'; // padrão
@@ -330,7 +335,7 @@ export default function LoginPage() {
             </CardHeader>
             <CardContent>
               <form
-                onSubmit={async (e) => {
+                onSubmit={(e) => {
                   e.preventDefault();
                   if (!twofaCode || twofaCode.length !== 6) {
                     toast({
@@ -340,48 +345,8 @@ export default function LoginPage() {
                     });
                     return;
                   }
-                  setIsLoading(true);
-                  try {
-                    const verifyRes = await fetch('/api/2fa/verify', {
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({ code: twofaCode }),
-                    });
-                    const verifyJson = await verifyRes.json();
-                    if (!verifyRes.ok) {
-                      toast({
-                        title: 'Falha no 2FA',
-                        description: verifyJson?.error || 'Código incorreto',
-                        variant: 'destructive',
-                      });
-                      setIsLoading(false);
-                      return;
-                    }
-                    // Após verificar 2FA, buscar sessão novamente e redirecionar
-                    const sessionRes = await fetch('/api/auth/session', {
-                      cache: 'no-store',
-                    });
-                    const session = await sessionRes.json();
-                    if (session?.user?.role) {
-                      let dashboardUrl = '/student/dashboard';
-                      if (session.user.role === 'ADMIN')
-                        dashboardUrl = '/admin/dashboard';
-                      else if (session.user.role === 'TEACHER')
-                        dashboardUrl = '/teacher/dashboard';
-                      sessionStorage.setItem('postLoginRedirect', '1');
-                      window.location.href = dashboardUrl;
-                    } else {
-                      sessionStorage.setItem('postLoginRedirect', '1');
-                      window.location.href = '/student/dashboard';
-                    }
-                  } catch (err) {
-                    toast({
-                      title: 'Erro',
-                      description: 'Não foi possível verificar 2FA.',
-                      variant: 'destructive',
-                    });
-                    setIsLoading(false);
-                  }
+                  // Resubmeter formulário principal com código 2FA
+                  handleSubmit(e);
                 }}
                 className="space-y-3"
               >
