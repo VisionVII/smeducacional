@@ -66,10 +66,11 @@ export function calculatePasswordStrength(password: string): {
     5: { feedback: 'Muito forte', color: 'text-green-700' },
   };
 
-  const result = feedbackMap[Math.min(score, 5) as keyof typeof feedbackMap];
+  const clampedScore = Math.max(0, Math.min(score, 5)); // Mantém dentro dos limites do feedbackMap
+  const result = feedbackMap[clampedScore as keyof typeof feedbackMap];
 
   return {
-    score: Math.min(score, 5),
+    score: clampedScore,
     feedback: result.feedback,
     color: result.color,
   };
