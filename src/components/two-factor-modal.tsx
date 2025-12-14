@@ -1,17 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { ShieldCheck, Clock } from 'lucide-react';
+import { ShieldCheck, Clock, X } from 'lucide-react';
 
 interface TwoFactorModalProps {
   isOpen: boolean;
@@ -69,18 +62,39 @@ export function TwoFactorModal({
     }
   };
 
-  return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <ShieldCheck className="h-5 w-5" />
-            {title}
-          </DialogTitle>
-          <DialogDescription>{description}</DialogDescription>
-        </DialogHeader>
+  if (!isOpen) return null;
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      {/* Backdrop */}
+      <div
+        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+        onClick={onClose}
+      />
+
+      {/* Modal */}
+      <div className="relative z-50 w-full max-w-md mx-4 bg-background border rounded-lg shadow-lg">
+        {/* Header */}
+        <div className="flex items-start justify-between p-6 border-b">
+          <div>
+            <h2 className="flex items-center gap-2 text-lg font-semibold">
+              <ShieldCheck className="h-5 w-5" />
+              {title}
+            </h2>
+            <p className="text-sm text-muted-foreground mt-1">{description}</p>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="p-1 rounded-md hover:bg-accent"
+            disabled={isLoading}
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+
+        {/* Content */}
+        <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
             <Clock className="h-4 w-4" />
             <span>Tempo restante: {countdown}s</span>
@@ -120,7 +134,7 @@ export function TwoFactorModal({
             </Button>
           </div>
         </form>
-      </DialogContent>
-    </Dialog>
+      </div>
+    </div>
   );
 }

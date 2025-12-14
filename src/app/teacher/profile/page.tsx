@@ -363,7 +363,11 @@ export default function TeacherProfilePage() {
       if (!res.ok) throw new Error('Erro ao ativar 2FA');
 
       const data = await res.json();
-      setQrCodeUrl(`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(data.data.otpauth)}`);
+      setQrCodeUrl(
+        `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(
+          data.data.otpauth
+        )}`
+      );
 
       toast({
         title: '2FA em configuração',

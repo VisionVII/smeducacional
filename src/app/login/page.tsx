@@ -310,7 +310,6 @@ export default function LoginPage() {
               </p>
             </div>
           </CardFooter>
-          </CardFooter>
         </form>
 
         {require2FA && (
@@ -321,7 +320,8 @@ export default function LoginPage() {
                 Verificação 2FA necessária
               </CardTitle>
               <CardDescription>
-                Digite o código de 6 dígitos do seu app de autenticação para continuar.
+                Digite o código de 6 dígitos do seu app de autenticação para
+                continuar.
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -329,35 +329,51 @@ export default function LoginPage() {
                 onSubmit={async (e) => {
                   e.preventDefault();
                   if (!twofaCode || twofaCode.length !== 6) {
-                    toast({ title: 'Código inválido', description: 'Informe os 6 dígitos.', variant: 'destructive' });
+                    toast({
+                      title: 'Código inválido',
+                      description: 'Informe os 6 dígitos.',
+                      variant: 'destructive',
+                    });
                     return;
                   }
                   setIsLoading(true);
                   try {
-                  const verifyRes = await fetch('/api/2fa/verify', {
+                    const verifyRes = await fetch('/api/2fa/verify', {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/json' },
                       body: JSON.stringify({ code: twofaCode }),
                     });
                     const verifyJson = await verifyRes.json();
                     if (!verifyRes.ok) {
-                      toast({ title: 'Falha no 2FA', description: verifyJson?.error || 'Código incorreto', variant: 'destructive' });
+                      toast({
+                        title: 'Falha no 2FA',
+                        description: verifyJson?.error || 'Código incorreto',
+                        variant: 'destructive',
+                      });
                       setIsLoading(false);
                       return;
                     }
                     // Após verificar 2FA, buscar sessão novamente e redirecionar
-                    const sessionRes = await fetch('/api/auth/session', { cache: 'no-store' });
+                    const sessionRes = await fetch('/api/auth/session', {
+                      cache: 'no-store',
+                    });
                     const session = await sessionRes.json();
                     if (session?.user?.role) {
                       let dashboardUrl = '/student/dashboard';
-                      if (session.user.role === 'ADMIN') dashboardUrl = '/admin/dashboard';
-                      else if (session.user.role === 'TEACHER') dashboardUrl = '/teacher/dashboard';
+                      if (session.user.role === 'ADMIN')
+                        dashboardUrl = '/admin/dashboard';
+                      else if (session.user.role === 'TEACHER')
+                        dashboardUrl = '/teacher/dashboard';
                       window.location.href = dashboardUrl;
                     } else {
                       window.location.href = '/student/dashboard';
                     }
                   } catch (err) {
-                    toast({ title: 'Erro', description: 'Não foi possível verificar 2FA.', variant: 'destructive' });
+                    toast({
+                      title: 'Erro',
+                      description: 'Não foi possível verificar 2FA.',
+                      variant: 'destructive',
+                    });
                     setIsLoading(false);
                   }
                 }}

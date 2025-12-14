@@ -24,7 +24,7 @@ export function generateTOTP(
 ): string {
   const key = base32Decode(secretBase32);
   const epoch = Math.floor(Date.now() / 1000);
-  const counter = Math.floor(epoch / step);
+  let counter = Math.floor(epoch / step);
   const buf = Buffer.alloc(8);
   for (let i = 7; i >= 0; i--) {
     buf[i] = counter & 0xff;

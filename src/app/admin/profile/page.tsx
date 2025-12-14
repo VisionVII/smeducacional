@@ -30,7 +30,11 @@ export default function AdminProfilePage() {
     newPassword: '',
     confirmPassword: '',
   });
-  const [twoFA, setTwoFA] = useState<{ secret?: string; otpauth?: string; enabled?: boolean }>({
+  const [twoFA, setTwoFA] = useState<{
+    secret?: string;
+    otpauth?: string;
+    enabled?: boolean;
+  }>({
     enabled: (session?.user as any)?.twoFactorEnabled ?? false,
   });
   const [showVerifyModal, setShowVerifyModal] = useState(false);
@@ -118,11 +122,22 @@ export default function AdminProfilePage() {
       const res = await fetch('/api/2fa/setup', { method: 'POST' });
       const json = await res.json();
       if (!res.ok) throw new Error(json?.error || 'Falha ao gerar segredo');
-      setTwoFA({ ...twoFA, secret: json.data.secret, otpauth: json.data.otpauth });
+      setTwoFA({
+        ...twoFA,
+        secret: json.data.secret,
+        otpauth: json.data.otpauth,
+      });
       setShowVerifyModal(true);
-      toast({ title: '2FA iniciado', description: 'Escaneie o QR com seu app de autenticação.' });
+      toast({
+        title: '2FA iniciado',
+        description: 'Escaneie o QR com seu app de autenticação.',
+      });
     } catch (e) {
-      toast({ title: 'Erro', description: 'Não foi possível iniciar o 2FA.', variant: 'destructive' });
+      toast({
+        title: 'Erro',
+        description: 'Não foi possível iniciar o 2FA.',
+        variant: 'destructive',
+      });
     } finally {
       setIsLoading(false);
     }
@@ -138,7 +153,10 @@ export default function AdminProfilePage() {
     if (!res.ok) throw new Error(json?.error || 'Falha ao verificar 2FA');
     setTwoFA({ enabled: true });
     await update();
-    toast({ title: '2FA habilitado', description: 'Sua conta agora requer 2FA no login.' });
+    toast({
+      title: '2FA habilitado',
+      description: 'Sua conta agora requer 2FA no login.',
+    });
   };
 
   const handleDisable2FA = async () => {
@@ -148,9 +166,16 @@ export default function AdminProfilePage() {
       if (!res.ok) throw new Error('Erro ao desabilitar 2FA');
       setTwoFA({ enabled: false });
       await update();
-      toast({ title: '2FA desabilitado', description: 'Você pode habilitar novamente quando quiser.' });
+      toast({
+        title: '2FA desabilitado',
+        description: 'Você pode habilitar novamente quando quiser.',
+      });
     } catch (e) {
-      toast({ title: 'Erro', description: 'Não foi possível desabilitar o 2FA.', variant: 'destructive' });
+      toast({
+        title: 'Erro',
+        description: 'Não foi possível desabilitar o 2FA.',
+        variant: 'destructive',
+      });
     } finally {
       setIsLoading(false);
     }
@@ -288,12 +313,16 @@ export default function AdminProfilePage() {
               <ShieldCheck className="h-5 w-5" />
               Autenticação em Duas Etapas (2FA)
             </CardTitle>
-            <CardDescription>Proteja sua conta com TOTP (Google Authenticator, Authy)</CardDescription>
+            <CardDescription>
+              Proteja sua conta com TOTP (Google Authenticator, Authy)
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             {twoFA.enabled ? (
               <div className="space-y-3">
-                <p className="text-green-600">2FA está habilitado nesta conta.</p>
+                <p className="text-green-600">
+                  2FA está habilitado nesta conta.
+                </p>
                 <Button
                   type="button"
                   variant="destructive"
@@ -307,25 +336,39 @@ export default function AdminProfilePage() {
             ) : (
               <div className="space-y-4">
                 {!twoFA.secret ? (
-                  <Button type="button" onClick={handleSetup2FA} disabled={isLoading}>
+                  <Button
+                    type="button"
+                    onClick={handleSetup2FA}
+                    disabled={isLoading}
+                  >
                     <QrCode className="h-4 w-4 mr-2" />
                     Gerar QR Code 2FA
                   </Button>
                 ) : (
                   <div className="space-y-3">
-                    <p className="text-sm text-muted-foreground">Abra seu app de autenticação e escaneie este QR:</p>
+                    <p className="text-sm text-muted-foreground">
+                      Abra seu app de autenticação e escaneie este QR:
+                    </p>
                     <div className="flex items-center gap-4">
                       <img
                         alt="QR Code 2FA"
                         className="w-40 h-40 rounded border"
-                        src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(twoFA.otpauth!)}`}
+                        src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(
+                          twoFA.otpauth!
+                        )}`}
                       />
                       <div className="text-xs break-all">
                         <div className="font-medium mb-1">otpauth URL</div>
-                        <div className="p-2 bg-secondary rounded">{twoFA.otpauth}</div>
+                        <div className="p-2 bg-secondary rounded">
+                          {twoFA.otpauth}
+                        </div>
                       </div>
                     </div>
-                    <Button type="button" onClick={() => setShowVerifyModal(true)} disabled={isLoading}>
+                    <Button
+                      type="button"
+                      onClick={() => setShowVerifyModal(true)}
+                      disabled={isLoading}
+                    >
                       <ShieldCheck className="h-4 w-4 mr-2" />
                       Verificar e Habilitar
                     </Button>
