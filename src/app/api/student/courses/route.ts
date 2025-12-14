@@ -11,10 +11,7 @@ export async function GET() {
     const session = await auth();
 
     if (!session || session.user.role !== 'STUDENT') {
-      return NextResponse.json(
-        { error: 'Não autorizado' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     }
 
     const enrollments = await prisma.enrollment.findMany({
@@ -65,9 +62,7 @@ export async function GET() {
           progress: enrollment.progress,
           totalLessons,
           completedLessons,
-          estimatedHours: Math.ceil(
-            (enrollment.course.duration || 0) / 60
-          ),
+          estimatedHours: Math.ceil((enrollment.course.duration || 0) / 60),
         };
       })
     );
