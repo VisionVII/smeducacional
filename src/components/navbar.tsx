@@ -5,16 +5,20 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { 
-  GraduationCap, 
-  LogOut, 
-  Moon, 
-  Sun, 
-  Menu, 
-  X, 
+import {
+  GraduationCap,
+  LogOut,
+  Moon,
+  Sun,
+  Menu,
+  X,
   User,
-  ChevronDown 
+  ChevronDown,
+  Settings,
+  FolderClosed,
 } from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Icon3D } from '@/components/ui/icon-3d';
 import { useTheme } from 'next-themes';
 import { signOut } from 'next-auth/react';
 
@@ -61,12 +65,14 @@ export function Navbar({ user, links }: NavbarProps) {
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           {/* Logo - Mobile First */}
-          <Link 
-            href="/" 
+          <Link
+            href="/"
             className="flex items-center gap-2 flex-shrink-0"
             onClick={() => setMobileMenuOpen(false)}
           >
-            <GraduationCap className="h-8 w-8 md:h-10 md:w-10 text-primary" />
+            <Icon3D size="md" color="primary" rounded="full">
+              <GraduationCap className="h-6 w-6 text-primary" />
+            </Icon3D>
           </Link>
 
           {/* Desktop Navigation */}
@@ -111,12 +117,23 @@ export function Navbar({ user, links }: NavbarProps) {
                 className="flex items-center gap-2 h-9"
                 onClick={() => setUserMenuOpen(!userMenuOpen)}
               >
-                <div className="h-7 w-7 rounded-full bg-primary/10 flex items-center justify-center">
-                  <User className="h-4 w-4" />
+                <div className="h-8 w-8">
+                  <Avatar className="h-8 w-8 ring-1 ring-primary/20 shadow-sm">
+                    <AvatarImage src={user.avatar || undefined} />
+                    <AvatarFallback>
+                      <Icon3D size="sm" color="primary" rounded="full">
+                        <User className="h-4 w-4" />
+                      </Icon3D>
+                    </AvatarFallback>
+                  </Avatar>
                 </div>
                 <div className="hidden lg:block text-left">
-                  <p className="text-sm font-medium leading-none">{user.name}</p>
-                  <p className="text-xs text-muted-foreground">{getRoleLabel(user.role)}</p>
+                  <p className="text-sm font-medium leading-none">
+                    {user.name}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {getRoleLabel(user.role)}
+                  </p>
                 </div>
                 <ChevronDown className="h-4 w-4" />
               </Button>
@@ -124,15 +141,19 @@ export function Navbar({ user, links }: NavbarProps) {
               {/* User Dropdown */}
               {userMenuOpen && (
                 <>
-                  <div 
-                    className="fixed inset-0 z-40" 
+                  <div
+                    className="fixed inset-0 z-40"
                     onClick={() => setUserMenuOpen(false)}
                   />
                   <div className="absolute right-0 mt-2 w-56 rounded-md border bg-background shadow-lg z-50">
                     <div className="p-3 border-b">
                       <p className="font-medium text-sm">{user.name}</p>
-                      <p className="text-xs text-muted-foreground">{user.email}</p>
-                      <p className="text-xs text-primary mt-1">{getRoleLabel(user.role)}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {user.email}
+                      </p>
+                      <p className="text-xs text-primary mt-1">
+                        {getRoleLabel(user.role)}
+                      </p>
                     </div>
                     <div className="p-2">
                       <Button
@@ -172,13 +193,20 @@ export function Navbar({ user, links }: NavbarProps) {
             {/* User Info Mobile */}
             <div className="px-3 py-2 mb-3 bg-accent/50 rounded-md">
               <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
-                  <User className="h-5 w-5" />
-                </div>
+                <Avatar className="h-10 w-10 ring-1 ring-primary/20 shadow-sm">
+                  <AvatarImage src={user.avatar || undefined} />
+                  <AvatarFallback>
+                    <Icon3D size="sm" color="primary" rounded="full">
+                      <User className="h-4 w-4" />
+                    </Icon3D>
+                  </AvatarFallback>
+                </Avatar>
                 <div>
                   <p className="font-medium text-sm">{user.name}</p>
                   <p className="text-xs text-muted-foreground">{user.email}</p>
-                  <p className="text-xs text-primary">{getRoleLabel(user.role)}</p>
+                  <p className="text-xs text-primary">
+                    {getRoleLabel(user.role)}
+                  </p>
                 </div>
               </div>
             </div>

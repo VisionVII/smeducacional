@@ -108,8 +108,10 @@ export default function AdminAccessPage() {
             ].map((feature, index) => (
               <Card key={index} className="border-0 shadow-sm">
                 <CardHeader>
-                  <div className="h-10 w-10 rounded-lg bg-red-100 dark:bg-red-900/30 flex items-center justify-center mb-3">
-                    <feature.icon className="h-5 w-5 text-red-600" />
+                  <div className="mb-3">
+                    <div className="bg-gradient-to-br from-red-300/30 to-red-300/10 ring-1 ring-red-400/30 ring-offset-1 ring-offset-background shadow-md rounded-lg h-10 w-10 flex items-center justify-center">
+                      <feature.icon className="h-5 w-5 text-red-600 drop-shadow-sm" />
+                    </div>
                   </div>
                   <CardTitle className="text-lg">{feature.title}</CardTitle>
                 </CardHeader>

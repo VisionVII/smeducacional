@@ -13,7 +13,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/ui/use-toast';
-import { User, Mail, Lock, Save } from 'lucide-react';
+import { User, Mail, Lock, Save, Upload } from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 export default function StudentProfilePage() {
   const { data: session, update } = useSession();
@@ -107,6 +108,44 @@ export default function StudentProfilePage() {
 
   return (
     <div className="container mx-auto py-8 max-w-4xl">
+      {/* Avatar */}
+      <div className="mb-6 flex items-center gap-4">
+        <Avatar className="h-16 w-16 ring-1 ring-primary/20 shadow-sm">
+          <AvatarImage src={session?.user?.avatar || undefined} />
+          <AvatarFallback>{session?.user?.name?.charAt(0) || 'A'}</AvatarFallback>
+        </Avatar>
+        <label
+          htmlFor="student-avatar-upload"
+          className="inline-flex items-center gap-2 bg-primary text-white px-3 py-2 rounded-md hover:bg-primary/90 transition-colors cursor-pointer"
+        >
+          <Upload className="h-4 w-4" />
+          Alterar foto
+          <input
+            id="student-avatar-upload"
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={async (e) => {
+              const file = e.target.files?.[0];
+              if (!file) return;
+              const fd = new FormData();
+              fd.append('file', file);
+              setIsLoading(true);
+              try {
+                const res = await fetch('/api/student/avatar', { method: 'POST', body: fd });
+                if (!res.ok) throw new Error('Erro ao enviar avatar');
+                await update();
+                toast({ title: 'Avatar atualizado', description: 'Sua foto foi atualizada com sucesso.' });
+              } catch (err) {
+                toast({ title: 'Erro', description: 'Não foi possível atualizar a foto.', variant: 'destructive' });
+              } finally {
+                setIsLoading(false);
+              }
+            }}
+            disabled={isLoading}
+          />
+        </label>
+      </div>
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">Meu Perfil</h1>
         <p className="text-muted-foreground">
