@@ -59,4 +59,12 @@ export function CookieBanner() {
           </div>
           <div className="flex flex-col md:flex-row gap-2 shrink-0">
             <Button variant="outline" asChild>
-              <Link href="/cookies">Configura
+              <Link href="/cookies">Configurar</Link>
+            </Button>
+            <Button onClick={accept}>Aceitar cookies</Button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

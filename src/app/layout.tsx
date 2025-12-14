@@ -11,7 +11,8 @@ const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   title: 'SM Educacional - Sistema Escolar Completo',
-  description: 'Plataforma moderna de ensino com cursos, certificados e gestão completa',
+  description:
+    'Plataforma moderna de ensino com cursos, certificados e gestão completa',
 };
 
 export default function RootLayout({
