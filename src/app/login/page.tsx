@@ -85,6 +85,42 @@ export default function LoginPage() {
 
           console.log('Session obtida:', session);
 
+          // Gate de 2FA: se habilitado para o usuário, solicitar código antes de redirecionar
+          if (session?.user?.twoFactorEnabled) {
+            let code = '';
+            // prompt simples para código TOTP (6 dígitos)
+            code =
+              window.prompt(
+                'Autenticação em duas etapas: informe o código de 6 dígitos do seu app (Google Authenticator, Authy)'
+              ) || '';
+            if (!code || code.length !== 6) {
+              toast({
+                title: 'Código 2FA inválido',
+                description: 'Informe os 6 dígitos para continuar.',
+                variant: 'destructive',
+              });
+              setIsLoading(false);
+              return;
+            }
+            // verificar 2FA usando endpoint já autenticado
+            const verifyRes = await fetch('/api/student/2fa/verify', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ code }),
+            });
+            const verifyJson = await verifyRes.json();
+            if (!verifyRes.ok) {
+              console.error('2FA verify error:', verifyJson);
+              toast({
+                title: 'Falha no 2FA',
+                description: verifyJson?.error || 'Código incorreto',
+                variant: 'destructive',
+              });
+              setIsLoading(false);
+              return;
+            }
+          }
+
           if (session?.user?.role) {
             let dashboardUrl = '/student/dashboard'; // padrão
             if (session.user.role === 'ADMIN') {
