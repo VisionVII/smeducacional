@@ -104,6 +104,8 @@ export default function LoginPage() {
             console.log(
               `Redirecionando para ${dashboardUrl} (role: ${session.user.role})`
             );
+            // Flag para permitir apenas um redirecionamento pós-login
+            sessionStorage.setItem('postLoginRedirect', '1');
             // Usar window.location.href para forçar full page reload e garantir cookies
             window.location.href = dashboardUrl;
           } else {
@@ -111,11 +113,13 @@ export default function LoginPage() {
             console.log(
               'Role não encontrado na sessão, redirecionando para student/dashboard'
             );
+            sessionStorage.setItem('postLoginRedirect', '1');
             window.location.href = '/student/dashboard';
           }
         } catch (error) {
           console.error('Erro ao obter sessão:', error);
           // Fallback: tentar redirecionar mesmo sem sessão, middleware vai redirecionar se necessário
+          sessionStorage.setItem('postLoginRedirect', '1');
           window.location.href = '/student/dashboard';
         }
         // Não chamar setIsLoading(false) porque estamos redirecionando
@@ -364,8 +368,10 @@ export default function LoginPage() {
                         dashboardUrl = '/admin/dashboard';
                       else if (session.user.role === 'TEACHER')
                         dashboardUrl = '/teacher/dashboard';
+                      sessionStorage.setItem('postLoginRedirect', '1');
                       window.location.href = dashboardUrl;
                     } else {
+                      sessionStorage.setItem('postLoginRedirect', '1');
                       window.location.href = '/student/dashboard';
                     }
                   } catch (err) {
