@@ -53,6 +53,23 @@ const landingThemeSchema = z.object({
   themeName: z.string().nullable().optional(),
 });
 
+// Schema para updates parciais (permite qualquer combinação de campos)
+const partialThemeSchema = z
+  .object({
+    palette: paletteSchema.optional(),
+    layout: layoutSchema.optional(),
+    animations: animationsSchema.optional(),
+    themeName: z.string().nullable().optional(),
+  })
+  .refine(
+    (data) =>
+      data.palette ||
+      data.layout ||
+      data.animations ||
+      data.themeName !== undefined,
+    { message: 'Pelo menos um campo deve ser fornecido' }
+  );
+
 export async function GET() {
   try {
     const session = await auth();
@@ -80,7 +97,7 @@ export async function PUT(request: NextRequest) {
     }
 
     const body = await request.json();
-    const parsed = landingThemeSchema.safeParse(body);
+    const parsed = partialThemeSchema.safeParse(body);
     if (!parsed.success) {
       return NextResponse.json(
         { error: parsed.error.errors[0].message },
@@ -88,9 +105,28 @@ export async function PUT(request: NextRequest) {
       );
     }
 
+    // Buscar tema atual para fazer merge
+    const currentUser = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { landingTheme: true },
+    });
+
+    const currentTheme = currentUser?.landingTheme as any;
+
+    // Merge do tema atual com as atualizações
+    const mergedTheme = {
+      palette: parsed.data.palette ?? currentTheme?.palette,
+      layout: parsed.data.layout ?? currentTheme?.layout,
+      animations: parsed.data.animations ?? currentTheme?.animations,
+      themeName:
+        parsed.data.themeName !== undefined
+          ? parsed.data.themeName
+          : currentTheme?.themeName,
+    };
+
     const updated = await prisma.user.update({
       where: { id: session.user.id },
-      data: { landingTheme: parsed.data },
+      data: { landingTheme: mergedTheme },
       select: { landingTheme: true },
     });
 
