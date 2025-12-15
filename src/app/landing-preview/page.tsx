@@ -12,7 +12,6 @@ import {
   HelpCircle,
 } from 'lucide-react';
 import { ThemeProvider } from '@/components/theme-provider';
-import { PublicThemeProvider } from '@/components/public-theme-provider';
 import {
   TeacherThemeProvider,
   useTeacherTheme,
@@ -120,8 +119,7 @@ function LandingPageContent({ teacherId }: { teacherId?: string }) {
   return (
     <>
       <AdaptiveNavbar />
-      <PublicThemeProvider teacherId={teacherId}>
-        <div className="min-h-screen bg-background text-foreground">
+      <div className="min-h-screen bg-background text-foreground">
           {/* Hero Section */}
           <section className="relative py-20 px-4 sm:px-6 lg:px-8 overflow-hidden">
             {/* Background gradient */}
@@ -367,7 +365,6 @@ function LandingPageContent({ teacherId }: { teacherId?: string }) {
             </div>
           </footer>
         </div>
-      </PublicThemeProvider>
     </>
   );
 }
