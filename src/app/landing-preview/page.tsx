@@ -71,11 +71,14 @@ function LandingPageContent({ teacherId }: { teacherId?: string }) {
   const loadLanding = async () => {
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 segundos
+      const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 segundos
 
       const response = await fetch('/api/teacher/landing', {
         signal: controller.signal,
         cache: 'no-store',
+        headers: {
+          'Content-Type': 'application/json',
+        },
       });
       clearTimeout(timeoutId);
 
@@ -87,10 +90,16 @@ function LandingPageContent({ teacherId }: { teacherId?: string }) {
         }
       } else if (response.status === 401) {
         console.error('Usuário não autorizado');
+        // Redirecionar para login se não autorizado
+        window.location.href = '/teacher/login';
+      } else {
+        console.error('Erro ao carregar landing:', response.status);
       }
     } catch (error) {
       if (error instanceof Error && error.name === 'AbortError') {
-        console.error('Timeout ao carregar landing (8s)');
+        console.error(
+          'Timeout ao carregar landing (15s) - possível problema de conexão com banco de dados'
+        );
       } else {
         console.error('Erro ao carregar landing:', error);
       }

@@ -11,26 +11,14 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Buscar landing do professor com timeout
-    let teacher;
-    try {
-      teacher = await Promise.race([
-        prisma.user.findUnique({
-          where: { id: session.user.id },
-          select: {
-            landingConfig: true,
-            landingTheme: true,
-          },
-        }),
-        new Promise((_, reject) =>
-          setTimeout(() => reject(new Error('Database query timeout')), 5000)
-        ),
-      ]);
-    } catch (dbError) {
-      console.error('Database error in landing GET:', dbError);
-      // Retornar default se banco falhar
-      teacher = null;
-    }
+    // Buscar landing do professor
+    const teacher = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: {
+        landingConfig: true,
+        landingTheme: true,
+      },
+    });
 
     if (!teacher || !teacher.landingConfig) {
       return NextResponse.json(
@@ -116,27 +104,16 @@ export async function PUT(request: NextRequest) {
 
     const body = await request.json();
 
-    // Atualizar landing do professor com timeout
-    let updated;
-    try {
-      updated = await Promise.race([
-        prisma.user.update({
-          where: { id: session.user.id },
-          data: {
-            landingConfig: body,
-          },
-          select: {
-            landingConfig: true,
-          },
-        }),
-        new Promise((_, reject) =>
-          setTimeout(() => reject(new Error('Database query timeout')), 5000)
-        ),
-      ]);
-    } catch (dbError) {
-      console.error('Database error in landing PUT:', dbError);
-      throw dbError;
-    }
+    // Atualizar landing do professor
+    const updated = await prisma.user.update({
+      where: { id: session.user.id },
+      data: {
+        landingConfig: body,
+      },
+      select: {
+        landingConfig: true,
+      },
+    });
 
     return NextResponse.json(updated.landingConfig, { status: 200 });
   } catch (error) {
