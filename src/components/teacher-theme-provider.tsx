@@ -282,17 +282,37 @@ export function TeacherThemeProvider({ children }: { children: ReactNode }) {
 
       if (response.ok) {
         const data = await response.json();
-        // Theme loaded successfully
-        // API retorna { theme: {...} } ou null
-        const themeData = data.theme || data;
+        // API retorna { theme: {...} } ou { theme: null }
+        const themeData = data.theme;
 
-        setTheme(themeData);
-        applyTheme(themeData, resolvedTheme ?? themeMode);
-        localStorage.setItem(
-          'teacher-theme-cache',
-          JSON.stringify({ theme: themeData })
-        );
-        hydratedCache.current = true;
+        // Se não há tema salvo (null), usar tema padrão
+        if (!themeData || !themeData.palette) {
+          console.log('[loadTheme] Sem tema personalizado, usando padrão');
+          if (DEFAULT_THEME) {
+            const fallback = {
+              palette: DEFAULT_THEME.palette,
+              layout: DEFAULT_THEME.layout,
+              animations: DEFAULT_THEME.animations,
+              themeName: DEFAULT_THEME.name,
+            };
+            setTheme(fallback as TeacherTheme);
+            applyTheme(fallback as TeacherTheme, resolvedTheme ?? themeMode);
+            localStorage.setItem(
+              'teacher-theme-cache',
+              JSON.stringify({ theme: fallback })
+            );
+            hydratedCache.current = true;
+          }
+        } else {
+          // Tema válido encontrado
+          setTheme(themeData);
+          applyTheme(themeData, resolvedTheme ?? themeMode);
+          localStorage.setItem(
+            'teacher-theme-cache',
+            JSON.stringify({ theme: themeData })
+          );
+          hydratedCache.current = true;
+        }
       } else {
         console.warn('[loadTheme] Failed to load theme, using fallback');
 
@@ -339,14 +359,20 @@ export function TeacherThemeProvider({ children }: { children: ReactNode }) {
       if (response.ok) {
         const data = await response.json();
         // API retorna { message: '...', theme: {...} }
-        const themeData = data.theme || data;
-        setTheme(themeData);
-        applyTheme(themeData, resolvedTheme ?? themeMode);
-        localStorage.setItem(
-          'teacher-theme-cache',
-          JSON.stringify({ theme: themeData })
-        );
-        hydratedCache.current = true;
+        const themeData = data.theme;
+        
+        if (themeData && themeData.palette) {
+          setTheme(themeData);
+          applyTheme(themeData, resolvedTheme ?? themeMode);
+          localStorage.setItem(
+            'teacher-theme-cache',
+            JSON.stringify({ theme: themeData })
+          );
+          hydratedCache.current = true;
+        } else {
+          console.error('[updateTheme] Tema inválido retornado pela API');
+          throw new Error('Tema inválido retornado pela API');
+        }
       } else {
         const error = await response.json();
         console.error('[updateTheme] API Error:', error);
@@ -381,6 +407,12 @@ export function TeacherThemeProvider({ children }: { children: ReactNode }) {
   };
 
   const applyTheme = (themeData: TeacherTheme, mode?: string) => {
+    // Validação de segurança
+    if (!themeData || !themeData.palette) {
+      console.error('[applyTheme] Tema inválido fornecido:', themeData);
+      return;
+    }
+
     const root = document.documentElement;
     const activeMode = mode ?? 'light';
     const resolvedPalette =
