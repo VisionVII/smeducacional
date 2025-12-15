@@ -19,6 +19,7 @@ export async function GET() {
           where: { id: session.user.id },
           select: {
             landingConfig: true,
+            landingTheme: true,
           },
         }),
         new Promise((_, reject) =>
@@ -80,12 +81,19 @@ export async function GET() {
           showModules: true,
           showTestimonial: true,
           showFaq: true,
+          theme: teacher?.landingTheme ?? null,
         },
         { status: 200 }
       );
     }
 
-    return NextResponse.json(teacher.landingConfig, { status: 200 });
+    const landing = teacher.landingConfig as any;
+    const merged = {
+      ...(landing ?? {}),
+      theme: teacher.landingTheme ?? landing?.theme ?? null,
+    };
+
+    return NextResponse.json(merged, { status: 200 });
   } catch (error) {
     console.error('Erro ao buscar landing:', error);
     const errorMessage =

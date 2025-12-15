@@ -3,15 +3,16 @@ import { auth } from '@/lib/auth';
 import { Navbar } from '@/components/navbar';
 import { Footer } from '@/components/footer';
 import { Breadcrumbs } from '@/components/breadcrumbs';
-import { 
-  BookOpen, 
-  Award, 
-  LayoutDashboard, 
-  GraduationCap, 
-  User, 
-  MessageSquare, 
-  Bell, 
-  ClipboardList 
+import { StudentThemeProvider } from '@/components/student-theme-provider';
+import {
+  BookOpen,
+  Award,
+  LayoutDashboard,
+  GraduationCap,
+  User,
+  MessageSquare,
+  Bell,
+  ClipboardList,
 } from 'lucide-react';
 
 export default async function StudentLayout({
@@ -69,15 +70,17 @@ export default async function StudentLayout({
   ];
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Navbar user={session.user} links={studentLinks} />
-      <main className="flex-1">
-        <div className="container mx-auto px-4 py-6">
-          <Breadcrumbs />
-          {children}
-        </div>
-      </main>
-      <Footer />
-    </div>
+    <StudentThemeProvider>
+      <div className="min-h-screen flex flex-col">
+        <Navbar user={session.user} links={studentLinks} />
+        <main className="flex-1">
+          <div className="container mx-auto px-4 py-6">
+            <Breadcrumbs />
+            {children}
+          </div>
+        </main>
+        <Footer />
+      </div>
+    </StudentThemeProvider>
   );
 }

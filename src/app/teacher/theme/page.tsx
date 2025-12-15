@@ -20,6 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { useToast } from '@/components/ui/use-toast';
 
 export default function ThemeCustomizerPage() {
   const {
@@ -30,8 +31,10 @@ export default function ThemeCustomizerPage() {
     systemTheme,
     setSystemTheme,
   } = useTeacherTheme();
+  const { toast } = useToast();
   const [selectedPreset, setSelectedPreset] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [savingTheme, setSavingTheme] = useState<string | null>(null);
   const [layoutConfig, setLayoutConfig] = useState({
     cardStyle: 'default',
     borderRadius: '0.5rem',
@@ -61,6 +64,7 @@ export default function ThemeCustomizerPage() {
 
   const handleApplyPreset = async (preset: ThemePreset) => {
     setIsSaving(true);
+    setSavingTheme(preset.id);
     try {
       await updateTheme({
         palette: preset.palette,
@@ -68,26 +72,39 @@ export default function ThemeCustomizerPage() {
         themeName: preset.name,
       });
       setSelectedPreset(preset.id);
-      alert(`Tema "${preset.name}" aplicado com sucesso!`);
+      toast({
+        title: '✨ Tema aplicado!',
+        description: `O tema "${preset.name}" foi aplicado com sucesso.`,
+      });
     } catch (error) {
-      alert('Erro ao aplicar tema. Tente novamente.');
+      toast({
+        title: '❌ Erro',
+        description: 'Não foi possível aplicar o tema. Tente novamente.',
+        variant: 'destructive',
+      });
     } finally {
       setIsSaving(false);
+      setSavingTheme(null);
     }
   };
 
   const handleReset = async () => {
-    if (confirm('Deseja realmente resetar para o tema padrão do sistema?')) {
-      setIsSaving(true);
-      try {
-        await resetTheme();
-        setSelectedPreset('default');
-        alert('Tema resetado para o padrão!');
-      } catch (error) {
-        alert('Erro ao resetar tema. Tente novamente.');
-      } finally {
-        setIsSaving(false);
-      }
+    setIsSaving(true);
+    try {
+      await resetTheme();
+      setSelectedPreset('default');
+      toast({
+        title: '🔄 Tema resetado',
+        description: 'O tema foi resetado para o padrão do sistema.',
+      });
+    } catch (error) {
+      toast({
+        title: '❌ Erro',
+        description: 'Não foi possível resetar o tema. Tente novamente.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -108,9 +125,16 @@ export default function ThemeCustomizerPage() {
           spacing: layoutConfig.spacing as ThemePreset['layout']['spacing'],
         },
       });
-      alert('Layout atualizado com sucesso!');
+      toast({
+        title: '💾 Layout salvo!',
+        description: 'As configurações de layout foram atualizadas.',
+      });
     } catch (error) {
-      alert('Erro ao salvar layout. Tente novamente.');
+      toast({
+        title: '❌ Erro',
+        description: 'Não foi possível salvar o layout. Tente novamente.',
+        variant: 'destructive',
+      });
     } finally {
       setIsSaving(false);
     }
@@ -214,11 +238,38 @@ export default function ThemeCustomizerPage() {
             {THEME_PRESETS.map((preset) => (
               <Card
                 key={preset.id}
-                className={`cursor-pointer transition-all hover:shadow-lg ${
+                className={`cursor-pointer transition-all hover:shadow-lg relative overflow-hidden ${
                   selectedPreset === preset.id ? 'ring-2 ring-primary' : ''
-                }`}
+                } ${savingTheme === preset.id ? 'pointer-events-none' : ''}`}
                 onClick={() => !isSaving && handleApplyPreset(preset)}
               >
+                {/* Loading overlay elegante com cores do tema */}
+                {savingTheme === preset.id && (
+                  <div className="absolute inset-0 z-10 flex items-center justify-center backdrop-blur-sm">
+                    <div className="relative">
+                      {/* Anel externo girando */}
+                      <div
+                        className="w-16 h-16 rounded-full animate-spin"
+                        style={{
+                          background: `conic-gradient(from 0deg, 
+                            hsl(${preset.palette.primary}), 
+                            hsl(${preset.palette.secondary}), 
+                            hsl(${preset.palette.accent}), 
+                            hsl(${preset.palette.primary}))`,
+                          opacity: 0.8,
+                        }}
+                      />
+                      {/* Centro branco */}
+                      <div className="absolute inset-2 bg-background rounded-full flex items-center justify-center">
+                        <Sparkles
+                          className="w-6 h-6 animate-pulse"
+                          style={{ color: `hsl(${preset.palette.primary})` }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 <CardHeader>
                   <CardTitle className="text-lg flex items-center justify-between">
                     {preset.name}

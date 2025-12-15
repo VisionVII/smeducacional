@@ -27,7 +27,8 @@ export default function RootLayout({
           attribute="class"
           defaultTheme="system"
           enableSystem
-          disableTransitionOnChange
+          enableColorScheme
+          storageKey="app-theme-mode"
         >
           <AuthProvider>
             <QueryProvider>

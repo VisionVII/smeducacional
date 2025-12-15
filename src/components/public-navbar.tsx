@@ -5,24 +5,26 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { 
-  GraduationCap, 
-  Moon, 
-  Sun, 
-  Menu, 
+import {
+  GraduationCap,
+  Moon,
+  Sun,
+  Menu,
   X,
   BookOpen,
   Users,
   Mail,
-  HelpCircle
+  HelpCircle,
 } from 'lucide-react';
 import { useTheme } from 'next-themes';
+import { useSystemBranding } from '@/hooks/use-system-branding';
 
 export function PublicNavbar() {
   const pathname = usePathname();
   const { theme, setTheme } = useTheme();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const { branding } = useSystemBranding();
 
   useEffect(() => {
     setMounted(true);
@@ -60,13 +62,25 @@ export function PublicNavbar() {
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
-          <Link 
-            href="/" 
+          <Link
+            href="/"
             className="flex items-center gap-2 flex-shrink-0"
             onClick={() => setMobileMenuOpen(false)}
           >
-            <GraduationCap className="h-8 w-8 md:h-10 md:w-10 text-primary" />
-            <span className="hidden sm:inline font-bold text-lg">SM Educacional</span>
+            {branding.logoUrl ? (
+              <img 
+                src={branding.logoUrl} 
+                alt={branding.companyName} 
+                className="h-10 object-contain"
+              />
+            ) : (
+              <>
+                <GraduationCap className="h-8 w-8 md:h-10 md:w-10 text-primary" />
+                <span className="hidden sm:inline font-bold text-lg">
+                  {branding.companyName}
+                </span>
+              </>
+            )}
           </Link>
 
           {/* Desktop Navigation */}

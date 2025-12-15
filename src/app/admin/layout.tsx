@@ -3,7 +3,13 @@ import { auth } from '@/lib/auth';
 import { Navbar } from '@/components/navbar';
 import { Footer } from '@/components/footer';
 import { Breadcrumbs } from '@/components/breadcrumbs';
-import { LayoutDashboard, Users, BookOpen, FolderTree } from 'lucide-react';
+import {
+  LayoutDashboard,
+  Users,
+  BookOpen,
+  FolderTree,
+  Settings,
+} from 'lucide-react';
 
 export default async function AdminLayout({
   children,
@@ -36,6 +42,11 @@ export default async function AdminLayout({
       href: '/admin/categories',
       label: 'Categorias',
       icon: <FolderTree className="h-4 w-4" />,
+    },
+    {
+      href: '/admin/settings',
+      label: 'Configurações',
+      icon: <Settings className="h-4 w-4" />,
     },
   ];
 

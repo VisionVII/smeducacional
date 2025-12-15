@@ -72,6 +72,7 @@ model User {
   teacherFinancial TeacherFinancial?
   teacherTheme     TeacherTheme?
   landingConfig    Json?
+  landingTheme     Json?
   payments         Payment[]
   invoices         Invoice[]
   teacherSubscription TeacherSubscription?
@@ -82,6 +83,17 @@ model User {
   studentEnrollmentPayments StudentEnrollmentPayment[]
 
   @@map("users")
+}
+
+model PublicSiteConfig {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  theme     Json?
+  content   Json?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("public_site_configs")
 }
 
 model Category {
@@ -768,4 +780,48 @@ model DeveloperMetrics {
   @@index([component])
   @@index([createdAt])
   @@map("developer_metrics")
+}
+model SystemConfig {
+  id              String   @id @default(cuid())
+  
+  // Identificador único (apenas um registro ativo)
+  key             String   @unique @default("system")
+  
+  // Informações da empresa/sistema
+  companyName     String   @default("SM Educacional")
+  systemName      String   @default("SM Educacional")
+  companyEmail    String?
+  companyPhone    String?
+  companyAddress  String?
+  
+  // Logos e imagens
+  logoUrl         String?  // Logo principal (navbar, emails, etc)
+  faviconUrl      String?  // Favicon do site
+  loginBgUrl      String?  // Background da tela de login
+  
+  // Cores padrão do sistema (para páginas sem tema específico)
+  primaryColor    String?  @default("#3B82F6")
+  secondaryColor  String?  @default("#10B981")
+  
+  // Configurações de SEO
+  metaTitle       String?
+  metaDescription String?
+  metaKeywords    String?
+  
+  // Redes sociais
+  facebookUrl     String?
+  instagramUrl    String?
+  linkedinUrl     String?
+  twitterUrl      String?
+  youtubeUrl      String?
+  
+  // Configurações gerais
+  maintenanceMode Boolean  @default(false)
+  registrationEnabled Boolean @default(true)
+  
+  // Timestamps
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@map("system_configs")
 }

@@ -46,6 +46,7 @@ interface PublicThemeContextType {
   theme: PublicTheme | null;
   isLoading: boolean;
   loadTeacherTheme: (teacherId: string) => Promise<void>;
+  loadAdminTheme: () => Promise<void>;
 }
 
 const PublicThemeContext = createContext<PublicThemeContextType | undefined>(
@@ -147,6 +148,9 @@ const applyTheme = (themeData: PublicTheme) => {
   const root = document.documentElement;
   const resolvedPalette = normalizeForLight(themeData.palette);
 
+  const prevTransition = root.style.transition;
+  root.style.transition = 'none';
+
   Object.entries(resolvedPalette).forEach(([key, value]) => {
     const cssVar = key
       .replace(/([A-Z])/g, '-$1')
@@ -214,14 +218,20 @@ const applyTheme = (themeData: PublicTheme) => {
     '--card-border',
     cardBorderMap[themeData.layout.cardStyle]
   );
+
+  requestAnimationFrame(() => {
+    root.style.transition = prevTransition;
+  });
 };
 
 export function PublicThemeProvider({
   children,
   teacherId,
+  staticTheme,
 }: {
   children: ReactNode;
   teacherId?: string;
+  staticTheme?: PublicTheme | null;
 }) {
   const [theme, setTheme] = useState<PublicTheme | null>(null);
   const [isLoading, setIsLoading] = useState(!!teacherId);
@@ -230,14 +240,15 @@ export function PublicThemeProvider({
   const loadTeacherTheme = async (id: string) => {
     try {
       setIsLoading(true);
-      const response = await fetch(`/api/teacher/${id}/theme`, {
+      const response = await fetch(`/api/teacher/${id}/landing/theme`, {
         cache: 'no-store',
       });
 
       if (response.ok) {
         const data = await response.json();
-        setTheme(data);
-        applyTheme(data);
+        const themeData = data?.theme ?? null;
+        setTheme(themeData ?? DEFAULT_THEME);
+        applyTheme(themeData ?? DEFAULT_THEME);
       } else {
         setTheme(DEFAULT_THEME);
         applyTheme(DEFAULT_THEME);
@@ -251,19 +262,52 @@ export function PublicThemeProvider({
     }
   };
 
+  const loadAdminTheme = async () => {
+    try {
+      setIsLoading(true);
+      const response = await fetch('/api/public/site', {
+        cache: 'no-store',
+      });
+      if (response.ok) {
+        const { data } = await response.json();
+        const themeData = data?.theme ?? null;
+        if (themeData) {
+          setTheme(themeData);
+          applyTheme(themeData);
+          return;
+        }
+      }
+      setTheme(DEFAULT_THEME);
+      applyTheme(DEFAULT_THEME);
+    } catch (error) {
+      console.error('Erro ao carregar tema público (admin):', error);
+      setTheme(DEFAULT_THEME);
+      applyTheme(DEFAULT_THEME);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
     setMounted(true);
   }, []);
 
   useEffect(() => {
-    if (mounted && teacherId) {
-      loadTeacherTheme(teacherId);
-    } else if (mounted && !teacherId) {
-      setTheme(DEFAULT_THEME);
-      applyTheme(DEFAULT_THEME);
+    if (!mounted) return;
+
+    if (staticTheme) {
+      setTheme(staticTheme);
+      applyTheme(staticTheme);
       setIsLoading(false);
+      return;
     }
-  }, [mounted, teacherId]);
+
+    if (teacherId) {
+      loadTeacherTheme(teacherId);
+    } else {
+      loadAdminTheme();
+    }
+  }, [mounted, teacherId, staticTheme]);
 
   // Restaurar tema padrão ao desmontar para evitar vazamento entre rotas
   useEffect(() => {
@@ -278,6 +322,7 @@ export function PublicThemeProvider({
         theme: theme ?? DEFAULT_THEME,
         isLoading,
         loadTeacherTheme,
+        loadAdminTheme,
       }}
     >
       {children}

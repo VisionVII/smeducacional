@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { Navbar } from '@/components/navbar';
 import { PublicNavbar } from '@/components/public-navbar';
+import { NavbarThemeProvider } from '@/components/navbar-theme-provider';
+import { useSystemBranding } from '@/hooks/use-system-branding';
 import {
   LayoutDashboard,
   BookOpen,
@@ -29,6 +31,7 @@ import {
 export function AdaptiveNavbar() {
   const { data: session, status } = useSession();
   const [mounted, setMounted] = useState(false);
+  const { branding } = useSystemBranding();
 
   useEffect(() => {
     setMounted(true);
@@ -157,15 +160,17 @@ export function AdaptiveNavbar() {
     }
 
     return (
-      <Navbar
-        user={{
-          name: session.user.name || 'Usuário',
-          email: session.user.email || '',
-          role: userRole,
-          avatar: (session.user as any).avatar || null,
-        }}
-        links={links}
-      />
+      <NavbarThemeProvider>
+        <Navbar
+          user={{
+            name: session.user.name || 'Usuário',
+            email: session.user.email || '',
+            role: userRole,
+            avatar: (session.user as any).avatar || null,
+          }}
+          links={links}
+        />
+      </NavbarThemeProvider>
     );
   }
 

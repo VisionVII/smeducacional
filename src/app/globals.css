@@ -37,8 +37,8 @@
     --card-border: 1px solid hsl(var(--border));
 
     /* Animation defaults */
-    --transition-duration: 200ms;
-    --transition-easing: ease-in-out;
+    --transition-duration: 300ms;
+    --transition-easing: cubic-bezier(0.4, 0, 0.2, 1);
     --animations-enabled: 1;
     --hover-animations: 1;
     --focus-animations: 1;
@@ -46,8 +46,8 @@
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
+    --background: 224 71% 4%;
+    --foreground: 213 31% 91%;
     --card: 222.2 84% 4.9%;
     --card-foreground: 210 40% 98%;
     --popover: 222.2 84% 4.9%;
@@ -79,6 +79,16 @@
   }
   body {
     @apply bg-background text-foreground;
+    transition: background-color 300ms ease-in-out, color 300ms ease-in-out;
+  }
+
+  /* Smooth transitions for theme changes */
+  *,
+  *::before,
+  *::after {
+    transition-property: background-color, border-color, color, fill, stroke;
+    transition-duration: 300ms;
+    transition-timing-function: ease-in-out;
   }
 }
 
@@ -140,4 +150,52 @@ input[type='range']::-webkit-slider-thumb:hover {
 input[type='range']::-moz-range-thumb:hover {
   background: #2563eb;
   transform: scale(1.1);
+}
+
+/* Navbar theme customization - aplica cores do usuário logado no navbar */
+html[data-navbar-themed] .navbar-themed {
+  background: hsl(var(--navbar-background) / 0.95) !important;
+  border-color: hsl(var(--navbar-border, var(--navbar-muted))) !important;
+  backdrop-filter: blur(8px);
+}
+
+html[data-navbar-themed] .navbar-link {
+  color: hsl(var(--navbar-foreground)) !important;
+}
+
+html[data-navbar-themed] .navbar-link:hover {
+  background: hsl(var(--navbar-accent)) !important;
+  color: hsl(var(--navbar-accent-foreground)) !important;
+}
+
+html[data-navbar-themed] .navbar-link-active {
+  background: hsl(var(--navbar-primary)) !important;
+  color: hsl(var(--navbar-primary-foreground)) !important;
+}
+
+/* Botões e componentes dentro do navbar usam cores do usuário */
+html[data-navbar-themed] .navbar-themed .bg-primary {
+  background: hsl(var(--navbar-primary)) !important;
+  color: hsl(var(--navbar-primary-foreground)) !important;
+}
+
+html[data-navbar-themed] .navbar-themed .text-primary {
+  color: hsl(var(--navbar-primary)) !important;
+}
+
+html[data-navbar-themed] .navbar-themed .border-primary {
+  border-color: hsl(var(--navbar-primary)) !important;
+}
+
+html[data-navbar-themed] .navbar-themed .ring-primary {
+  --tw-ring-color: hsl(var(--navbar-primary)) !important;
+}
+
+html[data-navbar-themed] .navbar-themed .hover\:bg-accent:hover {
+  background: hsl(var(--navbar-accent)) !important;
+  color: hsl(var(--navbar-accent-foreground)) !important;
+}
+
+html[data-navbar-themed] .navbar-themed .text-muted-foreground {
+  color: hsl(var(--navbar-muted-foreground)) !important;
 }

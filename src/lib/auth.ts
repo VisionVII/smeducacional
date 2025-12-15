@@ -106,7 +106,9 @@ export const authOptions: NextAuthOptions = {
         if (user.twoFactorEnabled && user.twoFactorSecret) {
           console.log('[auth][authorize] 🔐 Usuário possui 2FA habilitado');
 
-          if (!credentials.twoFactorCode) {
+          const twoFactorCode = credentials.twoFactorCode?.trim();
+
+          if (!twoFactorCode) {
             console.log(
               '[auth][authorize] ⚠️ 2FA requerido mas código não fornecido'
             );
@@ -115,11 +117,8 @@ export const authOptions: NextAuthOptions = {
 
           // Importar função de verificação TOTP
           const { verifyTOTP } = await import('@/lib/totp');
-          const isValid = verifyTOTP(
-            user.twoFactorSecret,
-            credentials.twoFactorCode,
-            2
-          );
+          // Aumentar tolerância para 3 passos (~90s) para lidar com clock skew
+          const isValid = verifyTOTP(user.twoFactorSecret, twoFactorCode, 3);
 
           if (!isValid) {
             console.error('[auth][authorize] ❌ Código 2FA inválido');

@@ -59,12 +59,12 @@ export default async function AdminDashboard() {
     totalEnrollments,
     totalCertificates,
     totalPayments,
-    totalRevenue,
+    totalRevenueAgg,
     paidCourses,
     activeStudentSubscriptions,
     activeTeacherSubscriptions,
     pendingInvoices,
-  ] = await Promise.all([
+  ] = await prisma.$transaction([
     prisma.user.count(),
     prisma.course.count(),
     prisma.enrollment.count(),
@@ -82,6 +82,7 @@ export default async function AdminDashboard() {
 
   const activeSubscriptions =
     activeStudentSubscriptions + activeTeacherSubscriptions;
+  const totalRevenue = totalRevenueAgg._sum.amount || 0;
 
   // ==========================================
   // Distribuição por Role
@@ -218,7 +219,7 @@ export default async function AdminDashboard() {
     totalEnrollments,
     totalCertificates,
     totalPayments,
-    totalRevenue: totalRevenue._sum.amount || 0,
+    totalRevenue,
     paidCourses,
     activeSubscriptions,
     pendingInvoices,

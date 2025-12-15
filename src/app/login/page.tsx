@@ -8,6 +8,14 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import {
   Card,
   CardContent,
   CardDescription,
@@ -36,16 +44,18 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
+      const normalized2FA = twofaCode.replace(/\s+/g, '');
+
       console.log('Iniciando login com:', {
         email: formData.email,
-        has2FA: !!twofaCode,
+        has2FA: !!normalized2FA,
       });
 
       // Usar signIn com redirect: false para controlar o fluxo
       const result = await signIn('credentials', {
         email: formData.email,
         password: formData.password,
-        twoFactorCode: twofaCode || undefined,
+        twoFactorCode: normalized2FA || undefined,
         redirect: false,
       });
 
@@ -62,9 +72,25 @@ export default function LoginPage() {
       }
 
       // 🔐 Detectar necessidade de 2FA
-      if (result.error === '2FA_REQUIRED') {
-        console.log('⚠️ 2FA requerido, exibindo UI para código');
+      const errorMessage = result.error || '';
+
+      if (
+        errorMessage === '2FA_REQUIRED' ||
+        errorMessage.includes('2FA') ||
+        errorMessage.includes('TOTP')
+      ) {
+        console.log(
+          '⚠️ 2FA requerido ou código inválido, exibindo UI para código'
+        );
         setRequire2FA(true);
+        toast({
+          title: 'Autenticação 2FA necessária',
+          description:
+            errorMessage === '2FA_REQUIRED'
+              ? 'Digite o código do app autenticador.'
+              : errorMessage,
+          variant: errorMessage === '2FA_REQUIRED' ? 'default' : 'destructive',
+        });
         setIsLoading(false);
         return;
       }
@@ -321,65 +347,69 @@ export default function LoginPage() {
           </CardFooter>
         </form>
 
-        {require2FA && (
-          <Card className="mt-6">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
+        <Dialog
+          open={require2FA}
+          onOpenChange={(open) => {
+            setRequire2FA(open);
+            if (!open) setTwofaCode('');
+          }}
+        >
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
                 <ShieldCheck className="h-5 w-5" />
                 Verificação 2FA necessária
-              </CardTitle>
-              <CardDescription>
-                Digite o código de 6 dígitos do seu app de autenticação para
+              </DialogTitle>
+              <DialogDescription>
+                Digite o código de 6 dígitos do seu app autenticador para
                 continuar.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  if (!twofaCode || twofaCode.length !== 6) {
-                    toast({
-                      title: 'Código inválido',
-                      description: 'Informe os 6 dígitos.',
-                      variant: 'destructive',
-                    });
-                    return;
-                  }
-                  // Resubmeter formulário principal com código 2FA
-                  handleSubmit(e);
-                }}
-                className="space-y-3"
-              >
-                <div className="space-y-2">
-                  <Label htmlFor="twofaCode">Código 2FA</Label>
-                  <Input
-                    id="twofaCode"
-                    inputMode="numeric"
-                    pattern="\\d{6}"
-                    placeholder="000000"
-                    value={twofaCode}
-                    onChange={(e) => setTwofaCode(e.target.value)}
-                  />
-                </div>
-                <div className="flex gap-2">
-                  <Button type="submit" disabled={isLoading}>
-                    Verificar 2FA
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => {
-                      setRequire2FA(false);
-                      setTwofaCode('');
-                    }}
-                  >
-                    Cancelar
-                  </Button>
-                </div>
-              </form>
-            </CardContent>
-          </Card>
-        )}
+              </DialogDescription>
+            </DialogHeader>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                const code = twofaCode.trim();
+                if (code.length !== 6) {
+                  toast({
+                    title: 'Código inválido',
+                    description: 'Informe os 6 dígitos do autenticador.',
+                    variant: 'destructive',
+                  });
+                  return;
+                }
+                handleSubmit(e);
+              }}
+              className="space-y-4"
+            >
+              <div className="space-y-2">
+                <Label htmlFor="twofaCode">Código 2FA</Label>
+                <Input
+                  id="twofaCode"
+                  inputMode="numeric"
+                  maxLength={6}
+                  placeholder="000000"
+                  value={twofaCode}
+                  onChange={(e) => {
+                    const val = e.target.value.replace(/\D/g, '');
+                    setTwofaCode(val);
+                  }}
+                />
+              </div>
+              <DialogFooter className="gap-2 sm:gap-0">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setRequire2FA(false)}
+                >
+                  Cancelar
+                </Button>
+                <Button type="submit" disabled={isLoading}>
+                  Verificar 2FA
+                </Button>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
       </Card>
     </div>
   );

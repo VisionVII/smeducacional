@@ -33,9 +33,13 @@ export async function POST(request: Request) {
       );
     }
 
-    const ok = verifyTOTP(user.twoFactorSecret, parsed.data.code);
+    const code = parsed.data.code.replace(/\s+/g, '');
+    const ok = verifyTOTP(user.twoFactorSecret, code, 3);
     if (!ok) {
-      return NextResponse.json({ error: 'Código inválido' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Código inválido ou expirado' },
+        { status: 400 }
+      );
     }
 
     await prisma.user.update({

@@ -21,6 +21,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Icon3D } from '@/components/ui/icon-3d';
 import { useTheme } from 'next-themes';
 import { signOut } from 'next-auth/react';
+import { useSystemBranding } from '@/hooks/use-system-branding';
 
 interface NavbarProps {
   user: {
@@ -42,12 +43,15 @@ export function Navbar({ user, links }: NavbarProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const { branding } = useSystemBranding();
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
   const handleLogout = async () => {
+    // Limpa cache de tema do usuário antes de fazer logout
+    sessionStorage.removeItem('user-theme-cache');
     await signOut({ callbackUrl: '/login' });
   };
 
@@ -60,19 +64,41 @@ export function Navbar({ user, links }: NavbarProps) {
     return labels[role] || role;
   };
 
+  // Define home baseado no role do usuário
+  const getHomeHref = () => {
+    switch (user.role) {
+      case 'STUDENT':
+        return '/student/dashboard';
+      case 'TEACHER':
+        return '/teacher/dashboard';
+      case 'ADMIN':
+        return '/admin/dashboard';
+      default:
+        return '/';
+    }
+  };
+
   return (
-    <nav className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <nav className="navbar-themed sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           {/* Logo - Mobile First */}
           <Link
-            href="/"
+            href={getHomeHref()}
             className="flex items-center gap-2 flex-shrink-0"
             onClick={() => setMobileMenuOpen(false)}
           >
-            <Icon3D size="md" color="primary" rounded="full">
-              <GraduationCap className="h-6 w-6 text-primary" />
-            </Icon3D>
+            {branding.logoUrl ? (
+              <img 
+                src={branding.logoUrl} 
+                alt={branding.companyName} 
+                className="h-10 object-contain"
+              />
+            ) : (
+              <Icon3D size="md" color="primary" rounded="full">
+                <GraduationCap className="h-6 w-6 text-primary" />
+              </Icon3D>
+            )}
           </Link>
 
           {/* Desktop Navigation */}
@@ -82,9 +108,9 @@ export function Navbar({ user, links }: NavbarProps) {
                 key={link.href}
                 href={link.href}
                 className={cn(
-                  'flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors',
+                  'navbar-link flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors',
                   pathname === link.href
-                    ? 'bg-primary text-primary-foreground'
+                    ? 'navbar-link-active bg-primary text-primary-foreground'
                     : 'hover:bg-accent hover:text-accent-foreground'
                 )}
               >
