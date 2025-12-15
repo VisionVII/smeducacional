@@ -68,9 +68,9 @@ export function PublicNavbar() {
             onClick={() => setMobileMenuOpen(false)}
           >
             {branding.logoUrl ? (
-              <img 
-                src={branding.logoUrl} 
-                alt={branding.companyName} 
+              <img
+                src={branding.logoUrl}
+                alt={branding.companyName}
                 className="h-10 object-contain"
               />
             ) : (
