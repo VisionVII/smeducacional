@@ -6,6 +6,7 @@ import {
   useEffect,
   useState,
   ReactNode,
+  useRef,
 } from 'react';
 import { useTheme as useNextTheme } from 'next-themes';
 import { THEME_PRESETS } from '@/lib/theme-presets';
@@ -229,18 +230,47 @@ export function TeacherThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setTheme] = useState<TeacherTheme | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [mounted, setMounted] = useState(false);
+  const hydratedCache = useRef(false);
   const {
     theme: themeMode,
     resolvedTheme,
     setTheme: setSystemTheme,
   } = useNextTheme();
 
+  // Force use of teacher-specific storage key
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      // Garante que o teacher usa sua própria chave de armazenamento
+      const storedTheme = localStorage.getItem('teacher-theme-mode');
+      if (!storedTheme) {
+        localStorage.setItem('teacher-theme-mode', 'system');
+      }
+    }
+  }, []);
+
   const loadTheme = async () => {
     try {
+      // Hidrata de cache persistente para evitar flash
+      if (!hydratedCache.current) {
+        const cached = localStorage.getItem('teacher-theme-cache');
+        if (cached) {
+          try {
+            const { theme: cachedTheme } = JSON.parse(cached);
+            if (cachedTheme) {
+              setTheme(cachedTheme);
+              applyTheme(cachedTheme, resolvedTheme ?? themeMode);
+              hydratedCache.current = true;
+            }
+          } catch {
+            localStorage.removeItem('teacher-theme-cache');
+          }
+        }
+      }
+
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 3000);
 
-      const response = await fetch('/api/teacher/theme', {
+      const response = await fetch('/api/user/theme', {
         signal: controller.signal,
         cache: 'no-store',
         headers: {
@@ -253,9 +283,16 @@ export function TeacherThemeProvider({ children }: { children: ReactNode }) {
       if (response.ok) {
         const data = await response.json();
         // Theme loaded successfully
+        // API retorna { theme: {...} } ou null
+        const themeData = data.theme || data;
 
-        setTheme(data);
-        applyTheme(data, resolvedTheme ?? themeMode);
+        setTheme(themeData);
+        applyTheme(themeData, resolvedTheme ?? themeMode);
+        localStorage.setItem(
+          'teacher-theme-cache',
+          JSON.stringify({ theme: themeData })
+        );
+        hydratedCache.current = true;
       } else {
         console.warn('[loadTheme] Failed to load theme, using fallback');
 
@@ -269,6 +306,11 @@ export function TeacherThemeProvider({ children }: { children: ReactNode }) {
           };
           setTheme(fallback as TeacherTheme);
           applyTheme(fallback as TeacherTheme, resolvedTheme ?? themeMode);
+          localStorage.setItem(
+            'teacher-theme-cache',
+            JSON.stringify({ theme: fallback })
+          );
+          hydratedCache.current = true;
         }
       }
     } catch (error) {
@@ -286,7 +328,7 @@ export function TeacherThemeProvider({ children }: { children: ReactNode }) {
     try {
       // Updating theme
 
-      const response = await fetch('/api/teacher/theme', {
+      const response = await fetch('/api/user/theme', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updates),
@@ -296,8 +338,15 @@ export function TeacherThemeProvider({ children }: { children: ReactNode }) {
 
       if (response.ok) {
         const data = await response.json();
-        setTheme(data);
-        applyTheme(data, resolvedTheme ?? themeMode);
+        // API retorna { message: '...', theme: {...} }
+        const themeData = data.theme || data;
+        setTheme(themeData);
+        applyTheme(themeData, resolvedTheme ?? themeMode);
+        localStorage.setItem(
+          'teacher-theme-cache',
+          JSON.stringify({ theme: themeData })
+        );
+        hydratedCache.current = true;
       } else {
         const error = await response.json();
         console.error('[updateTheme] API Error:', error);
@@ -315,11 +364,13 @@ export function TeacherThemeProvider({ children }: { children: ReactNode }) {
 
   const resetTheme = async () => {
     try {
-      const response = await fetch('/api/teacher/theme', {
+      const response = await fetch('/api/user/theme', {
         method: 'DELETE',
       });
 
       if (response.ok) {
+        localStorage.removeItem('teacher-theme-cache');
+        hydratedCache.current = false;
         // Recarregar tema padrão
         await loadTheme();
       }
@@ -342,6 +393,10 @@ export function TeacherThemeProvider({ children }: { children: ReactNode }) {
       primary: resolvedPalette.primary,
       background: resolvedPalette.background,
     });
+
+    // 🚀 Desabilita transições para aplicação instantânea
+    const prevTransition = root.style.transition;
+    root.style.transition = 'none';
 
     Object.entries(resolvedPalette).forEach(([key, value]) => {
       const cssVar = key
@@ -427,9 +482,9 @@ export function TeacherThemeProvider({ children }: { children: ReactNode }) {
     };
 
     const durationMap = {
-      slow: '500ms',
-      normal: '200ms',
-      fast: '100ms',
+      slow: '380ms',
+      normal: '180ms',
+      fast: '120ms',
     };
 
     root.style.setProperty(
@@ -454,6 +509,11 @@ export function TeacherThemeProvider({ children }: { children: ReactNode }) {
     } else {
       root.classList.remove('animations-enabled');
     }
+
+    // 🚀 Força repaint e restaura transições após aplicação
+    requestAnimationFrame(() => {
+      root.style.transition = prevTransition;
+    });
   };
 
   useEffect(() => {
