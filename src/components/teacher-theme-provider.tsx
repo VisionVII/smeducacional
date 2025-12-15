@@ -270,7 +270,7 @@ export function TeacherThemeProvider({ children }: { children: ReactNode }) {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 3000);
 
-      const response = await fetch('/api/user/theme', {
+      const response = await fetch('/api/teacher/landing/theme', {
         signal: controller.signal,
         cache: 'no-store',
         headers: {
@@ -328,7 +328,7 @@ export function TeacherThemeProvider({ children }: { children: ReactNode }) {
     try {
       // Updating theme
 
-      const response = await fetch('/api/user/theme', {
+      const response = await fetch('/api/teacher/landing/theme', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updates),
@@ -364,7 +364,7 @@ export function TeacherThemeProvider({ children }: { children: ReactNode }) {
 
   const resetTheme = async () => {
     try {
-      const response = await fetch('/api/user/theme', {
+      const response = await fetch('/api/teacher/landing/theme', {
         method: 'DELETE',
       });
 
