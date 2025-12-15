@@ -15,21 +15,24 @@
 ### Tab "Marca"
 
 #### Logo Principal:
+
 - Campo: **"Logo Principal (URL)"**
 - Cole a URL pública da sua logo (ex: `https://seusite.com/logo.png`)
 - **Preview**: A logo aparecerá imediatamente abaixo do campo
-- **Onde aparece**: 
+- **Onde aparece**:
   - Menu do admin
   - Menu do professor
   - Menu do aluno
   - Menu das páginas públicas (landing, cursos, etc.)
 
 #### Favicon:
+
 - Campo: **"Favicon (URL)"**
 - Cole a URL do ícone que aparece na aba do navegador
 - Formato recomendado: `.ico`, `.png` (32x32 ou 16x16)
 
 #### Background do Login:
+
 - Campo: **"Imagem de Fundo do Login (URL)"**
 - Cole a URL da imagem de fundo da tela de login
 - Formato recomendado: JPG, PNG (1920x1080 ou maior)
@@ -43,8 +46,9 @@
 ### Tab "Empresa"
 
 Preencha os campos:
-- ✅ **Nome da Empresa*** (obrigatório): Ex: "SM Educacional"
-- ✅ **Nome do Sistema*** (obrigatório): Ex: "Plataforma SM"
+
+- ✅ **Nome da Empresa\*** (obrigatório): Ex: "SM Educacional"
+- ✅ **Nome do Sistema\*** (obrigatório): Ex: "Plataforma SM"
 - 📧 **E-mail**: Ex: "contato@smeducacional.com"
 - 📞 **Telefone**: Ex: "(11) 1234-5678"
 - 📍 **Endereço**: Endereço completo da instituição
@@ -56,11 +60,13 @@ Preencha os campos:
 ### Tab "Cores"
 
 #### Cor Primária:
+
 - Clique no **quadrado colorido** para abrir o seletor de cores
 - OU digite o código hexadecimal (ex: `#3b82f6`)
 - **Onde é usada**: Botões principais, links, destaques
 
 #### Cor Secundária:
+
 - Clique no **quadrado colorido** para abrir o seletor de cores
 - OU digite o código hexadecimal (ex: `#8b5cf6`)
 - **Onde é usada**: Elementos secundários, badges, ícones
@@ -74,11 +80,13 @@ Preencha os campos:
 ### Tab "SEO & Social"
 
 #### Meta Tags:
+
 - **Meta Título**: Título que aparece no Google (máx. 60 caracteres)
 - **Meta Descrição**: Descrição nos resultados de busca (máx. 160 caracteres)
 - **Palavras-chave**: Palavras separadas por vírgula
 
 #### Redes Sociais:
+
 - Cole as URLs dos perfis oficiais da empresa:
   - 📘 Facebook
   - 📸 Instagram
@@ -93,11 +101,13 @@ Preencha os campos:
 ### Tab "Sistema"
 
 #### Modo Manutenção:
+
 - **Ativado**: Bloqueia acesso público ao site (apenas admin acessa)
 - **Desativado**: Site funciona normalmente
 - **Uso**: Manutenções programadas, atualizações críticas
 
 #### Permitir Cadastro:
+
 - **Ativado**: Novos usuários podem se cadastrar
 - **Desativado**: Bloqueia registro de novos usuários
 - **Uso**: Controlar crescimento da base de usuários
@@ -115,6 +125,7 @@ Preencha os campos:
 ## 🎨 Onde as Configurações Aparecem?
 
 ### Logo do Sistema:
+
 - ✅ Menu do Admin (canto superior esquerdo)
 - ✅ Menu do Professor (canto superior esquerdo)
 - ✅ Menu do Aluno (canto superior esquerdo)
@@ -123,10 +134,12 @@ Preencha os campos:
 - ✅ Todas as páginas públicas
 
 ### Cores do Sistema:
+
 - ⚠️ **Apenas em páginas públicas** (landing, cursos, FAQ, etc.)
 - ❌ **NÃO afetam** cores dos dashboards (cada usuário tem tema próprio)
 
 ### Nome da Empresa:
+
 - ✅ Título da página (tab do navegador)
 - ✅ Rodapé das páginas
 - ✅ Emails transacionais
@@ -137,6 +150,7 @@ Preencha os campos:
 ## 📸 Como Fazer Upload de Logos?
 
 ### Opção 1: Supabase Storage (Recomendado)
+
 1. Acesse o painel do Supabase
 2. Vá em **Storage** → Bucket `images`
 3. Faça upload da logo
@@ -144,6 +158,7 @@ Preencha os campos:
 5. Cole a URL no campo de configuração
 
 ### Opção 2: Serviços Externos
+
 - **ImgBB**: https://imgbb.com (grátis, sem cadastro)
 - **Cloudinary**: https://cloudinary.com (grátis até 25GB)
 - **Google Drive**: Gere link público da imagem
@@ -155,19 +170,22 @@ Preencha os campos:
 ## 🚨 Problemas Comuns
 
 ### Logo não aparece:
+
 1. Verifique se a URL está correta
 2. Teste a URL no navegador (deve abrir a imagem)
 3. Certifique-se de que a URL é **HTTPS**
 4. Limpe o cache do navegador (Ctrl + Shift + R)
 
 ### Cores não mudaram:
+
 - Cores afetam apenas **páginas públicas**
 - Dashboards usam **temas personalizados** de cada usuário
 - Professor define seu próprio tema em "Tema do Professor"
 
 ### Não consigo salvar:
+
 - Verifique se está logado como **ADMIN**
-- Confira se os campos obrigatórios (*) estão preenchidos
+- Confira se os campos obrigatórios (\*) estão preenchidos
 - Verifique se as URLs são válidas (começam com http:// ou https://)
 
 ---

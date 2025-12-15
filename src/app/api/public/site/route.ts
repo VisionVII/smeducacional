@@ -13,8 +13,6 @@ export async function GET() {
       const created = await prisma.publicSiteConfig.create({
         data: {
           slug: DEFAULT_SLUG,
-          theme: null,
-          content: null,
         },
       });
       return NextResponse.json({ data: created });

@@ -98,8 +98,6 @@ export async function GET() {
       const created = await prisma.publicSiteConfig.create({
         data: {
           slug: DEFAULT_SLUG,
-          theme: null,
-          content: null,
         },
       });
       return NextResponse.json({ data: created });
@@ -132,12 +130,12 @@ export async function PUT(request: NextRequest) {
       where: { slug: DEFAULT_SLUG },
       create: {
         slug: DEFAULT_SLUG,
-        theme: parsed.data.theme ?? null,
-        content: parsed.data.content ?? null,
+        ...(parsed.data.theme ? { theme: parsed.data.theme } : {}),
+        ...(parsed.data.content ? { content: parsed.data.content } : {}),
       },
       update: {
-        theme: parsed.data.theme ?? null,
-        content: parsed.data.content ?? null,
+        ...(parsed.data.theme ? { theme: parsed.data.theme } : {}),
+        ...(parsed.data.content ? { content: parsed.data.content } : {}),
       },
     });
 
