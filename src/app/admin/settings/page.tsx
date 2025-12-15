@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
+import { useConfigSync, broadcastConfigChange } from '@/hooks/useConfigSync';
 import {
   Card,
   CardContent,
@@ -49,6 +50,7 @@ interface SystemConfig {
 
 export default function AdminSettingsPage() {
   const { data: session } = useSession();
+  const { invalidateAdminConfig } = useConfigSync();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [config, setConfig] = useState<SystemConfig>({
@@ -97,6 +99,9 @@ export default function AdminSettingsPage() {
           title: 'Sucesso',
           description: 'Configurações atualizadas com sucesso',
         });
+        // Invalidar cache e notificar outras abas
+        await invalidateAdminConfig();
+        broadcastConfigChange('admin');
         // Recarregar para garantir sincronização
         await loadConfig();
       } else {

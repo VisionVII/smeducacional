@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useTeacherTheme } from '@/components/teacher-theme-provider';
+import { useConfigSync, broadcastConfigChange } from '@/hooks/useConfigSync';
 import { THEME_PRESETS, ThemePreset } from '@/lib/theme-presets';
 import {
   Card,
@@ -31,6 +32,7 @@ export default function ThemeCustomizerPage() {
     systemTheme,
     setSystemTheme,
   } = useTeacherTheme();
+  const { invalidateTeacherTheme } = useConfigSync();
   const { toast } = useToast();
   const [selectedPreset, setSelectedPreset] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
@@ -72,6 +74,9 @@ export default function ThemeCustomizerPage() {
         themeName: preset.name,
       });
       setSelectedPreset(preset.id);
+      // Invalidar cache e notificar outras abas
+      await invalidateTeacherTheme();
+      broadcastConfigChange('teacher');
       toast({
         title: '✨ Tema aplicado!',
         description: `O tema "${preset.name}" foi aplicado com sucesso.`,
@@ -125,6 +130,9 @@ export default function ThemeCustomizerPage() {
           spacing: layoutConfig.spacing as ThemePreset['layout']['spacing'],
         },
       });
+      // Invalidar cache e notificar outras abas
+      await invalidateTeacherTheme();
+      broadcastConfigChange('teacher');
       toast({
         title: '💾 Layout salvo!',
         description: 'As configurações de layout foram atualizadas.',
