@@ -360,7 +360,7 @@ export function TeacherThemeProvider({ children }: { children: ReactNode }) {
         const data = await response.json();
         // API retorna { message: '...', theme: {...} }
         const themeData = data.theme;
-        
+
         if (themeData && themeData.palette) {
           setTheme(themeData);
           applyTheme(themeData, resolvedTheme ?? themeMode);
