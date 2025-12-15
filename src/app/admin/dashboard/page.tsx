@@ -258,10 +258,12 @@ export default async function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Painel Administrativo</h1>
-          <p className="text-muted-foreground">
+      <div className="container mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
+        <div className="mb-4 sm:mb-6 lg:mb-8">
+          <h1 className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-bold mb-1 sm:mb-2">
+            Painel Administrativo
+          </h1>
+          <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
             Visão geral completa do sistema, pagamentos e métricas
           </p>
         </div>
@@ -269,52 +271,70 @@ export default async function AdminDashboard() {
         {/* ==========================================
             STATS PRINCIPAIS
             ========================================== */}
-        <div className="grid md:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 mb-4 sm:mb-6 lg:mb-8">
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Usuários</CardTitle>
-              <Users className="h-4 w-4 text-muted-foreground" />
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-4 sm:px-6 pt-4 sm:pt-6">
+              <CardTitle className="text-sm sm:text-base font-medium">
+                Usuários
+              </CardTitle>
+              <Users className="h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground" />
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.totalUsers}</div>
-              <p className="text-xs text-muted-foreground">total no sistema</p>
+            <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
+              <div className="text-2xl sm:text-3xl font-bold">
+                {stats.totalUsers}
+              </div>
+              <p className="text-xs sm:text-sm text-muted-foreground mt-1">
+                total no sistema
+              </p>
             </CardContent>
           </Card>
 
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Cursos</CardTitle>
-              <BookOpen className="h-4 w-4 text-muted-foreground" />
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-4 sm:px-6 pt-4 sm:pt-6">
+              <CardTitle className="text-sm sm:text-base font-medium">
+                Cursos
+              </CardTitle>
+              <BookOpen className="h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground" />
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.totalCourses}</div>
-              <p className="text-xs text-muted-foreground">
+            <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
+              <div className="text-2xl sm:text-3xl font-bold">
+                {stats.totalCourses}
+              </div>
+              <p className="text-xs sm:text-sm text-muted-foreground mt-1">
                 {stats.paidCourses} pagos
               </p>
             </CardContent>
           </Card>
 
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Matrículas</CardTitle>
-              <GraduationCap className="h-4 w-4 text-muted-foreground" />
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-4 sm:px-6 pt-4 sm:pt-6">
+              <CardTitle className="text-sm sm:text-base font-medium">
+                Matrículas
+              </CardTitle>
+              <GraduationCap className="h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground" />
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.totalEnrollments}</div>
-              <p className="text-xs text-muted-foreground">ativas no sistema</p>
+            <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
+              <div className="text-2xl sm:text-3xl font-bold">
+                {stats.totalEnrollments}
+              </div>
+              <p className="text-xs sm:text-sm text-muted-foreground mt-1">
+                ativas no sistema
+              </p>
             </CardContent>
           </Card>
 
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Receita</CardTitle>
-              <DollarSign className="h-4 w-4 text-muted-foreground" />
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-4 sm:px-6 pt-4 sm:pt-6">
+              <CardTitle className="text-sm sm:text-base font-medium">
+                Receita
+              </CardTitle>
+              <DollarSign className="h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground" />
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">
+            <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
+              <div className="text-2xl sm:text-3xl font-bold">
                 R$ {stats.totalRevenue.toFixed(2)}
               </div>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-xs sm:text-sm text-muted-foreground mt-1">
                 {stats.totalPayments} pagamentos
               </p>
             </CardContent>
@@ -324,48 +344,50 @@ export default async function AdminDashboard() {
         {/* ==========================================
             MÉTRICAS DE PAGAMENTO
             ========================================== */}
-        <div className="grid md:grid-cols-3 gap-4 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6 mb-4 sm:mb-6 lg:mb-8">
           <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium">
+            <CardHeader className="pb-2 px-4 sm:px-6 pt-4 sm:pt-6">
+              <CardTitle className="text-sm sm:text-base font-medium">
                 Subscrições Ativas
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-green-600">
+            <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
+              <div className="text-2xl sm:text-3xl font-bold text-green-600">
                 {stats.activeSubscriptions}
               </div>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-xs sm:text-sm text-muted-foreground mt-1">
                 alunos + professores
               </p>
             </CardContent>
           </Card>
 
           <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium">
+            <CardHeader className="pb-2 px-4 sm:px-6 pt-4 sm:pt-6">
+              <CardTitle className="text-sm sm:text-base font-medium">
                 Faturas Vencidas
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-red-600">
+            <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
+              <div className="text-2xl sm:text-3xl font-bold text-red-600">
                 {stats.pendingInvoices}
               </div>
-              <p className="text-xs text-muted-foreground">require atenção</p>
+              <p className="text-xs sm:text-sm text-muted-foreground mt-1">
+                require atenção
+              </p>
             </CardContent>
           </Card>
 
           <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium">
+            <CardHeader className="pb-2 px-4 sm:px-6 pt-4 sm:pt-6">
+              <CardTitle className="text-sm sm:text-base font-medium">
                 GitHub Conectados
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-blue-600">
+            <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
+              <div className="text-2xl sm:text-3xl font-bold text-blue-600">
                 {githubIntegrations}
               </div>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-xs sm:text-sm text-muted-foreground mt-1">
                 integrações ativas
               </p>
             </CardContent>
@@ -375,22 +397,24 @@ export default async function AdminDashboard() {
         {/* ==========================================
             DISTRIBUIÇÃO DE USUÁRIOS
             ========================================== */}
-        <div className="grid md:grid-cols-2 gap-6 mb-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-4 sm:mb-6 lg:mb-8">
           <Card>
-            <CardHeader>
-              <CardTitle className="text-base">Usuários por Tipo</CardTitle>
-              <CardDescription>
+            <CardHeader className="px-4 sm:px-6 py-4 sm:py-5">
+              <CardTitle className="text-base sm:text-lg">
+                Usuários por Tipo
+              </CardTitle>
+              <CardDescription className="text-xs sm:text-sm mt-1">
                 Distribuição de funções no sistema
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
+            <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
+              <div className="space-y-3 sm:space-y-4">
                 {usersByRole.map((item) => (
                   <div
                     key={item.role}
                     className="flex items-center justify-between"
                   >
-                    <span className="text-sm capitalize">
+                    <span className="text-xs sm:text-sm capitalize">
                       {item.role.toLowerCase()}
                     </span>
                     <div className="flex items-center gap-2">
@@ -402,7 +426,7 @@ export default async function AdminDashboard() {
                           }}
                         />
                       </div>
-                      <span className="text-sm font-medium w-8 text-right">
+                      <span className="text-xs sm:text-sm font-medium w-8 text-right">
                         {item._count}
                       </span>
                     </div>
@@ -413,24 +437,32 @@ export default async function AdminDashboard() {
           </Card>
 
           <Card>
-            <CardHeader>
-              <CardTitle className="text-base">Status de Pagamentos</CardTitle>
-              <CardDescription>Distribuição por status</CardDescription>
+            <CardHeader className="px-4 sm:px-6 py-4 sm:py-5">
+              <CardTitle className="text-base sm:text-lg">
+                Status de Pagamentos
+              </CardTitle>
+              <CardDescription className="text-xs sm:text-sm mt-1">
+                Distribuição por status
+              </CardDescription>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
+            <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
+              <div className="space-y-3 sm:space-y-4">
                 {paymentsByStatus.map((item) => (
                   <div
                     key={item.status}
                     className="flex items-center justify-between"
                   >
                     <div>
-                      <span className="text-sm capitalize">{item.status}</span>
+                      <span className="text-xs sm:text-sm capitalize">
+                        {item.status}
+                      </span>
                       <p className="text-xs text-muted-foreground">
                         R$ {(item._sum.amount || 0).toFixed(2)}
                       </p>
                     </div>
-                    <span className="text-sm font-medium">{item._count}</span>
+                    <span className="text-xs sm:text-sm font-medium">
+                      {item._count}
+                    </span>
                   </div>
                 ))}
               </div>
@@ -441,62 +473,86 @@ export default async function AdminDashboard() {
         {/* ==========================================
             PAGAMENTOS RECENTES
             ========================================== */}
-        <Card className="mb-8">
-          <CardHeader>
-            <CardTitle className="text-base">Pagamentos Recentes</CardTitle>
-            <CardDescription>Últimas 10 transações</CardDescription>
+        <Card className="mb-4 sm:mb-6 lg:mb-8">
+          <CardHeader className="px-4 sm:px-6 py-4 sm:py-5">
+            <CardTitle className="text-base sm:text-lg">
+              Pagamentos Recentes
+            </CardTitle>
+            <CardDescription className="text-xs sm:text-sm mt-1">
+              Últimas 10 transações
+            </CardDescription>
           </CardHeader>
-          <CardContent>
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b">
-                    <th className="text-left py-2 px-2">Usuário</th>
-                    <th className="text-left py-2 px-2">Tipo</th>
-                    <th className="text-left py-2 px-2">Valor</th>
-                    <th className="text-left py-2 px-2">Status</th>
-                    <th className="text-left py-2 px-2">Data</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {paymentData.map((payment) => (
-                    <tr key={payment.id} className="border-b hover:bg-muted/50">
-                      <td className="py-2 px-2 text-xs">
-                        <div>
-                          <p className="font-medium">{payment.user.name}</p>
-                          <p className="text-muted-foreground">
-                            {payment.user.email}
-                          </p>
-                        </div>
-                      </td>
-                      <td className="py-2 px-2 text-xs">
-                        <span className="capitalize">{payment.type}</span>
-                      </td>
-                      <td className="py-2 px-2 font-medium">
-                        R$ {payment.amount.toFixed(2)}
-                      </td>
-                      <td className="py-2 px-2">
-                        <span
-                          className={`text-xs px-2 py-1 rounded-full ${
-                            payment.status === 'completed'
-                              ? 'bg-green-100 text-green-800'
-                              : payment.status === 'pending'
-                              ? 'bg-yellow-100 text-yellow-800'
-                              : 'bg-red-100 text-red-800'
-                          }`}
-                        >
-                          {payment.status}
-                        </span>
-                      </td>
-                      <td className="py-2 px-2 text-xs text-muted-foreground">
-                        {format(new Date(payment.createdAt), 'dd/MM HH:mm', {
-                          locale: ptBR,
-                        })}
-                      </td>
+          <CardContent className="px-2 sm:px-6 pb-4 sm:pb-6">
+            <div className="overflow-x-auto -mx-2 sm:mx-0">
+              <div className="min-w-[600px] sm:min-w-0">
+                <table className="w-full text-xs sm:text-sm">
+                  <thead>
+                    <tr className="border-b bg-muted/50">
+                      <th className="text-left py-2 sm:py-3 px-2 sm:px-3 font-medium">
+                        Usuário
+                      </th>
+                      <th className="text-left py-2 sm:py-3 px-2 sm:px-3 font-medium">
+                        Tipo
+                      </th>
+                      <th className="text-left py-2 sm:py-3 px-2 sm:px-3 font-medium">
+                        Valor
+                      </th>
+                      <th className="text-left py-2 sm:py-3 px-2 sm:px-3 font-medium">
+                        Status
+                      </th>
+                      <th className="text-left py-2 sm:py-3 px-2 sm:px-3 font-medium">
+                        Data
+                      </th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {paymentData.map((payment) => (
+                      <tr
+                        key={payment.id}
+                        className="border-b hover:bg-muted/50 transition-colors"
+                      >
+                        <td className="py-2 sm:py-3 px-2 sm:px-3">
+                          <div className="max-w-[150px] sm:max-w-none">
+                            <p className="font-medium truncate">
+                              {payment.user.name}
+                            </p>
+                            <p className="text-muted-foreground text-[10px] sm:text-xs truncate">
+                              {payment.user.email}
+                            </p>
+                          </div>
+                        </td>
+                        <td className="py-2 sm:py-3 px-2 sm:px-3">
+                          <span className="capitalize text-xs sm:text-sm">
+                            {payment.type}
+                          </span>
+                        </td>
+                        <td className="py-2 sm:py-3 px-2 sm:px-3 font-medium whitespace-nowrap">
+                          R$ {payment.amount.toFixed(2)}
+                        </td>
+                        <td className="py-2 sm:py-3 px-2 sm:px-3">
+                          <span
+                            className={`text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full whitespace-nowrap ${
+                              payment.status === 'completed'
+                                ? 'bg-green-100 text-green-800'
+                                : payment.status === 'pending'
+                                ? 'bg-yellow-100 text-yellow-800'
+                                : 'bg-red-100 text-red-800'
+                            }`}
+                            aria-label={`Pagamento ${payment.status}`}
+                          >
+                            {payment.status}
+                          </span>
+                        </td>
+                        <td className="py-2 sm:py-3 px-2 sm:px-3 text-muted-foreground text-xs sm:text-sm whitespace-nowrap">
+                          {format(new Date(payment.createdAt), 'dd/MM HH:mm', {
+                            locale: ptBR,
+                          })}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -504,19 +560,19 @@ export default async function AdminDashboard() {
         {/* ==========================================
             DIAGNÓSTICO DO BANCO DE DADOS
             ========================================== */}
-        <Card className="mb-8">
-          <CardHeader>
-            <CardTitle className="text-base flex items-center gap-2">
-              <Database className="h-4 w-4" />
+        <Card className="mb-4 sm:mb-6 lg:mb-8">
+          <CardHeader className="px-4 sm:px-6 py-4 sm:py-5">
+            <CardTitle className="text-base sm:text-lg flex items-center gap-2">
+              <Database className="h-4 w-4 sm:h-5 sm:w-5" />
               Diagnóstico do Banco de Dados
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-xs sm:text-sm mt-1">
               Visão rápida de tabelas, roles, funções, segurança e buckets
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-              <div className="border rounded-md p-3">
+          <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4">
+              <div className="border rounded-md p-3 sm:p-4 hover:bg-muted/50 transition-colors">
                 <div className="flex items-center justify-between mb-2">
                   <p className="text-sm font-medium">Tabelas</p>
                   <Database className="h-4 w-4 text-muted-foreground" />
@@ -622,10 +678,12 @@ export default async function AdminDashboard() {
         {/* ==========================================
             SYSTEM LOGS & DEVELOPER TOOLS
             ========================================== */}
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">System Logs</CardTitle>
+              <CardTitle className="text-sm sm:text-base">
+                System Logs
+              </CardTitle>
               <CardDescription>Últimos eventos do sistema</CardDescription>
             </CardHeader>
             <CardContent>
@@ -645,10 +703,10 @@ export default async function AdminDashboard() {
                       }`}
                     />
                     <div className="flex-1 min-w-0">
-                      <p className="text-xs font-medium truncate">
+                      <p className="text-xs sm:text-sm font-medium truncate">
                         {log.component}: {log.message}
                       </p>
-                      <p className="text-xs text-muted-foreground">
+                      <p className="text-xs sm:text-sm text-muted-foreground">
                         {format(new Date(log.createdAt), 'dd/MM HH:mm', {
                           locale: ptBR,
                         })}
@@ -662,7 +720,9 @@ export default async function AdminDashboard() {
 
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">Developer Metrics</CardTitle>
+              <CardTitle className="text-sm sm:text-base">
+                Developer Metrics
+              </CardTitle>
               <CardDescription>Performance e saúde do sistema</CardDescription>
             </CardHeader>
             <CardContent>
@@ -673,10 +733,10 @@ export default async function AdminDashboard() {
                     className="flex items-center justify-between pb-3 border-b last:border-0"
                   >
                     <div>
-                      <p className="text-xs font-medium capitalize">
+                      <p className="text-xs sm:text-sm font-medium capitalize">
                         {metric.component}
                       </p>
-                      <p className="text-xs text-muted-foreground">
+                      <p className="text-xs sm:text-sm text-muted-foreground">
                         {metric.responseTime}ms
                       </p>
                     </div>

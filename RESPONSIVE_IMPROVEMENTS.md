@@ -3,7 +3,8 @@
 ## Fase 1: ✅ COMPLETA - Admin Settings Page
 
 ### Antes
-- ❌ Heading `text-3xl` - muito grande em mobile  
+
+- ❌ Heading `text-3xl` - muito grande em mobile
 - ❌ Tabs com `grid-cols-5` - não responsive, empilha em mobile
 - ❌ Container sem padding móvel - conteúdo perto da borda
 - ❌ Inputs sem `min-h-11` - difíceis de tocar (< 44px)
@@ -14,58 +15,70 @@
 - ❌ Sem feedback visual de comprimento (meta-tags)
 
 ### Depois
+
 ✅ **Tipografia Responsiva**:
+
 - H1: `text-2xl sm:text-3xl lg:text-4xl`
 - Subtítulo: `text-xs sm:text-sm`
 - Labels: `text-sm sm:text-base`
 - Inputs: `text-base` (sempre, previne zoom em iOS)
 
 ✅ **Tabs Responsivos**:
+
 - `grid-cols-2 sm:grid-cols-3 lg:grid-cols-5`
 - Labels hidden em mobile: "Emp." → "Empresa" (sm+)
 - Padding responsivo: `p-2 sm:p-3`
 - Gap responsivo: `gap-2`
 
 ✅ **Container Responsivo**:
+
 - Padding: `px-4 sm:px-6 lg:px-8` + `py-6 sm:py-8`
 - Max-width mantido: `max-w-6xl`
 
 ✅ **Inputs Touch-Friendly (44x44px)**:
+
 - `min-h-11` (44px)
 - Padding: `px-3 py-3`
 - `font-base` (text base, não small)
 
 ✅ **Cards Responsivos**:
+
 - CardHeader padding: `px-4 sm:px-6 py-4`
 - CardContent padding: `px-4 sm:px-6 pb-6`
 - Espaçamento interno: `space-y-4 sm:space-y-6`
 
 ✅ **Grids Consistentes**:
+
 - `grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6`
 
 ✅ **Acessibilidade**:
+
 - Todos inputs com `aria-label` obrigatório
 - `aria-describedby` para inputs com helper text
 - Labels visuais + aria-labels
 - Contrastes adequados (fundo neutro)
 
 ✅ **Meta-tags com Feedback**:
+
 - Contador dinâmico: `({config.metaTitle?.length || 0}/60)`
 - Ajuda visual: `aria-describedby="metaTitleHelp"`
 
 ✅ **Botões Responsivos**:
+
 - Sticky no mobile: `sticky bottom-0 sm:relative`
 - Botão full-width em mobile: `w-full sm:w-auto`
 - Min-height: `min-h-11`
 - Font size: `text-base`
 
 ✅ **Switches Responsivos**:
-- Layout flex: `flex-col sm:flex-row` 
+
+- Layout flex: `flex-col sm:flex-row`
 - Label responsivo: `text-sm sm:text-base`
 - Descrição: `text-xs sm:text-sm`
 - Hover state: `hover:bg-muted/50`
 
 ### Métricas
+
 - **Arquivo**: [src/app/admin/settings/page.tsx](src/app/admin/settings/page.tsx)
 - **Linhas adicionadas**: ~200 (melhorias de spacing e breakpoints)
 - **Classes adicionadas**: `sm:`, `lg:`, breakpoint utilities
@@ -87,6 +100,7 @@
 ```
 
 ### Checklist Aplicado
+
 - [x] Tipografia escalonada (xs, sm, md, lg, xl)
 - [x] Inputs min-h-11 (44px touch target)
 - [x] Labels aria-label
@@ -103,14 +117,18 @@
 ## Próximas Fases
 
 ### Fase 2: Admin Dashboard (não iniciado)
+
 Rotas:
+
 - [ ] `/admin/dashboard` - cards, charts
 - [ ] `/admin/users` - tabelas, filters
 - [ ] `/admin/courses` - grid de cursos
 - [ ] `/admin/categories` - lista com ações
 
 ### Fase 3: Teacher Routes (não iniciado)
+
 Rotas:
+
 - [ ] `/teacher/dashboard` - cards, gráficos
 - [ ] `/teacher/theme` - color picker responsivo
 - [ ] `/teacher/landing` - builder
@@ -118,14 +136,18 @@ Rotas:
 - [ ] `/teacher/profile` - formulário
 
 ### Fase 4: Student Routes (não iniciado)
+
 Rotas:
+
 - [ ] `/student/dashboard` - progress cards
 - [ ] `/student/courses` - grid responsivo
 - [ ] `/student/course/[id]` - player + sidebar
 - [ ] `/student/profile` - formulário
 
 ### Fase 5: Public Routes (não iniciado)
+
 Rotas:
+
 - [ ] `/` - home responsive
 - [ ] `/courses` - catálogo responsivo
 - [ ] `/auth/login` - form responsivo
@@ -134,6 +156,7 @@ Rotas:
 ## Standards VisionVII Responsivos
 
 ### Breakpoints
+
 ```
 xs  : 0px      (mobile small)
 sm  : 640px    (mobile standard)
@@ -144,6 +167,7 @@ xl  : 1280px   (desktop large)
 ```
 
 ### Padding por Breakpoint
+
 ```
 Mobile (xs)     : px-4 py-6
 Tablet (sm)     : px-6 py-8
@@ -152,6 +176,7 @@ Desktop XL (xl) : px-8 py-10
 ```
 
 ### Font Sizes
+
 ```
 H1      : text-2xl sm:text-3xl lg:text-4xl
 H2      : text-xl sm:text-2xl lg:text-3xl
@@ -162,6 +187,7 @@ Input   : text-base (sempre, iOS)
 ```
 
 ### Touch Targets (44x44px)
+
 ```
 Button  : min-h-11 (44px)
 Input   : min-h-11 (44px)
@@ -170,6 +196,7 @@ Checkbox: tamanho padrão (precisa auditar)
 ```
 
 ### Grid Patterns
+
 ```
 1-col mobile   : grid-cols-1
 2-col tablet   : sm:grid-cols-2
@@ -179,6 +206,7 @@ Gap tablet     : sm:gap-6
 ```
 
 ## Commits
+
 - **commit**: (será commitado após validação)
 - **arquivos**: 1 (src/app/admin/settings/page.tsx)
 - **linhas**: +~200, -~100 (net: ~100)
