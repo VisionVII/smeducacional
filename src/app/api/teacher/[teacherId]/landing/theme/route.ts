@@ -2,11 +2,11 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 
 interface Params {
-  params: { teacherId: string };
+  params: Promise<{ teacherId: string }>;
 }
 
 export async function GET(_: Request, { params }: Params) {
-  const { teacherId } = params;
+  const { teacherId } = await params;
 
   if (!teacherId) {
     return NextResponse.json(
