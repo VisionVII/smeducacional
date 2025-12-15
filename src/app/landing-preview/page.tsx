@@ -120,7 +120,7 @@ function LandingPageContent({ teacherId }: { teacherId?: string }) {
   return (
     <>
       <AdaptiveNavbar />
-      <PublicThemeProvider teacherId={teacherId} staticTheme={landingTheme}>
+      <PublicThemeProvider teacherId={teacherId}>
         <div className="min-h-screen bg-background text-foreground">
           {/* Hero Section */}
           <section className="relative py-20 px-4 sm:px-6 lg:px-8 overflow-hidden">
