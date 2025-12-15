@@ -113,7 +113,9 @@ export async function DELETE() {
 
     await prisma.user.update({
       where: { id: session.user.id },
-      data: { landingTheme: null },
+      data: {
+        landingTheme: undefined,
+      },
     });
 
     return NextResponse.json({ message: 'Tema da landing removido' });
