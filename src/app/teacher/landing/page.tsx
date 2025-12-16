@@ -246,19 +246,21 @@ export default function TeacherLandingBuilder() {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto max-w-7xl p-6 space-y-6">
+      <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-4 sm:space-y-6">
         {/* Header */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <LayoutDashboard className="h-6 w-6 text-primary" />
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <LayoutDashboard className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
             <div>
-              <h1 className="text-3xl font-bold">Landing Page do Professor</h1>
-              <p className="text-muted-foreground">
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold">
+                Landing Page do Professor
+              </h1>
+              <p className="text-xs sm:text-sm lg:text-base text-muted-foreground">
                 Crie uma página persuasiva com seu tema e dados personalizados.
               </p>
             </div>
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
             <Button variant="outline" onClick={copyPreviewLink}>
               {copied ? (
                 <>
@@ -272,7 +274,11 @@ export default function TeacherLandingBuilder() {
                 </>
               )}
             </Button>
-            <Button variant="outline" asChild>
+            <Button
+              variant="outline"
+              asChild
+              className="w-full sm:w-auto min-h-[44px]"
+            >
               <a href="/landing-preview" target="_blank" rel="noreferrer">
                 <Eye className="h-4 w-4 mr-2" />
                 Visualizar
@@ -281,32 +287,37 @@ export default function TeacherLandingBuilder() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
           {/* Painel de Edição */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="lg:col-span-2 space-y-4 sm:space-y-6">
             {/* Seção Hero */}
             <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Seção Hero</CardTitle>
-                <CardDescription>
+              <CardHeader className="px-4 sm:px-6 py-4 sm:py-5">
+                <CardTitle className="text-base sm:text-lg">
+                  Seção Hero
+                </CardTitle>
+                <CardDescription className="text-xs sm:text-sm">
                   Título e subtítulo principais que capturam atenção
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6 space-y-3 sm:space-y-4">
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">
+                  <label className="text-xs sm:text-sm font-medium">
                     Título Principal
                   </label>
                   <Input
+                    className="min-h-[44px]"
                     placeholder="Ex: Transforme conhecimento em impacto real"
                     value={config.heroTitle}
                     onChange={(e) => updateField('heroTitle', e.target.value)}
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Subtítulo</label>
+                  <label className="text-xs sm:text-sm font-medium">
+                    Subtítulo
+                  </label>
                   <textarea
-                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="w-full rounded-md border border-input bg-background px-3 py-2.5 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-primary min-h-[88px]"
                     placeholder="Descreva brevemente o valor do seu curso"
                     value={config.heroSubtitle}
                     rows={3}
@@ -316,10 +327,11 @@ export default function TeacherLandingBuilder() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">
+                  <label className="text-xs sm:text-sm font-medium">
                     URL da Imagem (opcional)
                   </label>
                   <Input
+                    className="min-h-[44px]"
                     placeholder="https://..."
                     value={config.heroImage}
                     onChange={(e) => updateField('heroImage', e.target.value)}
@@ -330,26 +342,32 @@ export default function TeacherLandingBuilder() {
 
             {/* Seção CTA */}
             <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Call-to-Action (CTA)</CardTitle>
-                <CardDescription>
+              <CardHeader className="px-4 sm:px-6 py-4 sm:py-5">
+                <CardTitle className="text-base sm:text-lg">
+                  Call-to-Action (CTA)
+                </CardTitle>
+                <CardDescription className="text-xs sm:text-sm">
                   Botão principal que convida para ação
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6 space-y-3 sm:space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-3">
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">
+                    <label className="text-xs sm:text-sm font-medium">
                       Texto do Botão
                     </label>
                     <Input
+                      className="min-h-[44px]"
                       value={config.ctaLabel}
                       onChange={(e) => updateField('ctaLabel', e.target.value)}
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">Link</label>
+                    <label className="text-xs sm:text-sm font-medium">
+                      Link
+                    </label>
                     <Input
+                      className="min-h-[44px]"
                       placeholder="https://..."
                       value={config.ctaLink}
                       onChange={(e) => updateField('ctaLink', e.target.value)}
@@ -357,14 +375,16 @@ export default function TeacherLandingBuilder() {
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Cor do Botão</label>
+                  <label className="text-xs sm:text-sm font-medium">
+                    Cor do Botão
+                  </label>
                   <Select
                     value={config.ctaColor}
                     onValueChange={(value: any) =>
                       updateField('ctaColor', value)
                     }
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className="min-h-[44px]">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -379,13 +399,15 @@ export default function TeacherLandingBuilder() {
 
             {/* Seção Diferenciais */}
             <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Diferenciais</CardTitle>
-                <CardDescription>
+              <CardHeader className="px-4 sm:px-6 py-4 sm:py-5">
+                <CardTitle className="text-base sm:text-lg">
+                  Diferenciais
+                </CardTitle>
+                <CardDescription className="text-xs sm:text-sm">
                   Principais vantagens e benefícios
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6 space-y-3 sm:space-y-4">
                 {[
                   { key: 'highlightOne', iconKey: 'highlightOneIcon', num: 1 },
                   { key: 'highlightTwo', iconKey: 'highlightTwoIcon', num: 2 },
@@ -396,7 +418,7 @@ export default function TeacherLandingBuilder() {
                   },
                 ].map((item) => (
                   <div key={item.key} className="space-y-2">
-                    <label className="text-sm font-medium">
+                    <label className="text-xs sm:text-sm font-medium">
                       Diferencial {item.num}
                     </label>
                     <div className="flex gap-2">

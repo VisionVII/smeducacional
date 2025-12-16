@@ -157,19 +157,21 @@ export default function ThemeCustomizerPage() {
   }
 
   return (
-    <div className="container mx-auto p-6 max-w-7xl">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">Personalização de Tema</h1>
-        <p className="text-muted-foreground">
+    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 max-w-7xl">
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-2">
+          Personalização de Tema
+        </h1>
+        <p className="text-sm sm:text-base text-muted-foreground">
           Escolha um tema e controle o modo claro/escuro independentemente
         </p>
-        <div className="mt-3 flex gap-3 flex-wrap">
-          <Button variant="outline" asChild>
+        <div className="mt-3 flex flex-col sm:flex-row gap-2 sm:gap-3 flex-wrap">
+          <Button variant="outline" asChild className="w-full sm:w-auto">
             <a href="/teacher/landing" target="_blank" rel="noreferrer">
               Ver landing com tema atual
             </a>
           </Button>
-          <Button variant="secondary" asChild>
+          <Button variant="secondary" asChild className="w-full sm:w-auto">
             <a href="/teacher/landing" target="_blank" rel="noreferrer">
               Pré-visualizar link de campanha
             </a>
@@ -178,9 +180,9 @@ export default function ThemeCustomizerPage() {
       </div>
 
       {/* Modo Dark/Light */}
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+      <Card className="mb-4 sm:mb-6">
+        <CardHeader className="px-4 sm:px-6 py-4 sm:py-5">
+          <CardTitle className="text-base sm:text-lg flex items-center gap-2">
             {systemTheme === 'dark' ? (
               <Moon className="h-5 w-5" />
             ) : (
@@ -188,20 +190,20 @@ export default function ThemeCustomizerPage() {
             )}
             Modo de Exibição
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="text-xs sm:text-sm">
             Escolha entre modo claro, escuro ou automático (sistema)
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="flex items-center justify-between">
+        <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
             <Label htmlFor="theme-mode" className="flex flex-col gap-1">
-              <span>Modo de Tema</span>
-              <span className="text-sm text-muted-foreground font-normal">
+              <span className="text-sm sm:text-base">Modo de Tema</span>
+              <span className="text-xs sm:text-sm text-muted-foreground font-normal">
                 Esta configuração é independente do tema de cores
               </span>
             </Label>
             <Select value={systemTheme} onValueChange={handleSystemThemeChange}>
-              <SelectTrigger className="w-[180px]">
+              <SelectTrigger className="w-full sm:w-[180px] min-h-[44px]">
                 <SelectValue placeholder="Selecione o modo" />
               </SelectTrigger>
               <SelectContent>
@@ -230,19 +232,19 @@ export default function ThemeCustomizerPage() {
       </Card>
 
       {/* Temas Prontos */}
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+      <Card className="mb-4 sm:mb-6">
+        <CardHeader className="px-4 sm:px-6 py-4 sm:py-5">
+          <CardTitle className="text-base sm:text-lg flex items-center gap-2">
             <Sparkles className="h-5 w-5" />
             Temas Prontos
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="text-xs sm:text-sm">
             Selecione um dos temas pré-configurados. As mudanças são aplicadas
             instantaneamente.
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
             {THEME_PRESETS.map((preset) => (
               <Card
                 key={preset.id}
@@ -278,18 +280,20 @@ export default function ThemeCustomizerPage() {
                   </div>
                 )}
 
-                <CardHeader>
-                  <CardTitle className="text-lg flex items-center justify-between">
+                <CardHeader className="px-3 sm:px-6 py-3 sm:py-5">
+                  <CardTitle className="text-base sm:text-lg flex items-center justify-between">
                     {preset.name}
                     {selectedPreset === preset.id && (
-                      <span className="text-xs bg-primary text-primary-foreground px-2 py-1 rounded">
+                      <span className="text-[10px] sm:text-xs bg-primary text-primary-foreground px-1.5 sm:px-2 py-0.5 sm:py-1 rounded">
                         Ativo
                       </span>
                     )}
                   </CardTitle>
-                  <CardDescription>{preset.description}</CardDescription>
+                  <CardDescription className="text-xs sm:text-sm">
+                    {preset.description}
+                  </CardDescription>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="px-3 sm:px-6 pb-3 sm:pb-6">
                   <div className="flex gap-2">
                     <div
                       className="w-10 h-10 rounded-full border-2 border-white shadow-md"
@@ -315,27 +319,27 @@ export default function ThemeCustomizerPage() {
       </Card>
 
       {/* Configurações avançadas */}
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+      <Card className="mb-4 sm:mb-6">
+        <CardHeader className="px-4 sm:px-6 py-4 sm:py-5">
+          <CardTitle className="text-base sm:text-lg flex items-center gap-2">
             <Palette className="h-5 w-5" />
             Personalização Avançada
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="text-xs sm:text-sm">
             Ajuste estrutura dos cards, espaçamentos e sombras do layout. O modo
             escuro usa base escura, mantendo as cores principais do tema.
           </CardDescription>
         </CardHeader>
-        <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6 grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
           <div className="space-y-2">
-            <Label>Estilo de Card</Label>
+            <Label className="text-sm sm:text-base">Estilo de Card</Label>
             <Select
               value={layoutConfig.cardStyle}
               onValueChange={(value) =>
                 setLayoutConfig((prev) => ({ ...prev, cardStyle: value }))
               }
             >
-              <SelectTrigger>
+              <SelectTrigger className="min-h-[44px]">
                 <SelectValue placeholder="Selecione" />
               </SelectTrigger>
               <SelectContent>
@@ -348,14 +352,14 @@ export default function ThemeCustomizerPage() {
           </div>
 
           <div className="space-y-2">
-            <Label>Raio dos cantos</Label>
+            <Label className="text-sm sm:text-base">Raio dos cantos</Label>
             <Select
               value={layoutConfig.borderRadius}
               onValueChange={(value) =>
                 setLayoutConfig((prev) => ({ ...prev, borderRadius: value }))
               }
             >
-              <SelectTrigger>
+              <SelectTrigger className="min-h-[44px]">
                 <SelectValue placeholder="Selecione" />
               </SelectTrigger>
               <SelectContent>
@@ -369,14 +373,14 @@ export default function ThemeCustomizerPage() {
           </div>
 
           <div className="space-y-2">
-            <Label>Sombras</Label>
+            <Label className="text-sm sm:text-base">Sombras</Label>
             <Select
               value={layoutConfig.shadowIntensity}
               onValueChange={(value) =>
                 setLayoutConfig((prev) => ({ ...prev, shadowIntensity: value }))
               }
             >
-              <SelectTrigger>
+              <SelectTrigger className="min-h-[44px]">
                 <SelectValue placeholder="Selecione" />
               </SelectTrigger>
               <SelectContent>
@@ -389,14 +393,14 @@ export default function ThemeCustomizerPage() {
           </div>
 
           <div className="space-y-2">
-            <Label>Espaçamento</Label>
+            <Label className="text-sm sm:text-base">Espaçamento</Label>
             <Select
               value={layoutConfig.spacing}
               onValueChange={(value) =>
                 setLayoutConfig((prev) => ({ ...prev, spacing: value }))
               }
             >
-              <SelectTrigger>
+              <SelectTrigger className="min-h-[44px]">
                 <SelectValue placeholder="Selecione" />
               </SelectTrigger>
               <SelectContent>
@@ -407,14 +411,19 @@ export default function ThemeCustomizerPage() {
             </Select>
           </div>
 
-          <div className="md:col-span-2 flex justify-end gap-3">
+          <div className="md:col-span-2 flex flex-col sm:flex-row justify-end gap-2 sm:gap-3">
             <Button
               variant="outline"
               onClick={() => setLayoutConfig(theme?.layout || layoutConfig)}
+              className="w-full sm:w-auto min-h-[44px]"
             >
               Restaurar layout atual
             </Button>
-            <Button onClick={handleSaveLayout} disabled={isSaving}>
+            <Button
+              onClick={handleSaveLayout}
+              disabled={isSaving}
+              className="w-full sm:w-auto min-h-[44px]"
+            >
               Salvar layout
             </Button>
           </div>
@@ -422,12 +431,17 @@ export default function ThemeCustomizerPage() {
       </Card>
 
       {/* Ações */}
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle>Ações</CardTitle>
+      <Card className="mb-4 sm:mb-6">
+        <CardHeader className="px-4 sm:px-6 py-4 sm:py-5">
+          <CardTitle className="text-base sm:text-lg">Ações</CardTitle>
         </CardHeader>
-        <CardContent className="flex gap-4">
-          <Button onClick={handleReset} variant="outline" disabled={isSaving}>
+        <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6 flex flex-col sm:flex-row gap-2 sm:gap-4">
+          <Button
+            onClick={handleReset}
+            variant="outline"
+            disabled={isSaving}
+            className="w-full sm:w-auto min-h-[44px]"
+          >
             <RotateCcw className="h-4 w-4 mr-2" />
             Restaurar Padrão
           </Button>
@@ -436,19 +450,19 @@ export default function ThemeCustomizerPage() {
 
       {/* Preview */}
       <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+        <CardHeader className="px-4 sm:px-6 py-4 sm:py-5">
+          <CardTitle className="text-base sm:text-lg flex items-center gap-2">
             <Palette className="h-5 w-5" />
             Pré-visualização
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="text-xs sm:text-sm">
             Veja como seu tema aparece nos componentes
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
           <div className="space-y-4">
             <Card>
-              <CardHeader>
+              <CardHeader className="px-4 sm:px-6 py-4 sm:py-5">
                 <CardTitle>Card de Exemplo</CardTitle>
                 <CardDescription>
                   Este é um card com o tema aplicado

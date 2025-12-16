@@ -125,14 +125,14 @@ export default async function TeacherDashboard() {
 
   return (
     <div className="min-h-screen bg-background transition-theme">
-      <div className="container mx-auto px-4 py-8 space-y-8">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6 sm:space-y-8">
         {/* Hero Section - Perfil do Professor */}
         <Card className="border-2 transition-theme">
-          <CardContent className="pt-6">
+          <CardContent className="px-4 sm:px-6 py-4 sm:py-6">
             <div className="flex flex-col md:flex-row gap-6 items-start">
               {/* Avatar e Info Principal */}
-              <div className="flex gap-4 items-start">
-                <Avatar className="h-24 w-24 border-4 border-primary/10">
+              <div className="flex gap-3 sm:gap-4 items-start w-full lg:w-auto">
+                <Avatar className="h-16 w-16 sm:h-20 sm:w-20 lg:h-24 lg:w-24 border-4 border-primary/10">
                   <AvatarImage src={professor?.avatar || undefined} />
                   <AvatarFallback className="text-2xl">
                     {professor?.name?.charAt(0) || 'P'}
@@ -141,34 +141,41 @@ export default async function TeacherDashboard() {
 
                 <div className="space-y-2">
                   <div>
-                    <h1 className="text-3xl font-bold">{professor?.name}</h1>
-                    <p className="text-lg text-muted-foreground">
+                    <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold">
+                      {professor?.name}
+                    </h1>
+                    <p className="text-sm sm:text-base lg:text-lg text-muted-foreground">
                       Professor | Educador Digital
                     </p>
                   </div>
 
-                  <div className="flex gap-2">
-                    <Badge variant="secondary" className="gap-1">
+                  <div className="flex flex-wrap gap-2">
+                    <Badge variant="secondary" className="gap-1 text-xs">
                       <CheckCircle2 className="h-3 w-3" />
                       Ativo
                     </Badge>
-                    <Badge variant="outline">
+                    <Badge variant="outline" className="text-xs">
                       {profileCompletion}% Completo
                     </Badge>
                   </div>
 
-                  <p className="text-sm text-muted-foreground max-w-2xl">
+                  <p className="text-xs sm:text-sm text-muted-foreground max-w-2xl">
                     {professor?.email}
                   </p>
 
-                  <Button asChild size="sm" variant="outline">
+                  <Button
+                    asChild
+                    size="sm"
+                    variant="outline"
+                    className="w-full sm:w-auto"
+                  >
                     <Link href="/teacher/profile">Editar Perfil</Link>
                   </Button>
                 </div>
               </div>
 
               {/* Stats Rápidas */}
-              <div className="ml-auto grid grid-cols-2 gap-4 text-center">
+              <div className="w-full lg:ml-auto grid grid-cols-2 lg:grid-cols-2 gap-3 sm:gap-4 text-center">
                 <div className="space-y-1">
                   <p className="text-2xl font-bold text-primary">
                     {stats.totalCourses}
@@ -199,7 +206,7 @@ export default async function TeacherDashboard() {
         </Card>
 
         {/* KPIs Principais */}
-        <div className="grid md:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           <Card className="hover:shadow-lg transition-all transition-theme">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
@@ -207,9 +214,11 @@ export default async function TeacherDashboard() {
               </CardTitle>
               <BookOpen className="h-4 w-4 text-primary transition-theme" />
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.publishedCourses}</div>
-              <p className="text-xs text-muted-foreground">
+            <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
+              <div className="text-xl sm:text-2xl font-bold">
+                {stats.publishedCourses}
+              </div>
+              <p className="text-[10px] sm:text-xs text-muted-foreground">
                 {stats.draftCourses} em rascunho
               </p>
             </CardContent>
@@ -256,23 +265,23 @@ export default async function TeacherDashboard() {
         </div>
 
         {/* Grid Principal - Atuação e Insights */}
-        <div className="grid lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
           {/* Coluna Esquerda - Atuação Pedagógica */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="lg:col-span-2 space-y-4 sm:space-y-6">
             {/* Meus Cursos */}
             <Card className="transition-theme">
-              <CardHeader className="flex flex-row items-center justify-between">
+              <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0 px-4 sm:px-6 py-4 sm:py-5">
                 <div>
                   <CardTitle>Atuação Pedagógica</CardTitle>
                   <CardDescription>
                     Gerencie seus cursos e conteúdos
                   </CardDescription>
                 </div>
-                <Button asChild size="sm">
+                <Button asChild size="sm" className="w-full sm:w-auto">
                   <Link href="/teacher/courses/new">Novo Curso</Link>
                 </Button>
               </CardHeader>
-              <CardContent>
+              <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
                 {courses.length === 0 ? (
                   <div className="text-center py-12">
                     <BookOpen className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
@@ -596,8 +605,8 @@ export default async function TeacherDashboard() {
 
         {/* Footer - Insights Rápidos */}
         <Card className="bg-accent/50 transition-theme">
-          <CardContent className="py-4">
-            <div className="grid md:grid-cols-4 gap-4 text-center text-sm">
+          <CardContent className="px-4 sm:px-6 py-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 text-center text-xs sm:text-sm">
               <div className="space-y-1">
                 <p className="text-muted-foreground">Perfil Concluído</p>
                 <p className="text-xl font-bold">{profileCompletion}%</p>
