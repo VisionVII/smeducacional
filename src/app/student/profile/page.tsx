@@ -124,10 +124,10 @@ export default function StudentProfilePage() {
   };
 
   return (
-    <div className="container mx-auto py-8 max-w-4xl">
+    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 max-w-4xl">
       {/* Avatar */}
-      <div className="mb-6 flex items-center gap-4">
-        <Avatar className="h-16 w-16 ring-1 ring-primary/20 shadow-sm">
+      <div className="mb-6 flex items-center gap-3 sm:gap-4">
+        <Avatar className="h-14 w-14 sm:h-16 sm:w-16 ring-1 ring-primary/20 shadow-sm">
           <AvatarImage src={session?.user?.avatar || undefined} />
           <AvatarFallback>
             {session?.user?.name?.charAt(0) || 'A'}
@@ -135,7 +135,7 @@ export default function StudentProfilePage() {
         </Avatar>
         <label
           htmlFor="student-avatar-upload"
-          className="inline-flex items-center gap-2 bg-primary text-white px-3 py-2 rounded-md hover:bg-primary/90 transition-colors cursor-pointer"
+          className="inline-flex items-center gap-2 bg-primary text-white px-3 py-2.5 sm:py-2 rounded-md hover:bg-primary/90 transition-colors cursor-pointer text-sm min-h-[44px]"
         >
           <Upload className="h-4 w-4" />
           Alterar foto
@@ -175,29 +175,39 @@ export default function StudentProfilePage() {
           />
         </label>
       </div>
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">Meu Perfil</h1>
-        <p className="text-muted-foreground">
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-2">
+          Meu Perfil
+        </h1>
+        <p className="text-sm sm:text-base text-muted-foreground">
           Gerencie suas informações pessoais e configurações de conta
         </p>
       </div>
 
-      <div className="space-y-6">
+      <div className="space-y-4 sm:space-y-6">
         {/* Informações Pessoais */}
         <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+          <CardHeader className="px-4 sm:px-6 py-4 sm:py-5">
+            <CardTitle className="text-base sm:text-lg flex items-center gap-2">
               <User className="h-5 w-5" />
               Informações Pessoais
             </CardTitle>
-            <CardDescription>Atualize seu nome e email</CardDescription>
+            <CardDescription className="text-xs sm:text-sm">
+              Atualize seu nome e email
+            </CardDescription>
           </CardHeader>
-          <CardContent>
-            <form onSubmit={handleProfileUpdate} className="space-y-4">
+          <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
+            <form
+              onSubmit={handleProfileUpdate}
+              className="space-y-3 sm:space-y-4"
+            >
               <div className="space-y-2">
-                <Label htmlFor="name">Nome Completo</Label>
+                <Label htmlFor="name" className="text-sm sm:text-base">
+                  Nome Completo
+                </Label>
                 <Input
                   id="name"
+                  className="min-h-[44px]"
                   value={formData.name}
                   onChange={(e) =>
                     setFormData({ ...formData, name: e.target.value })
@@ -207,10 +217,13 @@ export default function StudentProfilePage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email" className="text-sm sm:text-base">
+                  Email
+                </Label>
                 <Input
                   id="email"
                   type="email"
+                  className="min-h-[44px]"
                   value={formData.email}
                   onChange={(e) =>
                     setFormData({ ...formData, email: e.target.value })
@@ -220,7 +233,11 @@ export default function StudentProfilePage() {
                 />
               </div>
 
-              <Button type="submit" disabled={isLoading}>
+              <Button
+                type="submit"
+                disabled={isLoading}
+                className="w-full sm:w-auto min-h-[44px]"
+              >
                 <Save className="h-4 w-4 mr-2" />
                 Salvar Alterações
               </Button>
@@ -230,20 +247,31 @@ export default function StudentProfilePage() {
 
         {/* Alterar Senha */}
         <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+          <CardHeader className="px-4 sm:px-6 py-4 sm:py-5">
+            <CardTitle className="text-base sm:text-lg flex items-center gap-2">
               <Lock className="h-5 w-5" />
               Segurança
             </CardTitle>
-            <CardDescription>Altere sua senha de acesso</CardDescription>
+            <CardDescription className="text-xs sm:text-sm">
+              Altere sua senha de acesso
+            </CardDescription>
           </CardHeader>
-          <CardContent>
-            <form onSubmit={handlePasswordChange} className="space-y-4">
+          <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
+            <form
+              onSubmit={handlePasswordChange}
+              className="space-y-3 sm:space-y-4"
+            >
               <div className="space-y-2">
-                <Label htmlFor="currentPassword">Senha Atual</Label>
+                <Label
+                  htmlFor="currentPassword"
+                  className="text-sm sm:text-base"
+                >
+                  Senha Atual
+                </Label>
                 <Input
                   id="currentPassword"
                   type="password"
+                  className="min-h-[44px]"
                   value={passwordData.currentPassword}
                   onChange={(e) =>
                     setPasswordData({
@@ -257,10 +285,13 @@ export default function StudentProfilePage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="newPassword">Nova Senha</Label>
+                <Label htmlFor="newPassword" className="text-sm sm:text-base">
+                  Nova Senha
+                </Label>
                 <Input
                   id="newPassword"
                   type="password"
+                  className="min-h-[44px]"
                   value={passwordData.newPassword}
                   onChange={(e) =>
                     setPasswordData({
@@ -274,10 +305,16 @@ export default function StudentProfilePage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="confirmPassword">Confirmar Nova Senha</Label>
+                <Label
+                  htmlFor="confirmPassword"
+                  className="text-sm sm:text-base"
+                >
+                  Confirmar Nova Senha
+                </Label>
                 <Input
                   id="confirmPassword"
                   type="password"
+                  className="min-h-[44px]"
                   value={passwordData.confirmPassword}
                   onChange={(e) =>
                     setPasswordData({
@@ -290,7 +327,11 @@ export default function StudentProfilePage() {
                 />
               </div>
 
-              <Button type="submit" disabled={isLoading}>
+              <Button
+                type="submit"
+                disabled={isLoading}
+                className="w-full sm:w-auto min-h-[44px]"
+              >
                 <Lock className="h-4 w-4 mr-2" />
                 Alterar Senha
               </Button>

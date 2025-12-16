@@ -1,6 +1,12 @@
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/db';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { BookOpen, Award, Clock, TrendingUp } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
@@ -31,24 +37,26 @@ export default async function StudentDashboard() {
 
   const stats = {
     activeCourses: enrollments.filter((e) => e.status === 'ACTIVE').length,
-    completedCourses: enrollments.filter((e) => e.status === 'COMPLETED').length,
+    completedCourses: enrollments.filter((e) => e.status === 'COMPLETED')
+      .length,
     certificates,
     totalHours: Math.floor(Math.random() * 100), // Placeholder
   };
 
   return (
     <div className="min-h-screen bg-background">
-      
-      <div className="container mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Olá, {user.name}! 👋</h1>
-          <p className="text-muted-foreground">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+        <div className="mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-2">
+            Olá, {user.name}! 👋
+          </h1>
+          <p className="text-sm sm:text-base text-muted-foreground">
             Continue seu aprendizado onde você parou
           </p>
         </div>
 
         {/* Stats Cards */}
-        <div className="grid md:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
@@ -56,9 +64,11 @@ export default async function StudentDashboard() {
               </CardTitle>
               <BookOpen className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.activeCourses}</div>
-              <p className="text-xs text-muted-foreground">
+            <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
+              <div className="text-xl sm:text-2xl font-bold">
+                {stats.activeCourses}
+              </div>
+              <p className="text-[10px] sm:text-xs text-muted-foreground">
                 em andamento
               </p>
             </CardContent>
@@ -66,16 +76,12 @@ export default async function StudentDashboard() {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                Concluídos
-              </CardTitle>
+              <CardTitle className="text-sm font-medium">Concluídos</CardTitle>
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{stats.completedCourses}</div>
-              <p className="text-xs text-muted-foreground">
-                cursos completos
-              </p>
+              <p className="text-xs text-muted-foreground">cursos completos</p>
             </CardContent>
           </Card>
 
@@ -88,9 +94,7 @@ export default async function StudentDashboard() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{stats.certificates}</div>
-              <p className="text-xs text-muted-foreground">
-                conquistados
-              </p>
+              <p className="text-xs text-muted-foreground">conquistados</p>
             </CardContent>
           </Card>
 
@@ -103,18 +107,18 @@ export default async function StudentDashboard() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{stats.totalHours}h</div>
-              <p className="text-xs text-muted-foreground">
-                tempo total
-              </p>
+              <p className="text-xs text-muted-foreground">tempo total</p>
             </CardContent>
           </Card>
         </div>
 
         {/* Cursos em Andamento */}
-        <Card className="mb-8">
-          <CardHeader>
-            <CardTitle>Continuar Aprendendo</CardTitle>
-            <CardDescription>
+        <Card className="mb-6 sm:mb-8">
+          <CardHeader className="px-4 sm:px-6 py-4 sm:py-5">
+            <CardTitle className="text-base sm:text-lg">
+              Continuar Aprendendo
+            </CardTitle>
+            <CardDescription className="text-xs sm:text-sm">
               Seus cursos em andamento
             </CardDescription>
           </CardHeader>
@@ -133,9 +137,12 @@ export default async function StudentDashboard() {
                 </Button>
               </div>
             ) : (
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                 {enrollments.slice(0, 6).map((enrollment) => (
-                  <Card key={enrollment.id} className="hover:shadow-lg transition-shadow">
+                  <Card
+                    key={enrollment.id}
+                    className="hover:shadow-lg transition-shadow"
+                  >
                     <CardHeader>
                       <CardTitle className="text-base line-clamp-2">
                         {enrollment.course.title}
@@ -147,8 +154,12 @@ export default async function StudentDashboard() {
                     <CardContent>
                       <div className="mb-2">
                         <div className="flex justify-between text-sm mb-1">
-                          <span className="text-muted-foreground">Progresso</span>
-                          <span className="font-medium">{Math.round(enrollment.progress)}%</span>
+                          <span className="text-muted-foreground">
+                            Progresso
+                          </span>
+                          <span className="font-medium">
+                            {Math.round(enrollment.progress)}%
+                          </span>
                         </div>
                         <div className="w-full bg-secondary rounded-full h-2">
                           <div
