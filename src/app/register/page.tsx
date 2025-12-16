@@ -152,11 +152,14 @@ export default function RegisterPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="name">Nome completo</Label>
+              <Label htmlFor="name" className="text-sm">
+                Nome Completo
+              </Label>
               <Input
                 id="name"
                 type="text"
-                placeholder="João Silva"
+                placeholder="Seu nome"
+                className="min-h-[44px]"
                 value={formData.name}
                 onChange={(e) =>
                   setFormData({ ...formData, name: e.target.value })
@@ -165,11 +168,14 @@ export default function RegisterPage() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email" className="text-sm">
+                Email
+              </Label>
               <Input
                 id="email"
                 type="email"
                 placeholder="seu@email.com"
+                className="min-h-[44px]"
                 value={formData.email}
                 onChange={(e) =>
                   setFormData({ ...formData, email: e.target.value })
