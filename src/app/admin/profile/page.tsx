@@ -13,7 +13,16 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/ui/use-toast';
-import { User, Lock, Save, ShieldCheck, ShieldOff, QrCode, Upload, Camera } from 'lucide-react';
+import {
+  User,
+  Lock,
+  Save,
+  ShieldCheck,
+  ShieldOff,
+  QrCode,
+  Upload,
+  Camera,
+} from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { TwoFactorModal } from '@/components/two-factor-modal';
 
@@ -247,7 +256,9 @@ export default function AdminProfilePage() {
   return (
     <div className="container mx-auto py-4 sm:py-8 px-4 max-w-4xl">
       <div className="mb-6 sm:mb-8">
-        <h1 className="text-2xl sm:text-3xl font-bold mb-2">Meu Perfil (Admin)</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold mb-2">
+          Meu Perfil (Admin)
+        </h1>
         <p className="text-sm sm:text-base text-muted-foreground">
           Gerencie suas informações pessoais e configurações de conta
         </p>
@@ -261,17 +272,22 @@ export default function AdminProfilePage() {
               <Camera className="h-5 w-5" />
               Foto de Perfil
             </CardTitle>
-            <CardDescription className="text-sm">Atualize sua foto de perfil</CardDescription>
+            <CardDescription className="text-sm">
+              Atualize sua foto de perfil
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
               <Avatar className="h-24 w-24 sm:h-32 sm:w-32">
-                <AvatarImage src={avatarPreview || session?.user?.avatar || ''} alt="Avatar" />
+                <AvatarImage
+                  src={avatarPreview || session?.user?.avatar || ''}
+                  alt="Avatar"
+                />
                 <AvatarFallback className="text-2xl sm:text-3xl">
                   {session?.user?.name?.[0]?.toUpperCase() || 'A'}
                 </AvatarFallback>
               </Avatar>
-              
+
               <div className="flex flex-col gap-2 w-full sm:w-auto">
                 <input
                   ref={fileInputRef}
@@ -305,12 +321,16 @@ export default function AdminProfilePage() {
               <User className="h-5 w-5" />
               Informações Pessoais
             </CardTitle>
-            <CardDescription className="text-sm">Atualize seu nome e email</CardDescription>
+            <CardDescription className="text-sm">
+              Atualize seu nome e email
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleProfileUpdate} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="name" className="text-sm">Nome Completo</Label>
+                <Label htmlFor="name" className="text-sm">
+                  Nome Completo
+                </Label>
                 <Input
                   id="name"
                   value={formData.name}
@@ -323,7 +343,9 @@ export default function AdminProfilePage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="email" className="text-sm">Email</Label>
+                <Label htmlFor="email" className="text-sm">
+                  Email
+                </Label>
                 <Input
                   id="email"
                   type="email"
@@ -337,65 +359,11 @@ export default function AdminProfilePage() {
                 />
               </div>
 
-              <Button type="submit" disabled={isLoading} className="w-full sm:w-auto"
-      toast({
-        title: 'Erro',
-        description: error.message || 'Não foi possível fazer upload da foto',
-        variant: 'destructive',
-      });
-    } finally {
-      setIsUploadingAvatar(false);
-    }
-  };
-
-  return (
-    <div className="container mx-auto py-8 max-w-4xl">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">Meu Perfil (Admin)</h1>
-        <p className="text-muted-foreground">
-          Gerencie suas informações pessoais e configurações de conta
-        </p>
-      </div>
-
-      <div className="space-y-6">
-        {/* Informações Pessoais */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <User className="h-5 w-5" />
-              Informações Pessoais
-            </CardTitle>
-            <CardDescription>Atualize seu nome e email</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleProfileUpdate} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="name">Nome Completo</Label>
-                <Input
-                  id="name"
-                  value={formData.name}
-                  onChange={(e) =>
-                    setFormData({ ...formData, name: e.target.value })
-                  }
-                  required
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) =>
-                    setFormData({ ...formData, email: e.target.value })
-                  }
-                  required
-                  autoComplete="email"
-                />
-              </div>
-
-              <Button type="submit" disabled={isLoading}>
+              <Button
+                type="submit"
+                disabled={isLoading}
+                className="w-full sm:w-auto"
+              >
                 <Save className="h-4 w-4 mr-2" />
                 Salvar Alterações
               </Button>
@@ -410,12 +378,16 @@ export default function AdminProfilePage() {
               <Lock className="h-5 w-5" />
               Segurança
             </CardTitle>
-            <CardDescription className="text-sm">Altere sua senha de acesso</CardDescription>
+            <CardDescription className="text-sm">
+              Altere sua senha de acesso
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handlePasswordChange} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="currentPassword" className="text-sm">Senha Atual</Label>
+                <Label htmlFor="currentPassword" className="text-sm">
+                  Senha Atual
+                </Label>
                 <Input
                   id="currentPassword"
                   type="password"
@@ -433,7 +405,9 @@ export default function AdminProfilePage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="newPassword" className="text-sm">Nova Senha</Label>
+                <Label htmlFor="newPassword" className="text-sm">
+                  Nova Senha
+                </Label>
                 <Input
                   id="newPassword"
                   type="password"
@@ -451,7 +425,9 @@ export default function AdminProfilePage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="confirmPassword" className="text-sm">Confirmar Nova Senha</Label>
+                <Label htmlFor="confirmPassword" className="text-sm">
+                  Confirmar Nova Senha
+                </Label>
                 <Input
                   id="confirmPassword"
                   type="password"
@@ -468,7 +444,11 @@ export default function AdminProfilePage() {
                 />
               </div>
 
-              <Button type="submit" disabled={isLoading} className="w-full sm:w-auto">
+              <Button
+                type="submit"
+                disabled={isLoading}
+                className="w-full sm:w-auto"
+              >
                 <Lock className="h-4 w-4 mr-2" />
                 Alterar Senha
               </Button>
@@ -532,7 +512,9 @@ export default function AdminProfilePage() {
                         )}`}
                       />
                       <div className="text-xs break-all w-full">
-                        <div className="font-medium mb-1 text-sm">otpauth URL</div>
+                        <div className="font-medium mb-1 text-sm">
+                          otpauth URL
+                        </div>
                         <div className="p-2 bg-secondary rounded text-xs overflow-auto">
                           {twoFA.otpauth}
                         </div>
