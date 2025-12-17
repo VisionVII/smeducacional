@@ -10,9 +10,9 @@ import { CookieBanner } from '@/components/cookie-banner';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'SM Educacional - Sistema Escolar Completo',
+  title: 'SM Educa - Plataforma Educacional Completa',
   description:
-    'Plataforma moderna de ensino com cursos, certificados e gestão completa',
+    'Sistema moderno de gestão educacional com cursos, certificados, videoaulas e muito mais',
 };
 
 export default function RootLayout({

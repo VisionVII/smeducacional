@@ -49,7 +49,7 @@ export default function AdminAccessPage() {
       <header className="border-b sticky top-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm z-50">
         <div className="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
           <Link href="/" className="text-2xl font-bold text-red-600">
-            SMEducacional
+            SM Educa
           </Link>
           <div className="flex gap-4">
             <Button variant="ghost" asChild>
@@ -77,7 +77,7 @@ export default function AdminAccessPage() {
             </h1>
 
             <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-              Gerenciamento central da plataforma SMEducacional. Apenas
+              Gerenciamento central da plataforma SM Educa. Apenas
               administradores autorizados têm acesso.
             </p>
           </div>

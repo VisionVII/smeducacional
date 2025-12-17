@@ -1,22 +1,22 @@
-# 🚀 VisionVII - Projetos Público
+# 🚀 SM Educa - Sistema Educacional Completo
 
 <div align="center">
   
-  ![VisionVII Logo](https://img.shields.io/badge/VisionVII-Inovação%20Digital-blue?style=for-the-badge)
+  ![SM Educa Logo](https://img.shields.io/badge/SM_Educa-Plataforma_Educacional-blue?style=for-the-badge)
   
-  **Transformando ideias em soluções digitais inovadoras**
+  **Transformando educação através da tecnologia**
   
-  [![Portfolio](https://img.shields.io/badge/Portfolio-VisionVII-orange?style=flat-square)](https://github.com/VisionVII)
   [![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
-  [![Status](https://img.shields.io/badge/Status-Ativo-success?style=flat-square)](https://github.com/VisionVII)
+  [![Status](https://img.shields.io/badge/Status-Ativo-success?style=flat-square)](https://github.com/SM-Educa)
+  [![Next.js](https://img.shields.io/badge/Next.js-16.0-black?style=flat-square)](https://nextjs.org/)
 
 </div>
 
 ---
 
-## 🎯 Sobre a VisionVII
+## 🎯 Sobre o SM Educa
 
-A **VisionVII** é uma empresa focada em **desenvolvimento de software**, **inovação tecnológica** e **transformação digital**. Nascemos com a missão de criar soluções que impactam positivamente pessoas e empresas através da tecnologia.
+O **SM Educa** é uma plataforma completa de **gestão educacional** e **e-learning**. Desenvolvido com tecnologias modernas para proporcionar a melhor experiência de aprendizado online.
 
 ### 🌟 Nossa Visão
 

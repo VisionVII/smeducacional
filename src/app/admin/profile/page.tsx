@@ -1,7 +1,7 @@
 'use client';
 
 import { useSession } from 'next-auth/react';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import {
   Card,
   CardContent,
@@ -13,7 +13,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/ui/use-toast';
-import { User, Lock, Save, ShieldCheck, ShieldOff, QrCode } from 'lucide-react';
+import { User, Lock, Save, ShieldCheck, ShieldOff, QrCode, Upload, Camera } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { TwoFactorModal } from '@/components/two-factor-modal';
 
@@ -21,6 +21,8 @@ export default function AdminProfilePage() {
   const { data: session, update } = useSession();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [formData, setFormData] = useState({
     name: session?.user?.name || '',
     email: session?.user?.email || '',
@@ -39,6 +41,9 @@ export default function AdminProfilePage() {
   });
   const [showVerifyModal, setShowVerifyModal] = useState(false);
   const [pendingVerificationCode, setPendingVerificationCode] = useState('');
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(
+    session?.user?.avatar || null
+  );
 
   const handleProfileUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -181,6 +186,110 @@ export default function AdminProfilePage() {
     }
   };
 
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];4 sm:py-8 px-4 max-w-4xl">
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-2xl sm:text-3xl font-bold mb-2">Meu Perfil (Admin)</h1>
+        <p className="text-sm sm:text-base text-muted-foreground">
+          Gerencie suas informações pessoais e configurações de conta
+        </p>
+      </div>
+
+      <div className="space-y-4 sm:space-y-6">
+        {/* Avatar */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
+              <Camera className="h-5 w-5" />
+              Foto de Perfil
+            </CardTitle>
+            <CardDescription className="text-sm">Atualize sua foto de perfil</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
+              <Avatar className="h-24 w-24 sm:h-32 sm:w-32">
+                <AvatarImage src={avatarPreview || session?.user?.avatar || ''} alt="Avatar" />
+                <AvatarFallback className="text-2xl sm:text-3xl">
+                  {session?.user?.name?.[0]?.toUpperCase() || 'A'}
+                </AvatarFallback>
+              </Avatar>
+              
+              <div className="flex flex-col gap-2 w-full sm:w-auto">
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/jpeg,image/jpg,image/png,image/webp"
+                  onChange={handleAvatarUpload}
+                  className="hidden"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={isUploadingAvatar}
+                  className="w-full sm:w-auto"
+                >
+                  <Upload className="h-4 w-4 mr-2" />
+                  {isUploadingAvatar ? 'Enviando...' : 'Escolher Foto'}
+                </Button>
+                <p className="text-xs text-muted-foreground text-center sm:text-left">
+                  JPG, PNG ou WEBP. Máx 5MB
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Informações Pessoais */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
+              <User className="h-5 w-5" />
+              Informações Pessoais
+            </CardTitle>
+            <CardDescription className="text-sm">Atualize seu nome e email</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleProfileUpdate} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="name" className="text-sm">Nome Completo</Label>
+                <Input
+                  id="name"
+                  value={formData.name}
+                  onChange={(e) =>
+                    setFormData({ ...formData, name: e.target.value })
+                  }
+                  required
+                  className="text-sm"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="email" className="text-sm">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) =>
+                    setFormData({ ...formData, email: e.target.value })
+                  }
+                  required
+                  autoComplete="email"
+                  className="text-sm"
+                />
+              </div>
+
+              <Button type="submit" disabled={isLoading} className="w-full sm:w-auto"
+      toast({
+        title: 'Erro',
+        description: error.message || 'Não foi possível fazer upload da foto',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsUploadingAvatar(false);
+    }
+  };
+
   return (
     <div className="container mx-auto py-8 max-w-4xl">
       <div className="mb-8">
@@ -239,16 +348,16 @@ export default function AdminProfilePage() {
         {/* Alterar Senha */}
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
               <Lock className="h-5 w-5" />
               Segurança
             </CardTitle>
-            <CardDescription>Altere sua senha de acesso</CardDescription>
+            <CardDescription className="text-sm">Altere sua senha de acesso</CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handlePasswordChange} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="currentPassword">Senha Atual</Label>
+                <Label htmlFor="currentPassword" className="text-sm">Senha Atual</Label>
                 <Input
                   id="currentPassword"
                   type="password"
@@ -261,11 +370,12 @@ export default function AdminProfilePage() {
                   }
                   required
                   autoComplete="current-password"
+                  className="text-sm"
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="newPassword">Nova Senha</Label>
+                <Label htmlFor="newPassword" className="text-sm">Nova Senha</Label>
                 <Input
                   id="newPassword"
                   type="password"
@@ -278,11 +388,12 @@ export default function AdminProfilePage() {
                   }
                   required
                   autoComplete="new-password"
+                  className="text-sm"
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="confirmPassword">Confirmar Nova Senha</Label>
+                <Label htmlFor="confirmPassword" className="text-sm">Confirmar Nova Senha</Label>
                 <Input
                   id="confirmPassword"
                   type="password"
@@ -295,10 +406,11 @@ export default function AdminProfilePage() {
                   }
                   required
                   autoComplete="new-password"
+                  className="text-sm"
                 />
               </div>
 
-              <Button type="submit" disabled={isLoading}>
+              <Button type="submit" disabled={isLoading} className="w-full sm:w-auto">
                 <Lock className="h-4 w-4 mr-2" />
                 Alterar Senha
               </Button>
@@ -309,18 +421,18 @@ export default function AdminProfilePage() {
         {/* 2FA */}
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
               <ShieldCheck className="h-5 w-5" />
               Autenticação em Duas Etapas (2FA)
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-sm">
               Proteja sua conta com TOTP (Google Authenticator, Authy)
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             {twoFA.enabled ? (
               <div className="space-y-3">
-                <p className="text-green-600">
+                <p className="text-sm text-green-600">
                   2FA está habilitado nesta conta.
                 </p>
                 <Button
@@ -328,6 +440,8 @@ export default function AdminProfilePage() {
                   variant="destructive"
                   onClick={handleDisable2FA}
                   disabled={isLoading}
+                  size="sm"
+                  className="w-full sm:w-auto"
                 >
                   <ShieldOff className="h-4 w-4 mr-2" />
                   Desabilitar 2FA
@@ -340,6 +454,8 @@ export default function AdminProfilePage() {
                     type="button"
                     onClick={handleSetup2FA}
                     disabled={isLoading}
+                    size="sm"
+                    className="w-full sm:w-auto"
                   >
                     <QrCode className="h-4 w-4 mr-2" />
                     Gerar QR Code 2FA
@@ -349,7 +465,7 @@ export default function AdminProfilePage() {
                     <p className="text-sm text-muted-foreground">
                       Abra seu app de autenticação e escaneie este QR:
                     </p>
-                    <div className="flex items-center gap-4">
+                    <div className="flex flex-col sm:flex-row items-center gap-4">
                       <img
                         alt="QR Code 2FA"
                         className="w-40 h-40 rounded border"
@@ -357,9 +473,9 @@ export default function AdminProfilePage() {
                           twoFA.otpauth!
                         )}`}
                       />
-                      <div className="text-xs break-all">
-                        <div className="font-medium mb-1">otpauth URL</div>
-                        <div className="p-2 bg-secondary rounded">
+                      <div className="text-xs break-all w-full">
+                        <div className="font-medium mb-1 text-sm">otpauth URL</div>
+                        <div className="p-2 bg-secondary rounded text-xs overflow-auto">
                           {twoFA.otpauth}
                         </div>
                       </div>
@@ -368,6 +484,8 @@ export default function AdminProfilePage() {
                       type="button"
                       onClick={() => setShowVerifyModal(true)}
                       disabled={isLoading}
+                      size="sm"
+                      className="w-full sm:w-auto"
                     >
                       <ShieldCheck className="h-4 w-4 mr-2" />
                       Verificar e Habilitar

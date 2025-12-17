@@ -98,7 +98,7 @@ export default async function VerifyCertificatePage({ params }: PageProps) {
                   Certificado de Conclusão
                 </h3>
                 <p className="text-muted-foreground text-sm">
-                  Emitido por SM Educacional - VisionVII
+                  Emitido por SM Educa
                 </p>
               </div>
             </div>
