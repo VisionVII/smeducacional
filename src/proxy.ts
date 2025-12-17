@@ -65,7 +65,7 @@ function addSecurityHeaders(response: NextResponse): NextResponse {
   return response;
 }
 
-export async function GET(request: NextRequest) {
+export default async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   const token = await getToken({

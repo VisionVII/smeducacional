@@ -187,7 +187,65 @@ export default function AdminProfilePage() {
   };
 
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];4 sm:py-8 px-4 max-w-4xl">
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validar tipo
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+    if (!allowedTypes.includes(file.type)) {
+      toast({
+        title: 'Erro',
+        description: 'Tipo de arquivo inválido. Use JPG, PNG ou WEBP',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    // Validar tamanho (5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast({
+        title: 'Erro',
+        description: 'Arquivo muito grande. Máximo 5MB',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    setIsUploadingAvatar(true);
+
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const res = await fetch('/api/admin/avatar', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) throw new Error(data.error || 'Erro ao fazer upload');
+
+      setAvatarPreview(data.avatarUrl);
+      await update();
+
+      toast({
+        title: 'Foto atualizada',
+        description: 'Sua foto de perfil foi atualizada com sucesso.',
+      });
+    } catch (error: any) {
+      toast({
+        title: 'Erro',
+        description: error.message || 'Não foi possível fazer upload da foto',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsUploadingAvatar(false);
+    }
+  };
+
+  return (
+    <div className="container mx-auto py-4 sm:py-8 px-4 max-w-4xl">
       <div className="mb-6 sm:mb-8">
         <h1 className="text-2xl sm:text-3xl font-bold mb-2">Meu Perfil (Admin)</h1>
         <p className="text-sm sm:text-base text-muted-foreground">
