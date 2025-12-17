@@ -339,9 +339,6 @@ export default async function NewAdminDashboard() {
           >
             <AreaChartComponent
               data={dailyStats.map((d) => ({ name: d.date, value: d.users }))}
-              dataKey="value"
-              xAxisKey="name"
-              color="hsl(var(--chart-1))"
             />
           </DashboardCard>
 
@@ -357,9 +354,6 @@ export default async function NewAdminDashboard() {
                 name: d.date,
                 value: d.enrollments,
               }))}
-              dataKey="value"
-              xAxisKey="name"
-              color="hsl(var(--chart-2))"
             />
           </DashboardCard>
 
@@ -372,9 +366,6 @@ export default async function NewAdminDashboard() {
           >
             <BarChartComponent
               data={dailyStats.map((d) => ({ name: d.date, value: d.revenue }))}
-              dataKey="value"
-              xAxisKey="name"
-              color="hsl(var(--chart-3))"
             />
           </DashboardCard>
 
