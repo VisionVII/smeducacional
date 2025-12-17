@@ -115,7 +115,7 @@ export default async function NewAdminDashboard() {
       select: {
         id: true,
         enrolledAt: true,
-        user: {
+        student: {
           select: {
             name: true,
             email: true,
@@ -251,7 +251,7 @@ export default async function NewAdminDashboard() {
     })),
     ...recentEnrollments.map((enrollment) => ({
       id: `enrollment-${enrollment.id}`,
-      user: enrollment.user,
+      user: enrollment.student,
       action: `Matriculou-se em ${enrollment.course.title}`,
       type: 'enrollment' as const,
       createdAt: enrollment.enrolledAt,

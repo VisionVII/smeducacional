@@ -1,18 +1,22 @@
 # 🎨 Novo Dashboard Admin Profissional
 
 ## 📍 Localização
+
 `/admin/dashboard/new`
 
 ## 🎯 Características Principais
 
 ### ✅ Responsividade Mobile-First
+
 - **100% otimizado para dispositivos móveis**
 - Breakpoints inteligentes (mobile → tablet → desktop)
 - Texto e ícones escaláveis
 - Cards com layout adaptativo (coluna → linha)
 
 ### ✅ Sistema de Personalização de Layout
+
 - **4 modos de visualização:**
+
   - **Mobile First**: Otimizado para telas pequenas (padrão)
   - **Compacto**: Máximo de cards visíveis
   - **Confortável**: Equilíbrio perfeito
@@ -25,15 +29,15 @@
 ### ✅ Componentes Modulares
 
 #### 1. `<DashboardGrid>`
+
 Grid responsivo e personalizável com controles de layout.
 
 ```tsx
-<DashboardGrid storageKey="meu-dashboard">
-  {/* Cards aqui */}
-</DashboardGrid>
+<DashboardGrid storageKey="meu-dashboard">{/* Cards aqui */}</DashboardGrid>
 ```
 
 #### 2. `<StatCard>`
+
 Cards de estatísticas com ícones, valores, trends e variants coloridos.
 
 ```tsx
@@ -42,12 +46,13 @@ Cards de estatísticas com ícones, valores, trends e variants coloridos.
   value={1250}
   icon={Users}
   variant="primary"
-  trend={{ value: "+12% este mês", positive: true }}
+  trend={{ value: '+12% este mês', positive: true }}
   subtitle="Todos cadastrados"
 />
 ```
 
 **Variants disponíveis:**
+
 - `default` - Cinza padrão
 - `primary` - Azul
 - `success` - Verde
@@ -55,6 +60,7 @@ Cards de estatísticas com ícones, valores, trends e variants coloridos.
 - `danger` - Vermelho
 
 #### 3. `<DashboardCard>`
+
 Card genérico para conteúdo customizado (gráficos, listas, etc).
 
 ```tsx
@@ -69,6 +75,7 @@ Card genérico para conteúdo customizado (gráficos, listas, etc).
 ```
 
 #### 4. `<RecentActivity>`
+
 Lista de atividades recentes com avatares, badges e timestamps.
 
 ```tsx
@@ -80,13 +87,16 @@ Lista de atividades recentes com avatares, badges e timestamps.
 ```
 
 ### ✅ Gráficos Interativos
+
 Integração completa com `chart-components.tsx`:
+
 - **AreaChart**: Crescimento de usuários
 - **LineChart**: Matrículas diárias
 - **BarChart**: Receita diária
 - Todos responsivos via ResponsiveContainer
 
 ### ✅ Performance Otimizada
+
 - **Queries paralelas** com `Promise.all()`
 - **Transações Prisma** para consistência
 - **Server Components** por padrão (zero JS no cliente quando possível)
@@ -95,18 +105,21 @@ Integração completa com `chart-components.tsx`:
 ## 🎨 Design Profissional
 
 ### Sistema de Cores
+
 - Variants com cores semânticas (primary, success, warning, danger)
 - Modo escuro totalmente suportado
 - Gradientes sutis em cards de ícones
 - Hover states com shadow-lg
 
 ### Tipografia Responsiva
+
 ```tsx
 text-xs sm:text-sm lg:text-base  // Labels
 text-2xl sm:text-3xl lg:text-4xl // Headers
 ```
 
 ### Espaçamento Adaptativo
+
 ```tsx
 gap-3 sm:gap-4 lg:gap-6          // Grid gaps
 px-3 sm:px-4 lg:px-6             // Paddings
@@ -116,39 +129,46 @@ py-4 sm:py-6 lg:py-8             // Margins verticais
 ## 📊 Dados Exibidos
 
 ### Estatísticas Principais
+
 - Total de usuários (com trend mensal)
 - Cursos disponíveis
 - Matrículas (com trend semanal)
 - Receita total
 
 ### Gráficos (Últimos 7 dias)
+
 - Crescimento de usuários
 - Matrículas diárias
 - Receita diária (R$)
 
 ### Outros Dados
+
 - Distribuição de usuários por role (com barras de progresso)
 - Atividade recente unificada (usuários + matrículas + cursos)
 
 ## 🚀 Como Usar
 
 ### 1. Acessar o novo dashboard
+
 ```
 /admin/dashboard/new
 ```
 
 ### 2. Personalizar layout
+
 1. Clique em **"Personalizar"**
 2. Selecione um layout no dropdown **"Layout"**
 3. Sua escolha é salva automaticamente
 4. Clique em **"Aplicar"** para sair do modo de edição
 
 ### 3. Resetar para padrão
+
 Menu "Layout" → "Resetar Padrão"
 
 ## 🔧 Arquivos Criados
 
 ### Componentes
+
 ```
 src/components/admin/
 ├── dashboard-grid.tsx      # Sistema de grid personalizável
@@ -158,12 +178,14 @@ src/components/admin/
 ```
 
 ### UI Components
+
 ```
 src/components/ui/
 └── dropdown-menu.tsx       # Componente de menu dropdown
 ```
 
 ### Páginas
+
 ```
 src/app/admin/dashboard/
 └── new/
@@ -173,17 +195,20 @@ src/app/admin/dashboard/
 ## 📱 Responsividade
 
 ### Mobile (< 640px)
+
 - 1 coluna
 - Textos menores
 - Cards full-width
 - Icons compactos (h-4 w-4)
 
 ### Tablet (640px - 1024px)
+
 - 2 colunas
 - Textos médios
 - Cards lado a lado
 
 ### Desktop (> 1024px)
+
 - 3-4 colunas (depende do layout escolhido)
 - Textos grandes
 - Max-width container para não esticar demais
