@@ -1,6 +1,7 @@
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 import { redirect } from 'next/navigation';
+import { Metadata } from 'next';
 import {
   Users,
   BookOpen,
@@ -22,7 +23,7 @@ import {
 } from '@/components/admin/chart-components';
 import { format, subDays } from 'date-fns';
 
-export const metadata = {
+export const metadata: Metadata = {
   title: 'Dashboard Admin | SM Educa',
   description: 'Painel administrativo completo',
 };
@@ -337,9 +338,9 @@ export default async function NewAdminDashboard() {
             className="sm:col-span-2 lg:col-span-2"
           >
             <AreaChartComponent
-              data={dailyStats}
-              dataKey="users"
-              xAxisKey="date"
+              data={dailyStats.map((d) => ({ name: d.date, value: d.users }))}
+              dataKey="value"
+              xAxisKey="name"
               color="hsl(var(--chart-1))"
             />
           </DashboardCard>
@@ -352,9 +353,12 @@ export default async function NewAdminDashboard() {
             className="sm:col-span-2 lg:col-span-2"
           >
             <LineChartComponent
-              data={dailyStats}
-              dataKey="enrollments"
-              xAxisKey="date"
+              data={dailyStats.map((d) => ({
+                name: d.date,
+                value: d.enrollments,
+              }))}
+              dataKey="value"
+              xAxisKey="name"
               color="hsl(var(--chart-2))"
             />
           </DashboardCard>
@@ -367,9 +371,9 @@ export default async function NewAdminDashboard() {
             className="sm:col-span-2 lg:col-span-2"
           >
             <BarChartComponent
-              data={dailyStats}
-              dataKey="revenue"
-              xAxisKey="date"
+              data={dailyStats.map((d) => ({ name: d.date, value: d.revenue }))}
+              dataKey="value"
+              xAxisKey="name"
               color="hsl(var(--chart-3))"
             />
           </DashboardCard>
