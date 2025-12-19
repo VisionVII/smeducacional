@@ -194,9 +194,26 @@ export default function LoginPage() {
     }
   };
 
+  const loginBgStyle = branding.loginBgUrl
+    ? {
+        backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(${branding.loginBgUrl})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+      }
+    : {};
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-800 p-4">
-      <Card className="w-full max-w-md">
+    <div
+      className="min-h-screen flex items-center justify-center p-4 relative"
+      style={loginBgStyle}
+    >
+      {/* Fallback gradient se não houver imagem */}
+      {!branding.loginBgUrl && (
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-purple-500/5 to-pink-500/5 dark:from-primary/10 dark:via-purple-500/10 dark:to-pink-500/10" />
+      )}
+
+      <Card className="w-full max-w-md relative z-10 shadow-2xl backdrop-blur-sm bg-background/95 border-2">
         <CardHeader className="space-y-1 text-center">
           <div className="flex justify-center mb-4">
             {branding.logoUrl ? (
@@ -212,10 +229,11 @@ export default function LoginPage() {
             )}
           </div>
           <CardTitle className="text-2xl font-bold">
-            Bem-vindo de volta
+            {branding.loginTitle || 'Bem-vindo de volta'}
           </CardTitle>
           <CardDescription className="text-sm">
-            Entre com suas credenciais para acessar sua conta
+            {branding.loginDescription ||
+              'Entre com suas credenciais para acessar sua conta'}
           </CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit}>

@@ -312,6 +312,11 @@ export const authOptions: NextAuthOptions = {
     async redirect({ url, baseUrl }) {
       console.log('[auth][redirect] Processando redirect:', { url, baseUrl });
 
+      // NUNCA redirecionar rotas da API (causa erro CLIENT_FETCH_ERROR)
+      if (url.includes('/api/')) {
+        return url;
+      }
+
       // Se URL é relativa e começa com /, usar direto com baseUrl
       if (url.startsWith('/')) {
         return `${baseUrl}${url}`;

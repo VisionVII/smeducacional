@@ -11,9 +11,18 @@ export async function GET() {
         systemName: true,
         logoUrl: true,
         faviconUrl: true,
+        loginBgUrl: true,
         navbarBgUrl: true,
         primaryColor: true,
         secondaryColor: true,
+        homeTitle: true,
+        homeDescription: true,
+        loginTitle: true,
+        loginDescription: true,
+        registerTitle: true,
+        registerDescription: true,
+        coursesTitle: true,
+        coursesDescription: true,
       },
     });
 
@@ -24,9 +33,19 @@ export async function GET() {
         systemName: 'SM Educacional',
         logoUrl: null,
         faviconUrl: null,
+        loginBgUrl: null,
         navbarBgUrl: null,
         primaryColor: null,
         secondaryColor: null,
+        homeTitle: 'Bem-vindo ao SM Educacional',
+        homeDescription: 'Transforme seu futuro com educação de qualidade',
+        loginTitle: 'Bem-vindo de volta',
+        loginDescription: 'Entre com suas credenciais para acessar sua conta',
+        registerTitle: 'Crie sua conta',
+        registerDescription: 'Comece sua jornada de aprendizado hoje',
+        coursesTitle: 'Nossos Cursos',
+        coursesDescription:
+          'Descubra cursos incríveis para alavancar sua carreira',
       });
     }
 

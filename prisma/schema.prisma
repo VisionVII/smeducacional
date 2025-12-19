@@ -879,6 +879,16 @@ model SystemConfig {
   // Tema global do sistema (V2.0 - Hierárquico)
   themePresetId   String?  @default("academic-blue") // ID do preset de tema (academic-blue, forest-green, etc)
   
+  // Configurações de páginas públicas (títulos e descrições personalizadas)
+  homeTitle       String?  @default("Bem-vindo ao SM Educacional")
+  homeDescription String?  @default("Transforme seu futuro com educação de qualidade")
+  loginTitle      String?  @default("Bem-vindo de volta")
+  loginDescription String? @default("Entre com suas credenciais para acessar sua conta")
+  registerTitle   String?  @default("Crie sua conta")
+  registerDescription String? @default("Comece sua jornada de aprendizado hoje")
+  coursesTitle    String?  @default("Nossos Cursos")
+  coursesDescription String? @default("Descubra cursos incríveis para alavancar sua carreira")
+  
   // Configurações de SEO
   metaTitle       String?
   metaDescription String?

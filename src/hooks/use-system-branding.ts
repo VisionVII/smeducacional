@@ -7,9 +7,19 @@ interface SystemBranding {
   systemName: string;
   logoUrl: string | null;
   faviconUrl: string | null;
+  loginBgUrl: string | null;
   navbarBgUrl: string | null;
   primaryColor: string | null;
   secondaryColor: string | null;
+  // Títulos e descrições de páginas públicas
+  homeTitle: string;
+  homeDescription: string;
+  loginTitle: string;
+  loginDescription: string;
+  registerTitle: string;
+  registerDescription: string;
+  coursesTitle: string;
+  coursesDescription: string;
 }
 
 // Cache global para evitar re-fetches desnecessários
@@ -23,9 +33,18 @@ export function useSystemBranding() {
     systemName: 'SM Educacional',
     logoUrl: null,
     faviconUrl: null,
+    loginBgUrl: null,
     navbarBgUrl: null,
     primaryColor: null,
     secondaryColor: null,
+    homeTitle: 'Bem-vindo ao SM Educacional',
+    homeDescription: 'Transforme seu futuro com educação de qualidade',
+    loginTitle: 'Bem-vindo de volta',
+    loginDescription: 'Entre com suas credenciais para acessar sua conta',
+    registerTitle: 'Crie sua conta',
+    registerDescription: 'Comece sua jornada de aprendizado hoje',
+    coursesTitle: 'Nossos Cursos',
+    coursesDescription: 'Descubra cursos incríveis para alavancar sua carreira',
   });
   const [loading, setLoading] = useState(true);
 

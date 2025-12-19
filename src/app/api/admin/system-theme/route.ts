@@ -60,11 +60,11 @@ export async function PUT(request: Request) {
 
     const { themePresetId } = result.data;
 
-    // Atualizar SystemConfig (upsert garante que existe)
+    // Atualizar SystemConfig (upsert pelo campo 'key' único)
     await prisma.systemConfig.upsert({
-      where: { id: 'system' },
+      where: { key: 'system' }, // Buscar pelo campo único 'key'
       create: {
-        id: 'system',
+        key: 'system',
         themePresetId,
         companyName: 'SM Educacional',
         systemName: 'SM Educacional',
@@ -105,9 +105,9 @@ export async function DELETE() {
 
     // Resetar SystemConfig para Academic Blue
     await prisma.systemConfig.upsert({
-      where: { id: 'system' },
+      where: { key: 'system' }, // Buscar pelo campo único 'key'
       create: {
-        id: 'system',
+        key: 'system',
         themePresetId: 'academic-blue',
         companyName: 'SM Educacional',
         systemName: 'SM Educacional',
