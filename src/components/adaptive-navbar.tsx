@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { Navbar } from '@/components/navbar';
 import { PublicNavbar } from '@/components/public-navbar';
-import { NavbarThemeProvider } from '@/components/navbar-theme-provider';
 import { useSystemBranding } from '@/hooks/use-system-branding';
 import {
   LayoutDashboard,
@@ -131,7 +130,7 @@ export function AdaptiveNavbar() {
       case 'ADMIN':
         links = [
           {
-            href: '/admin/dashboard',
+            href: '/admin',
             label: 'Dashboard',
             icon: <LayoutDashboard className="h-4 w-4" />,
           },
@@ -160,17 +159,15 @@ export function AdaptiveNavbar() {
     }
 
     return (
-      <NavbarThemeProvider>
-        <Navbar
-          user={{
-            name: session.user.name || 'Usuário',
-            email: session.user.email || '',
-            role: userRole,
-            avatar: (session.user as any).avatar || null,
-          }}
-          links={links}
-        />
-      </NavbarThemeProvider>
+      <Navbar
+        user={{
+          name: session.user.name || 'Usuário',
+          email: session.user.email || '',
+          role: userRole,
+          avatar: (session.user as any).avatar || null,
+        }}
+        links={links}
+      />
     );
   }
 

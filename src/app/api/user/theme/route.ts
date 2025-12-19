@@ -1,144 +1,68 @@
+/**
+ * ============================================
+ * USER THEME API ROUTES - SISTEMA V2.0
+ * ============================================
+ *
+ * GET: Busca tema do usuário
+ * PUT: Atualiza tema (preset + card config)
+ * DELETE: Reset para tema padrão
+ */
+
+import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/db';
-import { NextResponse } from 'next/server';
+import { getUserTheme, createDefaultTheme } from '@/lib/themes/get-user-theme';
 import { z } from 'zod';
 
-// Schema de validação para paleta de cores
-const paletteSchema = z.object({
-  background: z
-    .string()
-    .regex(
-      /^\d+(\.\d+)?\s+\d+(\.\d+)?%\s+\d+(\.\d+)?%$/,
-      'Formato HSL inválido'
-    ),
-  foreground: z
-    .string()
-    .regex(
-      /^\d+(\.\d+)?\s+\d+(\.\d+)?%\s+\d+(\.\d+)?%$/,
-      'Formato HSL inválido'
-    ),
-  primary: z
-    .string()
-    .regex(
-      /^\d+(\.\d+)?\s+\d+(\.\d+)?%\s+\d+(\.\d+)?%$/,
-      'Formato HSL inválido'
-    ),
-  primaryForeground: z
-    .string()
-    .regex(
-      /^\d+(\.\d+)?\s+\d+(\.\d+)?%\s+\d+(\.\d+)?%$/,
-      'Formato HSL inválido'
-    ),
-  secondary: z
-    .string()
-    .regex(
-      /^\d+(\.\d+)?\s+\d+(\.\d+)?%\s+\d+(\.\d+)?%$/,
-      'Formato HSL inválido'
-    ),
-  secondaryForeground: z
-    .string()
-    .regex(
-      /^\d+(\.\d+)?\s+\d+(\.\d+)?%\s+\d+(\.\d+)?%$/,
-      'Formato HSL inválido'
-    ),
-  accent: z
-    .string()
-    .regex(
-      /^\d+(\.\d+)?\s+\d+(\.\d+)?%\s+\d+(\.\d+)?%$/,
-      'Formato HSL inválido'
-    ),
-  accentForeground: z
-    .string()
-    .regex(
-      /^\d+(\.\d+)?\s+\d+(\.\d+)?%\s+\d+(\.\d+)?%$/,
-      'Formato HSL inválido'
-    ),
-  card: z
-    .string()
-    .regex(
-      /^\d+(\.\d+)?\s+\d+(\.\d+)?%\s+\d+(\.\d+)?%$/,
-      'Formato HSL inválido'
-    ),
-  cardForeground: z
-    .string()
-    .regex(
-      /^\d+(\.\d+)?\s+\d+(\.\d+)?%\s+\d+(\.\d+)?%$/,
-      'Formato HSL inválido'
-    ),
-  muted: z
-    .string()
-    .regex(
-      /^\d+(\.\d+)?\s+\d+(\.\d+)?%\s+\d+(\.\d+)?%$/,
-      'Formato HSL inválido'
-    ),
-  mutedForeground: z
-    .string()
-    .regex(
-      /^\d+(\.\d+)?\s+\d+(\.\d+)?%\s+\d+(\.\d+)?%$/,
-      'Formato HSL inválido'
-    ),
-});
+// ============================================
+// SCHEMAS ZOD (VALIDAÇÃO SERVER-SIDE)
+// ============================================
 
-// Schema de validação para layout
-const layoutSchema = z.object({
-  cardStyle: z.enum(['default', 'bordered', 'elevated', 'flat']),
-  borderRadius: z
-    .string()
-    .regex(/^\d+(\.\d+)?(rem|px|em)$/, 'Formato de border radius inválido'),
-  shadowIntensity: z.enum(['none', 'light', 'medium', 'strong']),
-  spacing: z.enum(['compact', 'comfortable', 'spacious']),
-});
-
-// Schema de validação para animações
-const animationsSchema = z.object({
-  enabled: z.boolean(),
-  duration: z.enum(['slow', 'normal', 'fast']),
-  easing: z.enum([
-    'ease-in-out',
-    'ease-in',
-    'ease-out',
-    'cubic-bezier(0.68, -0.55, 0.265, 1.55)',
+const updateThemeSchema = z.object({
+  presetId: z.enum([
+    'academic-blue',
+    'forest-green',
+    'sunset-orange',
+    'royal-purple',
+    'ocean-teal',
+    'crimson-red',
   ]),
-  transitions: z.array(z.enum(['all', 'colors', 'transforms', 'opacity'])),
-  hover: z.boolean(),
-  focus: z.boolean(),
-  pageTransitions: z.boolean(),
+  cardStyle: z.enum(['FLAT', 'ELEVATED', 'BORDERED', 'GLASS']).optional(),
+  cardShadow: z.enum(['NONE', 'LIGHT', 'MEDIUM', 'STRONG', 'XL']).optional(),
+  cardBorder: z.boolean().optional(),
+  card3D: z.boolean().optional(),
+  cardGlass: z.boolean().optional(),
+  spacing: z
+    .enum(['COMPACT', 'COMFORTABLE', 'SPACIOUS', 'EXTRA_SPACIOUS'])
+    .optional(),
+  borderRadius: z
+    .enum(['NONE', 'SMALL', 'MEDIUM', 'LARGE', 'XL', 'FULL'])
+    .optional(),
+  animationsEnabled: z.boolean().optional(),
+  animationSpeed: z
+    .enum(['DISABLED', 'FAST', 'NORMAL', 'SLOW', 'VERY_SLOW'])
+    .optional(),
+  hoverEffects: z.boolean().optional(),
+  fontSize: z.enum(['SMALL', 'NORMAL', 'LARGE', 'EXTRA_LARGE']).optional(),
 });
 
-// Schema completo para PUT
-const themeSchema = z.object({
-  palette: paletteSchema.optional(),
-  layout: layoutSchema.optional(),
-  animations: animationsSchema.optional(),
-  themeName: z.string().max(50).optional().nullable(),
-});
+// ============================================
+// GET - BUSCAR TEMA
+// ============================================
 
-// GET /api/user/theme - Obter tema do usuário autenticado (qualquer role)
 export async function GET() {
   try {
     const session = await auth();
 
-    if (!session || !session.user) {
-      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
     }
 
-    const userId = session.user.id;
-
-    // Busca o tema do usuário (independente do role)
-    const userTheme = await prisma.teacherTheme.findUnique({
-      where: { userId },
-    });
-
-    if (!userTheme) {
-      // Retorna null se não tem tema customizado (usa padrão no frontend)
-      return NextResponse.json({ theme: null });
-    }
+    const theme = await getUserTheme(session.user.id);
 
     return NextResponse.json({
-      palette: userTheme.palette,
-      layout: userTheme.layout,
-      animations: userTheme.animations,
-      themeName: userTheme.themeName,
+      data: theme,
+      message: 'Tema carregado com sucesso',
     });
   } catch (error) {
     console.error('[GET /api/user/theme] Erro:', error);
@@ -146,90 +70,73 @@ export async function GET() {
   }
 }
 
-// PUT /api/user/theme - Atualizar tema do usuário autenticado (qualquer role)
+// ============================================
+// PUT - ATUALIZAR TEMA
+// ============================================
+
 export async function PUT(request: Request) {
   try {
     const session = await auth();
 
-    if (!session || !session.user) {
-      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
     }
 
-    const userId = session.user.id;
     const body = await request.json();
 
-    // Valida dados
-    const result = themeSchema.safeParse(body);
+    // Validar com Zod
+    const result = updateThemeSchema.safeParse(body);
     if (!result.success) {
       return NextResponse.json(
-        { error: 'Dados inválidos', details: result.error.errors },
+        { error: result.error.errors[0].message },
         { status: 400 }
       );
     }
 
     const data = result.data;
 
-    // Upsert do tema (cria se não existe, atualiza se existe)
-    const updatedTheme = await prisma.teacherTheme.upsert({
-      where: { userId },
-      update: {
-        ...(data.palette && { palette: data.palette }),
-        ...(data.layout && { layout: data.layout }),
-        ...(data.animations !== undefined && { animations: data.animations }),
-        ...(data.themeName !== undefined && { themeName: data.themeName }),
-      },
+    // Upsert: atualiza se existe, cria se não existe
+    await prisma.userTheme.upsert({
+      where: { userId: session.user.id },
       create: {
-        userId,
-        palette: data.palette || {
-          background: '0 0% 100%',
-          foreground: '240 10% 3.9%',
-          primary: '222.2 47.4% 11.2%',
-          primaryForeground: '210 40% 98%',
-          secondary: '210 40% 96.1%',
-          secondaryForeground: '222.2 47.4% 11.2%',
-          accent: '210 40% 96.1%',
-          accentForeground: '222.2 47.4% 11.2%',
-          card: '0 0% 100%',
-          cardForeground: '240 10% 3.9%',
-          muted: '210 40% 96.1%',
-          mutedForeground: '215.4 16.3% 46.9%',
-        },
-        layout: data.layout || {
-          cardStyle: 'default',
-          borderRadius: '0.5rem',
-          shadowIntensity: 'medium',
-          spacing: 'comfortable',
-        },
-        animations: data.animations || {
-          enabled: true,
-          duration: 'normal',
-          easing: 'ease-in-out',
-          transitions: ['all'],
-          hover: true,
-          focus: true,
-          pageTransitions: false,
-        },
-        themeName: data.themeName || 'Tema Personalizado',
+        userId: session.user.id,
+        presetId: data.presetId,
+        cardStyle: data.cardStyle || 'FLAT',
+        cardShadow: data.cardShadow || 'NONE',
+        cardBorder: data.cardBorder ?? true,
+        card3D: data.card3D ?? false,
+        cardGlass: data.cardGlass ?? false,
+        spacing: data.spacing || 'COMFORTABLE',
+        borderRadius: data.borderRadius || 'MEDIUM',
+        animationsEnabled: data.animationsEnabled ?? true,
+        animationSpeed: data.animationSpeed || 'NORMAL',
+        hoverEffects: data.hoverEffects ?? true,
+        fontSize: data.fontSize || 'NORMAL',
+      },
+      update: {
+        presetId: data.presetId,
+        cardStyle: data.cardStyle || 'FLAT',
+        cardShadow: data.cardShadow || 'NONE',
+        cardBorder: data.cardBorder ?? true,
+        card3D: data.card3D ?? false,
+        cardGlass: data.cardGlass ?? false,
+        spacing: data.spacing || 'COMFORTABLE',
+        borderRadius: data.borderRadius || 'MEDIUM',
+        animationsEnabled: data.animationsEnabled ?? true,
+        animationSpeed: data.animationSpeed || 'NORMAL',
+        hoverEffects: data.hoverEffects ?? true,
+        fontSize: data.fontSize || 'NORMAL',
+        updatedAt: new Date(),
       },
     });
 
-    // Limpa cache do usuário
-    return NextResponse.json(
-      {
-        message: 'Tema atualizado com sucesso',
-        theme: {
-          palette: updatedTheme.palette,
-          layout: updatedTheme.layout,
-          animations: updatedTheme.animations,
-          themeName: updatedTheme.themeName,
-        },
-      },
-      {
-        headers: {
-          'Cache-Control': 'no-store, must-revalidate',
-        },
-      }
-    );
+    // Busca tema completo para retornar
+    const theme = await getUserTheme(session.user.id);
+
+    return NextResponse.json({
+      data: theme,
+      message: 'Tema atualizado com sucesso',
+    });
   } catch (error) {
     console.error('[PUT /api/user/theme] Erro:', error);
     return NextResponse.json(
@@ -239,31 +146,48 @@ export async function PUT(request: Request) {
   }
 }
 
-// DELETE /api/user/theme - Resetar tema do usuário para o padrão
+// ============================================
+// DELETE - RESET PARA TEMA PADRÃO
+// ============================================
+
 export async function DELETE() {
   try {
     const session = await auth();
 
-    if (!session || !session.user) {
-      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
     }
 
-    const userId = session.user.id;
-
-    // Deleta tema customizado (volta pro padrão)
-    await prisma.teacherTheme.delete({
-      where: { userId },
+    // Deletar tema customizado (volta para padrão)
+    await prisma.userTheme.delete({
+      where: { userId: session.user.id },
     });
 
-    return NextResponse.json(
-      { message: 'Tema resetado para o padrão' },
-      {
-        headers: {
-          'Cache-Control': 'no-store, must-revalidate',
-        },
-      }
-    );
+    // Criar tema padrão
+    const theme = await createDefaultTheme(session.user.id);
+
+    return NextResponse.json({
+      data: theme,
+      message: 'Tema resetado para Academic Blue',
+    });
   } catch (error) {
+    // Se não existia tema, retorna padrão sem erro
+    if (
+      error &&
+      typeof error === 'object' &&
+      'code' in error &&
+      error.code === 'P2025'
+    ) {
+      const session = await auth();
+      if (session?.user?.id) {
+        const theme = await createDefaultTheme(session.user.id);
+        return NextResponse.json({
+          data: theme,
+          message: 'Tema padrão aplicado',
+        });
+      }
+    }
+
     console.error('[DELETE /api/user/theme] Erro:', error);
     return NextResponse.json(
       { error: 'Erro ao resetar tema' },

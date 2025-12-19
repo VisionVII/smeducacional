@@ -72,14 +72,24 @@ export function Navbar({ user, links }: NavbarProps) {
       case 'TEACHER':
         return '/teacher/dashboard';
       case 'ADMIN':
-        return '/admin/dashboard';
+        return '/admin';
       default:
         return '/';
     }
   };
 
   return (
-    <nav className="navbar-themed sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <nav
+      className="navbar-themed sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
+      style={{
+        backgroundImage: branding.navbarBgUrl
+          ? `url(${branding.navbarBgUrl})`
+          : undefined,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+      }}
+    >
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           {/* Logo - Mobile First */}
@@ -88,16 +98,16 @@ export function Navbar({ user, links }: NavbarProps) {
             className="flex items-center gap-2 flex-shrink-0"
             onClick={() => setMobileMenuOpen(false)}
           >
-            {branding.logoUrl ? (
-              <img 
-                src={branding.logoUrl} 
-                alt={branding.companyName} 
-                className="h-10 object-contain"
-              />
-            ) : (
+            {!mounted || !branding.logoUrl ? (
               <Icon3D size="md" color="primary" rounded="full">
                 <GraduationCap className="h-6 w-6 text-primary" />
               </Icon3D>
+            ) : (
+              <img
+                src={branding.logoUrl}
+                alt={branding.companyName}
+                className="h-10 object-contain"
+              />
             )}
           </Link>
 

@@ -70,7 +70,7 @@ model User {
   activityLogs     ActivityLog[]
   teacherEducation TeacherEducation[]
   teacherFinancial TeacherFinancial?
-  teacherTheme     TeacherTheme?
+  theme            UserTheme?         // Tema unificado V2.0
   landingConfig    Json?
   landingTheme     Json?
   payments         Payment[]
@@ -437,22 +437,40 @@ model TeacherFinancial {
   @@map("teacher_financial")
 }
 
-model TeacherTheme {
+// ============================================
+// TEMA SYSTEM V2.0 - UNIFICADO E EXTENSÍVEL
+// ============================================
+
+model UserTheme {
   id        String   @id @default(cuid())
   userId    String   @unique
   
-  // Paleta de cores (HSL values)
-  palette   Json     @default("{\"background\":\"0 0% 100%\",\"foreground\":\"240 10% 3.9%\",\"primary\":\"221.2 83.2% 53.3%\",\"primaryForeground\":\"210 40% 98%\",\"secondary\":\"210 40% 96.1%\",\"secondaryForeground\":\"222.2 47.4% 11.2%\",\"accent\":\"210 40% 96.1%\",\"accentForeground\":\"222.2 47.4% 11.2%\",\"card\":\"0 0% 100%\",\"cardForeground\":\"240 10% 3.9%\",\"muted\":\"210 40% 96.1%\",\"mutedForeground\":\"215.4 16.3% 46.9%\"}")
+  // Preset selecionado (academic-blue, forest-green, etc.)
+  presetId  String   @default("academic-blue")
   
-  // Layout e estilos
-  layout    Json     @default("{\"cardStyle\":\"default\",\"borderRadius\":\"0.5rem\",\"shadowIntensity\":\"medium\",\"spacing\":\"comfortable\"}")
+  // === CARD SYSTEM (EXTENSÍVEL) ===
+  cardStyle      CardStyle       @default(FLAT)
+  cardShadow     ShadowIntensity @default(NONE)
+  cardBorder     Boolean         @default(true)
+  card3D         Boolean         @default(false)
+  cardGlass      Boolean         @default(false)
   
-  // Animações
-  animations Json   @default("{\"enabled\":true,\"duration\":\"normal\",\"easing\":\"ease-in-out\",\"transitions\":[\"all\"],\"hover\":true,\"focus\":true,\"pageTransitions\":true}")
+  // === LAYOUT (EXTENSÍVEL) ===
+  spacing        Spacing         @default(COMFORTABLE)
+  borderRadius   BorderRadius    @default(MEDIUM)
   
-  // Nome do tema (opcional, para presets)
-  themeName String?
+  // === ANIMATIONS (EXTENSÍVEL) ===
+  animationsEnabled Boolean      @default(true)
+  animationSpeed    AnimationSpeed @default(NORMAL)
+  hoverEffects      Boolean      @default(true)
+  transitionEasing  String       @default("ease-in-out")
   
+  // === ADVANCED OPTIONS (FUTURAS EXPANSÕES) ===
+  customColors   Json?          // Para usuários criarem temas personalizados
+  fontFamily     String?        // Permitir troca de fonte no futuro
+  fontSize       FontSize       @default(NORMAL)
+  
+  // Metadata
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -460,7 +478,58 @@ model TeacherTheme {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
-  @@map("teacher_themes")
+  @@index([presetId])
+  @@map("user_themes")
+}
+
+// === ENUMS EXTENSÍVEIS (FÁCIL ADICIONAR NOVOS) ===
+
+enum CardStyle {
+  FLAT       // Sem sombra, borda sutil
+  ELEVATED   // Sombra suave
+  BORDERED   // Borda grossa colorida
+  GLASS      // Backdrop blur
+  NEON       // Futuro: borda brilhante
+  GRADIENT   // Futuro: fundo gradiente
+}
+
+enum ShadowIntensity {
+  NONE
+  LIGHT
+  MEDIUM
+  STRONG
+  XL         // Futuro: sombra extra grande
+}
+
+enum Spacing {
+  COMPACT      // 0.75rem
+  COMFORTABLE  // 1rem (padrão)
+  SPACIOUS     // 1.5rem
+  EXTRA_SPACIOUS // Futuro: 2rem
+}
+
+enum BorderRadius {
+  NONE      // 0
+  SMALL     // 0.25rem
+  MEDIUM    // 0.5rem (padrão)
+  LARGE     // 0.75rem
+  XL        // 1rem
+  FULL      // 9999px (pill shape)
+}
+
+enum AnimationSpeed {
+  DISABLED  // 0ms
+  FAST      // 150ms
+  NORMAL    // 200ms (padrão)
+  SLOW      // 300ms
+  VERY_SLOW // Futuro: 500ms
+}
+
+enum FontSize {
+  SMALL     // 0.875rem
+  NORMAL    // 1rem (padrão)
+  LARGE     // 1.125rem
+  EXTRA_LARGE // Futuro: 1.25rem
 }
 
 // ============================================
@@ -798,10 +867,17 @@ model SystemConfig {
   logoUrl         String?  // Logo principal (navbar, emails, etc)
   faviconUrl      String?  // Favicon do site
   loginBgUrl      String?  // Background da tela de login
+  navbarBgUrl     String?  // Background da navbar (header)
   
-  // Cores padrão do sistema (para páginas sem tema específico)
+  // Cores padrão do sistema (DEPRECATED - usar publicTheme)
   primaryColor    String?  @default("#3B82F6")
   secondaryColor  String?  @default("#10B981")
+  
+  // Tema público para rotas não autenticadas (home, landing, catálogo)
+  publicTheme     Json?    // { palette, layout, animations, themeName }
+  
+  // Tema global do sistema (V2.0 - Hierárquico)
+  themePresetId   String?  @default("academic-blue") // ID do preset de tema (academic-blue, forest-green, etc)
   
   // Configurações de SEO
   metaTitle       String?

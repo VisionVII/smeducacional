@@ -11,6 +11,7 @@ export async function GET() {
         systemName: true,
         logoUrl: true,
         faviconUrl: true,
+        navbarBgUrl: true,
         primaryColor: true,
         secondaryColor: true,
       },
@@ -23,6 +24,7 @@ export async function GET() {
         systemName: 'SM Educacional',
         logoUrl: null,
         faviconUrl: null,
+        navbarBgUrl: null,
         primaryColor: null,
         secondaryColor: null,
       });

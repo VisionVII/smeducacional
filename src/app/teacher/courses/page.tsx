@@ -66,73 +66,127 @@ export default async function TeacherCoursesPage() {
   );
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-3xl font-bold">Meus Cursos</h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-2">
-            Gerencie e crie seus cursos
-          </p>
-        </div>
-        <Link href="/teacher/courses/new">
-          <Button size="lg">
-            <Plus className="h-5 w-5 mr-2" />
-            Criar Novo Curso
-          </Button>
-        </Link>
-      </div>
-
-      {/* Estatísticas */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Total de Cursos
-            </CardTitle>
-            <BookOpen className="h-4 w-4 text-muted-foreground" />
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 max-w-[1800px]">
+        {/* Header Premium */}
+        <Card className="relative overflow-hidden border-2 hover:border-primary/50 transition-all duration-500 hover:shadow-2xl mb-6 sm:mb-8">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-primary/10 to-transparent rounded-bl-[200px]"></div>
+          <CardHeader className="relative z-10">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div className="flex items-center gap-4">
+                <div className="p-4 bg-gradient-to-br from-primary to-primary/80 rounded-2xl shadow-lg">
+                  <BookOpen className="h-8 w-8 text-white" />
+                </div>
+                <div>
+                  <CardTitle className="text-3xl font-bold bg-gradient-to-r from-primary via-purple-600 to-pink-600 bg-clip-text text-transparent">
+                    Meus Cursos
+                  </CardTitle>
+                  <p className="text-muted-foreground mt-1">
+                    Gerencie e crie seus cursos
+                  </p>
+                </div>
+              </div>
+              <Link href="/teacher/courses/new">
+                <Button
+                  size="lg"
+                  className="bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90 shadow-lg"
+                >
+                  <Plus className="h-5 w-5 mr-2" />
+                  Criar Novo Curso
+                </Button>
+              </Link>
+            </div>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{totalCourses}</div>
-            <p className="text-xs text-muted-foreground">
-              {publishedCourses} publicados, {draftCourses} rascunhos
-            </p>
-          </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Publicados</CardTitle>
-            <CheckCircle className="h-4 w-4 text-green-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{publishedCourses}</div>
-            <p className="text-xs text-muted-foreground">
-              Disponíveis para alunos
-            </p>
-          </CardContent>
-        </Card>
+        {/* Estatísticas Premium */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
+          {/* Total de Cursos */}
+          <Card className="relative overflow-hidden border-2 hover:border-primary/50 transition-all duration-500 hover:shadow-2xl hover:-translate-y-1 group">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-500/20 to-transparent rounded-bl-[100px]"></div>
+            <CardHeader className="pb-2">
+              <div className="flex items-center justify-between">
+                <div className="p-3 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-lg group-hover:scale-110 transition-transform duration-300">
+                  <BookOpen className="h-5 w-5 text-white" />
+                </div>
+              </div>
+              <CardTitle className="text-sm text-muted-foreground font-medium mt-2">
+                Total de Cursos
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold bg-gradient-to-r from-blue-500 to-blue-600 bg-clip-text text-transparent">
+                {totalCourses}
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                {publishedCourses} publicados, {draftCourses} rascunhos
+              </p>
+            </CardContent>
+          </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Rascunhos</CardTitle>
-            <Clock className="h-4 w-4 text-yellow-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{draftCourses}</div>
-            <p className="text-xs text-muted-foreground">Em construção</p>
-          </CardContent>
-        </Card>
+          {/* Publicados */}
+          <Card className="relative overflow-hidden border-2 hover:border-green-500/50 transition-all duration-500 hover:shadow-2xl hover:-translate-y-1 group">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-green-500/20 to-transparent rounded-bl-[100px]"></div>
+            <CardHeader className="pb-2">
+              <div className="flex items-center justify-between">
+                <div className="p-3 bg-gradient-to-br from-green-500 to-green-600 rounded-xl shadow-lg group-hover:scale-110 transition-transform duration-300">
+                  <CheckCircle className="h-5 w-5 text-white" />
+                </div>
+              </div>
+              <CardTitle className="text-sm text-muted-foreground font-medium mt-2">
+                Publicados
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold bg-gradient-to-r from-green-500 to-green-600 bg-clip-text text-transparent">
+                {publishedCourses}
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                Disponíveis para alunos
+              </p>
+            </CardContent>
+          </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Total de Alunos
-            </CardTitle>
-            <Users className="h-4 w-4 text-blue-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{totalStudents}</div>
+          {/* Rascunhos */}
+          <Card className="relative overflow-hidden border-2 hover:border-amber-500/50 transition-all duration-500 hover:shadow-2xl hover:-translate-y-1 group">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-amber-500/20 to-transparent rounded-bl-[100px]"></div>
+            <CardHeader className="pb-2">
+              <div className="flex items-center justify-between">
+                <div className="p-3 bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl shadow-lg group-hover:scale-110 transition-transform duration-300">
+                  <Clock className="h-5 w-5 text-white" />
+                </div>
+              </div>
+              <CardTitle className="text-sm text-muted-foreground font-medium mt-2">
+                Rascunhos
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold bg-gradient-to-r from-amber-500 to-amber-600 bg-clip-text text-transparent">
+                {draftCourses}
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                Em construção
+              </p>
+            </CardContent>
+          </Card>
+
+          {/* Total de Alunos */}
+          <Card className="relative overflow-hidden border-2 hover:border-purple-500/50 transition-all duration-500 hover:shadow-2xl hover:-translate-y-1 group">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-purple-500/20 to-transparent rounded-bl-[100px]"></div>
+            <CardHeader className="pb-2">
+              <div className="flex items-center justify-between">
+                <div className="p-3 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl shadow-lg group-hover:scale-110 transition-transform duration-300">
+                  <Users className="h-5 w-5 text-white" />
+                </div>
+              </div>
+              <CardTitle className="text-sm text-muted-foreground font-medium mt-2">
+                Total de Alunos
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold bg-gradient-to-r from-purple-500 to-purple-600 bg-clip-text text-transparent">
+                {totalStudents}
+              </div>
             <p className="text-xs text-muted-foreground">Matriculados</p>
           </CardContent>
         </Card>

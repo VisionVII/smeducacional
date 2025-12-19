@@ -6,6 +6,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { QueryProvider } from '@/components/query-provider';
 import { AuthProvider } from '@/components/auth-provider';
 import { CookieBanner } from '@/components/cookie-banner';
+import { ThemeScript } from '@/components/theme-script';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -22,6 +23,60 @@ export default function RootLayout({
 }) {
   return (
     <html lang="pt-BR" suppressHydrationWarning>
+      <head>
+        {/* Dark mode detection (next-themes) */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  const theme = localStorage.getItem('app-theme-mode') || 'system';
+                  const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+                  const effectiveTheme = theme === 'system' ? systemTheme : theme;
+                  if (effectiveTheme === 'dark') {
+                    document.documentElement.classList.add('dark');
+                  }
+                } catch (e) {}
+              })();
+            `,
+          }}
+        />
+        {/* Theme colors SSR (ZERO FOUC) */}
+        <ThemeScript />
+        {/* Preload logo e favicon para carregamento instantâneo */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  const cached = localStorage.getItem('system-branding-cache');
+                  if (cached) {
+                    const { logoUrl, faviconUrl } = JSON.parse(cached);
+                    if (logoUrl) {
+                      const link = document.createElement('link');
+                      link.rel = 'preload';
+                      link.as = 'image';
+                      link.href = logoUrl;
+                      document.head.appendChild(link);
+                    }
+                    if (faviconUrl) {
+                      const favicon = document.querySelector('link[rel="icon"]');
+                      if (favicon) {
+                        favicon.setAttribute('href', faviconUrl);
+                      } else {
+                        const link = document.createElement('link');
+                        link.rel = 'icon';
+                        link.href = faviconUrl;
+                        document.head.appendChild(link);
+                      }
+                    }
+                  }
+                } catch (e) {}
+              })();
+            `,
+          }}
+        />
+      </head>
       <body className={inter.className}>
         <ThemeProvider
           attribute="class"

@@ -169,7 +169,7 @@ export default function DatabaseDashboardPage() {
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-4">
           <Button variant="ghost" size="sm" asChild>
-            <Link href="/admin/dashboard">
+            <Link href="/admin">
               <ArrowLeft className="h-4 w-4 mr-2" />
               Voltar ao Dashboard
             </Link>

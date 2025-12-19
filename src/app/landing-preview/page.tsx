@@ -12,10 +12,6 @@ import {
   HelpCircle,
 } from 'lucide-react';
 import { ThemeProvider } from '@/components/theme-provider';
-import {
-  TeacherThemeProvider,
-  useTeacherTheme,
-} from '@/components/teacher-theme-provider';
 import { AdaptiveNavbar } from '@/components/adaptive-navbar';
 import { useSearchParams } from 'next/navigation';
 
@@ -387,9 +383,7 @@ function LandingPreviewContent() {
       enableSystem
       disableTransitionOnChange
     >
-      <TeacherThemeProvider>
-        <LandingPageContent teacherId={teacherId} />
-      </TeacherThemeProvider>
+      <LandingPageContent teacherId={teacherId} />
     </ThemeProvider>
   );
 }

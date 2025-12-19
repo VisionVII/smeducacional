@@ -14,6 +14,7 @@ interface StatCardProps {
   };
   subtitle?: string;
   variant?: 'default' | 'primary' | 'success' | 'warning' | 'danger';
+  className?: string;
 }
 
 const variantStyles = {
@@ -42,10 +43,15 @@ export function StatCard({
   trend,
   subtitle,
   variant = 'default',
+  className,
 }: StatCardProps) {
   return (
     <Card
-      className={cn('transition-all hover:shadow-lg', variantStyles[variant])}
+      className={cn(
+        'transition-all hover:shadow-lg',
+        variantStyles[variant],
+        className
+      )}
     >
       <CardHeader className="flex flex-row items-center justify-between pb-2 px-4 sm:px-6 pt-4 sm:pt-6">
         <CardTitle className="text-xs sm:text-sm font-medium truncate pr-2">

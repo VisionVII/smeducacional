@@ -18,9 +18,11 @@ import {
 import { toast } from '@/components/ui/use-toast';
 import { GraduationCap, Home } from 'lucide-react';
 import { PasswordInput } from '@/components/password-input';
+import { useSystemBranding } from '@/hooks/use-system-branding';
 
 export default function RegisterPage() {
   const router = useRouter();
+  const { branding } = useSystemBranding();
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
@@ -101,9 +103,17 @@ export default function RegisterPage() {
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1 text-center">
           <div className="flex justify-center mb-4">
-            <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
-              <GraduationCap className="h-7 w-7 text-primary" />
-            </div>
+            {branding.logoUrl ? (
+              <img
+                src={branding.logoUrl}
+                alt={branding.companyName}
+                className="h-16 object-contain"
+              />
+            ) : (
+              <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
+                <GraduationCap className="h-7 w-7 text-primary" />
+              </div>
+            )}
           </div>
           <CardTitle className="text-2xl font-bold">Criar conta</CardTitle>
           <CardDescription className="text-sm">

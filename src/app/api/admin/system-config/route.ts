@@ -4,24 +4,70 @@ import { prisma } from '@/lib/db';
 import { z } from 'zod';
 
 const systemConfigSchema = z.object({
-  companyName: z.string().min(1).optional(),
-  systemName: z.string().min(1).optional(),
-  companyEmail: z.string().email().optional().nullable(),
-  companyPhone: z.string().optional().nullable(),
-  companyAddress: z.string().optional().nullable(),
-  logoUrl: z.string().url().optional().nullable(),
-  faviconUrl: z.string().url().optional().nullable(),
-  loginBgUrl: z.string().url().optional().nullable(),
-  primaryColor: z.string().optional().nullable(),
-  secondaryColor: z.string().optional().nullable(),
-  metaTitle: z.string().optional().nullable(),
-  metaDescription: z.string().optional().nullable(),
-  metaKeywords: z.string().optional().nullable(),
-  facebookUrl: z.string().url().optional().nullable(),
-  instagramUrl: z.string().url().optional().nullable(),
-  linkedinUrl: z.string().url().optional().nullable(),
-  twitterUrl: z.string().url().optional().nullable(),
-  youtubeUrl: z.string().url().optional().nullable(),
+  companyName: z.string().min(1, 'Nome da empresa é obrigatório'),
+  systemName: z.string().min(1, 'Nome do sistema é obrigatório'),
+  companyEmail: z
+    .string()
+    .email('Email inválido')
+    .or(z.literal(''))
+    .nullable()
+    .optional(),
+  companyPhone: z.string().nullable().optional(),
+  companyAddress: z.string().nullable().optional(),
+  logoUrl: z
+    .string()
+    .url('URL inválida')
+    .or(z.literal(''))
+    .nullable()
+    .optional(),
+  faviconUrl: z
+    .string()
+    .url('URL inválida')
+    .or(z.literal(''))
+    .nullable()
+    .optional(),
+  loginBgUrl: z
+    .string()
+    .url('URL inválida')
+    .or(z.literal(''))
+    .nullable()
+    .optional(),
+  primaryColor: z.string().nullable().optional(),
+  secondaryColor: z.string().nullable().optional(),
+  publicTheme: z.any().nullable().optional(), // JSON theme config (palette, layout, animations)
+  metaTitle: z.string().nullable().optional(),
+  metaDescription: z.string().nullable().optional(),
+  metaKeywords: z.string().nullable().optional(),
+  facebookUrl: z
+    .string()
+    .url('URL inválida')
+    .or(z.literal(''))
+    .nullable()
+    .optional(),
+  instagramUrl: z
+    .string()
+    .url('URL inválida')
+    .or(z.literal(''))
+    .nullable()
+    .optional(),
+  linkedinUrl: z
+    .string()
+    .url('URL inválida')
+    .or(z.literal(''))
+    .nullable()
+    .optional(),
+  twitterUrl: z
+    .string()
+    .url('URL inválida')
+    .or(z.literal(''))
+    .nullable()
+    .optional(),
+  youtubeUrl: z
+    .string()
+    .url('URL inválida')
+    .or(z.literal(''))
+    .nullable()
+    .optional(),
   maintenanceMode: z.boolean().optional(),
   registrationEnabled: z.boolean().optional(),
 });

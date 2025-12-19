@@ -3,7 +3,6 @@ import { auth } from '@/lib/auth';
 import { Navbar } from '@/components/navbar';
 import { Footer } from '@/components/footer';
 import { Breadcrumbs } from '@/components/breadcrumbs';
-import { StudentThemeProvider } from '@/components/student-theme-provider';
 import {
   BookOpen,
   Award,
@@ -13,6 +12,7 @@ import {
   MessageSquare,
   Bell,
   ClipboardList,
+  Palette,
 } from 'lucide-react';
 
 export default async function StudentLayout({
@@ -58,6 +58,11 @@ export default async function StudentLayout({
       icon: <Bell className="h-4 w-4" />,
     },
     {
+      href: '/student/settings/theme',
+      label: 'Tema',
+      icon: <Palette className="h-4 w-4" />,
+    },
+    {
       href: '/student/profile',
       label: 'Perfil',
       icon: <User className="h-4 w-4" />,
@@ -70,17 +75,15 @@ export default async function StudentLayout({
   ];
 
   return (
-    <StudentThemeProvider>
-      <div className="min-h-screen flex flex-col">
-        <Navbar user={session.user} links={studentLinks} />
-        <main className="flex-1">
-          <div className="container mx-auto px-4 py-6">
-            <Breadcrumbs />
-            {children}
-          </div>
-        </main>
-        <Footer />
-      </div>
-    </StudentThemeProvider>
+    <div className="min-h-screen flex flex-col">
+      <Navbar user={session.user} links={studentLinks} />
+      <main className="flex-1">
+        <div className="container mx-auto px-4 py-6">
+          <Breadcrumbs />
+          {children}
+        </div>
+      </main>
+      <Footer />
+    </div>
   );
 }

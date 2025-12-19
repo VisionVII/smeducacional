@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Diagnóstico Tema</title>
+  <style>
+    body {
+      font-family: monospace;
+      padding: 20px;
+      background: #1e1e1e;
+      color: #d4d4d4;
+    }
+
+    pre {
+      background: #2d2d2d;
+      padding: 15px;
+      border-radius: 5px;
+      overflow-x: auto;
+    }
+
+    .success {
+      color: #4ec9b0;
+    }
+
+    .error {
+      color: #f48771;
+    }
+
+    .warning {
+      color: #dcdcaa;
+    }
+
+    button {
+      padding: 10px 20px;
+      margin: 10px 5px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>🔍 Diagnóstico do Sistema de Temas</h1>
+
+  <button onclick="testAPI()">1. Testar API</button>
+  <button onclick="testLocalStorage()">2. Verificar LocalStorage</button>
+  <button onclick="testDOM()">3. Verificar DOM</button>
+  <button onclick="applyTestTheme()">4. Aplicar Tema de Teste</button>
+  <button onclick="clearAll()">5. Limpar Tudo</button>
+
+  <div id="output"></div>
+
+  <script>
+    const output = document.getElementById('output');
+
+    function log(msg, type = 'info') {
+      const colors = { success: '#4ec9b0', error: '#f48771', warning: '#dcdcaa', info: '#d4d4d4' };
+      output.innerHTML += `<div style="color: ${colors[type]}">${msg}</div>`;
+    }
+
+    async function testAPI() {
+      output.innerHTML = '<h2>📡 Testando APIs...</h2>';
+
+      try {
+        log('Testando /api/system/public-theme...', 'info');
+        const res1 = await fetch('/api/system/public-theme');
+        const data1 = await res1.json();
+        log(`Status: ${res1.status}`, res1.ok ? 'success' : 'error');
+        log(`<pre>${JSON.stringify(data1, null, 2)}</pre>`, 'info');
+
+        log('\nTestando /api/debug-theme...', 'info');
+        const res2 = await fetch('/api/debug-theme');
+        const data2 = await res2.json();
+        log(`Status: ${res2.status}`, res2.ok ? 'success' : 'error');
+        log(`<pre>${JSON.stringify(data2, null, 2)}</pre>`, 'info');
+      } catch (err) {
+        log(`Erro: ${err.message}`, 'error');
+      }
+    }
+
+    function testLocalStorage() {
+      output.innerHTML = '<h2>💾 Verificando LocalStorage...</h2>';
+
+      const theme = localStorage.getItem('sm-educa-system-theme');
+      if (theme) {
+        log('✅ Cache encontrado:', 'success');
+        try {
+          const parsed = JSON.parse(theme);
+          log(`<pre>${JSON.stringify(parsed, null, 2)}</pre>`, 'info');
+
+          const age = Math.floor((Date.now() - parsed.timestamp) / 1000);
+          log(`Idade: ${age} segundos (max 300)`, age < 300 ? 'success' : 'warning');
+        } catch (e) {
+          log(`Erro ao parsear: ${e.message}`, 'error');
+        }
+      } else {
+        log('❌ Nenhum cache encontrado', 'warning');
+      }
+    }
+
+    function testDOM() {
+      output.innerHTML = '<h2>🌐 Verificando DOM...</h2>';
+
+      const root = document.documentElement;
+      const vars = ['--primary', '--secondary', '--accent', '--background'];
+
+      log('CSS Variables inline:', 'info');
+      vars.forEach(v => {
+        const value = root.style.getPropertyValue(v);
+        log(`${v}: ${value || '(não definido)'}`, value ? 'success' : 'warning');
+      });
+
+      log('\nCSS Variables computed:', 'info');
+      const computed = getComputedStyle(root);
+      vars.forEach(v => {
+        const value = computed.getPropertyValue(v).trim();
+        log(`${v}: ${value}`, 'info');
+      });
+
+      log('\nAtributos:', 'info');
+      log(`data-custom-theme: ${root.getAttribute('data-custom-theme') || '(nenhum)'}`, 'info');
+      log(`class: ${root.className || '(nenhum)'}`, 'info');
+    }
+
+    async function applyTestTheme() {
+      output.innerHTML = '<h2>🎨 Aplicando Tema de Teste...</h2>';
+
+      const testTheme = {
+        themeName: 'Teste Manual',
+        palette: {
+          primary: '350 100% 50%',
+          secondary: '200 100% 50%',
+          accent: '100 100% 50%',
+          background: '0 0% 100%',
+          foreground: '0 0% 0%'
+        }
+      };
+
+      const root = document.documentElement;
+      Object.entries(testTheme.palette).forEach(([key, value]) => {
+        const cssVar = `--${key}`;
+        root.style.setProperty(cssVar, value, 'important');
+        log(`Setando ${cssVar} = ${value}`, 'success');
+      });
+
+      log('\n✅ Tema de teste aplicado! Verifique as cores mudaram.', 'success');
+    }
+
+    function clearAll() {
+      output.innerHTML = '<h2>🧹 Limpando...</h2>';
+
+      localStorage.removeItem('sm-educa-system-theme');
+      log('✅ LocalStorage limpo', 'success');
+
+      const root = document.documentElement;
+      ['--primary', '--secondary', '--accent', '--background', '--foreground'].forEach(v => {
+        root.style.removeProperty(v);
+      });
+      log('✅ CSS Variables removidas', 'success');
+
+      log('\n🔄 Recarregue a página para testar novamente', 'warning');
+    }
+  </script>
+</body>
+
+</html>

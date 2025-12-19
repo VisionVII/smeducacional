@@ -40,7 +40,7 @@ export function AuthRedirectCheck() {
       let dashboardUrl = '/student/dashboard';
 
       if (role === 'ADMIN') {
-        dashboardUrl = '/admin/dashboard';
+        dashboardUrl = '/admin';
       } else if (role === 'TEACHER') {
         dashboardUrl = '/teacher/dashboard';
       }

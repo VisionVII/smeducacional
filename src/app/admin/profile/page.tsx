@@ -12,6 +12,8 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/components/ui/use-toast';
 import {
   User,
@@ -22,6 +24,11 @@ import {
   QrCode,
   Upload,
   Camera,
+  Mail,
+  Shield,
+  Key,
+  CheckCircle2,
+  AlertCircle,
 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { TwoFactorModal } from '@/components/two-factor-modal';
@@ -49,7 +56,6 @@ export default function AdminProfilePage() {
     enabled: (session?.user as any)?.twoFactorEnabled ?? false,
   });
   const [showVerifyModal, setShowVerifyModal] = useState(false);
-  const [pendingVerificationCode, setPendingVerificationCode] = useState('');
   const [avatarPreview, setAvatarPreview] = useState<string | null>(
     session?.user?.avatar || null
   );
@@ -90,6 +96,15 @@ export default function AdminProfilePage() {
       toast({
         title: 'Erro',
         description: 'As senhas não coincidem.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    if (passwordData.newPassword.length < 8) {
+      toast({
+        title: 'Erro',
+        description: 'A senha deve ter pelo menos 8 caracteres.',
         variant: 'destructive',
       });
       return;
@@ -199,7 +214,6 @@ export default function AdminProfilePage() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Validar tipo
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
     if (!allowedTypes.includes(file.type)) {
       toast({
@@ -210,7 +224,6 @@ export default function AdminProfilePage() {
       return;
     }
 
-    // Validar tamanho (5MB)
     if (file.size > 5 * 1024 * 1024) {
       toast({
         title: 'Erro',
@@ -254,41 +267,62 @@ export default function AdminProfilePage() {
   };
 
   return (
-    <div className="container mx-auto py-4 sm:py-8 px-4 max-w-4xl">
-      <div className="mb-6 sm:mb-8">
-        <h1 className="text-2xl sm:text-3xl font-bold mb-2">
-          Meu Perfil (Admin)
-        </h1>
-        <p className="text-sm sm:text-base text-muted-foreground">
-          Gerencie suas informações pessoais e configurações de conta
-        </p>
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
+      <div className="container mx-auto py-6 sm:py-10 px-4 max-w-5xl">
+        {/* Header com gradiente */}
+        <div className="mb-8 sm:mb-12">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="p-3 bg-gradient-to-br from-primary to-purple-600 rounded-xl shadow-lg">
+              <User className="h-7 w-7 text-white" />
+            </div>
+            <div>
+              <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-primary via-purple-600 to-pink-600 bg-clip-text text-transparent">
+                Meu Perfil
+              </h1>
+              <Badge variant="outline" className="mt-1">
+                <Shield className="h-3 w-3 mr-1" />
+                Administrador
+              </Badge>
+            </div>
+          </div>
+          <p className="text-base text-muted-foreground ml-[60px]">
+            Gerencie suas informações pessoais e configurações de segurança
+          </p>
+        </div>
 
-      <div className="space-y-4 sm:space-y-6">
-        {/* Avatar */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
-              <Camera className="h-5 w-5" />
-              Foto de Perfil
-            </CardTitle>
-            <CardDescription className="text-sm">
-              Atualize sua foto de perfil
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
-              <Avatar className="h-24 w-24 sm:h-32 sm:w-32">
-                <AvatarImage
-                  src={avatarPreview || session?.user?.avatar || ''}
-                  alt="Avatar"
-                />
-                <AvatarFallback className="text-2xl sm:text-3xl">
-                  {session?.user?.name?.[0]?.toUpperCase() || 'A'}
-                </AvatarFallback>
-              </Avatar>
-
-              <div className="flex flex-col gap-2 w-full sm:w-auto">
+        {/* Grid responsivo 2 colunas */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Coluna esquerda - Avatar e Info rápida */}
+          <div className="lg:col-span-1 space-y-6">
+            {/* Avatar Card */}
+            <Card className="overflow-hidden border-2 hover:border-primary/50 transition-all duration-300 hover:shadow-xl">
+              <CardHeader className="text-center bg-gradient-to-br from-primary/10 via-purple-500/10 to-pink-500/10 pb-4">
+                <div className="flex justify-center mb-4">
+                  <div className="relative group">
+                    <Avatar className="h-32 w-32 border-4 border-background shadow-2xl ring-4 ring-primary/20 transition-transform duration-300 group-hover:scale-105">
+                      <AvatarImage
+                        src={avatarPreview || session?.user?.avatar || ''}
+                        alt="Avatar"
+                        className="object-cover"
+                      />
+                      <AvatarFallback className="text-4xl font-bold bg-gradient-to-br from-primary to-purple-600 text-white">
+                        {session?.user?.name?.[0]?.toUpperCase() || 'A'}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="absolute inset-0 rounded-full bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                      <Camera className="h-8 w-8 text-white" />
+                    </div>
+                  </div>
+                </div>
+                <CardTitle className="text-xl font-bold">
+                  {session?.user?.name}
+                </CardTitle>
+                <CardDescription className="flex items-center justify-center gap-2 text-sm">
+                  <Mail className="h-3.5 w-3.5" />
+                  {session?.user?.email}
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="pt-6 pb-6">
                 <input
                   ref={fileInputRef}
                   type="file"
@@ -301,241 +335,390 @@ export default function AdminProfilePage() {
                   variant="outline"
                   onClick={() => fileInputRef.current?.click()}
                   disabled={isUploadingAvatar}
-                  className="w-full sm:w-auto"
+                  className="w-full group hover:bg-primary hover:text-primary-foreground transition-all duration-300"
                 >
-                  <Upload className="h-4 w-4 mr-2" />
-                  {isUploadingAvatar ? 'Enviando...' : 'Escolher Foto'}
+                  {isUploadingAvatar ? (
+                    <>
+                      <div className="h-4 w-4 mr-2 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                      Enviando...
+                    </>
+                  ) : (
+                    <>
+                      <Upload className="h-4 w-4 mr-2 group-hover:scale-110 transition-transform duration-300" />
+                      Alterar Foto
+                    </>
+                  )}
                 </Button>
-                <p className="text-xs text-muted-foreground text-center sm:text-left">
-                  JPG, PNG ou WEBP. Máx 5MB
+                <p className="text-xs text-muted-foreground text-center mt-3">
+                  JPG, PNG ou WEBP • Máx 5MB
                 </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+              </CardContent>
+            </Card>
 
-        {/* Informações Pessoais */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
-              <User className="h-5 w-5" />
-              Informações Pessoais
-            </CardTitle>
-            <CardDescription className="text-sm">
-              Atualize seu nome e email
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleProfileUpdate} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="name" className="text-sm">
-                  Nome Completo
-                </Label>
-                <Input
-                  id="name"
-                  value={formData.name}
-                  onChange={(e) =>
-                    setFormData({ ...formData, name: e.target.value })
-                  }
-                  required
-                  className="text-sm"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="email" className="text-sm">
-                  Email
-                </Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) =>
-                    setFormData({ ...formData, email: e.target.value })
-                  }
-                  required
-                  autoComplete="email"
-                  className="text-sm"
-                />
-              </div>
-
-              <Button
-                type="submit"
-                disabled={isLoading}
-                className="w-full sm:w-auto"
-              >
-                <Save className="h-4 w-4 mr-2" />
-                Salvar Alterações
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
-
-        {/* Alterar Senha */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
-              <Lock className="h-5 w-5" />
-              Segurança
-            </CardTitle>
-            <CardDescription className="text-sm">
-              Altere sua senha de acesso
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handlePasswordChange} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="currentPassword" className="text-sm">
-                  Senha Atual
-                </Label>
-                <Input
-                  id="currentPassword"
-                  type="password"
-                  value={passwordData.currentPassword}
-                  onChange={(e) =>
-                    setPasswordData({
-                      ...passwordData,
-                      currentPassword: e.target.value,
-                    })
-                  }
-                  required
-                  autoComplete="current-password"
-                  className="text-sm"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="newPassword" className="text-sm">
-                  Nova Senha
-                </Label>
-                <Input
-                  id="newPassword"
-                  type="password"
-                  value={passwordData.newPassword}
-                  onChange={(e) =>
-                    setPasswordData({
-                      ...passwordData,
-                      newPassword: e.target.value,
-                    })
-                  }
-                  required
-                  autoComplete="new-password"
-                  className="text-sm"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="confirmPassword" className="text-sm">
-                  Confirmar Nova Senha
-                </Label>
-                <Input
-                  id="confirmPassword"
-                  type="password"
-                  value={passwordData.confirmPassword}
-                  onChange={(e) =>
-                    setPasswordData({
-                      ...passwordData,
-                      confirmPassword: e.target.value,
-                    })
-                  }
-                  required
-                  autoComplete="new-password"
-                  className="text-sm"
-                />
-              </div>
-
-              <Button
-                type="submit"
-                disabled={isLoading}
-                className="w-full sm:w-auto"
-              >
-                <Lock className="h-4 w-4 mr-2" />
-                Alterar Senha
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
-
-        {/* 2FA */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
-              <ShieldCheck className="h-5 w-5" />
-              Autenticação em Duas Etapas (2FA)
-            </CardTitle>
-            <CardDescription className="text-sm">
-              Proteja sua conta com TOTP (Google Authenticator, Authy)
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {twoFA.enabled ? (
-              <div className="space-y-3">
-                <p className="text-sm text-green-600">
-                  2FA está habilitado nesta conta.
-                </p>
-                <Button
-                  type="button"
-                  variant="destructive"
-                  onClick={handleDisable2FA}
-                  disabled={isLoading}
-                  size="sm"
-                  className="w-full sm:w-auto"
-                >
-                  <ShieldOff className="h-4 w-4 mr-2" />
-                  Desabilitar 2FA
-                </Button>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {!twoFA.secret ? (
-                  <Button
-                    type="button"
-                    onClick={handleSetup2FA}
-                    disabled={isLoading}
-                    size="sm"
-                    className="w-full sm:w-auto"
+            {/* Status de Segurança */}
+            <Card className="border-2 hover:border-green-500/50 transition-all duration-300">
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <Shield className="h-5 w-5 text-green-600" />
+                  Status de Segurança
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="flex items-center justify-between p-3 bg-green-500/10 rounded-lg border border-green-500/20">
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="h-4 w-4 text-green-600" />
+                    <span className="text-sm font-medium">Senha Forte</span>
+                  </div>
+                  <Badge
+                    variant="outline"
+                    className="bg-green-500/10 text-green-700 border-green-500/30"
                   >
-                    <QrCode className="h-4 w-4 mr-2" />
-                    Gerar QR Code 2FA
-                  </Button>
-                ) : (
-                  <div className="space-y-3">
-                    <p className="text-sm text-muted-foreground">
-                      Abra seu app de autenticação e escaneie este QR:
-                    </p>
-                    <div className="flex flex-col sm:flex-row items-center gap-4">
-                      <img
-                        alt="QR Code 2FA"
-                        className="w-40 h-40 rounded border"
-                        src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(
-                          twoFA.otpauth!
-                        )}`}
+                    Ativo
+                  </Badge>
+                </div>
+                <div
+                  className={`flex items-center justify-between p-3 rounded-lg border ${
+                    twoFA.enabled
+                      ? 'bg-green-500/10 border-green-500/20'
+                      : 'bg-yellow-500/10 border-yellow-500/20'
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    {twoFA.enabled ? (
+                      <CheckCircle2 className="h-4 w-4 text-green-600" />
+                    ) : (
+                      <AlertCircle className="h-4 w-4 text-yellow-600" />
+                    )}
+                    <span className="text-sm font-medium">2FA</span>
+                  </div>
+                  <Badge
+                    variant="outline"
+                    className={
+                      twoFA.enabled
+                        ? 'bg-green-500/10 text-green-700 border-green-500/30'
+                        : 'bg-yellow-500/10 text-yellow-700 border-yellow-500/30'
+                    }
+                  >
+                    {twoFA.enabled ? 'Ativo' : 'Inativo'}
+                  </Badge>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Coluna direita - Formulários */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Informações Pessoais */}
+            <Card className="border-2 hover:border-primary/50 transition-all duration-300 hover:shadow-xl">
+              <CardHeader className="bg-gradient-to-r from-primary/5 via-purple-500/5 to-pink-500/5">
+                <CardTitle className="flex items-center gap-2 text-xl">
+                  <User className="h-5 w-5 text-primary" />
+                  Informações Pessoais
+                </CardTitle>
+                <CardDescription>
+                  Atualize seu nome e email de acesso
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="pt-6">
+                <form onSubmit={handleProfileUpdate} className="space-y-5">
+                  <div className="space-y-2">
+                    <Label
+                      htmlFor="name"
+                      className="text-sm font-medium flex items-center gap-2"
+                    >
+                      <User className="h-4 w-4 text-muted-foreground" />
+                      Nome Completo
+                    </Label>
+                    <Input
+                      id="name"
+                      value={formData.name}
+                      onChange={(e) =>
+                        setFormData({ ...formData, name: e.target.value })
+                      }
+                      required
+                      className="h-11 text-base"
+                      placeholder="Digite seu nome completo"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label
+                      htmlFor="email"
+                      className="text-sm font-medium flex items-center gap-2"
+                    >
+                      <Mail className="h-4 w-4 text-muted-foreground" />
+                      Email
+                    </Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      value={formData.email}
+                      onChange={(e) =>
+                        setFormData({ ...formData, email: e.target.value })
+                      }
+                      required
+                      autoComplete="email"
+                      className="h-11 text-base"
+                      placeholder="seu@email.com"
+                    />
+                  </div>
+
+                  <Separator />
+
+                  <div className="flex justify-end">
+                    <Button
+                      type="submit"
+                      disabled={isLoading}
+                      size="lg"
+                      className="min-w-[160px] shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5"
+                    >
+                      {isLoading ? (
+                        <>
+                          <div className="h-4 w-4 mr-2 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                          Salvando...
+                        </>
+                      ) : (
+                        <>
+                          <Save className="h-4 w-4 mr-2" />
+                          Salvar Alterações
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                </form>
+              </CardContent>
+            </Card>
+
+            {/* Alterar Senha */}
+            <Card className="border-2 hover:border-primary/50 transition-all duration-300 hover:shadow-xl">
+              <CardHeader className="bg-gradient-to-r from-primary/5 via-purple-500/5 to-pink-500/5">
+                <CardTitle className="flex items-center gap-2 text-xl">
+                  <Lock className="h-5 w-5 text-primary" />
+                  Segurança da Conta
+                </CardTitle>
+                <CardDescription>
+                  Altere sua senha para manter sua conta segura
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="pt-6">
+                <form onSubmit={handlePasswordChange} className="space-y-5">
+                  <div className="space-y-2">
+                    <Label
+                      htmlFor="currentPassword"
+                      className="text-sm font-medium flex items-center gap-2"
+                    >
+                      <Key className="h-4 w-4 text-muted-foreground" />
+                      Senha Atual
+                    </Label>
+                    <Input
+                      id="currentPassword"
+                      type="password"
+                      value={passwordData.currentPassword}
+                      onChange={(e) =>
+                        setPasswordData({
+                          ...passwordData,
+                          currentPassword: e.target.value,
+                        })
+                      }
+                      required
+                      autoComplete="current-password"
+                      className="h-11 text-base"
+                      placeholder="••••••••"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label
+                        htmlFor="newPassword"
+                        className="text-sm font-medium"
+                      >
+                        Nova Senha
+                      </Label>
+                      <Input
+                        id="newPassword"
+                        type="password"
+                        value={passwordData.newPassword}
+                        onChange={(e) =>
+                          setPasswordData({
+                            ...passwordData,
+                            newPassword: e.target.value,
+                          })
+                        }
+                        required
+                        autoComplete="new-password"
+                        className="h-11 text-base"
+                        placeholder="Mínimo 8 caracteres"
                       />
-                      <div className="text-xs break-all w-full">
-                        <div className="font-medium mb-1 text-sm">
-                          otpauth URL
-                        </div>
-                        <div className="p-2 bg-secondary rounded text-xs overflow-auto">
-                          {twoFA.otpauth}
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label
+                        htmlFor="confirmPassword"
+                        className="text-sm font-medium"
+                      >
+                        Confirmar Nova Senha
+                      </Label>
+                      <Input
+                        id="confirmPassword"
+                        type="password"
+                        value={passwordData.confirmPassword}
+                        onChange={(e) =>
+                          setPasswordData({
+                            ...passwordData,
+                            confirmPassword: e.target.value,
+                          })
+                        }
+                        required
+                        autoComplete="new-password"
+                        className="h-11 text-base"
+                        placeholder="Digite novamente"
+                      />
+                    </div>
+                  </div>
+
+                  <Separator />
+
+                  <div className="flex justify-end">
+                    <Button
+                      type="submit"
+                      disabled={isLoading}
+                      size="lg"
+                      variant="outline"
+                      className="min-w-[160px] border-2 hover:bg-primary hover:text-primary-foreground transition-all duration-300"
+                    >
+                      {isLoading ? (
+                        <>
+                          <div className="h-4 w-4 mr-2 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                          Alterando...
+                        </>
+                      ) : (
+                        <>
+                          <Lock className="h-4 w-4 mr-2" />
+                          Alterar Senha
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                </form>
+              </CardContent>
+            </Card>
+
+            {/* 2FA */}
+            <Card className="border-2 hover:border-primary/50 transition-all duration-300 hover:shadow-xl">
+              <CardHeader className="bg-gradient-to-r from-primary/5 via-purple-500/5 to-pink-500/5">
+                <CardTitle className="flex items-center gap-2 text-xl">
+                  <ShieldCheck className="h-5 w-5 text-primary" />
+                  Autenticação em Duas Etapas (2FA)
+                </CardTitle>
+                <CardDescription>
+                  Adicione uma camada extra de proteção com TOTP (Google
+                  Authenticator, Authy, etc.)
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="pt-6 space-y-6">
+                {twoFA.enabled ? (
+                  <div className="space-y-4">
+                    <div className="p-4 bg-green-500/10 border-2 border-green-500/20 rounded-xl">
+                      <div className="flex items-start gap-3">
+                        <CheckCircle2 className="h-5 w-5 text-green-600 mt-0.5" />
+                        <div>
+                          <p className="text-sm font-medium text-green-900 dark:text-green-100">
+                            2FA Ativo
+                          </p>
+                          <p className="text-xs text-green-700 dark:text-green-300 mt-1">
+                            Sua conta está protegida com autenticação em duas
+                            etapas.
+                          </p>
                         </div>
                       </div>
                     </div>
                     <Button
                       type="button"
-                      onClick={() => setShowVerifyModal(true)}
+                      variant="destructive"
+                      onClick={handleDisable2FA}
                       disabled={isLoading}
-                      size="sm"
-                      className="w-full sm:w-auto"
+                      size="lg"
+                      className="w-full sm:w-auto shadow-lg hover:shadow-xl transition-all duration-300"
                     >
-                      <ShieldCheck className="h-4 w-4 mr-2" />
-                      Verificar e Habilitar
+                      <ShieldOff className="h-4 w-4 mr-2" />
+                      Desabilitar 2FA
                     </Button>
                   </div>
+                ) : (
+                  <div className="space-y-5">
+                    {!twoFA.secret ? (
+                      <>
+                        <div className="p-4 bg-yellow-500/10 border-2 border-yellow-500/20 rounded-xl">
+                          <div className="flex items-start gap-3">
+                            <AlertCircle className="h-5 w-5 text-yellow-600 mt-0.5" />
+                            <div>
+                              <p className="text-sm font-medium text-yellow-900 dark:text-yellow-100">
+                                2FA Não Configurado
+                              </p>
+                              <p className="text-xs text-yellow-700 dark:text-yellow-300 mt-1">
+                                Recomendamos ativar o 2FA para maior segurança.
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                        <Button
+                          type="button"
+                          onClick={handleSetup2FA}
+                          disabled={isLoading}
+                          size="lg"
+                          className="w-full sm:w-auto shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5"
+                        >
+                          <QrCode className="h-4 w-4 mr-2" />
+                          Configurar 2FA
+                        </Button>
+                      </>
+                    ) : (
+                      <div className="space-y-4">
+                        <div className="p-4 bg-blue-500/10 border-2 border-blue-500/20 rounded-xl">
+                          <p className="text-sm font-medium text-blue-900 dark:text-blue-100 mb-3">
+                            Escaneie o QR Code
+                          </p>
+                          <p className="text-xs text-blue-700 dark:text-blue-300 mb-4">
+                            Abra seu app de autenticação (Google Authenticator,
+                            Authy, etc.) e escaneie o código abaixo:
+                          </p>
+                          <div className="flex flex-col sm:flex-row items-center gap-4 bg-white dark:bg-gray-900 p-4 rounded-lg">
+                            <img
+                              alt="QR Code 2FA"
+                              className="w-48 h-48 rounded-lg border-2 shadow-lg"
+                              src={`https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=${encodeURIComponent(
+                                twoFA.otpauth!
+                              )}`}
+                            />
+                            <div className="flex-1 w-full">
+                              <p className="font-medium mb-2 text-sm">
+                                Não consegue escanear?
+                              </p>
+                              <div className="p-3 bg-secondary rounded-lg text-xs break-all overflow-auto max-h-32 border">
+                                {twoFA.otpauth}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <Button
+                          type="button"
+                          onClick={() => setShowVerifyModal(true)}
+                          disabled={isLoading}
+                          size="lg"
+                          className="w-full shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5"
+                        >
+                          <ShieldCheck className="h-4 w-4 mr-2" />
+                          Verificar e Ativar
+                        </Button>
+                      </div>
+                    )}
+                  </div>
                 )}
-              </div>
-            )}
-          </CardContent>
-        </Card>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
       </div>
 
       <TwoFactorModal

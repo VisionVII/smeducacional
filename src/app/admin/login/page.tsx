@@ -85,7 +85,7 @@ export default function AdminLoginPage() {
 
           if (session?.user?.role === 'ADMIN') {
             console.log('Redirecionando para dashboard do administrador');
-            window.location.href = '/admin/dashboard';
+            window.location.href = '/admin';
           } else {
             toast({
               title: 'Acesso negado',
@@ -97,7 +97,7 @@ export default function AdminLoginPage() {
           }
         } catch (error) {
           console.error('Erro ao obter sessão:', error);
-          window.location.href = '/admin/dashboard';
+          window.location.href = '/admin';
         }
       } else {
         toast({
@@ -124,7 +124,7 @@ export default function AdminLoginPage() {
   const handleGoogleSignIn = async () => {
     setIsLoading(true);
     try {
-      await signIn('google', { callbackUrl: '/admin/dashboard' });
+      await signIn('google', { callbackUrl: '/admin' });
     } catch (error) {
       console.error('Google sign-in error:', error);
       toast({

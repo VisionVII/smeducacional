@@ -26,6 +26,14 @@ export function useConfigSync() {
     localStorage.removeItem('teacher-theme-cache');
   }, [queryClient]);
 
+  // Invalidar tema do estudante
+  const invalidateStudentTheme = useCallback(async () => {
+    await queryClient.invalidateQueries({
+      queryKey: ['student-theme'],
+    });
+    localStorage.removeItem('student-theme-cache');
+  }, [queryClient]);
+
   // Invalidar todas as configurações
   const invalidateAll = useCallback(async () => {
     await Promise.all([
@@ -34,6 +42,9 @@ export function useConfigSync() {
       }),
       queryClient.invalidateQueries({
         queryKey: ['teacher-theme'],
+      }),
+      queryClient.invalidateQueries({
+        queryKey: ['student-theme'],
       }),
       queryClient.invalidateQueries({
         queryKey: ['landing-config'],
@@ -46,7 +57,8 @@ export function useConfigSync() {
     const handleStorageChange = (e: StorageEvent) => {
       if (
         e.key === 'admin-config-updated' ||
-        e.key === 'teacher-theme-updated'
+        e.key === 'teacher-theme-updated' ||
+        e.key === 'student-theme-updated'
       ) {
         const timestamp = e.newValue;
         console.debug('[useConfigSync] Mudança detectada:', e.key, timestamp);
@@ -61,6 +73,7 @@ export function useConfigSync() {
   return {
     invalidateAdminConfig,
     invalidateTeacherTheme,
+    invalidateStudentTheme,
     invalidateAll,
   };
 }
@@ -68,7 +81,9 @@ export function useConfigSync() {
 /**
  * Notifica outras abas sobre mudanças
  */
-export function broadcastConfigChange(type: 'admin' | 'teacher' | 'all') {
+export function broadcastConfigChange(
+  type: 'admin' | 'teacher' | 'student' | 'all'
+) {
   const timestamp = new Date().toISOString();
 
   if (type === 'admin' || type === 'all') {
@@ -77,5 +92,9 @@ export function broadcastConfigChange(type: 'admin' | 'teacher' | 'all') {
 
   if (type === 'teacher' || type === 'all') {
     localStorage.setItem('teacher-theme-updated', timestamp);
+  }
+
+  if (type === 'student' || type === 'all') {
+    localStorage.setItem('student-theme-updated', timestamp);
   }
 }

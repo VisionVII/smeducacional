@@ -21,6 +21,7 @@ import {
   Video,
   Calendar,
   Target,
+  Activity,
 } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
@@ -124,24 +125,31 @@ export default async function TeacherDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-background transition-theme">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6 sm:space-y-8">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 transition-theme">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 max-w-[1800px] space-y-6 sm:space-y-8">
         {/* Hero Section - Perfil do Professor */}
-        <Card className="border-2 transition-theme">
-          <CardContent className="px-4 sm:px-6 py-4 sm:py-6">
+        <Card className="relative overflow-hidden border-2 hover:border-primary/50 transition-all duration-500 hover:shadow-2xl transition-theme">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-primary/10 to-transparent rounded-bl-[200px] transition-transform duration-700"></div>
+          <CardContent className="px-4 sm:px-6 py-4 sm:py-6 relative z-10">
             <div className="flex flex-col md:flex-row gap-6 items-start">
               {/* Avatar e Info Principal */}
               <div className="flex gap-3 sm:gap-4 items-start w-full lg:w-auto">
-                <Avatar className="h-16 w-16 sm:h-20 sm:w-20 lg:h-24 lg:w-24 border-4 border-primary/10">
-                  <AvatarImage src={professor?.avatar || undefined} />
-                  <AvatarFallback className="text-2xl">
-                    {professor?.name?.charAt(0) || 'P'}
-                  </AvatarFallback>
-                </Avatar>
+                <div className="relative">
+                  <Avatar className="h-16 w-16 sm:h-20 sm:w-20 lg:h-24 lg:w-24 border-4 border-primary/20 ring-4 ring-primary/10 transition-all hover:scale-105">
+                    <AvatarImage src={professor?.avatar || undefined} />
+                    <AvatarFallback className="text-2xl bg-gradient-to-br from-primary to-primary/80 text-primary-foreground">
+                      {professor?.name?.charAt(0) || 'P'}
+                    </AvatarFallback>
+                  </Avatar>
+                  <Badge className="absolute -bottom-2 -right-2 bg-gradient-to-r from-green-500 to-emerald-500 text-white border-0 shadow-lg animate-pulse">
+                    <Activity className="h-3 w-3 mr-1" />
+                    Online
+                  </Badge>
+                </div>
 
                 <div className="space-y-2">
                   <div>
-                    <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold">
+                    <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold bg-gradient-to-r from-primary via-purple-600 to-pink-600 bg-clip-text text-transparent">
                       {professor?.name}
                     </h1>
                     <p className="text-sm sm:text-base lg:text-lg text-muted-foreground">
@@ -207,14 +215,17 @@ export default async function TeacherDashboard() {
 
         {/* KPIs Principais */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-          <Card className="hover:shadow-lg transition-all transition-theme">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <Card className="relative overflow-hidden border-2 hover:border-primary/50 transition-all duration-500 hover:shadow-2xl hover:-translate-y-1 group transition-theme">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-primary/5 to-transparent rounded-bl-full"></div>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
               <CardTitle className="text-sm font-medium">
                 Cursos Publicados
               </CardTitle>
-              <BookOpen className="h-4 w-4 text-primary transition-theme" />
+              <div className="p-3 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-lg group-hover:scale-110 transition-transform duration-300">
+                <BookOpen className="h-4 w-4 text-white" />
+              </div>
             </CardHeader>
-            <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
+            <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6 relative z-10">
               <div className="text-xl sm:text-2xl font-bold">
                 {stats.publishedCourses}
               </div>
@@ -224,14 +235,17 @@ export default async function TeacherDashboard() {
             </CardContent>
           </Card>
 
-          <Card className="hover:shadow-lg transition-all transition-theme">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <Card className="relative overflow-hidden border-2 hover:border-primary/50 transition-all duration-500 hover:shadow-2xl hover:-translate-y-1 group transition-theme">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-primary/5 to-transparent rounded-bl-full"></div>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
               <CardTitle className="text-sm font-medium">
                 Alunos Ativos
               </CardTitle>
-              <Users className="h-4 w-4 text-primary transition-theme" />
+              <div className="p-3 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl shadow-lg group-hover:scale-110 transition-transform duration-300">
+                <Users className="h-4 w-4 text-white" />
+              </div>
             </CardHeader>
-            <CardContent>
+            <CardContent className="relative z-10">
               <div className="text-2xl font-bold">{stats.totalStudents}</div>
               <p className="text-xs text-muted-foreground">
                 em {stats.totalCourses} cursos
@@ -239,23 +253,29 @@ export default async function TeacherDashboard() {
             </CardContent>
           </Card>
 
-          <Card className="hover:shadow-lg transition-all transition-theme">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <Card className="relative overflow-hidden border-2 hover:border-primary/50 transition-all duration-500 hover:shadow-2xl hover:-translate-y-1 group transition-theme">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-primary/5 to-transparent rounded-bl-full"></div>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
               <CardTitle className="text-sm font-medium">Conteúdos</CardTitle>
-              <Video className="h-4 w-4 text-primary transition-theme" />
+              <div className="p-3 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl shadow-lg group-hover:scale-110 transition-transform duration-300">
+                <Video className="h-4 w-4 text-white" />
+              </div>
             </CardHeader>
-            <CardContent>
+            <CardContent className="relative z-10">
               <div className="text-2xl font-bold">{stats.totalLessons}</div>
               <p className="text-xs text-muted-foreground">aulas produzidas</p>
             </CardContent>
           </Card>
 
-          <Card className="hover:shadow-lg transition-all transition-theme">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <Card className="relative overflow-hidden border-2 hover:border-primary/50 transition-all duration-500 hover:shadow-2xl hover:-translate-y-1 group transition-theme">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-primary/5 to-transparent rounded-bl-full"></div>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
               <CardTitle className="text-sm font-medium">Mensagens</CardTitle>
-              <MessageSquare className="h-4 w-4 text-primary transition-theme" />
+              <div className="p-3 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl shadow-lg group-hover:scale-110 transition-transform duration-300">
+                <MessageSquare className="h-4 w-4 text-white" />
+              </div>
             </CardHeader>
-            <CardContent>
+            <CardContent className="relative z-10">
               <div className="text-2xl font-bold">{stats.pendingMessages}</div>
               <p className="text-xs text-muted-foreground">
                 pendentes de resposta

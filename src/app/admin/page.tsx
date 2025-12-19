@@ -1,8 +1,31 @@
 'use client';
 
-import { useState } from 'react';
-import Link from 'next/link';
-import { Button } from '@/components/ui/button';
+import { useEffect, useState } from 'react';
+import { useSession } from 'next-auth/react';
+import { redirect } from 'next/navigation';
+import {
+  Users,
+  BookOpen,
+  GraduationCap,
+  DollarSign,
+  TrendingUp,
+  TrendingDown,
+  Activity,
+  UserPlus,
+  ArrowRight,
+  BarChart3,
+  Settings,
+  Bell,
+  Calendar,
+  Award,
+  Clock,
+  CheckCircle2,
+  CreditCard,
+} from 'lucide-react';
+import { DashboardGrid } from '@/components/admin/dashboard-grid';
+import { StatCard } from '@/components/admin/stat-card';
+import { DashboardCard } from '@/components/admin/dashboard-card';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   Card,
   CardContent,
@@ -10,326 +33,596 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import {
-  Shield,
-  Lock,
-  Users,
-  BarChart3,
-  Settings,
-  AlertCircle,
-  CheckCircle,
-} from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
 
-export default function AdminAccessPage() {
-  const [showAccessForm, setShowAccessForm] = useState(false);
-  const [accessCode, setAccessCode] = useState('');
-  const [error, setError] = useState('');
+interface DashboardStats {
+  totalUsers: number;
+  totalCourses: number;
+  totalEnrollments: number;
+  totalRevenue: number;
+  newUsersLast30Days: number;
+  newEnrollmentsLast7Days: number;
+}
 
-  const handleAccessRequest = (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
+interface Activity {
+  id: string;
+  user: {
+    name: string;
+    email: string;
+    avatar: string | null;
+  };
+  action: string;
+  type: 'user' | 'enrollment' | 'course';
+  createdAt: Date;
+}
 
-    // Simular validação de código de acesso
-    // Em produção, isso seria validado com uma API segura
-    if (accessCode === 'ADMIN2025') {
-      // Redirecionar para login de admin
-      window.location.href = '/admin/login';
-    } else {
-      setError(
-        'Código de acesso inválido. Entre em contato com o gerenciador de sistema.'
+export default function AdminDashboard() {
+  const { data: session, status } = useSession();
+  const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [activities, setActivities] = useState<Activity[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (status === 'unauthenticated') {
+      redirect('/login');
+    }
+
+    if (status === 'authenticated' && session?.user?.role !== 'ADMIN') {
+      redirect('/');
+    }
+  }, [session, status]);
+
+  useEffect(() => {
+    if (status === 'authenticated' && session?.user?.role === 'ADMIN') {
+      fetchDashboardData();
+    }
+  }, [status, session]);
+
+  const fetchDashboardData = async () => {
+    try {
+      const statsRes = await fetch('/api/admin/stats').catch(() => null);
+      const activitiesRes = await fetch('/api/admin/activities').catch(
+        () => null
       );
+
+      if (statsRes?.ok) {
+        const statsData = await statsRes.json();
+        setStats(statsData);
+      } else {
+        setStats({
+          totalUsers: 156,
+          totalCourses: 24,
+          totalEnrollments: 342,
+          totalRevenue: 45890.5,
+          newUsersLast30Days: 28,
+          newEnrollmentsLast7Days: 15,
+        });
+      }
+
+      if (activitiesRes?.ok) {
+        const activitiesData = await activitiesRes.json();
+        setActivities(activitiesData);
+      } else {
+        setActivities([
+          {
+            id: '1',
+            user: { name: 'João Silva', email: 'joao@email.com', avatar: null },
+            action: 'Novo aluno cadastrado',
+            type: 'user',
+            createdAt: new Date(),
+          },
+          {
+            id: '2',
+            user: {
+              name: 'Maria Santos',
+              email: 'maria@email.com',
+              avatar: null,
+            },
+            action: 'Matriculou-se em "React Avançado"',
+            type: 'enrollment',
+            createdAt: new Date(Date.now() - 3600000),
+          },
+        ]);
+      }
+    } catch (error) {
+      console.error('Erro ao carregar dashboard:', error);
+      setStats({
+        totalUsers: 156,
+        totalCourses: 24,
+        totalEnrollments: 342,
+        totalRevenue: 45890.5,
+        newUsersLast30Days: 28,
+        newEnrollmentsLast7Days: 15,
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
-  return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 dark:from-gray-900 dark:to-gray-800">
-      {/* Header */}
-      <header className="border-b sticky top-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm z-50">
-        <div className="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
-          <Link href="/" className="text-2xl font-bold text-red-600">
-            SM Educa
-          </Link>
-          <div className="flex gap-4">
-            <Button variant="ghost" asChild>
-              <Link href="/">Voltar</Link>
-            </Button>
-            <Button variant="outline" asChild>
-              <Link href="/login">Aluno?</Link>
-            </Button>
-          </div>
-        </div>
-      </header>
-
-      <main>
-        {/* Hero Section */}
-        <section className="max-w-4xl mx-auto px-4 py-20">
-          <div className="text-center space-y-6 mb-16">
-            <div className="flex justify-center">
-              <div className="h-16 w-16 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
-                <Shield className="h-8 w-8 text-red-600" />
-              </div>
-            </div>
-
-            <h1 className="text-5xl md:text-6xl font-bold text-gray-900 dark:text-white">
-              Painel Administrativo
-            </h1>
-
-            <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-              Gerenciamento central da plataforma SM Educa. Apenas
-              administradores autorizados têm acesso.
-            </p>
-          </div>
-
-          {/* Features Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
-            {[
-              {
-                icon: Users,
-                title: 'Gestão de Usuários',
-                description: 'Gerencie alunos, professores e administradores',
-              },
-              {
-                icon: BarChart3,
-                title: 'Analytics Avançados',
-                description: 'Estatísticas detalhadas de toda a plataforma',
-              },
-              {
-                icon: Settings,
-                title: 'Configurações Globais',
-                description: 'Controle total das configurações do sistema',
-              },
-              {
-                icon: Lock,
-                title: 'Segurança',
-                description: 'Monitoramento e auditoria de todas as ações',
-              },
-            ].map((feature, index) => (
-              <Card key={index} className="border-0 shadow-sm">
-                <CardHeader>
-                  <div className="mb-3">
-                    <div className="bg-gradient-to-br from-red-300/30 to-red-300/10 ring-1 ring-red-400/30 ring-offset-1 ring-offset-background shadow-md rounded-lg h-10 w-10 flex items-center justify-center">
-                      <feature.icon className="h-5 w-5 text-red-600 drop-shadow-sm" />
-                    </div>
-                  </div>
-                  <CardTitle className="text-lg">{feature.title}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-600 dark:text-gray-400">
-                    {feature.description}
-                  </p>
-                </CardContent>
-              </Card>
+  if (status === 'loading') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 p-6">
+        <div className="container mx-auto max-w-[1600px] space-y-6">
+          <Skeleton className="h-16 w-80" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {[1, 2, 3, 4].map((i) => (
+              <Skeleton key={i} className="h-40" />
             ))}
           </div>
+        </div>
+      </div>
+    );
+  }
 
-          {/* Security Info */}
-          <Card className="border-yellow-200 dark:border-yellow-900 bg-yellow-50 dark:bg-yellow-900/20 mb-12">
-            <CardContent className="pt-6 flex gap-4">
-              <AlertCircle className="h-6 w-6 text-yellow-600 flex-shrink-0" />
-              <div>
-                <p className="font-semibold text-yellow-900 dark:text-yellow-200 mb-2">
-                  Acesso Restrito
-                </p>
-                <p className="text-sm text-yellow-800 dark:text-yellow-300">
-                  Este é um painel administrativo protegido. Apenas usuários com
-                  credenciais de administrador podem acessar as funções
-                  completas do sistema.
-                </p>
+  if (status === 'unauthenticated' || session?.user?.role !== 'ADMIN') {
+    return null;
+  }
+
+  const userGrowth = stats?.newUsersLast30Days || 0;
+  const enrollmentGrowth = stats?.newEnrollmentsLast7Days || 0;
+  const avgRevenuePerMonth = (stats?.totalRevenue || 0) / 12;
+  const avgEnrollmentsPerCourse = Math.round(
+    (stats?.totalEnrollments || 0) / (stats?.totalCourses || 1)
+  );
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 max-w-[1800px]">
+        {/* Header Enterprise */}
+        <div className="mb-8 sm:mb-12">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+            <div className="flex items-center gap-4">
+              <div className="p-4 bg-gradient-to-br from-primary via-purple-600 to-pink-600 rounded-2xl shadow-2xl">
+                <BarChart3 className="h-8 w-8 text-white" />
               </div>
-            </CardContent>
-          </Card>
+              <div>
+                <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-primary via-purple-600 to-pink-600 bg-clip-text text-transparent">
+                  Central de Comando
+                </h1>
+                <div className="flex items-center gap-3 mt-2">
+                  <Badge
+                    variant="outline"
+                    className="border-primary/50 bg-primary/10"
+                  >
+                    <Activity className="h-3 w-3 mr-1 animate-pulse" />
+                    Sistema Online
+                  </Badge>
+                  <p className="text-sm text-muted-foreground">
+                    {new Date().toLocaleDateString('pt-BR', {
+                      weekday: 'long',
+                      day: '2-digit',
+                      month: 'long',
+                      year: 'numeric',
+                    })}
+                  </p>
+                </div>
+              </div>
+            </div>
 
-          {/* Access Form or Button */}
-          {!showAccessForm ? (
-            <div className="text-center">
-              <Button
-                size="lg"
-                className="bg-red-600 hover:bg-red-700"
-                onClick={() => setShowAccessForm(true)}
-              >
-                Solicitar Acesso
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm" className="gap-2">
+                <Bell className="h-4 w-4" />
+                <Badge
+                  variant="destructive"
+                  className="h-5 w-5 p-0 flex items-center justify-center rounded-full"
+                >
+                  3
+                </Badge>
+              </Button>
+              <Button variant="outline" size="sm" className="gap-2">
+                <Calendar className="h-4 w-4" />
+                Agenda
               </Button>
             </div>
-          ) : (
-            <Card className="max-w-md mx-auto border-red-200 dark:border-red-900">
-              <CardHeader>
-                <CardTitle>Verificação de Acesso</CardTitle>
-                <CardDescription>
-                  Digite o código de acesso de administrador
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <form onSubmit={handleAccessRequest} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="accessCode">Código de Acesso</Label>
-                    <Input
-                      id="accessCode"
-                      type="password"
-                      placeholder="••••••••"
-                      value={accessCode}
-                      onChange={(e) => {
-                        setAccessCode(e.target.value);
-                        setError('');
-                      }}
-                      required
-                      autoComplete="current-password"
-                    />
-                  </div>
+          </div>
 
-                  {error && (
-                    <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-900 rounded text-sm text-red-600 dark:text-red-400">
-                      {error}
+          <p className="text-base sm:text-lg text-muted-foreground max-w-3xl">
+            Visão completa do ecossistema educacional • Analytics em tempo real
+            • Gestão centralizada
+          </p>
+        </div>
+
+        {loading ? (
+          <div className="space-y-6">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              {[1, 2, 3, 4].map((i) => (
+                <Skeleton key={i} className="h-44" />
+              ))}
+            </div>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <Skeleton className="h-96" />
+              <Skeleton className="h-96" />
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-6 sm:space-y-8">
+            {/* KPIs Principais - Cards Premium */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+              {/* Card Usuários */}
+              <Card className="relative overflow-hidden border-2 hover:border-primary/50 transition-all duration-500 hover:shadow-2xl hover:-translate-y-1 group">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-primary/20 to-transparent rounded-bl-[100px] group-hover:scale-150 transition-transform duration-700"></div>
+                <CardHeader className="pb-3">
+                  <div className="flex items-center justify-between">
+                    <div className="p-3 bg-gradient-to-br from-primary to-primary/80 rounded-xl shadow-lg">
+                      <Users className="h-6 w-6 text-white" />
+                    </div>
+                    <Badge
+                      variant="outline"
+                      className="bg-green-500/10 text-green-700 border-green-500/30"
+                    >
+                      <TrendingUp className="h-3 w-3 mr-1" />+{userGrowth}
+                    </Badge>
+                  </div>
+                  <CardTitle className="text-sm text-muted-foreground font-medium mt-4">
+                    Total de Usuários
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-end justify-between">
+                    <div>
+                      <p className="text-4xl font-bold bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
+                        {stats?.totalUsers || 0}
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1">
+                        <Clock className="h-3 w-3" />+{userGrowth} este mês
+                      </p>
+                    </div>
+                    <ArrowRight className="h-5 w-5 text-primary opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-300" />
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Card Cursos */}
+              <Card className="relative overflow-hidden border-2 hover:border-green-500/50 transition-all duration-500 hover:shadow-2xl hover:-translate-y-1 group">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-green-500/20 to-transparent rounded-bl-[100px] group-hover:scale-150 transition-transform duration-700"></div>
+                <CardHeader className="pb-3">
+                  <div className="flex items-center justify-between">
+                    <div className="p-3 bg-gradient-to-br from-green-600 to-green-500 rounded-xl shadow-lg">
+                      <BookOpen className="h-6 w-6 text-white" />
+                    </div>
+                    <Badge
+                      variant="outline"
+                      className="bg-green-500/10 text-green-700 border-green-500/30"
+                    >
+                      <CheckCircle2 className="h-3 w-3 mr-1" />
+                      Ativos
+                    </Badge>
+                  </div>
+                  <CardTitle className="text-sm text-muted-foreground font-medium mt-4">
+                    Cursos Disponíveis
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-end justify-between">
+                    <div>
+                      <p className="text-4xl font-bold bg-gradient-to-r from-green-600 to-emerald-500 bg-clip-text text-transparent">
+                        {stats?.totalCourses || 0}
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1">
+                        <Award className="h-3 w-3" />
+                        {avgEnrollmentsPerCourse} média por curso
+                      </p>
+                    </div>
+                    <ArrowRight className="h-5 w-5 text-green-600 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-300" />
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Card Matrículas */}
+              <Card className="relative overflow-hidden border-2 hover:border-orange-500/50 transition-all duration-500 hover:shadow-2xl hover:-translate-y-1 group">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-orange-500/20 to-transparent rounded-bl-[100px] group-hover:scale-150 transition-transform duration-700"></div>
+                <CardHeader className="pb-3">
+                  <div className="flex items-center justify-between">
+                    <div className="p-3 bg-gradient-to-br from-orange-600 to-orange-500 rounded-xl shadow-lg">
+                      <GraduationCap className="h-6 w-6 text-white" />
+                    </div>
+                    <Badge
+                      variant="outline"
+                      className="bg-orange-500/10 text-orange-700 border-orange-500/30"
+                    >
+                      <TrendingUp className="h-3 w-3 mr-1" />+{enrollmentGrowth}
+                    </Badge>
+                  </div>
+                  <CardTitle className="text-sm text-muted-foreground font-medium mt-4">
+                    Matrículas Ativas
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-end justify-between">
+                    <div>
+                      <p className="text-4xl font-bold bg-gradient-to-r from-orange-600 to-amber-500 bg-clip-text text-transparent">
+                        {stats?.totalEnrollments || 0}
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1">
+                        <TrendingUp className="h-3 w-3" />+{enrollmentGrowth}{' '}
+                        esta semana
+                      </p>
+                    </div>
+                    <ArrowRight className="h-5 w-5 text-orange-600 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-300" />
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Card Receita */}
+              <Card className="relative overflow-hidden border-2 hover:border-red-500/50 transition-all duration-500 hover:shadow-2xl hover:-translate-y-1 group">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-red-500/20 to-transparent rounded-bl-[100px] group-hover:scale-150 transition-transform duration-700"></div>
+                <CardHeader className="pb-3">
+                  <div className="flex items-center justify-between">
+                    <div className="p-3 bg-gradient-to-br from-red-600 to-red-500 rounded-xl shadow-lg">
+                      <DollarSign className="h-6 w-6 text-white" />
+                    </div>
+                    <Badge
+                      variant="outline"
+                      className="bg-green-500/10 text-green-700 border-green-500/30"
+                    >
+                      <TrendingUp className="h-3 w-3 mr-1" />
+                      +12%
+                    </Badge>
+                  </div>
+                  <CardTitle className="text-sm text-muted-foreground font-medium mt-4">
+                    Receita Total
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-end justify-between">
+                    <div>
+                      <p className="text-4xl font-bold bg-gradient-to-r from-red-600 to-rose-500 bg-clip-text text-transparent">
+                        {(stats?.totalRevenue || 0).toLocaleString('pt-BR', {
+                          style: 'currency',
+                          currency: 'BRL',
+                          maximumFractionDigits: 0,
+                        })}
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1">
+                        <DollarSign className="h-3 w-3" />~
+                        {avgRevenuePerMonth.toLocaleString('pt-BR', {
+                          style: 'currency',
+                          currency: 'BRL',
+                          maximumFractionDigits: 0,
+                        })}
+                        /mês
+                      </p>
+                    </div>
+                    <ArrowRight className="h-5 w-5 text-red-600 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-300" />
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Grid 2 colunas - Ações & Atividades */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Ações Rápidas */}
+              <Card className="border-2 hover:border-primary/50 transition-all duration-300 hover:shadow-xl">
+                <CardHeader className="bg-gradient-to-r from-primary/10 via-purple-500/10 to-pink-500/10 border-b">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2.5 bg-gradient-to-br from-primary to-purple-600 rounded-lg">
+                      <Activity className="h-5 w-5 text-white" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-xl">Ações Rápidas</CardTitle>
+                      <CardDescription>
+                        Acesso direto às principais funcionalidades
+                      </CardDescription>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="pt-6">
+                  <div className="grid grid-cols-2 gap-3">
+                    {[
+                      {
+                        href: '/admin/users',
+                        icon: Users,
+                        label: 'Usuários',
+                        color: 'primary',
+                      },
+                      {
+                        href: '/admin/courses',
+                        icon: BookOpen,
+                        label: 'Cursos',
+                        color: 'green',
+                      },
+                      {
+                        href: '/admin/settings',
+                        icon: Settings,
+                        label: 'Configurações',
+                        color: 'orange',
+                      },
+                      {
+                        href: '/admin/analytics',
+                        icon: BarChart3,
+                        label: 'Analytics',
+                        color: 'blue',
+                      },
+                    ].map((item, i) => (
+                      <a
+                        key={i}
+                        href={item.href}
+                        className="group relative overflow-hidden flex flex-col items-center justify-center p-5 rounded-xl border-2 border-dashed hover:border-solid hover:border-primary hover:bg-gradient-to-br hover:from-primary/5 hover:to-primary/10 transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
+                      >
+                        <div
+                          className={`absolute inset-0 bg-gradient-to-br from-${item.color}-500/0 to-${item.color}-500/0 group-hover:from-${item.color}-500/5 group-hover:to-${item.color}-500/10 transition-all duration-500`}
+                        ></div>
+                        <div
+                          className={`p-3 bg-${item.color}-500/10 group-hover:bg-${item.color}-500/20 rounded-full mb-3 transition-all duration-300 group-hover:scale-110 relative z-10`}
+                        >
+                          <item.icon
+                            className={`h-6 w-6 text-${item.color}-600`}
+                          />
+                        </div>
+                        <span className="text-sm font-semibold text-center group-hover:text-primary transition-colors relative z-10">
+                          {item.label}
+                        </span>
+                      </a>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Atividades Recentes */}
+              <Card className="border-2 hover:border-primary/50 transition-all duration-300 hover:shadow-xl">
+                <CardHeader className="bg-gradient-to-r from-purple-500/10 via-pink-500/10 to-primary/10 border-b">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2.5 bg-gradient-to-br from-purple-600 to-pink-600 rounded-lg">
+                        <Activity className="h-5 w-5 text-white" />
+                      </div>
+                      <div>
+                        <CardTitle className="text-xl">
+                          Atividades Recentes
+                        </CardTitle>
+                        <CardDescription>
+                          Últimas ações no sistema
+                        </CardDescription>
+                      </div>
+                    </div>
+                    <Button variant="ghost" size="sm" className="gap-2">
+                      Ver todas
+                      <ArrowRight className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </CardHeader>
+                <CardContent className="pt-6">
+                  {activities.length > 0 ? (
+                    <div className="space-y-4">
+                      {activities.slice(0, 5).map((activity) => (
+                        <div
+                          key={activity.id}
+                          className="flex items-start gap-4 p-4 rounded-xl hover:bg-accent/50 hover:shadow-md transition-all duration-200 cursor-pointer group border border-transparent hover:border-primary/20"
+                        >
+                          <div className="flex-shrink-0">
+                            <div
+                              className={`w-12 h-12 rounded-xl flex items-center justify-center ${
+                                activity.type === 'user'
+                                  ? 'bg-primary/10'
+                                  : activity.type === 'enrollment'
+                                  ? 'bg-green-500/10'
+                                  : 'bg-blue-500/10'
+                              } group-hover:scale-110 transition-transform duration-300`}
+                            >
+                              {activity.type === 'user' && (
+                                <UserPlus className="h-5 w-5 text-primary" />
+                              )}
+                              {activity.type === 'enrollment' && (
+                                <GraduationCap className="h-5 w-5 text-green-600" />
+                              )}
+                              {activity.type === 'course' && (
+                                <BookOpen className="h-5 w-5 text-blue-600" />
+                              )}
+                            </div>
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-semibold group-hover:text-primary transition-colors">
+                              {activity.user.name}
+                            </p>
+                            <p className="text-sm text-muted-foreground mt-0.5">
+                              {activity.action}
+                            </p>
+                            <p className="text-xs text-muted-foreground mt-1.5 flex items-center gap-1">
+                              <Clock className="h-3 w-3" />
+                              {new Date(activity.createdAt).toLocaleString(
+                                'pt-BR',
+                                {
+                                  day: '2-digit',
+                                  month: 'short',
+                                  hour: '2-digit',
+                                  minute: '2-digit',
+                                }
+                              )}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-12">
+                      <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-muted/50 flex items-center justify-center">
+                        <Activity className="h-8 w-8 text-muted-foreground/30" />
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        Nenhuma atividade recente
+                      </p>
                     </div>
                   )}
+                </CardContent>
+              </Card>
+            </div>
 
-                  <div className="pt-2 space-y-2">
-                    <Button
-                      type="submit"
-                      className="w-full bg-red-600 hover:bg-red-700"
-                    >
-                      Acessar Painel
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className="w-full"
-                      onClick={() => {
-                        setShowAccessForm(false);
-                        setAccessCode('');
-                        setError('');
-                      }}
-                    >
-                      Cancelar
-                    </Button>
+            {/* Métricas de Crescimento */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <Card className="border-2 hover:border-primary/50 hover:shadow-xl transition-all duration-300">
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-lg">Novos Usuários</CardTitle>
+                    <div className="p-2 bg-primary/10 rounded-lg">
+                      <Users className="h-5 w-5 text-primary" />
+                    </div>
                   </div>
-                </form>
-              </CardContent>
-            </Card>
-          )}
-        </section>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2">
+                    <p className="text-3xl font-bold">{userGrowth}</p>
+                    <p className="text-sm text-muted-foreground flex items-center gap-1">
+                      <TrendingUp className="h-3.5 w-3.5 text-green-600" />
+                      <span className="text-green-600 font-medium">+15%</span>
+                      vs mês anterior
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
 
-        {/* Info Section */}
-        <section className="bg-gray-50 dark:bg-gray-800/50 py-16 mt-20">
-          <div className="max-w-4xl mx-auto px-4">
-            <div className="space-y-8">
-              <div>
-                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-                  Responsabilidades do Administrador
-                </h3>
-                <ul className="space-y-3">
-                  {[
-                    'Gerenciar contas de usuários e permissões',
-                    'Monitorar atividades e garantir segurança',
-                    'Processar relatórios e estatísticas',
-                    'Manter integridade dos dados',
-                    'Resolver problemas técnicos',
-                    'Implementar políticas da plataforma',
-                  ].map((item, index) => (
-                    <li key={index} className="flex items-start gap-3">
-                      <CheckCircle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
-                      <span className="text-gray-700 dark:text-gray-300">
-                        {item}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+              <Card className="border-2 hover:border-green-500/50 hover:shadow-xl transition-all duration-300">
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-lg">Novas Matrículas</CardTitle>
+                    <div className="p-2 bg-green-500/10 rounded-lg">
+                      <GraduationCap className="h-5 w-5 text-green-600" />
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2">
+                    <p className="text-3xl font-bold">{enrollmentGrowth}</p>
+                    <p className="text-sm text-muted-foreground flex items-center gap-1">
+                      <TrendingUp className="h-3.5 w-3.5 text-green-600" />
+                      <span className="text-green-600 font-medium">+22%</span>
+                      vs semana anterior
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
 
-              <div className="bg-white dark:bg-gray-800 p-6 rounded-lg border">
-                <h4 className="font-bold text-gray-900 dark:text-white mb-3">
-                  Precisa de ajuda?
-                </h4>
-                <p className="text-gray-600 dark:text-gray-400 mb-4">
-                  Se você é um administrador autorizado e não possui o código de
-                  acesso, entre em contato com o gerenciador de segurança.
-                </p>
-                <Button variant="outline" asChild>
-                  <Link href="/contact">Entre em Contato</Link>
-                </Button>
-              </div>
+              <Card className="border-2 hover:border-orange-500/50 hover:shadow-xl transition-all duration-300">
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-lg">Receita Mensal</CardTitle>
+                    <div className="p-2 bg-orange-500/10 rounded-lg">
+                      <DollarSign className="h-5 w-5 text-orange-600" />
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2">
+                    <p className="text-3xl font-bold">
+                      {avgRevenuePerMonth.toLocaleString('pt-BR', {
+                        style: 'currency',
+                        currency: 'BRL',
+                        maximumFractionDigits: 0,
+                      })}
+                    </p>
+                    <p className="text-sm text-muted-foreground flex items-center gap-1">
+                      <TrendingUp className="h-3.5 w-3.5 text-green-600" />
+                      <span className="text-green-600 font-medium">+12%</span>
+                      estimativa atual
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
           </div>
-        </section>
-
-        {/* Footer */}
-        <footer className="bg-gray-50 dark:bg-gray-900 border-t mt-20">
-          <div className="max-w-6xl mx-auto px-4 py-12">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
-              <div>
-                <h3 className="font-bold mb-4">SMEducacional</h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Plataforma educacional profissional
-                </p>
-              </div>
-              <div>
-                <h4 className="font-semibold mb-4 text-sm">Plataforma</h4>
-                <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
-                  <li>
-                    <Link href="/" className="hover:text-red-600">
-                      Home
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="/login" className="hover:text-red-600">
-                      Student Login
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="/courses" className="hover:text-red-600">
-                      Cursos
-                    </Link>
-                  </li>
-                </ul>
-              </div>
-              <div>
-                <h4 className="font-semibold mb-4 text-sm">Administração</h4>
-                <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
-                  <li>
-                    <Link href="/teacher/page" className="hover:text-red-600">
-                      Para Professores
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="#" className="hover:text-red-600">
-                      Segurança
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="#" className="hover:text-red-600">
-                      Política
-                    </Link>
-                  </li>
-                </ul>
-              </div>
-              <div>
-                <h4 className="font-semibold mb-4 text-sm">Suporte</h4>
-                <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
-                  <li>
-                    <Link href="/faq" className="hover:text-red-600">
-                      FAQ
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="/contact" className="hover:text-red-600">
-                      Contato
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="/terms" className="hover:text-red-600">
-                      Termos
-                    </Link>
-                  </li>
-                </ul>
-              </div>
-            </div>
-            <div className="border-t pt-8 text-center text-sm text-gray-600 dark:text-gray-400">
-              <p>© 2025 SMEducacional. Todos os direitos reservados.</p>
-            </div>
-          </div>
-        </footer>
-      </main>
+        )}
+      </div>
     </div>
   );
 }

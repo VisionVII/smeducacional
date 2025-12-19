@@ -9,6 +9,7 @@ import {
   BookOpen,
   FolderTree,
   Settings,
+  Palette,
 } from 'lucide-react';
 
 export default async function AdminLayout({
@@ -24,7 +25,7 @@ export default async function AdminLayout({
 
   const adminLinks = [
     {
-      href: '/admin/dashboard',
+      href: '/admin',
       label: 'Dashboard',
       icon: <LayoutDashboard className="h-4 w-4" />,
     },
@@ -42,6 +43,11 @@ export default async function AdminLayout({
       href: '/admin/categories',
       label: 'Categorias',
       icon: <FolderTree className="h-4 w-4" />,
+    },
+    {
+      href: '/admin/settings/theme',
+      label: 'Tema',
+      icon: <Palette className="h-4 w-4" />,
     },
     {
       href: '/admin/settings',
