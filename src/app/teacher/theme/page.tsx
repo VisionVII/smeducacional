@@ -68,14 +68,6 @@ export default function ThemeCustomizerPage() {
     </div>
   );
 }
-    }
-  };
-
-  const handleSystemThemeChange = (value: string) => {
-    setSystemTheme(value);
-  };
-
-  const handleSaveLayout = async () => {
     setIsSaving(true);
     try {
       await updateTheme({
