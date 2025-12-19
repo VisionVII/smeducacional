@@ -5,19 +5,17 @@
 
 'use client';
 
-import { useEffect, useCallback } from 'react';
-import { useTeacherTheme } from '@/components/teacher-theme-provider';
+import { useEffect } from 'react';
 
 export function useThemeSync() {
-  const { loadTheme } = useTeacherTheme();
+  // Hook simplificado - tema agora gerenciado por ThemeScript SSR
+  // Mantido para compatibilidade, mas sem lógica ativa
 
-  // Recarregar tema quando a aba ficar visível
-  const handleVisibilityChange = useCallback(() => {
+  const handleVisibilityChange = () => {
     if (document.visibilityState === 'visible') {
-      console.debug('[useThemeSync] Aba visível, sincronizando tema');
-      loadTheme();
+      console.debug('[useThemeSync] Aba visível');
     }
-  }, [loadTheme]);
+  };
 
   // Recarregar tema quando a janela ganhar foco
   const handleFocus = useCallback(() => {

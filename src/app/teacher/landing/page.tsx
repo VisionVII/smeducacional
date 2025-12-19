@@ -30,8 +30,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { useTeacherTheme } from '@/components/teacher-theme-provider';
-import { useThemeSync } from '@/hooks/useThemeSync';
 
 interface FAQItem {
   question: string;
@@ -65,9 +63,6 @@ interface LandingConfig {
 }
 
 export default function TeacherLandingBuilder() {
-  const { theme, loadTheme } = useTeacherTheme();
-  useThemeSync(); // Sincronizar tema em tempo real
-
   const [config, setConfig] = useState<LandingConfig | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -601,7 +596,7 @@ export default function TeacherLandingBuilder() {
                   Pré-visualização
                 </CardTitle>
                 <CardDescription className="text-xs">
-                  Modo {theme?.palette ? 'tema ativo' : 'claro'}
+                  Modo de visualização
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4 text-sm">
