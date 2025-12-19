@@ -68,35 +68,7 @@ export default function ThemeCustomizerPage() {
     </div>
   );
 }
-    setIsSaving(true);
-    try {
-      await updateTheme({
-        layout: {
-          cardStyle:
-            layoutConfig.cardStyle as ThemePreset['layout']['cardStyle'],
-          borderRadius: layoutConfig.borderRadius,
-          shadowIntensity:
-            layoutConfig.shadowIntensity as ThemePreset['layout']['shadowIntensity'],
-          spacing: layoutConfig.spacing as ThemePreset['layout']['spacing'],
-        },
-      });
-      // Invalidar cache e notificar outras abas
-      await invalidateTeacherTheme();
-      broadcastConfigChange('teacher');
-      toast({
-        title: '💾 Layout salvo!',
-        description: 'As configurações de layout foram atualizadas.',
-      });
-    } catch (error) {
-      toast({
-        title: '❌ Erro',
-        description: 'Não foi possível salvar o layout. Tente novamente.',
-        variant: 'destructive',
-      });
-    } finally {
-      setIsSaving(false);
-    }
-  };
+
 
   if (isLoading) {
     return (
