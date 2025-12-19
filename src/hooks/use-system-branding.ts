@@ -26,6 +26,18 @@ interface SystemBranding {
 let cachedBranding: SystemBranding | null = null;
 let fetchPromise: Promise<SystemBranding> | null = null;
 
+// Função para limpar cache de branding (chamada após atualização no admin)
+export function clearBrandingCache() {
+  if (typeof window !== 'undefined') {
+    localStorage.removeItem('system-branding-cache');
+    cachedBranding = null;
+    fetchPromise = null;
+    // Dispara evento customizado para que outros componentes recarreguem
+    window.dispatchEvent(new Event('branding-cache-cleared'));
+    console.log('[useSystemBranding] Cache limpo e evento disparado');
+  }
+}
+
 export function useSystemBranding() {
   // SEMPRE inicia com fallback para evitar hydration mismatch
   const [branding, setBranding] = useState<SystemBranding>({
@@ -102,6 +114,38 @@ export function useSystemBranding() {
     }
 
     loadBranding();
+
+    // Listener para quando cache for limpo (ex: admin salvou configurações)
+    const handleCacheCleared = () => {
+      console.log(
+        '[useSystemBranding] Evento de cache limpo detectado, recarregando...'
+      );
+      loadBranding();
+    };
+
+    // Listener para mudanças no localStorage de outras abas
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'system-branding-cache' && e.newValue) {
+        try {
+          const newData = JSON.parse(e.newValue);
+          setBranding(newData);
+          console.log('[useSystemBranding] Cache atualizado de outra aba');
+        } catch (err) {
+          console.error('[useSystemBranding] Erro ao parsear cache:', err);
+        }
+      } else if (e.key === 'system-branding-cache' && !e.newValue) {
+        // Cache foi limpo em outra aba
+        loadBranding();
+      }
+    };
+
+    window.addEventListener('branding-cache-cleared', handleCacheCleared);
+    window.addEventListener('storage', handleStorageChange);
+
+    return () => {
+      window.removeEventListener('branding-cache-cleared', handleCacheCleared);
+      window.removeEventListener('storage', handleStorageChange);
+    };
   }, []);
 
   return { branding, loading };

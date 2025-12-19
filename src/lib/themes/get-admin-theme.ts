@@ -1,18 +1,18 @@
 import { prisma } from '@/lib/db';
 import { getPresetById } from './presets';
-import type { ThemeColors, ThemePresetId } from './presets';
+import type { ThemeColors, ThemePresetId, ThemePreset } from './presets';
 
 /**
- * Busca o tema global do sistema (SystemConfig)
+ * Busca o preset completo do tema global do sistema (SystemConfig)
  *
  * Este tema é usado para:
  * - Todas as rotas públicas (/, /courses, /login, etc.)
  * - Área administrativa (/admin/*)
  * - Fallback quando teacher/student não têm tema próprio
  *
- * @returns {Promise<ThemeColors>} Cores do tema global
+ * @returns {Promise<ThemePreset>} Preset completo (light + dark)
  */
-export async function getAdminTheme(): Promise<ThemeColors> {
+export async function getAdminThemePreset(): Promise<ThemePreset> {
   try {
     // Busca SystemConfig do banco
     const systemConfig = await prisma.systemConfig.findFirst({
@@ -29,19 +29,26 @@ export async function getAdminTheme(): Promise<ThemeColors> {
 
     if (!preset) {
       console.warn(
-        `[getAdminTheme] Preset "${presetId}" não encontrado, usando academic-blue`
+        `[getAdminThemePreset] Preset "${presetId}" não encontrado, usando academic-blue`
       );
-      return getPresetById('academic-blue')!.light; // academic-blue sempre existe
+      return getPresetById('academic-blue')!;
     }
 
-    // Retorna sempre light theme (dark mode via CSS)
-    return preset.light;
+    return preset;
   } catch (error) {
-    console.error('[getAdminTheme] Erro ao buscar tema global:', error);
-
-    // Fallback: retorna academic-blue
-    return getPresetById('academic-blue')!.light;
+    console.error('[getAdminThemePreset] Erro ao buscar tema global:', error);
+    return getPresetById('academic-blue')!;
   }
+}
+
+/**
+ * Busca o tema global do sistema (SystemConfig)
+ * @deprecated Use getAdminThemePreset() para obter light + dark
+ * @returns {Promise<ThemeColors>} Cores do tema global (apenas light)
+ */
+export async function getAdminTheme(): Promise<ThemeColors> {
+  const preset = await getAdminThemePreset();
+  return preset.light;
 }
 
 /**

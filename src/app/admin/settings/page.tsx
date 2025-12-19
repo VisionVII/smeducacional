@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useSession } from 'next-auth/react';
 import { useConfigSync, broadcastConfigChange } from '@/hooks/useConfigSync';
+import { clearBrandingCache } from '@/hooks/use-system-branding';
 import {
   Card,
   CardContent,
@@ -19,11 +19,9 @@ import { toast } from '@/components/ui/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Building2,
-  Palette,
   Globe,
   Settings as SettingsIcon,
   Image as ImageIcon,
-  Sparkles,
 } from 'lucide-react';
 import { BrandingTab } from '@/components/admin/settings/branding-tab';
 
@@ -38,7 +36,7 @@ interface SystemConfig {
   loginBgUrl?: string | null;
   primaryColor?: string | null;
   secondaryColor?: string | null;
-  publicTheme?: any | null;
+  publicTheme?: unknown | null;
   metaTitle?: string | null;
   metaDescription?: string | null;
   metaKeywords?: string | null;
@@ -52,7 +50,6 @@ interface SystemConfig {
 }
 
 export default function AdminSettingsPage() {
-  const { data: session } = useSession();
   const { invalidateAdminConfig } = useConfigSync();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -105,17 +102,21 @@ export default function AdminSettingsPage() {
         // Invalidar cache e notificar outras abas
         await invalidateAdminConfig();
         broadcastConfigChange('admin');
+        // Limpar cache de branding (logo, favicon, etc) para forçar recarregamento
+        clearBrandingCache();
         // Recarregar para garantir sincronização
         await loadConfig();
       } else {
         throw new Error(data.error || 'Erro ao salvar');
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Erro ao salvar configurações:', error);
       toast({
         title: 'Erro',
         description:
-          error.message || 'Não foi possível salvar as configurações',
+          error instanceof Error
+            ? error.message
+            : 'Não foi possível salvar as configurações',
         variant: 'destructive',
       });
     } finally {
@@ -123,36 +124,11 @@ export default function AdminSettingsPage() {
     }
   }
 
-  const updateConfig = (field: keyof SystemConfig, value: any) => {
+  const updateConfig = (
+    field: keyof SystemConfig,
+    value: string | boolean | null
+  ) => {
     setConfig((prev) => ({ ...prev, [field]: value }));
-  };
-
-  const handleSavePublicTheme = async (theme: any) => {
-    try {
-      const res = await fetch('/api/admin/system-config', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...config, publicTheme: theme }),
-      });
-
-      if (!res.ok) throw new Error('Erro ao salvar');
-
-      setConfig((prev) => ({ ...prev, publicTheme: theme }));
-      await invalidateAdminConfig();
-      broadcastConfigChange('admin');
-
-      toast({
-        title: 'Tema público atualizado',
-        description: 'O tema foi aplicado às páginas públicas.',
-      });
-    } catch (error) {
-      toast({
-        title: 'Erro',
-        description: 'Não foi possível salvar o tema público.',
-        variant: 'destructive',
-      });
-      throw error;
-    }
   };
 
   if (loading) {
@@ -197,7 +173,7 @@ export default function AdminSettingsPage() {
         <Tabs defaultValue="company" className="space-y-8">
           {/* Tabs Navigation Premium */}
           <div className="relative">
-            <TabsList className="w-full p-1 bg-muted/50 backdrop-blur-sm rounded-xl border-2 shadow-sm flex overflow-x-auto overflow-y-hidden lg:grid lg:grid-cols-5 gap-1">
+            <TabsList className="w-full p-1 bg-muted/50 backdrop-blur-sm rounded-xl border-2 shadow-sm flex overflow-x-auto overflow-y-hidden lg:grid lg:grid-cols-4 gap-1">
               <TabsTrigger
                 value="company"
                 className="flex items-center gap-2 text-xs sm:text-sm px-4 py-3 whitespace-nowrap rounded-lg transition-all duration-300 data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-purple-600 data-[state=active]:text-white data-[state=active]:shadow-lg"
@@ -210,14 +186,7 @@ export default function AdminSettingsPage() {
                 className="flex items-center gap-2 text-xs sm:text-sm px-4 py-3 whitespace-nowrap rounded-lg transition-all duration-300 data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-purple-600 data-[state=active]:text-white data-[state=active]:shadow-lg"
               >
                 <ImageIcon className="h-4 w-4 shrink-0" />
-                <span className="font-medium">Marca</span>
-              </TabsTrigger>
-              <TabsTrigger
-                value="theme"
-                className="flex items-center gap-2 text-xs sm:text-sm px-4 py-3 whitespace-nowrap rounded-lg transition-all duration-300 data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-purple-600 data-[state=active]:text-white data-[state=active]:shadow-lg"
-              >
-                <Palette className="h-4 w-4 shrink-0" />
-                <span className="font-medium">Cores</span>
+                <span className="font-medium">Identidade Visual</span>
               </TabsTrigger>
               <TabsTrigger
                 value="seo"
@@ -357,7 +326,7 @@ export default function AdminSettingsPage() {
             </Card>
           </TabsContent>
 
-          {/* Marca Visual */}
+          {/* Identidade Visual */}
           <TabsContent value="branding" className="space-y-6 sm:space-y-8">
             <BrandingTab
               assets={{
@@ -367,16 +336,6 @@ export default function AdminSettingsPage() {
               }}
               onUpdate={updateConfig}
             />
-          </TabsContent>
-
-          {/* Cores do Tema */}
-          <TabsContent value="theme" className="space-y-6 sm:space-y-8">
-            {/* Tema Público - Desativado temporariamente */}
-            {/* <ThemePreview currentThemeName={config.publicTheme?.themeName} />
-            <PublicThemeEditor
-              currentTheme={config.publicTheme}
-              onSave={handleSavePublicTheme}
-            /> */}
           </TabsContent>
 
           {/* SEO & Redes Sociais */}

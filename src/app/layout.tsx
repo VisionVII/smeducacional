@@ -14,6 +14,31 @@ export const metadata: Metadata = {
   title: 'SM Educa - Plataforma Educacional Completa',
   description:
     'Sistema moderno de gestão educacional com cursos, certificados, videoaulas e muito mais',
+  viewport: {
+    width: 'device-width',
+    initialScale: 1,
+    maximumScale: 5,
+    userScalable: true,
+    viewportFit: 'cover',
+  },
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#ffffff' },
+    { media: '(prefers-color-scheme: dark)', color: '#09090b' },
+  ],
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'SM Educa',
+  },
+  formatDetection: {
+    telephone: false,
+  },
+  openGraph: {
+    title: 'SM Educa - Plataforma Educacional',
+    description: 'Sistema moderno de gestão educacional',
+    type: 'website',
+    locale: 'pt_BR',
+  },
 };
 
 export default function RootLayout({
@@ -77,7 +102,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className={inter.className}>
+      <body className={`${inter.className} mobile-safe-area antialiased`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"

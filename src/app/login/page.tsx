@@ -205,7 +205,7 @@ export default function LoginPage() {
 
   return (
     <div
-      className="min-h-screen flex items-center justify-center p-4 relative"
+      className="min-h-screen flex items-center justify-center p-4 sm:p-6 lg:p-8 relative safe-top safe-bottom"
       style={loginBgStyle}
     >
       {/* Fallback gradient se não houver imagem */}
@@ -214,13 +214,14 @@ export default function LoginPage() {
       )}
 
       <Card className="w-full max-w-md relative z-10 shadow-2xl backdrop-blur-sm bg-background/95 border-2">
-        <CardHeader className="space-y-1 text-center">
+        <CardHeader className="space-y-1 text-center px-4 sm:px-6 pt-6 sm:pt-8">
           <div className="flex justify-center mb-4">
             {branding.logoUrl ? (
               <img
                 src={branding.logoUrl}
                 alt={branding.companyName}
-                className="h-16 object-contain"
+                className="h-12 sm:h-16 object-contain"
+                loading="eager"
               />
             ) : (
               <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
@@ -228,7 +229,7 @@ export default function LoginPage() {
               </div>
             )}
           </div>
-          <CardTitle className="text-2xl font-bold">
+          <CardTitle className="text-xl sm:text-2xl font-bold">
             {branding.loginTitle || 'Bem-vindo de volta'}
           </CardTitle>
           <CardDescription className="text-sm">
@@ -237,7 +238,7 @@ export default function LoginPage() {
           </CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit}>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-4 px-4 sm:px-6">
             <div className="space-y-2">
               <Label htmlFor="email" className="text-sm">
                 Email
@@ -246,13 +247,13 @@ export default function LoginPage() {
                 id="email"
                 type="email"
                 placeholder="seu@email.com"
-                className="min-h-[44px]"
                 value={formData.email}
                 onChange={(e) =>
                   setFormData({ ...formData, email: e.target.value })
                 }
                 required
                 autoComplete="username"
+                inputMode="email"
               />
             </div>
 
@@ -268,7 +269,7 @@ export default function LoginPage() {
               autoComplete="current-password"
             />
 
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
               <div className="flex items-center space-x-2">
                 <Checkbox
                   id="rememberMe"
@@ -276,27 +277,28 @@ export default function LoginPage() {
                   onCheckedChange={(checked) =>
                     setFormData({ ...formData, rememberMe: checked as boolean })
                   }
+                  className="touch-target"
                 />
                 <label
                   htmlFor="rememberMe"
-                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer select-none"
                 >
                   Lembrar-me
                 </label>
               </div>
               <Link
                 href="/forgot-password"
-                className="text-sm text-primary hover:underline"
+                className="text-sm text-primary hover:underline touch-target no-tap-highlight"
               >
                 Esqueceu a senha?
               </Link>
             </div>
           </CardContent>
-          <CardFooter className="flex flex-col space-y-4">
+          <CardFooter className="flex flex-col space-y-3 px-4 sm:px-6 pb-6 sm:pb-8">
             <Button
               type="button"
               variant="outline"
-              className="w-full"
+              className="w-full touch-target"
               onClick={handleGoogleSignIn}
               disabled={isLoading}
             >

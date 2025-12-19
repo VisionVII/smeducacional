@@ -124,59 +124,73 @@
     --chart-5: 27 87% 67%;
   }
 
-  /* ===== DARK MODE ===== */
+  /* ===== DARK MODE - ESTRATÉGICO E VIBRANTE ===== */
   .dark {
-    --background: 224 71% 4%;
-    --foreground: 213 31% 91%;
+    /* Backgrounds - Preto profundo com leve nuance azulada */
+    --background: 222 84% 5%;
+    --foreground: 210 40% 98%;
 
-    --card: 224 71% 4%;
-    --card-foreground: 213 31% 91%;
+    /* Cards - Levemente mais claro que o background para criar profundidade */
+    --card: 220 45% 9%;
+    --card-foreground: 210 40% 98%;
 
-    --popover: 224 71% 4%;
-    --popover-foreground: 213 31% 91%;
+    /* Popovers - Mesmo tom dos cards */
+    --popover: 220 45% 9%;
+    --popover-foreground: 210 40% 98%;
 
-    --primary: 0 0% 98%;
-    --primary-foreground: 224 71% 4%;
+    /* Primary - Azul vibrante e estratégico */
+    --primary: 217 91% 60%;
+    --primary-foreground: 222 84% 5%;
 
-    --secondary: 215 28% 17%;
+    /* Secondary - Roxo suave para complementar */
+    --secondary: 262 52% 47%;
     --secondary-foreground: 210 40% 98%;
 
-    --muted: 215 28% 17%;
-    --muted-foreground: 215 20% 65%;
+    /* Muted - Cinza azulado para textos secundários */
+    --muted: 217 33% 17%;
+    --muted-foreground: 215 20% 70%;
 
-    --accent: 215 28% 17%;
+    /* Accent - Verde-azulado vibrante */
+    --accent: 173 80% 40%;
     --accent-foreground: 210 40% 98%;
 
-    --destructive: 0 62% 30%;
+    /* Destructive - Vermelho vibrante mas não agressivo */
+    --destructive: 0 72% 51%;
     --destructive-foreground: 210 40% 98%;
 
-    --success: 142 71% 45%;
-    --success-foreground: 0 0% 98%;
+    /* Success - Verde vibrante e positivo */
+    --success: 142 76% 45%;
+    --success-foreground: 210 40% 98%;
 
-    --warning: 38 92% 60%;
-    --warning-foreground: 0 0% 98%;
+    /* Warning - Laranja/Amarelo chamativo */
+    --warning: 38 92% 58%;
+    --warning-foreground: 222 84% 5%;
 
-    --info: 199 89% 60%;
-    --info-foreground: 0 0% 98%;
+    /* Info - Ciano vibrante */
+    --info: 199 89% 55%;
+    --info-foreground: 222 84% 5%;
 
-    --border: 215 28% 17%;
-    --input: 215 28% 17%;
-    --ring: 216 34% 17%;
+    /* Borders - Sutis mas visíveis */
+    --border: 217 33% 20%;
+    --input: 217 33% 20%;
+    --ring: 217 91% 60%;
 
-    /* Dark mode shadows (mais sutis) */
-    --shadow-light: 0 1px 2px 0 rgb(0 0 0 / 0.3);
-    --shadow-medium: 0 4px 6px -1px rgb(0 0 0 / 0.4),
-      0 2px 4px -2px rgb(0 0 0 / 0.4);
-    --shadow-strong: 0 10px 15px -3px rgb(0 0 0 / 0.5),
-      0 4px 6px -4px rgb(0 0 0 / 0.5);
-    --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.6),
-      0 8px 10px -6px rgb(0 0 0 / 0.6);
+    /* Dark mode shadows (com glow sutil) */
+    --shadow-light: 0 1px 3px 0 rgb(0 0 0 / 0.4),
+      0 1px 2px 0 rgb(66 153 225 / 0.05);
+    --shadow-medium: 0 4px 8px -2px rgb(0 0 0 / 0.5),
+      0 2px 4px -2px rgb(66 153 225 / 0.1);
+    --shadow-strong: 0 12px 20px -4px rgb(0 0 0 / 0.6),
+      0 4px 8px -4px rgb(66 153 225 / 0.15);
+    --shadow-xl: 0 24px 32px -8px rgb(0 0 0 / 0.7),
+      0 8px 16px -8px rgb(66 153 225 / 0.2);
 
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
+    /* Charts - Cores vibrantes e distintas */
+    --chart-1: 217 91% 60%;
+    --chart-2: 142 76% 45%;
+    --chart-3: 38 92% 58%;
+    --chart-4: 262 52% 60%;
+    --chart-5: 340 82% 58%;
   }
 }
 
@@ -377,10 +391,276 @@
    ============================================================================= */
 
 /* =============================================================================
+   MOBILE OPTIMIZATIONS - BEST PRACTICES
+   Safe areas, touch targets, scrolling, performance
+   ============================================================================= */
+
+@layer utilities {
+  /* ===== SAFE AREAS FOR NOTCH DEVICES ===== */
+  .mobile-safe-area {
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .safe-top {
+    padding-top: max(1rem, env(safe-area-inset-top));
+  }
+
+  .safe-bottom {
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+
+  /* ===== TOUCH TARGETS (Min 44x44px - iOS/Android guidelines) ===== */
+  .touch-target {
+    min-height: 44px;
+    min-width: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .touch-target-large {
+    min-height: 56px;
+    min-width: 56px;
+  }
+
+  /* ===== SMOOTH SCROLLING ===== */
+  .smooth-scroll {
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+  }
+
+  /* ===== PREVENT OVERSCROLL BOUNCE (iOS) ===== */
+  .no-overscroll {
+    overscroll-behavior: contain;
+  }
+
+  /* ===== PREVENT TEXT SIZE ADJUSTMENT ON MOBILE ===== */
+  .no-text-size-adjust {
+    -webkit-text-size-adjust: 100%;
+    -moz-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  /* ===== TAP HIGHLIGHT (Remove iOS tap flash) ===== */
+  .no-tap-highlight {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* ===== MOBILE HIDE/SHOW ===== */
+  @media (max-width: 640px) {
+    .mobile-hidden {
+      display: none !important;
+    }
+  }
+
+  @media (min-width: 641px) {
+    .desktop-hidden {
+      display: none !important;
+    }
+  }
+
+  /* ===== MOBILE TYPOGRAPHY ===== */
+  .text-mobile-xs {
+    font-size: 0.75rem; /* 12px */
+    line-height: 1.5;
+  }
+
+  .text-mobile-sm {
+    font-size: 0.875rem; /* 14px */
+    line-height: 1.5;
+  }
+
+  .text-mobile-base {
+    font-size: 1rem; /* 16px - minimum for readability */
+    line-height: 1.5;
+  }
+
+  .text-mobile-lg {
+    font-size: 1.125rem; /* 18px */
+    line-height: 1.5;
+  }
+
+  /* ===== MOBILE SPACING ===== */
+  .mobile-padding {
+    padding: 1rem; /* 16px */
+  }
+
+  .mobile-padding-sm {
+    padding: 0.75rem; /* 12px */
+  }
+
+  .mobile-padding-lg {
+    padding: 1.5rem; /* 24px */
+  }
+
+  /* ===== MOBILE CARD STACKING ===== */
+  @media (max-width: 640px) {
+    .mobile-stack > * {
+      width: 100%;
+      margin-bottom: 1rem;
+    }
+
+    .mobile-stack > *:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  /* ===== HORIZONTAL SCROLL CONTAINER ===== */
+  .scroll-container {
+    display: flex;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x mandatory;
+    gap: 1rem;
+  }
+
+  .scroll-container::-webkit-scrollbar {
+    display: none;
+  }
+
+  .scroll-container {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scroll-item {
+    flex: 0 0 auto;
+    scroll-snap-align: start;
+  }
+
+  /* ===== STICKY HEADERS ===== */
+  .sticky-header {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    background: var(--background);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
+  /* ===== MOBILE MENU OVERLAY ===== */
+  .mobile-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 50;
+  }
+
+  /* ===== BOTTOM SHEET / DRAWER ===== */
+  .bottom-sheet {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--card);
+    border-top-left-radius: 1rem;
+    border-top-right-radius: 1rem;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
+    z-index: 51;
+    max-height: 90vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* ===== FORM INPUTS MOBILE ===== */
+  .mobile-input {
+    min-height: 48px;
+    font-size: 16px; /* Prevents iOS zoom on focus */
+    padding: 0.75rem 1rem;
+  }
+
+  /* ===== LOADING SKELETON ===== */
+  .skeleton {
+    background: linear-gradient(
+      90deg,
+      hsl(var(--muted)) 0%,
+      hsl(var(--muted) / 0.8) 50%,
+      hsl(var(--muted)) 100%
+    );
+    background-size: 200% 100%;
+    animation: skeleton-loading 1.5s ease-in-out infinite;
+  }
+
+  @keyframes skeleton-loading {
+    0% {
+      background-position: 200% 0;
+    }
+    100% {
+      background-position: -200% 0;
+    }
+  }
+
+  /* ===== PULL TO REFRESH HINT ===== */
+  .pull-to-refresh {
+    position: relative;
+    overflow-y: scroll;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* ===== MOBILE PERFORMANCE ===== */
+  .gpu-accelerated {
+    transform: translateZ(0);
+    will-change: transform;
+  }
+
+  .hardware-accelerated {
+    transform: translate3d(0, 0, 0);
+    backface-visibility: hidden;
+    perspective: 1000px;
+  }
+}
+
+/* =============================================================================
+   MOBILE-FIRST ACCESSIBILITY
+   ============================================================================= */
+
+@layer base {
+  /* Ensure min font size for readability */
+  html {
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Focus visible for keyboard navigation */
+  *:focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 2px;
+  }
+
+  /* Remove focus outline for mouse users */
+  *:focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  /* Prevent horizontal scroll */
+  body {
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  /* Better tap targets on mobile */
+  @media (pointer: coarse) {
+    button,
+    a,
+    [role='button'] {
+      min-height: 44px;
+      min-width: 44px;
+    }
+  }
+}
+
+/* =============================================================================
    FIM - Sistema pronto para expansão!
    
    PRÓXIMAS ADIÇÕES FUTURAS:
-   - [ ] Skeleton loaders
+   - [ ] Skeleton loaders ✅
    - [ ] Toast animations
    - [ ] Modal transitions
    - [ ] Parallax effects

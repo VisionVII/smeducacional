@@ -16,7 +16,7 @@
 
 import { auth } from '@/lib/auth';
 import { getUserTheme } from '@/lib/themes/get-user-theme';
-import { getAdminTheme } from '@/lib/themes/get-admin-theme';
+import { getAdminThemePreset } from '@/lib/themes/get-admin-theme';
 import { generateCssVariables } from '@/lib/themes/presets';
 import { headers } from 'next/headers';
 
@@ -44,7 +44,8 @@ function shouldUseAdminTheme(pathname: string): boolean {
 }
 
 export async function ThemeScript() {
-  let cssVars = '';
+  let lightVars = '';
+  let darkVars = '';
 
   try {
     // Busca pathname atual
@@ -57,23 +58,25 @@ export async function ThemeScript() {
     // Decide qual tema usar baseado em hierarquia
     if (shouldUseAdminTheme(pathname)) {
       // Usa tema admin
-      const adminTheme = await getAdminTheme();
-      cssVars = generateCssVariables(adminTheme);
+      const adminPreset = await getAdminThemePreset();
+      lightVars = generateCssVariables(adminPreset.light);
+      darkVars = generateCssVariables(adminPreset.dark);
     } else if (session?.user?.id) {
       // Usuário logado em rota teacher/student: usa tema customizado (com fallback)
       const userTheme = await getUserTheme(session.user.id);
-      const colors = userTheme.preset.light; // Sempre light no SSR, next-themes ajusta depois
-      cssVars = generateCssVariables(colors);
+      lightVars = generateCssVariables(userTheme.preset.light);
+      darkVars = generateCssVariables(userTheme.preset.dark);
     } else {
       // Fallback: tema admin
-      const adminTheme = await getAdminTheme();
-      cssVars = generateCssVariables(adminTheme);
+      const adminPreset = await getAdminThemePreset();
+      lightVars = generateCssVariables(adminPreset.light);
+      darkVars = generateCssVariables(adminPreset.dark);
     }
   } catch (error) {
     console.error('[ThemeScript] Erro ao gerar CSS variables:', error);
 
     // Fallback: tema padrão hardcoded
-    cssVars = `
+    lightVars = `
     --background: 0 0% 100%;
     --foreground: 224 71% 4%;
     --primary: 221 83% 53%;
@@ -94,34 +97,23 @@ export async function ThemeScript() {
     --info: 199 89% 48%;
     --error: 0 84% 60%;
     `;
+    darkVars = lightVars; // Mesmas cores para fallback
   }
 
+  // Retorna <style> tag ao invés de <script> inline
+  // Isso permite que next-themes controle .dark class sem conflitos
   return (
-    <script
-      id="theme-script"
+    <style
+      id="theme-vars"
       dangerouslySetInnerHTML={{
         __html: `
-(function() {
-  try {
-    // Aplica CSS variables no :root IMEDIATAMENTE
-    const root = document.documentElement;
-    const vars = \`${cssVars}\`;
-    
-    // Parse e aplica cada variável
-    vars.split(';').forEach(function(line) {
-      const parts = line.trim().split(':');
-      if (parts.length === 2) {
-        const key = parts[0].trim();
-        const value = parts[1].trim();
-        if (key.startsWith('--')) {
-          root.style.setProperty(key, value);
-        }
-      }
-    });
-  } catch (e) {
-    console.error('[theme-script] Erro ao aplicar tema:', e);
-  }
-})();
+:root {
+  ${lightVars}
+}
+
+.dark {
+  ${darkVars}
+}
         `,
       }}
     />

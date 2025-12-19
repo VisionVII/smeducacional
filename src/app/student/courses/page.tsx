@@ -80,87 +80,90 @@ export default function StudentCoursesPage() {
           </CardHeader>
         </Card>
 
-      {courses && courses.length === 0 ? (
-        <Card className="border-2 hover:border-primary/30 transition-all">
-          <CardContent className="flex flex-col items-center justify-center py-12">
-            <div className="p-6 bg-gradient-to-br from-primary/10 to-primary/5 rounded-full mb-4">
-              <BookOpen className="h-12 w-12 text-primary" />
-            </div>
-            <h3 className="text-lg font-semibold mb-2">
-              Nenhum curso encontrado
-            </h3>
-            <p className="text-muted-foreground mb-4">
-              Você ainda não está matriculado em nenhum curso
-            </p>
-            <Button
-              asChild
-              className="bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90"
-            >
-              <Link href="/courses">Explorar Cursos</Link>
-            </Button>
-          </CardContent>
-        </Card>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-          {courses?.map((course) => (
-            <Card
-              key={course.id}
-              className="relative overflow-hidden border-2 hover:border-primary/50 transition-all duration-500 hover:shadow-2xl hover:-translate-y-1 group"
-            >
-              <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-primary/10 to-transparent rounded-bl-[100px]"></div>
-              <CardHeader className="px-4 sm:px-6 py-4 sm:py-5 relative z-10">
-                <CardTitle className="text-base sm:text-lg line-clamp-1">
-                  {course.title}
-                </CardTitle>
-                <CardDescription className="text-xs sm:text-sm line-clamp-2">
-                  {course.description}
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6 relative z-10">
-                {course.thumbnail && (
-                  <img
-                    src={course.thumbnail}
-                    alt={course.title}
-                    className="w-full h-40 object-cover rounded-md mb-4 group-hover:scale-105 transition-transform duration-300"
-                  />
-                )}
+        {courses && courses.length === 0 ? (
+          <Card className="border-2 hover:border-primary/30 transition-all">
+            <CardContent className="flex flex-col items-center justify-center py-12">
+              <div className="p-6 bg-gradient-to-br from-primary/10 to-primary/5 rounded-full mb-4">
+                <BookOpen className="h-12 w-12 text-primary" />
+              </div>
+              <h3 className="text-lg font-semibold mb-2">
+                Nenhum curso encontrado
+              </h3>
+              <p className="text-muted-foreground mb-4">
+                Você ainda não está matriculado em nenhum curso
+              </p>
+              <Button
+                asChild
+                className="bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90"
+              >
+                <Link href="/courses">Explorar Cursos</Link>
+              </Button>
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+            {courses?.map((course) => (
+              <Card
+                key={course.id}
+                className="relative overflow-hidden border-2 hover:border-primary/50 transition-all duration-500 hover:shadow-2xl hover:-translate-y-1 group"
+              >
+                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-primary/10 to-transparent rounded-bl-[100px]"></div>
+                <CardHeader className="px-4 sm:px-6 py-4 sm:py-5 relative z-10">
+                  <CardTitle className="text-base sm:text-lg line-clamp-1">
+                    {course.title}
+                  </CardTitle>
+                  <CardDescription className="text-xs sm:text-sm line-clamp-2">
+                    {course.description}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6 relative z-10">
+                  {course.thumbnail && (
+                    <img
+                      src={course.thumbnail}
+                      alt={course.title}
+                      className="w-full h-40 object-cover rounded-md mb-4 group-hover:scale-105 transition-transform duration-300"
+                    />
+                  )}
 
-                <div className="space-y-4">
-                  <div>
-                    <div className="flex justify-between text-sm mb-2">
-                      <span className="text-muted-foreground">Progresso</span>
-                      <span className="font-semibold">{course.progress}%</span>
+                  <div className="space-y-4">
+                    <div>
+                      <div className="flex justify-between text-sm mb-2">
+                        <span className="text-muted-foreground">Progresso</span>
+                        <span className="font-semibold">
+                          {course.progress}%
+                        </span>
+                      </div>
+                      <Progress value={course.progress} className="h-2" />
                     </div>
-                    <Progress value={course.progress} className="h-2" />
+
+                    <div className="flex items-center justify-between text-sm text-muted-foreground">
+                      <div className="flex items-center gap-1">
+                        <BookOpen className="h-4 w-4" />
+                        <span>
+                          {course.completedLessons}/{course.totalLessons} aulas
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Clock className="h-4 w-4" />
+                        <span>{course.estimatedHours}h</span>
+                      </div>
+                    </div>
+
+                    <Button
+                      asChild
+                      className="w-full min-h-[44px] bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90"
+                    >
+                      <Link href={`/student/courses/${course.id}`}>
+                        {course.progress > 0 ? 'Continuar' : 'Começar'}
+                      </Link>
+                    </Button>
                   </div>
-
-                  <div className="flex items-center justify-between text-sm text-muted-foreground">
-                    <div className="flex items-center gap-1">
-                      <BookOpen className="h-4 w-4" />
-                      <span>
-                        {course.completedLessons}/{course.totalLessons} aulas
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Clock className="h-4 w-4" />
-                      <span>{course.estimatedHours}h</span>
-                    </div>
-                  </div>
-
-                  <Button
-                    asChild
-                    className="w-full min-h-[44px] bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90"
-                  >
-                    <Link href={`/student/courses/${course.id}`}>
-                      {course.progress > 0 ? 'Continuar' : 'Começar'}
-                    </Link>
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      )}
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

@@ -210,8 +210,11 @@ export function Navbar({ user, links }: NavbarProps) {
             <Button
               variant="ghost"
               size="icon"
-              className="md:hidden h-9 w-9"
+              className="md:hidden touch-target no-tap-highlight"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              aria-label={mobileMenuOpen ? 'Fechar menu' : 'Abrir menu'}
+              aria-expanded={mobileMenuOpen}
+              aria-controls="mobile-menu"
             >
               {mobileMenuOpen ? (
                 <X className="h-5 w-5" />
@@ -225,56 +228,72 @@ export function Navbar({ user, links }: NavbarProps) {
 
         {/* Mobile Menu */}
         {mobileMenuOpen && (
-          <div className="md:hidden border-t py-4 space-y-1">
-            {/* User Info Mobile */}
-            <div className="px-3 py-2 mb-3 bg-accent/50 rounded-md">
-              <div className="flex items-center gap-3">
-                <Avatar className="h-10 w-10 ring-1 ring-primary/20 shadow-sm">
-                  <AvatarImage src={user.avatar || undefined} />
-                  <AvatarFallback>
-                    <Icon3D size="sm" color="primary" rounded="full">
-                      <User className="h-4 w-4" />
-                    </Icon3D>
-                  </AvatarFallback>
-                </Avatar>
-                <div>
-                  <p className="font-medium text-sm">{user.name}</p>
-                  <p className="text-xs text-muted-foreground">{user.email}</p>
-                  <p className="text-xs text-primary">
-                    {getRoleLabel(user.role)}
-                  </p>
+          <>
+            {/* Overlay */}
+            <div
+              className="mobile-overlay md:hidden"
+              onClick={() => setMobileMenuOpen(false)}
+              aria-hidden="true"
+            />
+            {/* Menu Content */}
+            <div
+              id="mobile-menu"
+              className="md:hidden border-t py-4 space-y-1 relative z-50 bg-background smooth-scroll"
+              role="navigation"
+              aria-label="Menu de navegação mobile"
+            >
+              {/* User Info Mobile */}
+              <div className="px-3 py-2 mb-3 bg-accent/50 rounded-md">
+                <div className="flex items-center gap-3">
+                  <Avatar className="h-10 w-10 ring-1 ring-primary/20 shadow-sm">
+                    <AvatarImage src={user.avatar || undefined} />
+                    <AvatarFallback>
+                      <Icon3D size="sm" color="primary" rounded="full">
+                        <User className="h-4 w-4" />
+                      </Icon3D>
+                    </AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <p className="font-medium text-sm">{user.name}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {user.email}
+                    </p>
+                    <p className="text-xs text-primary">
+                      {getRoleLabel(user.role)}
+                    </p>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {/* Navigation Links Mobile */}
-            {links.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                onClick={() => setMobileMenuOpen(false)}
-                className={cn(
-                  'flex items-center gap-3 px-3 py-3 rounded-md text-sm font-medium transition-colors',
-                  pathname === link.href
-                    ? 'bg-primary text-primary-foreground'
-                    : 'hover:bg-accent hover:text-accent-foreground'
-                )}
+              {/* Navigation Links Mobile */}
+              {links.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={cn(
+                    'flex items-center gap-3 px-3 py-3 rounded-md text-sm font-medium transition-colors touch-target no-tap-highlight',
+                    pathname === link.href
+                      ? 'bg-primary text-primary-foreground'
+                      : 'hover:bg-accent hover:text-accent-foreground active:scale-95'
+                  )}
+                >
+                  {link.icon}
+                  {link.label}
+                </Link>
+              ))}
+
+              {/* Logout Mobile */}
+              <Button
+                variant="ghost"
+                className="w-full justify-start px-3 py-3 touch-target text-sm font-medium no-tap-highlight"
+                onClick={handleLogout}
               >
-                {link.icon}
-                {link.label}
-              </Link>
-            ))}
-
-            {/* Logout Mobile */}
-            <Button
-              variant="ghost"
-              className="w-full justify-start px-3 py-3 h-auto text-sm font-medium"
-              onClick={handleLogout}
-            >
-              <LogOut className="h-4 w-4 mr-3" />
-              Sair
-            </Button>
-          </div>
+                <LogOut className="h-4 w-4 mr-3" />
+                Sair
+              </Button>
+            </div>
+          </>
         )}
       </div>
     </nav>
