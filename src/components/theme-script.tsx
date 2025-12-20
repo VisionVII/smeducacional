@@ -55,22 +55,28 @@ export async function ThemeScript() {
     // Busca sessão do usuário
     const session = await auth();
 
-    // Decide qual tema usar baseado em hierarquia
-    if (shouldUseAdminTheme(pathname)) {
-      // Usa tema admin
-      const adminPreset = await getAdminThemePreset();
-      lightVars = generateCssVariables(adminPreset.light);
-      darkVars = generateCssVariables(adminPreset.dark);
-    } else if (session?.user?.id) {
-      // Usuário logado em rota teacher/student: usa tema customizado (com fallback)
+    // NOVA LÓGICA: Teacher/Student sempre usam tema PRÓPRIO
+    // Admin theme APENAS em rotas públicas e /admin
+    if (
+      session?.user?.id &&
+      !pathname.startsWith('/admin') &&
+      !shouldUseAdminTheme(pathname)
+    ) {
+      // Usuário logado em rota autenticada: usa tema customizado (com fallback ao admin)
       const userTheme = await getUserTheme(session.user.id);
       lightVars = generateCssVariables(userTheme.preset.light);
       darkVars = generateCssVariables(userTheme.preset.dark);
+
+      console.log(
+        `[ThemeScript] Aplicando tema de ${session.user.role} (${userTheme.presetId}) em ${pathname}`
+      );
     } else {
-      // Fallback: tema admin
+      // Rotas públicas ou admin: usa tema admin
       const adminPreset = await getAdminThemePreset();
       lightVars = generateCssVariables(adminPreset.light);
       darkVars = generateCssVariables(adminPreset.dark);
+
+      console.log(`[ThemeScript] Aplicando tema ADMIN em ${pathname}`);
     }
   } catch (error) {
     console.error('[ThemeScript] Erro ao gerar CSS variables:', error);
@@ -100,8 +106,9 @@ export async function ThemeScript() {
     darkVars = lightVars; // Mesmas cores para fallback
   }
 
-  // Retorna <style> tag ao invés de <script> inline
-  // Isso permite que next-themes controle .dark class sem conflitos
+  // Retorna <style> tag com escopo correto por rota
+  // Admin theme sempre no :root (rotas públicas + /admin)
+  // User themes aplicados via data-theme-scope attribute
   return (
     <style
       id="theme-vars"
