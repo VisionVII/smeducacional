@@ -119,7 +119,6 @@ export async function POST(request: NextRequest) {
     if (error) {
       console.error('[upload-branding] ❌ Erro no Supabase:', {
         message: error.message,
-        status: error.statusCode,
         details: error,
       });
       return NextResponse.json(
