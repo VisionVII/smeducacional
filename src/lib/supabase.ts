@@ -20,7 +20,7 @@ if (typeof window === 'undefined') {
 }
 
 if (!supabaseUrl || !supabaseAnonKey) {
-  const missing = [];
+  const missing: string[] = [];
   if (!supabaseUrl) missing.push('NEXT_PUBLIC_SUPABASE_URL');
   if (!supabaseAnonKey) missing.push('NEXT_PUBLIC_SUPABASE_ANON_KEY');
   throw new Error(
