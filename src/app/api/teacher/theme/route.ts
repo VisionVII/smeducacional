@@ -112,7 +112,7 @@ export async function GET() {
       );
     }
 
-    const theme = await prisma.teacherTheme.findUnique({
+    const theme = await prisma.userTheme.findUnique({
       where: { userId: session.user.id },
       select: {
         id: true,
@@ -217,7 +217,7 @@ export async function PUT(request: Request) {
     }
 
     // Atualizar ou criar tema
-    const theme = await prisma.teacherTheme.upsert({
+    const theme = await prisma.userTheme.upsert({
       where: { userId: session.user.id },
       create: {
         userId: session.user.id,
@@ -319,7 +319,7 @@ export async function DELETE() {
     }
 
     // Deletar tema customizado (volta ao padrão)
-    await prisma.teacherTheme.deleteMany({
+    await prisma.userTheme.deleteMany({
       where: { userId: session.user.id },
     });
 

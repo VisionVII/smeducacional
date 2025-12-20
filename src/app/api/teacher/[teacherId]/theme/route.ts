@@ -20,7 +20,7 @@ export async function GET(
     }
 
     // Buscar tema do professor
-    const theme = await prisma.teacherTheme.findUnique({
+    const theme = await prisma.userTheme.findUnique({
       where: { userId: teacherId },
       select: {
         palette: true,
