@@ -187,10 +187,10 @@ export default async function TeacherCoursesPage() {
               <div className="text-3xl font-bold bg-gradient-to-r from-purple-500 to-purple-600 bg-clip-text text-transparent">
                 {totalStudents}
               </div>
-            <p className="text-xs text-muted-foreground">Matriculados</p>
-          </CardContent>
-        </Card>
-      </div>
+              <p className="text-xs text-muted-foreground mt-1">Matriculados</p>
+            </CardContent>
+          </Card>
+        </div>
 
       {/* Lista de Cursos */}
       {courses.length === 0 ? (

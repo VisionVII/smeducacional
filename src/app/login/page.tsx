@@ -205,7 +205,7 @@ export default function LoginPage() {
 
   return (
     <div
-      className="min-h-screen flex items-center justify-center p-4 sm:p-6 lg:p-8 relative safe-top safe-bottom"
+      className="min-h-screen flex items-center justify-center px-4 py-6 sm:p-6 lg:p-8 relative safe-top safe-bottom"
       style={loginBgStyle}
     >
       {/* Fallback gradient se não houver imagem */}
@@ -213,34 +213,34 @@ export default function LoginPage() {
         <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-purple-500/5 to-pink-500/5 dark:from-primary/10 dark:via-purple-500/10 dark:to-pink-500/10" />
       )}
 
-      <Card className="w-full max-w-md relative z-10 shadow-2xl backdrop-blur-sm bg-background/95 border-2">
-        <CardHeader className="space-y-1 text-center px-4 sm:px-6 pt-6 sm:pt-8">
-          <div className="flex justify-center mb-4">
+      <Card className="w-full max-w-md relative z-10 shadow-2xl backdrop-blur-sm bg-background/95 border-2 mx-auto">
+        <CardHeader className="space-y-2 text-center px-4 sm:px-6 pt-6 sm:pt-8">
+          <div className="flex justify-center mb-3 sm:mb-4">
             {branding.logoUrl ? (
               <img
                 src={branding.logoUrl}
                 alt={branding.companyName}
-                className="h-12 sm:h-16 object-contain"
+                className="h-14 sm:h-16 w-auto max-w-[200px] object-contain"
                 loading="eager"
               />
             ) : (
-              <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
-                <GraduationCap className="h-7 w-7 text-primary" />
+              <div className="h-14 w-14 sm:h-16 sm:w-16 rounded-full bg-primary/10 flex items-center justify-center">
+                <GraduationCap className="h-8 w-8 sm:h-9 sm:w-9 text-primary" />
               </div>
             )}
           </div>
-          <CardTitle className="text-xl sm:text-2xl font-bold">
+          <CardTitle className="text-xl sm:text-2xl font-bold leading-tight">
             {branding.loginTitle || 'Bem-vindo de volta'}
           </CardTitle>
-          <CardDescription className="text-sm">
+          <CardDescription className="text-sm sm:text-base leading-relaxed">
             {branding.loginDescription ||
               'Entre com suas credenciais para acessar sua conta'}
           </CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit}>
-          <CardContent className="space-y-4 px-4 sm:px-6">
+          <CardContent className="space-y-5 px-4 sm:px-6">
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-sm">
+              <Label htmlFor="email" className="text-sm font-medium">
                 Email
               </Label>
               <Input
@@ -254,6 +254,7 @@ export default function LoginPage() {
                 required
                 autoComplete="username"
                 inputMode="email"
+                className="h-11 text-base"
               />
             </div>
 
@@ -269,36 +270,36 @@ export default function LoginPage() {
               autoComplete="current-password"
             />
 
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
-              <div className="flex items-center space-x-2">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-2">
+              <div className="flex items-center space-x-2 min-h-[44px]">
                 <Checkbox
                   id="rememberMe"
                   checked={formData.rememberMe}
                   onCheckedChange={(checked) =>
                     setFormData({ ...formData, rememberMe: checked as boolean })
                   }
-                  className="touch-target"
+                  className="touch-target h-5 w-5"
                 />
                 <label
                   htmlFor="rememberMe"
-                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer select-none"
+                  className="text-sm sm:text-base font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer select-none"
                 >
                   Lembrar-me
                 </label>
               </div>
               <Link
                 href="/forgot-password"
-                className="text-sm text-primary hover:underline touch-target no-tap-highlight"
+                className="text-sm sm:text-base text-primary hover:underline touch-target no-tap-highlight font-medium min-h-[44px] flex items-center"
               >
                 Esqueceu a senha?
               </Link>
             </div>
           </CardContent>
-          <CardFooter className="flex flex-col space-y-3 px-4 sm:px-6 pb-6 sm:pb-8">
+          <CardFooter className="flex flex-col space-y-4 px-4 sm:px-6 pb-6 sm:pb-8">
             <Button
               type="button"
               variant="outline"
-              className="w-full touch-target"
+              className="w-full touch-target h-11 text-base"
               onClick={handleGoogleSignIn}
               disabled={isLoading}
             >
@@ -334,46 +335,41 @@ export default function LoginPage() {
               </div>
             </div>
 
-            <Button type="submit" className="w-full" disabled={isLoading}>
+            <Button
+              type="submit"
+              className="w-full h-11 text-base font-semibold"
+              disabled={isLoading}
+            >
               {isLoading ? 'Entrando...' : 'Entrar'}
             </Button>
 
-            <div className="flex items-center justify-between w-full text-sm">
+            <div className="flex flex-col sm:flex-row items-center justify-between w-full gap-3 text-sm">
               <Link
                 href="/"
-                className="text-muted-foreground hover:text-primary flex items-center gap-1"
+                className="text-muted-foreground hover:text-primary flex items-center gap-1 touch-target no-tap-highlight"
               >
                 <Home className="h-4 w-4" />
-                Voltar ao início
+                <span className="text-sm sm:text-base">Voltar ao início</span>
               </Link>
-              <p className="text-muted-foreground">
-                Não tem uma conta?{' '}
+              <p className="text-muted-foreground text-center">
+                Não tem conta?{' '}
                 <Link
                   href="/register"
-                  className="text-primary hover:underline font-medium"
+                  className="text-primary hover:underline font-medium touch-target no-tap-highlight"
                 >
                   Cadastre-se
                 </Link>
               </p>
             </div>
 
-            <div className="pt-4 border-t text-center text-xs text-muted-foreground space-y-2">
-              <p>
+            <div className="pt-4 border-t text-center text-xs sm:text-sm text-muted-foreground space-y-3">
+              <p className="leading-relaxed">
                 É professor?{' '}
                 <Link
                   href="/teacher"
-                  className="text-primary hover:underline font-medium"
+                  className="text-primary hover:underline font-medium touch-target no-tap-highlight"
                 >
                   Conheça nosso programa
-                </Link>
-              </p>
-              <p className="text-muted-foreground/70">
-                Esqueceu sua senha?{' '}
-                <Link
-                  href="/forgot-password"
-                  className="text-primary hover:underline"
-                >
-                  Recuperar acesso
                 </Link>
               </p>
             </div>
