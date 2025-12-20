@@ -111,10 +111,10 @@ export default function AdminUsersPage() {
         (u) => u.role === 'STUDENT' && u.performanceStatus === 'needs-attention'
       ).length || 0,
     avgCompletionRate:
-      users
+      (users
         ?.filter((u) => u.role === 'STUDENT')
         .reduce((acc, u) => acc + (u.completionRate || 0), 0) /
-        (users?.filter((u) => u.role === 'STUDENT').length || 1) || 0,
+        (users?.filter((u) => u.role === 'STUDENT').length || 1)) || 0,
   };
 
   const deleteUserMutation = useMutation({
