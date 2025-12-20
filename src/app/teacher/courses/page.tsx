@@ -192,8 +192,8 @@ export default async function TeacherCoursesPage() {
           </Card>
         </div>
 
-      {/* Lista de Cursos */}
-      {courses.length === 0 ? (
+        {/* Lista de Cursos */}
+        {courses.length === 0 ? (
         <Card>
           <CardContent className="py-16 text-center">
             <BookOpen className="h-16 w-16 mx-auto mb-4 text-gray-400" />
@@ -328,6 +328,7 @@ export default async function TeacherCoursesPage() {
           })}
         </div>
       )}
+      </div>
     </div>
   );
 }
