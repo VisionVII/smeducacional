@@ -37,10 +37,7 @@ export async function GET() {
     );
   } catch (error) {
     console.error('Erro ao buscar tema:', error);
-    return NextResponse.json(
-      { error: 'Erro ao buscar tema' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Erro ao buscar tema' }, { status: 500 });
   }
 }
 

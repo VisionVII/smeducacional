@@ -14,6 +14,7 @@ import {
 import { ThemeProvider } from '@/components/theme-provider';
 import { AdaptiveNavbar } from '@/components/adaptive-navbar';
 import { useSearchParams } from 'next/navigation';
+import { usePublicTheme } from '@/hooks/usePublicTheme';
 
 interface FAQItem {
   question: string;
@@ -47,7 +48,7 @@ interface LandingConfig {
 }
 
 function LandingPageContent({ teacherId }: { teacherId?: string }) {
-  const { theme } = useTeacherTheme();
+  const { theme, loading: themeLoading } = usePublicTheme();
   const [config, setConfig] = useState<LandingConfig | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [landingTheme, setLandingTheme] = useState<any | null>(null);
