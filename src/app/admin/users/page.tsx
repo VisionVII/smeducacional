@@ -113,8 +113,8 @@ export default function AdminUsersPage() {
     avgCompletionRate:
       (users
         ?.filter((u) => u.role === 'STUDENT')
-        .reduce((acc, u) => acc + (u.completionRate || 0), 0) /
-        (users?.filter((u) => u.role === 'STUDENT').length || 1)) || 0,
+        .reduce((acc, u) => acc + (u.completionRate || 0), 0) ?? 0) /
+      (users?.filter((u) => u.role === 'STUDENT').length || 1),
   };
 
   const deleteUserMutation = useMutation({
