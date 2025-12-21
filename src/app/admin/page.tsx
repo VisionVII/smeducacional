@@ -161,6 +161,7 @@ export default function AdminDashboard() {
 
   const userGrowth = stats?.newUsersLast30Days || 28;
   const enrollmentGrowth = stats?.newEnrollmentsLast7Days || 15;
+  const avgRevenuePerMonth = (stats?.totalRevenue || 0) / 12;
   const avgEnrollmentsPerCourse = Math.round(
     (stats?.totalEnrollments || 0) / (stats?.totalCourses || 1)
   );
