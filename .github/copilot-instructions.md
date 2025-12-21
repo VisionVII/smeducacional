@@ -10,7 +10,7 @@ Cada linha deve orientar escolhas técnicas, arquitetura, padrões visuais, flux
 
 **Frontend & Fullstack**
 
-- Next.js 15 (App Router)
+- Next.js 16.1.0 (App Router + Turbopack)
 - TypeScript
 - Tailwind CSS + Shadcn/UI
 - Zod (validação server-side obrigatória)
@@ -38,23 +38,26 @@ Clean Architecture Garantida
 
 Toda lógica deve seguir:
 
-Route (Controller)
-→ Server Action
-→ Service Layer
-→ Repository Layer
-→ Prisma Client
+**API Routes Pattern (Implementado)**:
 
-Nunca escreva:
+```
+Client Component
+  → fetch('/api/...')
+    → API Route Handler
+      → Zod Validation
+      → auth() check
+      → Prisma Query
+      → Response
+```
 
-lógica de domínio dentro de componentes React
+**Nunca escreva**:
 
-consultas Prisma diretamente em rotas
-
-validações fora de Zod
-
-fetchers dentro de hooks que não sejam TanStack Query
-
-lógica de regra dentro da UI
+- ❌ Lógica de domínio dentro de componentes React
+- ❌ Queries Prisma diretamente em Client Components
+- ❌ Validações fora de Zod schemas
+- ❌ Fetchers dentro de hooks que não sejam TanStack Query
+- ❌ Lógica de regra dentro da UI
+- ❌ Server Actions (projeto não usa)
 
 ☑️ 4. Estrutura de Pastas Real (NÃO ALTERAR)
 
@@ -97,6 +100,49 @@ lógica de regra dentro da UI
 ```
 
 **IMPORTANTE**: Não existe `/server/actions/services/repositories`. Use API Routes em `/app/api`.
+
+**Rotas API Admin Implementadas** (mapa completo):
+
+```
+/api/admin
+  /users
+    GET    - Listar usuários com filtros (role, search, pagination)
+    POST   - Criar novo usuário (bcrypt hash, validação Zod)
+  /users/[id]
+    GET    - Detalhes do usuário
+    PUT    - Atualizar usuário (email uniqueness check)
+    DELETE - Remover usuário (cascade via Prisma)
+
+  /profile
+    GET    - Perfil do admin logado (bio, phone, avatar)
+    PUT    - Atualizar perfil (email uniqueness, Zod validation)
+
+  /password
+    PUT    - Trocar senha (bcrypt verify + hash, prevent reuse)
+
+  /avatar
+    POST   - Upload avatar (Supabase Storage, delete old)
+
+  /stats
+    GET    - Dashboard statistics (users, courses, enrollments, revenue)
+
+  /activities
+    GET    - Feed de atividades recentes (users, enrollments, courses)
+
+  /courses
+    GET    - Listar cursos (filtros: search, status, category)
+  /courses/[id]
+    PUT    - Atualizar curso (isPublished, categoryId, instructor)
+    DELETE - Remover curso (check active enrollments first)
+
+  /system-config
+    GET    - Configurações do sistema
+    PUT    - Atualizar configurações (Zod validation)
+
+  /system-theme
+    PUT    - Atualizar tema (preset validation)
+    DELETE - Resetar tema para default
+```
 
 ☑️ 5. Naming Conventions (Alta Prioridade)
 Models
@@ -181,17 +227,31 @@ export async function GET() {
 }
 ```
 
-☑️ 7. Padrões de Erro (Obrigatórios)
+☑️ 7. Padrões de Erro e Response (Obrigatórios)
 
 **API Routes** devem retornar:
 
 ```typescript
-// Sucesso
+// Sucesso (200 OK)
 { data: T, message?: string }
+
+// Sucesso criação (201 Created)
+{ data: T, message: "Recurso criado com sucesso" }
 
 // Erro
 { error: string }, { status: 4xx | 5xx }
 ```
+
+**HTTP Status Codes Padrão**:
+
+- `200 OK` - Sucesso em GET/PUT/DELETE
+- `201 Created` - Sucesso em POST (criação)
+- `400 Bad Request` - Validação falhou, dados inválidos
+- `401 Unauthorized` - Não autenticado (sem sessão)
+- `403 Forbidden` - Autenticado mas sem permissão (role errado)
+- `404 Not Found` - Recurso não existe
+- `409 Conflict` - Conflito (ex: email duplicado)
+- `500 Internal Server Error` - Erro inesperado do servidor
 
 **Zod Validation (Server-Side OBRIGATÓRIA)**:
 
@@ -212,7 +272,139 @@ if (!result.success) {
 }
 ```
 
+**Pattern Completo de API Route**:
+
+```typescript
+import { NextRequest, NextResponse } from 'next/server';
+import { auth } from '@/lib/auth';
+import { prisma } from '@/lib/db';
+import { z } from 'zod';
+
+// Schema Zod
+const updateUserSchema = z.object({
+  name: z.string().min(2).max(100),
+  email: z.string().email().toLowerCase(),
+});
+
+export async function PUT(
+  req: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    // 1. Auth check
+    const session = await auth();
+    if (!session) {
+      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+    }
+
+    // 2. Role check
+    if (session.user.role !== 'ADMIN') {
+      return NextResponse.json({ error: 'Acesso negado' }, { status: 403 });
+    }
+
+    // 3. Parse body
+    const body = await req.json();
+
+    // 4. Validate with Zod
+    const result = updateUserSchema.safeParse(body);
+    if (!result.success) {
+      return NextResponse.json(
+        { error: result.error.errors[0].message },
+        { status: 400 }
+      );
+    }
+
+    const { name, email } = result.data;
+
+    // 5. Business logic checks
+    const existingUser = await prisma.user.findUnique({
+      where: { email },
+    });
+
+    if (existingUser && existingUser.id !== params.id) {
+      return NextResponse.json(
+        { error: 'Email já está em uso' },
+        { status: 409 }
+      );
+    }
+
+    // 6. Database operation
+    const user = await prisma.user.update({
+      where: { id: params.id },
+      data: { name, email },
+    });
+
+    // 7. Success response
+    return NextResponse.json({
+      data: user,
+      message: 'Usuário atualizado com sucesso',
+    });
+  } catch (error) {
+    console.error('[API /admin/users/[id] PUT]', error);
+    return NextResponse.json(
+      { error: 'Erro ao atualizar usuário' },
+      { status: 500 }
+    );
+  }
+}
+```
+
 **NUNCA aceitar dados não validados** em API routes ou funções críticas.
+
+### ☑️ 7.1. Security & Rate Limiting (Obrigatório em Produção)
+
+**Rate Limiting Pattern** (`src/lib/rate-limit.ts`):
+
+```typescript
+import { checkRateLimit, getClientIP } from '@/lib/rate-limit';
+
+export async function POST(req: NextRequest) {
+  // Rate limiting em endpoints públicos (login, register, reset)
+  const ip = getClientIP(req);
+  const rateLimitResult = await checkRateLimit(ip, {
+    limit: 5, // 5 tentativas
+    windowSeconds: 60, // por minuto
+  });
+
+  if (!rateLimitResult.success) {
+    return NextResponse.json(
+      {
+        error: `Muitas tentativas. Tente novamente em ${rateLimitResult.retryAfter}s`,
+      },
+      { status: 429 }
+    );
+  }
+
+  // ... resto da lógica
+}
+```
+
+**Security Checklist para API Routes**:
+
+- ✅ **Autenticação**: Sempre chamar `auth()` em rotas protegidas
+- ✅ **Autorização**: Verificar `session.user.role` antes de operações sensíveis
+- ✅ **Validação**: Usar Zod para validar TODOS os inputs
+- ✅ **Sanitização**: Zod já previne XSS básico, mas cuidado com HTML raw
+- ✅ **SQL Injection**: Prisma protege automaticamente (usar sempre Prisma)
+- ✅ **Rate Limiting**: Aplicar em endpoints públicos (login, register, reset)
+- ✅ **CORS**: Configurado no Next.js, verificar em `next.config.ts`
+- ✅ **Secrets**: NUNCA expor secrets no client-side (prefixo `NEXT_PUBLIC_`)
+- ✅ **Logs**: Não logar senhas, tokens ou dados sensíveis
+
+**Password Security (bcrypt pattern)**:
+
+```typescript
+import bcrypt from 'bcryptjs';
+
+// Hash password (12 rounds = boa segurança + performance)
+const hashedPassword = await bcrypt.hash(password, 12);
+
+// Verify password
+const isValid = await bcrypt.compare(inputPassword, user.password);
+
+// NUNCA armazene senhas em plain text
+// NUNCA envie senhas em responses
+```
 
 ☑️ 8. Design System VisionVII (UI Governance)
 
@@ -430,6 +622,34 @@ npm run clean:engine       # Mata processos Node.js
   });
   ```
 
+**Performance Best Practices**:
+
+```typescript
+// ✅ BOM: Parallel queries
+const [totalUsers, totalCourses] = await Promise.all([
+  prisma.user.count(),
+  prisma.course.count(),
+]);
+
+// ❌ RUIM: Sequential queries
+const totalUsers = await prisma.user.count();
+const totalCourses = await prisma.course.count();
+
+// ✅ BOM: Select only needed fields
+const users = await prisma.user.findMany({
+  select: { id: true, name: true, email: true },
+});
+
+// ❌ RUIM: Fetch all fields
+const users = await prisma.user.findMany();
+
+// ✅ BOM: Use transactions for multiple writes
+await prisma.$transaction([
+  prisma.user.create({ data: userData }),
+  prisma.enrollment.create({ data: enrollmentData }),
+]);
+```
+
 **Rate Limiting** (`src/lib/rate-limit.ts`):
 
 - In-memory Map store (considerar Redis para produção)
@@ -441,6 +661,43 @@ npm run clean:engine       # Mata processos Node.js
 - Buckets: `videos`, `pdfs`, `images`, `materials`
 - Helpers: `uploadFile()`, `deleteFile()`, `listFiles()`
 - RLS policies obrigatórias (ver SUPABASE_STORAGE_SETUP.md)
+
+**Avatar Upload Pattern (CRÍTICO)**:
+
+```typescript
+// NUNCA usar filesystem local (ephemeral no Vercel)
+// ❌ ERRADO:
+import { writeFile } from 'fs/promises';
+await writeFile('/public/uploads/avatars/...', buffer);
+
+// ✅ CORRETO:
+import { uploadFile, deleteFile } from '@/lib/supabase';
+
+// 1. Deletar avatar antigo antes de upload
+const currentUser = await prisma.user.findUnique({
+  where: { id },
+  select: { avatar: true },
+});
+
+if (currentUser?.avatar) {
+  const oldPath = currentUser.avatar.split('/images/').pop();
+  if (oldPath?.startsWith('avatars/')) {
+    await deleteFile('images', oldPath);
+  }
+}
+
+// 2. Upload novo avatar
+const fileName = `avatars/${userId}-${Date.now()}.${extension}`;
+const { url, error } = await uploadFile(file, 'images', fileName);
+
+// 3. Atualizar banco
+await prisma.user.update({
+  where: { id },
+  data: { avatar: url },
+});
+```
+
+**Rotas implementadas**: `/api/admin/avatar`, `/api/teacher/avatar`, `/api/student/avatar`
 
 **Stripe Integration** (`src/lib/stripe.ts`):
 
@@ -458,6 +715,53 @@ npm run clean:engine       # Mata processos Node.js
 6. **Rate Limiting**: Store in-memory reseta em restart (não persistente)
 7. **Direct URL**: Necessário para migrations, não para queries normais
 8. **Cookie Secure Flag**: Auto-gerenciado por NextAuth baseado em `NODE_ENV`
+9. **Avatar Upload Local**: NUNCA use filesystem local (`fs.writeFile`), SEMPRE use Supabase Storage
+10. **Prisma Schema Field Names**: Veja seção abaixo para campos corretos
+
+### ⚠️ Prisma Schema Field Names (CRÍTICO)
+
+Erros comuns de TypeScript build causados por campos incorretos:
+
+```typescript
+// ❌ ERRADO (causa erro de build):
+const course = await prisma.course.findMany({
+  where: { published: true }, // Não existe
+  include: { teacher: true }, // Não existe
+  select: { category: true }, // Não existe
+});
+
+// ✅ CORRETO (schema real):
+const course = await prisma.course.findMany({
+  where: { isPublished: true }, // Boolean field
+  include: { instructor: true }, // Relation to User
+  select: { categoryId: true }, // String foreign key
+});
+```
+
+**Course Model - Campos Corretos**:
+
+- `instructor` → Relação com User (NOT `teacher`)
+- `instructorId` → String foreign key
+- `isPublished` → Boolean (NOT `published`)
+- `publishedAt` → DateTime opcional
+- `categoryId` → String foreign key (NOT `category`)
+
+**User Model - Campos Corretos**:
+
+- `avatar` → String opcional (URL do Supabase)
+- `role` → Enum (STUDENT, TEACHER, ADMIN)
+- `createdAt` → DateTime
+
+**Enrollment Model - Campos Corretos**:
+
+- `enrolledAt` → DateTime (NOT `createdAt` para enrollments)
+- `student` → Relação com User
+- `course` → Relação com Course
+
+**Payment Model - Campos Corretos**:
+
+- `status` → Enum com valor `COMPLETED` (use para aggregate revenue)
+- `amount` → Float
 
 ☑️ 14. Git Workflow Oficial
 Sempre:
@@ -510,6 +814,36 @@ docs/\*
 - ✔ Documentar decisões não óbvias em comentários PT-BR
 - ✔ Testar localmente antes de commit
 - ✔ Manter performance e escalabilidade em mente
+
+### 📋 Checklist Pré-Commit (OBRIGATÓRIO)
+
+Antes de fazer commit, SEMPRE verificar:
+
+```bash
+# 1. TypeScript compilation
+npm run build
+
+# 2. Linting
+npm run lint
+
+# 3. Verificar campos Prisma
+# - instructor (NOT teacher)
+# - isPublished (NOT published)
+# - categoryId (NOT category)
+# - enrolledAt (para Enrollment)
+
+# 4. Verificar imports de storage
+# - Usar @/lib/supabase (NOT fs/promises)
+# - uploadFile() + deleteFile() pattern
+
+# 5. Verificar auth em API routes
+# - const session = await auth()
+# - Role check: session.user.role === 'ADMIN'
+
+# 6. Verificar Zod validation
+# - safeParse() antes de processar dados
+# - Retornar erro 400 se validação falhar
+```
 
 ## ☑️ 14. Assinatura VisionVII (obrigatória ao final de cada README gerado)
 
