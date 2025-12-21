@@ -30,7 +30,9 @@ export default function AdminAIAssistantPage() {
   const [input, setInput] = useState('');
   const [response, setResponse] = useState('');
   const [loading, setLoading] = useState(false);
-  const [selectedAgent, setSelectedAgent] = useState(AGENTS[0]);
+  // Filtro defensivo: remove agentes com id vazio/falsy
+  const AGENTS_FILTERED = AGENTS.filter((a) => !!a.id && a.id !== '');
+  const [selectedAgent, setSelectedAgent] = useState(AGENTS_FILTERED[0]);
 
   const handleSend = async () => {
     if (!input.trim()) {
@@ -73,9 +75,9 @@ export default function AdminAIAssistantPage() {
           <div>
             <label className="text-xs font-medium mb-1 block">Agente</label>
             <Select
-              value={selectedAgent.id}
+              value={selectedAgent?.id}
               onValueChange={(val) => {
-                const found = AGENTS.find((a) => a.id === val);
+                const found = AGENTS_FILTERED.find((a) => a.id === val);
                 if (found) setSelectedAgent(found);
               }}
             >
@@ -83,7 +85,7 @@ export default function AdminAIAssistantPage() {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {AGENTS.map((agent) => (
+                {AGENTS_FILTERED.map((agent) => (
                   <SelectItem key={agent.id} value={agent.id}>
                     {agent.label}
                   </SelectItem>
