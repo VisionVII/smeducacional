@@ -22,11 +22,18 @@ import { generateCssVariables } from '@/lib/themes/presets';
 export async function ThemeScript() {
   let lightVars = '';
   let darkVars = '';
+  let session = null;
 
   try {
-    // Busca sessão do usuário
-    const session = await auth();
+    // Busca sessão do usuário (pode falhar em rotas estáticas)
+    session = await auth().catch(() => null);
+  } catch (authError) {
+    console.debug(
+      '[ThemeScript] Não foi possível obter sessão, usando tema admin'
+    );
+  }
 
+  try {
     // LÓGICA CORRIGIDA: Verifica ROLE do usuário ao invés de pathname
     // - ADMIN role → usa tema admin
     // - TEACHER/STUDENT roles → usa tema próprio
