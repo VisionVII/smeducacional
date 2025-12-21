@@ -446,7 +446,7 @@ export default function CourseContentPage({
                     </div>
                   ) : (
                     <div className="space-y-2">
-                      {module.lessons.map((lesson, lessonIndex) => (
+                      {module.lessons?.map((lesson, lessonIndex) => (
                         <div
                           key={lesson.id}
                           className="flex items-center gap-3 p-3 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800"

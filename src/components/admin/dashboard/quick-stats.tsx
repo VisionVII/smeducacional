@@ -68,7 +68,7 @@ export function QuickStats({ stats }: QuickStatsProps) {
 
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-      {cards.map((card) => {
+      {cards?.map((card) => {
         const Icon = card.icon;
         return (
           <Card key={card.title} className="overflow-hidden">

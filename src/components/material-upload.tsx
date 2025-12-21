@@ -7,13 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/components/ui/use-toast';
 import { supabase } from '@/lib/supabase';
-import {
-  X,
-  FileText,
-  File,
-  Loader2,
-  Download,
-} from 'lucide-react';
+import { X, FileText, File, Loader2, Download } from 'lucide-react';
 
 interface Material {
   id?: string;
@@ -38,7 +32,7 @@ export function MaterialUpload({
 }: MaterialUploadProps) {
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
-  
+
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
 
@@ -89,9 +83,9 @@ export function MaterialUpload({
       }
 
       // Obter URL pública
-      const { data: { publicUrl } } = supabase.storage
-        .from('course-materials')
-        .getPublicUrl(filePath);
+      const {
+        data: { publicUrl },
+      } = supabase.storage.from('course-materials').getPublicUrl(filePath);
 
       // Adicionar à lista de materiais
       const newMaterial: Material = {
@@ -102,7 +96,7 @@ export function MaterialUpload({
       };
 
       onMaterialsChange([...materials, newMaterial]);
-      
+
       toast({
         title: 'Upload concluído!',
         description: `${file.name} enviado com sucesso.`,
@@ -126,8 +120,9 @@ export function MaterialUpload({
   };
 
   const getFileIcon = (fileType: string) => {
-    if (fileType.includes('pdf')) return <FileText className="h-5 w-5 text-red-600" />;
-    if (fileType.includes('spreadsheet') || fileType.includes('excel')) 
+    if (fileType.includes('pdf'))
+      return <FileText className="h-5 w-5 text-red-600" />;
+    if (fileType.includes('spreadsheet') || fileType.includes('excel'))
       return <FileText className="h-5 w-5 text-green-600" />;
     if (fileType.includes('code') || fileType.includes('text/plain'))
       return <FileText className="h-5 w-5 text-blue-600" />;
@@ -160,7 +155,7 @@ export function MaterialUpload({
           className="hidden"
           disabled={isUploading}
         />
-        
+
         {isUploading ? (
           <div className="space-y-3">
             <Loader2 className="h-10 w-10 mx-auto animate-spin text-blue-600" />
@@ -170,9 +165,7 @@ export function MaterialUpload({
         ) : (
           <>
             <FileText className="h-10 w-10 mx-auto mb-3 text-gray-400" />
-            <p className="font-medium mb-1">
-              Clique para adicionar materiais
-            </p>
+            <p className="font-medium mb-1">Clique para adicionar materiais</p>
             <p className="text-sm text-gray-600 dark:text-gray-400">
               PDF, DOC, XLS, PPT, ZIP (máx. {maxSizeMB}MB cada)
             </p>
@@ -185,7 +178,7 @@ export function MaterialUpload({
         <div className="space-y-2">
           <Label>Materiais Anexados ({materials.length})</Label>
           <div className="space-y-2">
-            {materials.map((material, index) => (
+            {materials?.map((material, index) => (
               <div
                 key={index}
                 className="flex items-center gap-3 p-3 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition"

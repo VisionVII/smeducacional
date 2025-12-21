@@ -258,7 +258,7 @@ function LandingPageContent({ teacherId }: { teacherId?: string }) {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {config.modules.map((module, idx) => (
+                {config.modules?.map((module, idx) => (
                   <div
                     key={idx}
                     className="p-6 rounded-xl border-2 border-primary/20 bg-background hover:border-primary/50 transition-colors"
@@ -305,7 +305,7 @@ function LandingPageContent({ teacherId }: { teacherId?: string }) {
               </div>
 
               <div className="space-y-4">
-                {config.faqItems.map((item, idx) => (
+                {config.faqItems?.map((item, idx) => (
                   <div
                     key={idx}
                     className="border border-border rounded-lg overflow-hidden"

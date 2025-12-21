@@ -641,7 +641,7 @@ export default function TeacherProfilePage() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
-                {education.map((edu, idx) => (
+                {education?.map((edu, idx) => (
                   <div key={idx} className="border rounded-lg p-4 space-y-2">
                     <div className="flex justify-between items-start">
                       <div>

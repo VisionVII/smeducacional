@@ -436,7 +436,7 @@ export function CoursePlayer({
                   </div>
                 ) : (
                   <div className="divide-y">
-                    {modules.map((module) => (
+                    {modules?.map((module) => (
                       <div key={module.id}>
                         <button
                           onClick={() => toggleModule(module.id)}
@@ -460,7 +460,7 @@ export function CoursePlayer({
 
                         {expandedModules.has(module.id) && (
                           <div className="bg-gray-50 dark:bg-gray-900">
-                            {module.lessons.map((lesson) => {
+                            {module.lessons?.map((lesson) => {
                               const isLocked =
                                 isCoursePaid && !isEnrolled && !lesson.isFree;
                               const isActive = selectedLesson?.id === lesson.id;

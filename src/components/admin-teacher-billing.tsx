@@ -205,7 +205,7 @@ export function AdminTeacherBilling() {
                 </tr>
               </thead>
               <tbody>
-                {teachers.map((teacher) => (
+                {teachers?.map((teacher) => (
                   <tr
                     key={teacher.userId}
                     className="border-b hover:bg-gray-50"

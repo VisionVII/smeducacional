@@ -118,14 +118,14 @@ export default function FAQPage() {
           </div>
 
           <div className="space-y-8">
-            {faqs.map((section, idx) => (
+            {faqs?.map((section, idx) => (
               <Card key={idx}>
                 <CardHeader>
                   <CardTitle>{section.category}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <Accordion type="single" collapsible className="w-full">
-                    {section.questions.map((faq, qIdx) => (
+                    {section.questions?.map((faq, qIdx) => (
                       <AccordionItem key={qIdx} value={`item-${idx}-${qIdx}`}>
                         <AccordionTrigger className="text-left">
                           {faq.question}

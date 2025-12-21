@@ -50,7 +50,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
     return (
       <div className="bg-background border border-border rounded-lg shadow-lg p-3">
         <p className="font-semibold text-sm mb-1">{label}</p>
-        {payload.map((entry: any, index: number) => (
+        {payload?.map((entry: any, index: number) => (
           <p key={index} className="text-sm" style={{ color: entry.color }}>
             {entry.name}: {entry.value}
           </p>
@@ -222,7 +222,7 @@ export function PieChartComponent({
               fill="#8884d8"
               dataKey="value"
             >
-              {data.map((entry, index) => (
+              {data?.map((entry, index) => (
                 <Cell
                   key={`cell-${index}`}
                   fill={pieColors[index % pieColors.length]}
@@ -271,7 +271,7 @@ export function MultiBarChartComponent({
             <YAxis stroke="hsl(var(--muted-foreground))" />
             <Tooltip content={<CustomTooltip />} />
             <Legend />
-            {dataKeys.map((item) => (
+            {dataKeys?.map((item) => (
               <Bar
                 key={item.key}
                 dataKey={item.key}
@@ -313,7 +313,7 @@ export function MultiLineChartComponent({
             <YAxis stroke="hsl(var(--muted-foreground))" />
             <Tooltip content={<CustomTooltip />} />
             <Legend />
-            {dataKeys.map((item) => (
+            {dataKeys?.map((item) => (
               <Line
                 key={item.key}
                 type="monotone"

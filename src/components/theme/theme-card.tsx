@@ -65,7 +65,7 @@ export function ThemeCard({ preset, isSelected, onClick }: ThemeCardProps) {
         {/* Tags (categorias) */}
         {preset.tags && preset.tags.length > 0 && (
           <div className="mt-3 flex flex-wrap gap-1">
-            {preset.tags.slice(0, 3).map((tag) => (
+            {preset.tags?.slice(0, 3).map((tag) => (
               <span
                 key={tag}
                 className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground"

@@ -72,7 +72,7 @@ export function RecentActivity({
               Nenhuma atividade recente
             </p>
           ) : (
-            activities.map((activity) => (
+            activities?.map((activity) => (
               <div
                 key={activity.id}
                 className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 pb-4 border-b last:border-0 last:pb-0"

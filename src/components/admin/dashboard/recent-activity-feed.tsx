@@ -86,7 +86,7 @@ export function RecentActivityFeed({ activity }: RecentActivityFeedProps) {
               Nenhuma atividade recente
             </p>
           ) : (
-            allActivity.map((item) => (
+            allActivity?.map((item) => (
               <div
                 key={item.id}
                 className="flex items-start gap-4 pb-4 border-b last:border-0 last:pb-0"

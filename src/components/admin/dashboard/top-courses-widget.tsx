@@ -31,7 +31,7 @@ export function TopCoursesWidget({ courses }: TopCoursesWidgetProps) {
               Nenhum curso disponível
             </p>
           ) : (
-            courses.map((course, index) => (
+            courses?.map((course, index) => (
               <Link
                 key={course.id}
                 href={`/admin/courses/${course.id}`}

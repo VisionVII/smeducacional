@@ -44,7 +44,7 @@ export function QuickActionsPanel() {
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-1 gap-2">
-          {actions.map((action) => {
+          {actions?.map((action) => {
             const Icon = action.icon;
             return (
               <Button

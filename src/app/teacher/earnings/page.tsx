@@ -162,7 +162,7 @@ export default function TeacherEarningsPage() {
         <CardContent>
           {earnings.topCourses.length > 0 ? (
             <div className="space-y-4">
-              {earnings.topCourses.map((course, index) => (
+              {earnings.topCourses?.map((course, index) => (
                 <div
                   key={index}
                   className="flex items-center justify-between p-4 border rounded-lg"

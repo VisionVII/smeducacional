@@ -466,7 +466,7 @@ export default function TeacherLandingBuilder() {
                 </div>
               </CardHeader>
               <CardContent className="space-y-3">
-                {config.modules.map((module, idx) => (
+                {config.modules?.map((module, idx) => (
                   <div key={idx} className="flex gap-2">
                     <Input
                       value={module}
@@ -535,7 +535,7 @@ export default function TeacherLandingBuilder() {
                 </div>
               </CardHeader>
               <CardContent className="space-y-3">
-                {config.faqItems.map((item, idx) => (
+                {config.faqItems?.map((item, idx) => (
                   <div key={idx} className="space-y-2 p-3 border rounded-lg">
                     <div className="flex gap-2">
                       <Input

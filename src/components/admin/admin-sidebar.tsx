@@ -134,7 +134,7 @@ export function AdminSidebar() {
   return (
     <aside className="w-64 border-r bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 fixed left-0 top-16 bottom-0 overflow-y-auto">
       <nav className="space-y-2 p-4">
-        {navItems.map((item) => {
+        {navItems?.map((item) => {
           const Icon = item.icon;
           const isActive =
             pathname === item.href || pathname?.startsWith(item.href + '/');
