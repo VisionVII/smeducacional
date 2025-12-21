@@ -1,0 +1,6 @@
+# Relatórios de segurança
+*.json
+!.gitkeep
+
+# Logs
+*.log
