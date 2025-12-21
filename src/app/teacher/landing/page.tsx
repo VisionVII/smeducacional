@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { z } from 'zod';
 import {
   Card,
   CardContent,
@@ -9,11 +10,11 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { useToast } from '@/components/ui/use-toast';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import {
   Sparkles,
-  Megaphone,
   LayoutDashboard,
   Plus,
   Trash2,
@@ -35,6 +36,47 @@ interface FAQItem {
   question: string;
   answer: string;
 }
+
+// Schema Zod para validação de segurança
+const landingConfigSchema = z.object({
+  heroTitle: z
+    .string()
+    .min(3, 'Título deve ter no mínimo 3 caracteres')
+    .max(200, 'Título muito longo'),
+  heroSubtitle: z
+    .string()
+    .min(10, 'Subtítulo deve ter no mínimo 10 caracteres')
+    .max(500, 'Subtítulo muito longo'),
+  heroImage: z.string().url('URL inválida').or(z.literal('')),
+  ctaLabel: z
+    .string()
+    .min(2, 'Texto do botão muito curto')
+    .max(50, 'Texto do botão muito longo'),
+  ctaLink: z.string().url('Link inválido'),
+  ctaColor: z.enum(['primary', 'secondary', 'accent']),
+  highlightOne: z.string().max(200),
+  highlightOneIcon: z.string().max(2),
+  highlightTwo: z.string().max(200),
+  highlightTwoIcon: z.string().max(2),
+  highlightThree: z.string().max(200),
+  highlightThreeIcon: z.string().max(2),
+  testimonial: z.string().max(1000),
+  testimonialAuthor: z.string().max(100),
+  modules: z.array(z.string().max(200)),
+  faqItems: z.array(
+    z.object({
+      question: z.string().max(300),
+      answer: z.string().max(1000),
+    })
+  ),
+  sectionOrder: z.array(z.string()),
+  backgroundColor: z.string(),
+  textColor: z.string(),
+  showSocialProof: z.boolean(),
+  showModules: z.boolean(),
+  showTestimonial: z.boolean(),
+  showFaq: z.boolean(),
+});
 
 interface LandingConfig {
   heroTitle: string;
@@ -63,19 +105,16 @@ interface LandingConfig {
 }
 
 export default function TeacherLandingBuilder() {
+  const { toast } = useToast();
   const [config, setConfig] = useState<LandingConfig | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  useEffect(() => {
-    loadLanding();
-  }, []);
-
-  const loadLanding = async () => {
+  const loadLanding = useCallback(async () => {
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 segundos
+      const timeoutId = setTimeout(() => controller.abort(), 8000);
 
       const response = await fetch('/api/teacher/landing', {
         signal: controller.signal,
@@ -86,25 +125,60 @@ export default function TeacherLandingBuilder() {
         const data = await response.json();
         setConfig(data);
       } else if (response.status === 401) {
-        console.error('Usuário não autorizado');
+        toast({
+          title: 'Acesso negado',
+          description: 'Você precisa estar autenticado como professor.',
+          variant: 'destructive',
+        });
+      } else {
+        toast({
+          title: 'Erro ao carregar',
+          description: 'Não foi possível carregar a landing page.',
+          variant: 'destructive',
+        });
       }
     } catch (error) {
       if (error instanceof Error && error.name === 'AbortError') {
-        console.error('Timeout ao carregar landing (8s)');
+        toast({
+          title: 'Tempo esgotado',
+          description: 'A requisição demorou muito. Tente novamente.',
+          variant: 'destructive',
+        });
       } else {
-        console.error('Erro ao carregar landing:', error);
+        toast({
+          title: 'Erro inesperado',
+          description: 'Ocorreu um erro ao carregar os dados.',
+          variant: 'destructive',
+        });
       }
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [toast]);
+
+  useEffect(() => {
+    loadLanding();
+  }, [loadLanding]);
 
   const saveLanding = async () => {
     if (!config) return;
+
+    // Validação Zod client-side (segurança)
+    const validation = landingConfigSchema.safeParse(config);
+    if (!validation.success) {
+      const firstError = validation.error.errors[0];
+      toast({
+        title: 'Dados inválidos',
+        description: firstError.message,
+        variant: 'destructive',
+      });
+      return;
+    }
+
     setIsSaving(true);
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 segundos
+      const timeoutId = setTimeout(() => controller.abort(), 8000);
 
       const response = await fetch('/api/teacher/landing', {
         method: 'PUT',
@@ -115,15 +189,42 @@ export default function TeacherLandingBuilder() {
       clearTimeout(timeoutId);
 
       if (response.ok) {
-        alert('Landing salva com sucesso!');
+        toast({
+          title: 'Sucesso',
+          description: 'Landing page salva com sucesso!',
+        });
+      } else if (response.status === 401) {
+        toast({
+          title: 'Acesso negado',
+          description: 'Você precisa estar autenticado.',
+          variant: 'destructive',
+        });
+      } else if (response.status === 403) {
+        toast({
+          title: 'Sem permissão',
+          description: 'Você não tem permissão para esta ação.',
+          variant: 'destructive',
+        });
       } else {
-        alert('Erro ao salvar landing: ' + response.statusText);
+        toast({
+          title: 'Erro ao salvar',
+          description: 'Não foi possível salvar as alterações.',
+          variant: 'destructive',
+        });
       }
     } catch (error) {
       if (error instanceof Error && error.name === 'AbortError') {
-        alert('Timeout ao salvar landing (8s).');
+        toast({
+          title: 'Tempo esgotado',
+          description: 'A operação demorou muito. Tente novamente.',
+          variant: 'destructive',
+        });
       } else {
-        alert('Erro ao salvar landing.');
+        toast({
+          title: 'Erro inesperado',
+          description: 'Ocorreu um erro ao salvar.',
+          variant: 'destructive',
+        });
       }
     } finally {
       setIsSaving(false);
@@ -131,23 +232,48 @@ export default function TeacherLandingBuilder() {
   };
 
   const resetLanding = async () => {
-    if (!confirm('Deseja realmente resetar a landing page?')) return;
+    if (
+      !confirm(
+        'Deseja realmente resetar a landing page? Esta ação não pode ser desfeita.'
+      )
+    )
+      return;
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 segundos
+      const timeoutId = setTimeout(() => controller.abort(), 8000);
 
-      await fetch('/api/teacher/landing', {
+      const response = await fetch('/api/teacher/landing', {
         method: 'DELETE',
         signal: controller.signal,
       });
       clearTimeout(timeoutId);
 
-      await loadLanding();
+      if (response.ok) {
+        toast({
+          title: 'Resetado com sucesso',
+          description: 'Landing page foi restaurada ao padrão.',
+        });
+        await loadLanding();
+      } else {
+        toast({
+          title: 'Erro ao resetar',
+          description: 'Não foi possível resetar a landing page.',
+          variant: 'destructive',
+        });
+      }
     } catch (error) {
       if (error instanceof Error && error.name === 'AbortError') {
-        alert('Timeout ao resetar landing (8s).');
+        toast({
+          title: 'Tempo esgotado',
+          description: 'A operação demorou muito.',
+          variant: 'destructive',
+        });
       } else {
-        alert('Erro ao resetar landing.');
+        toast({
+          title: 'Erro inesperado',
+          description: 'Ocorreu um erro ao resetar.',
+          variant: 'destructive',
+        });
       }
     }
   };
@@ -157,9 +283,16 @@ export default function TeacherLandingBuilder() {
     navigator.clipboard.writeText(link);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+    toast({
+      title: 'Link copiado',
+      description: 'Link da landing page copiado para a área de transferência.',
+    });
   };
 
-  const updateField = (key: keyof LandingConfig, value: any) => {
+  const updateField = (
+    key: keyof LandingConfig,
+    value: LandingConfig[keyof LandingConfig]
+  ) => {
     setConfig((prev) => (prev ? { ...prev, [key]: value } : null));
   };
 
@@ -375,9 +508,9 @@ export default function TeacherLandingBuilder() {
                   </label>
                   <Select
                     value={config.ctaColor}
-                    onValueChange={(value: any) =>
-                      updateField('ctaColor', value)
-                    }
+                    onValueChange={(
+                      value: 'primary' | 'secondary' | 'accent'
+                    ) => updateField('ctaColor', value)}
                   >
                     <SelectTrigger className="min-h-[44px]">
                       <SelectValue />

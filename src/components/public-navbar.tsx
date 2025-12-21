@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -23,12 +24,7 @@ export function PublicNavbar() {
   const pathname = usePathname();
   const { theme, setTheme } = useTheme();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [mounted, setMounted] = useState(false);
   const { branding } = useSystemBranding();
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   const publicLinks = [
     {
@@ -78,10 +74,13 @@ export function PublicNavbar() {
             onClick={() => setMobileMenuOpen(false)}
           >
             {branding.logoUrl ? (
-              <img
+              <Image
                 src={branding.logoUrl}
                 alt={branding.companyName}
-                className="h-10 object-contain"
+                width={120}
+                height={40}
+                className="h-10 w-auto object-contain"
+                priority
               />
             ) : (
               <>
@@ -115,18 +114,16 @@ export function PublicNavbar() {
           {/* Right Side Actions */}
           <div className="flex items-center gap-2">
             {/* Theme Toggle */}
-            {mounted && (
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-9 w-9"
-                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-              >
-                <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-                <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-                <span className="sr-only">Alternar tema</span>
-              </Button>
-            )}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-9 w-9"
+              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+            >
+              <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+              <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+              <span className="sr-only">Alternar tema</span>
+            </Button>
 
             {/* Auth Buttons - Desktop */}
             <div className="hidden md:flex items-center gap-2">
