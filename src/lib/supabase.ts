@@ -37,19 +37,31 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey);
  * @param path Caminho do arquivo (ex: 'curso-123/thumbnail.jpg')
  * @returns URL pública do arquivo
  */
+/**
+ * Upload de arquivo para o Supabase Storage
+ * Aceita Buffer (Node.js) ou File (browser)
+ * @param file Buffer (Node.js) ou File (browser)
+ * @param bucket Nome do bucket
+ * @param path Caminho do arquivo
+ */
 export async function uploadFile(
-  file: File,
+  file: any, // Buffer (Node.js) ou File (browser)
   bucket: string,
   path: string
 ): Promise<{ url: string; error?: string }> {
   try {
-    // Upload do arquivo
+    // Detecta ambiente Node.js (Buffer) ou browser (File)
+    let uploadData: any = file;
+    let options: any = { cacheControl: '3600', upsert: true };
+
+    // Se for Buffer, define contentType genérico
+    if (typeof Buffer !== 'undefined' && file instanceof Buffer) {
+      options.contentType = 'application/pdf';
+    }
+
     const { data, error } = await supabase.storage
       .from(bucket)
-      .upload(path, file, {
-        cacheControl: '3600',
-        upsert: true, // Sobrescreve se já existir
-      });
+      .upload(path, uploadData, options);
 
     if (error) {
       console.error('Erro no upload:', error);

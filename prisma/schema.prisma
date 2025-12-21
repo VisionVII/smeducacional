@@ -1,3 +1,13 @@
+model AuditReport {
+  id         String   @id @default(uuid())
+  userId     String
+  createdAt  DateTime @default(now())
+  result     Json
+  pdfUrl     String?
+  riskScore  Int
+  status     String
+  user       User     @relation(fields: [userId], references: [id])
+}
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
@@ -58,6 +68,7 @@ model User {
 
   // Relações
   enrollments      Enrollment[]
+  auditReports     AuditReport[]
   progress         Progress[]
   certificates     Certificate[]
   createdCourses   Course[]        @relation("CourseCreator")
