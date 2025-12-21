@@ -329,7 +329,7 @@ export default function DatabaseDashboardPage() {
                         ? tablesData?.schemas
                         : functionsData?.schemas
                       )
-                        ?.filter((schema: string) => schema)
+                        ?.filter((schema: string) => schema && schema !== '')
                         .map((schema: string) => (
                           <SelectItem key={schema} value={schema}>
                             {schema}

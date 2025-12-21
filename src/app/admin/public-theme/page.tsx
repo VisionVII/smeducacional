@@ -130,7 +130,7 @@ export default function PublicThemePage() {
                   <SelectValue placeholder="Selecione um tema" />
                 </SelectTrigger>
                 <SelectContent>
-                  {THEME_PRESETS.filter((preset) => preset.id).map((preset) => (
+                  {THEME_PRESETS.filter((preset) => preset.id && preset.id !== '').map((preset) => (
                     <SelectItem key={preset.id} value={preset.id}>
                       {preset.name}
                     </SelectItem>
