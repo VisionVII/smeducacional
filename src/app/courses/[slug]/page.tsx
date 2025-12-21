@@ -173,7 +173,7 @@ export default async function CourseDetailPage({
                   </CardHeader>
                   <CardContent>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                      {course.whatYouLearn.split(',').map((item, index) => (
+                      {course.whatYouLearn?.split(',').map((item, index) => (
                         <div key={index} className="flex items-start gap-2">
                           <CheckCircle className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
                           <span>{item.trim()}</span>
@@ -209,7 +209,7 @@ export default async function CourseDetailPage({
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    {course.modules.map((module, moduleIndex) => (
+                    {course.modules?.map((module, moduleIndex) => (
                       <div key={module.id} className="border rounded-lg p-4">
                         <h3 className="font-semibold mb-3">
                           {moduleIndex + 1}. {module.title}
@@ -220,7 +220,7 @@ export default async function CourseDetailPage({
                           </p>
                         )}
                         <div className="space-y-2">
-                          {module.lessons.map((lesson, lessonIndex) => (
+                          {module.lessons?.map((lesson, lessonIndex) => (
                             <div
                               key={lesson.id}
                               className="flex items-center justify-between py-2 px-3 rounded bg-gray-50 dark:bg-gray-800"

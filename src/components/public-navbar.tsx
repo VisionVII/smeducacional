@@ -95,7 +95,7 @@ export function PublicNavbar() {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-1">
-            {publicLinks.map((link) => (
+            {publicLinks?.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
@@ -159,7 +159,7 @@ export function PublicNavbar() {
         {mobileMenuOpen && (
           <div className="md:hidden border-t py-4 space-y-1">
             {/* Navigation Links Mobile */}
-            {publicLinks.map((link) => (
+            {publicLinks?.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}

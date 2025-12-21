@@ -113,7 +113,7 @@ export function Navbar({ user, links }: NavbarProps) {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-1 lg:gap-2">
-            {links.map((link) => (
+            {links?.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
@@ -266,7 +266,7 @@ export function Navbar({ user, links }: NavbarProps) {
               </div>
 
               {/* Navigation Links Mobile */}
-              {links.map((link) => (
+              {links?.map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}
