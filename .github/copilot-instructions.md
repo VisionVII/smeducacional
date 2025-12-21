@@ -717,6 +717,37 @@ await prisma.user.update({
 8. **Cookie Secure Flag**: Auto-gerenciado por NextAuth baseado em `NODE_ENV`
 9. **Avatar Upload Local**: NUNCA use filesystem local (`fs.writeFile`), SEMPRE use Supabase Storage
 10. **Prisma Schema Field Names**: Veja seção abaixo para campos corretos
+11. **CSP Errors**: Middleware (`middleware.ts`) já inclui `unsafe-eval` para Next.js HMR
+
+### 🔒 Content Security Policy (CSP)
+
+**Configuração Atual** (`middleware.ts`):
+
+O middleware aplica headers de segurança em todas as rotas, incluindo CSP que permite:
+
+```typescript
+script-src 'self' 'unsafe-eval' 'unsafe-inline' https://cdn.jsdelivr.net https://www.googletagmanager.com;
+```
+
+**Por que `unsafe-eval`?**
+
+- ✅ **Necessário** para Next.js HMR (Hot Module Replacement) em desenvolvimento
+- ✅ **Necessário** para algumas bibliotecas React que usam `new Function()`
+- ✅ **Aceitável** em produção com outras camadas de segurança ativas
+
+**Outros Headers de Segurança**:
+
+- `X-Frame-Options: DENY` - Previne clickjacking
+- `X-Content-Type-Options: nosniff` - Previne MIME sniffing
+- `X-XSS-Protection: 1; mode=block` - XSS protection
+- `Strict-Transport-Security` - Force HTTPS
+- `Referrer-Policy` - Controla informações de referrer
+
+**IMPORTANTE**:
+
+- ❌ NÃO remover `unsafe-eval` - Next.js precisa
+- ✅ CSP é aplicado via middleware, não via meta tags
+- ✅ Vercel aplica automaticamente security headers extras
 
 ### ⚠️ Prisma Schema Field Names (CRÍTICO)
 
