@@ -195,7 +195,7 @@ export const SECURITY_RULES: SecurityRule[] = [
     },
     suggestion:
       'Adicione status code: NextResponse.json({ error: "..." }, { status: 400 })',
-    owaspReference: null,
+    owaspReference: undefined,
   },
   {
     id: 'BP-002',
@@ -206,7 +206,7 @@ export const SECURITY_RULES: SecurityRule[] = [
     pattern: /console\.log\(/,
     suggestion:
       'Use console.error para logs importantes ou remova console.logs em produção',
-    owaspReference: null,
+    owaspReference: undefined,
   },
 ];
 
@@ -226,7 +226,7 @@ export const CUSTOM_RULES: SecurityRule[] = [
       return hasFeatureCheck && !hasFallback;
     },
     suggestion: 'Adicione try-catch ou fallback para feature flags',
-    owaspReference: null,
+    owaspReference: undefined,
   },
 ];
 

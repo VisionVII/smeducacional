@@ -7,12 +7,11 @@
 import OpenAI from 'openai';
 import { glob } from 'glob';
 import { readFile } from 'fs/promises';
-import { parse } from '@typescript-eslint/parser';
 import {
   SecurityIssue,
+  SecurityRule,
   ScanResult,
   ScanConfig,
-  GPTAnalysisRequest,
   GPTAnalysisResponse,
 } from './types';
 import { ALL_RULES } from './rules';
@@ -122,7 +121,7 @@ export class SecurityScanner {
   private checkRule(
     code: string,
     filePath: string,
-    rule: any
+    rule: SecurityRule
   ): SecurityIssue[] {
     const issues: SecurityIssue[] = [];
 
@@ -135,7 +134,9 @@ export class SecurityScanner {
 
       // Encontrar linha do match
       const lines = code.split('\n');
-      const lineNumber = lines.findIndex((line) => rule.pattern.test(line));
+      const lineNumber = lines.findIndex((line) =>
+        rule.pattern ? rule.pattern.test(line) : false
+      );
 
       if (lineNumber !== -1) {
         issues.push({
@@ -217,7 +218,7 @@ export class SecurityScanner {
   private async analyzeWithGPT(
     code: string,
     filePath: string,
-    context: any
+    context: Record<string, unknown>
   ): Promise<SecurityIssue[]> {
     const prompt = ANALYSIS_PROMPT_TEMPLATE(code, filePath, context);
 
@@ -303,7 +304,7 @@ export class SecurityScanner {
   /**
    * Gera recomendações gerais
    */
-  private generateRecommendations(summary: any): string[] {
+  private generateRecommendations(summary: Record<string, number>): string[] {
     const recs: string[] = [];
 
     if (summary.CRITICAL > 0) {
@@ -331,7 +332,7 @@ export class SecurityScanner {
   /**
    * Calcula score de compliance (0-100)
    */
-  private calculateComplianceScore(summary: any): number {
+  private calculateComplianceScore(summary: Record<string, number>): number {
     const weights = {
       CRITICAL: 10,
       HIGH: 5,

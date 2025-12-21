@@ -159,7 +159,7 @@ export const customRules: SecurityRule[] = [
 
 Adicione arquivos/padrões para ignorar:
 
-```typescript
+````typescript
 // config.ts
 export const IGNORE_PATTERNS = [
   'node_modules/**',
@@ -167,7 +167,9 @@ export const IGNORE_PATTERNS = [
   'prisma/migrations/**',
   'public/**',
 ];
-```
+```bash
+npm run ai:security
+````
 
 ---
 
@@ -175,7 +177,7 @@ export const IGNORE_PATTERNS = [
 
 Relatórios são gerados em `salao-ia/reports/security/`:
 
-```
+```text
 reports/
   └── security/
       ├── 2025-12-21_14-30-00.json    # JSON estruturado
@@ -184,6 +186,14 @@ reports/
 ```
 
 ### Exemplo de Relatório JSON
+
+```text
+reports/
+  └── security/
+      ├── 2025-12-21_14-30-00.json    # JSON estruturado
+      ├── 2025-12-21_14-30-00.html    # Visualização web
+      └── latest.json                 # Sempre o mais recente
+```
 
 ```json
 {

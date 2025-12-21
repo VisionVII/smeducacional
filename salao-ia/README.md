@@ -71,7 +71,7 @@ npm install openai zod
 
 ### Executar Agente Específico
 
-```bash
+````bash
 # SecureOpsAI - Scan de Segurança
 npm run ai:security
 
@@ -80,13 +80,15 @@ npm run ai:architecture
 
 # UIDirectorAI - Análise de UI (futuro)
 npm run ai:ui
-```
+```bash
+npm run ai:security
+````
 
 ---
 
 ## 🏗️ Estrutura de Cada Agente
 
-```
+```text
 salao-ia/
   └── [nome-agente]/
       ├── config.ts           # Configuração GPT-4 + prompts
