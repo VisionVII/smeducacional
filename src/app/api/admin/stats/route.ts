@@ -28,7 +28,7 @@ export async function GET() {
 
       // Total de cursos publicados
       prisma.course.count({
-        where: { published: true },
+        where: { isPublished: true },
       }),
 
       // Total de matrículas
