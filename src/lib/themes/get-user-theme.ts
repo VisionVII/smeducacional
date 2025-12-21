@@ -32,7 +32,8 @@ export interface UserThemeData {
 
 /**
  * Busca tema do usuário no banco
- * Se não existir, faz fallback ao tema global do admin (SystemConfig)
+ * Se não existir, cria um tema padrão DIFERENTE do admin
+ * (evita que teacher/student herdem tema admin)
  */
 export async function getUserTheme(userId: string): Promise<UserThemeData> {
   try {
@@ -40,18 +41,18 @@ export async function getUserTheme(userId: string): Promise<UserThemeData> {
       where: { userId },
     });
 
-    // Se não tem tema customizado, busca tema global do admin
+    // Se não tem tema customizado, usa preset padrão independente (NÃO o admin theme)
     if (!userTheme) {
-      const systemConfig = await prisma.systemConfig.findFirst({
-        select: { themePresetId: true },
-      });
+      console.log(
+        `[getUserTheme] Usuário ${userId} sem tema customizado, usando forest-green padrão`
+      );
 
-      const fallbackPresetId =
-        (systemConfig?.themePresetId as ThemePresetId) || 'academic-blue';
-      const preset = getPresetById(fallbackPresetId) || getDefaultPreset();
+      // USA PRESET DIFERENTE DO ADMIN (forest-green ao invés de pegar o admin theme)
+      const defaultPresetId: ThemePresetId = 'forest-green';
+      const preset = getPresetById(defaultPresetId) || getDefaultPreset();
 
       return {
-        presetId: fallbackPresetId,
+        presetId: defaultPresetId,
         preset,
         cardStyle: 'FLAT',
         cardShadow: 'NONE',

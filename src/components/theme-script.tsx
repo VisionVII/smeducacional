@@ -7,76 +7,49 @@
  * Zero FOUC (Flash of Unstyled Content).
  *
  * LÓGICA HIERÁRQUICA:
- * - Rotas públicas (/, /courses, /login) → Tema ADMIN
- * - Rotas admin (/admin/*) → Tema ADMIN
- * - Rotas teacher/student → Tema USUÁRIO (com fallback ao ADMIN)
+ * - ADMIN role → Tema admin (SystemConfig)
+ * - TEACHER/STUDENT roles → Tema próprio (UserTheme ou forest-green padrão)
+ * - Não autenticado → Tema admin
  *
- * IMPORTANTE: Este é um Server Component que gera um <script> inline.
+ * IMPORTANTE: Este é um Server Component que gera um <style> inline.
  */
 
 import { auth } from '@/lib/auth';
 import { getUserTheme } from '@/lib/themes/get-user-theme';
 import { getAdminThemePreset } from '@/lib/themes/get-admin-theme';
 import { generateCssVariables } from '@/lib/themes/presets';
-import { headers } from 'next/headers';
-
-/**
- * Define se rota deve usar tema admin (hierarquia)
- */
-function shouldUseAdminTheme(pathname: string): boolean {
-  // Rotas públicas sempre usam tema admin
-  const publicRoutes = ['/', '/courses', '/login', '/register', '/about'];
-  if (
-    publicRoutes.some(
-      (route) => pathname === route || pathname.startsWith(route + '/')
-    )
-  ) {
-    return true;
-  }
-
-  // Admin sempre usa tema admin
-  if (pathname.startsWith('/admin')) {
-    return true;
-  }
-
-  // Teacher/Student usam tema próprio
-  return false;
-}
 
 export async function ThemeScript() {
   let lightVars = '';
   let darkVars = '';
 
   try {
-    // Busca pathname atual
-    const headersList = await headers();
-    const pathname = headersList.get('x-pathname') || '/';
-
     // Busca sessão do usuário
     const session = await auth();
 
-    // NOVA LÓGICA: Teacher/Student sempre usam tema PRÓPRIO
-    // Admin theme APENAS em rotas públicas e /admin
-    if (
-      session?.user?.id &&
-      !pathname.startsWith('/admin') &&
-      !shouldUseAdminTheme(pathname)
-    ) {
-      // Usuário logado em rota autenticada: usa tema customizado (com fallback ao admin)
+    // LÓGICA CORRIGIDA: Verifica ROLE do usuário ao invés de pathname
+    // - ADMIN role → usa tema admin
+    // - TEACHER/STUDENT roles → usa tema próprio
+    if (session?.user?.id && session.user.role !== 'ADMIN') {
+      // Teacher ou Student: usa tema customizado (com fallback ao admin)
       const userTheme = await getUserTheme(session.user.id);
       lightVars = generateCssVariables(userTheme.preset.light);
       darkVars = generateCssVariables(userTheme.preset.dark);
 
       console.log(
-        `[ThemeScript] Aplicando tema de ${session.user.role} (${userTheme.presetId}) em ${pathname}`
+        `[ThemeScript] Aplicando tema de ${session.user.role} (${userTheme.presetId})`
       );
     } else {
-      // Rotas públicas ou admin: usa tema admin
+      // Admin ou não autenticado: usa tema admin
       const adminPreset = await getAdminThemePreset();
       lightVars = generateCssVariables(adminPreset.light);
       darkVars = generateCssVariables(adminPreset.dark);
 
-      console.log(`[ThemeScript] Aplicando tema ADMIN em ${pathname}`);
+      console.log(
+        `[ThemeScript] Aplicando tema ADMIN (role: ${
+          session?.user?.role || 'guest'
+        })`
+      );
     }
   } catch (error) {
     console.error('[ThemeScript] Erro ao gerar CSS variables:', error);
@@ -106,9 +79,8 @@ export async function ThemeScript() {
     darkVars = lightVars; // Mesmas cores para fallback
   }
 
-  // Retorna <style> tag com escopo correto por rota
-  // Admin theme sempre no :root (rotas públicas + /admin)
-  // User themes aplicados via data-theme-scope attribute
+  // Retorna <style> tag com CSS variables no :root
+  // Cada role tem seu tema independente aplicado globalmente
   return (
     <style
       id="theme-vars"
