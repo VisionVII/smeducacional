@@ -92,16 +92,15 @@ export async function PUT(
       data: {
         title: body.title,
         description: body.description,
-        category: body.category,
         level: body.level,
-        published: body.published,
+        isPublished: body.published,
         thumbnail: body.thumbnail,
       },
       select: {
         id: true,
         title: true,
         description: true,
-        published: true,
+        isPublished: true,
       },
     });
 

@@ -67,7 +67,7 @@ export async function GET(request: Request) {
           id: true,
           title: true,
           createdAt: true,
-          teacher: {
+          instructor: {
             select: {
               id: true,
               name: true,
@@ -121,10 +121,10 @@ export async function GET(request: Request) {
         type: 'course' as const,
         action: `Criou o curso "${course.title}"`,
         user: {
-          id: course.teacher.id,
-          name: course.teacher.name,
-          email: course.teacher.email,
-          avatar: course.teacher.avatar,
+          id: course.instructor.id,
+          name: course.instructor.name,
+          email: course.instructor.email,
+          avatar: course.instructor.avatar,
         },
         createdAt: course.createdAt,
       })),

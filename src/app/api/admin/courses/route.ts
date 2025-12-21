@@ -29,7 +29,7 @@ export async function GET(request: Request) {
     }
 
     if (status && ['DRAFT', 'PUBLISHED', 'ARCHIVED'].includes(status)) {
-      where.published = status === 'PUBLISHED';
+      where.isPublished = status === 'PUBLISHED';
     }
 
     if (category) {
@@ -43,12 +43,12 @@ export async function GET(request: Request) {
         title: true,
         description: true,
         thumbnail: true,
-        category: true,
+        categoryId: true,
         level: true,
-        published: true,
+        isPublished: true,
         createdAt: true,
         updatedAt: true,
-        teacher: {
+        instructor: {
           select: {
             id: true,
             name: true,
@@ -74,12 +74,12 @@ export async function GET(request: Request) {
       title: course.title,
       description: course.description || '',
       thumbnail: course.thumbnail,
-      category: course.category || 'Geral',
+      category: course.categoryId || 'Geral',
       level: course.level || 'BEGINNER',
-      status: course.published ? 'PUBLISHED' : 'DRAFT',
-      teacherName: course.teacher.name,
-      teacherId: course.teacher.id,
-      teacherAvatar: course.teacher.avatar,
+      status: course.isPublished ? 'PUBLISHED' : 'DRAFT',
+      teacherName: course.instructor.name,
+      teacherId: course.instructor.id,
+      teacherAvatar: course.instructor.avatar,
       enrollmentCount: course._count.enrollments,
       moduleCount: course._count.modules,
       createdAt: course.createdAt.toISOString(),
