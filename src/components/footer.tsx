@@ -134,14 +134,6 @@ export function Footer() {
               </li>
               <li>
                 <Link
-                  href="/how-it-works"
-                  className="text-muted-foreground hover:text-primary transition-colors inline-block py-1"
-                >
-                  Como Funciona
-                </Link>
-              </li>
-              <li>
-                <Link
                   href="/become-instructor"
                   className="text-muted-foreground hover:text-primary transition-colors inline-block py-1"
                 >

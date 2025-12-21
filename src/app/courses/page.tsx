@@ -23,6 +23,7 @@ import {
   Loader2,
   TrendingUp,
   Star,
+  AlertCircle,
 } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 
@@ -64,10 +65,16 @@ function CoursesClient() {
   const [courses, setCourses] = useState<Course[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedLevel, setSelectedLevel] = useState<string>('all');
   const [sortBy, setSortBy] = useState<string>('recent');
+
+  // Previne erro de hidratação SSR/CSR
+  if (!mounted) {
+    return null;
+  }
 
   useEffect(() => {
     setMounted(true);
@@ -76,13 +83,20 @@ function CoursesClient() {
 
   const loadData = async () => {
     setIsLoading(true);
+    setError(null);
     try {
       const [coursesRes, categoriesRes] = await Promise.all([
-        fetch('/api/courses'),
-        fetch('/api/categories'),
+        fetch('/api/courses').catch((err) => {
+          console.error('Erro ao buscar cursos:', err);
+          return null;
+        }),
+        fetch('/api/categories').catch((err) => {
+          console.error('Erro ao buscar categorias:', err);
+          return null;
+        }),
       ]);
 
-      if (coursesRes.ok) {
+      if (coursesRes && coursesRes.ok) {
         const contentType = coursesRes.headers.get('content-type');
 
         if (contentType && contentType.includes('application/json')) {
@@ -103,7 +117,7 @@ function CoursesClient() {
         setCourses([]);
       }
 
-      if (categoriesRes.ok) {
+      if (categoriesRes && categoriesRes.ok) {
         const contentType = categoriesRes.headers.get('content-type');
 
         if (contentType && contentType.includes('application/json')) {
@@ -122,6 +136,7 @@ function CoursesClient() {
       }
     } catch (error) {
       console.error('Erro ao carregar dados:', error);
+      setError('Erro ao carregar cursos. Por favor, tente novamente.');
       setCourses([]);
       setCategories([]);
     } finally {
@@ -182,6 +197,31 @@ function CoursesClient() {
         </div>
       </section>
 
+      {/* Error Message */}
+      {error && (
+        <div className="container mx-auto px-4 py-4">
+          <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4 flex items-start gap-3">
+            <AlertCircle className="h-5 w-5 text-destructive flex-shrink-0 mt-0.5" />
+            <div className="flex-1">
+              <h3 className="font-semibold text-destructive mb-1">
+                Erro ao carregar cursos
+              </h3>
+              <p className="text-sm text-muted-foreground mb-3">{error}</p>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  setError(null);
+                  loadData();
+                }}
+              >
+                Tentar Novamente
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Filters Section */}
       <section className="container mx-auto px-4 py-8">
         <div className="bg-card rounded-lg border p-4 md:p-6 mb-8">
@@ -207,11 +247,11 @@ function CoursesClient() {
                 className="w-full h-10 rounded-md border border-input bg-background px-3 py-2 text-sm"
               >
                 <option value="all">Todas as Categorias</option>
-                {categories.map((cat) => (
+                {categories?.map((cat) => (
                   <option key={cat.id} value={cat.id}>
                     {cat.name}
                   </option>
-                ))}
+                )) || []}
               </select>
             </div>
 
@@ -308,7 +348,7 @@ function CoursesClient() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredCourses.map((course) => {
+            {filteredCourses?.map((course) => {
               const isPaid =
                 typeof course.price === 'number' && course.price > 0;
               return (
