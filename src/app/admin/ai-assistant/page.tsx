@@ -32,6 +32,12 @@ export default function AdminAIAssistantPage() {
   const [loading, setLoading] = useState(false);
   // Filtro defensivo: remove agentes com id vazio/falsy
   const AGENTS_FILTERED = AGENTS.filter((a) => !!a.id && a.id !== '');
+  if (typeof window !== 'undefined') {
+    // Log defensivo para diagnóstico de dados em produção
+    // eslint-disable-next-line no-console
+    console.log('[AI-ASSISTANT] AGENTS:', AGENTS);
+    console.log('[AI-ASSISTANT] AGENTS_FILTERED:', AGENTS_FILTERED);
+  }
   const [selectedAgent, setSelectedAgent] = useState(AGENTS_FILTERED[0]);
 
   const handleSend = async () => {
@@ -85,11 +91,15 @@ export default function AdminAIAssistantPage() {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {AGENTS_FILTERED.map((agent) => (
-                  <SelectItem key={agent.id} value={agent.id}>
-                    {agent.label}
-                  </SelectItem>
-                ))}
+                {AGENTS_FILTERED.length === 0 ? (
+                  <SelectItem disabled value="">Nenhum agente disponível</SelectItem>
+                ) : (
+                  AGENTS_FILTERED.map((agent) => (
+                    <SelectItem key={agent.id} value={agent.id}>
+                      {agent.label}
+                    </SelectItem>
+                  ))
+                )}
               </SelectContent>
             </Select>
           </div>
