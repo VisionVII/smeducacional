@@ -328,7 +328,7 @@ export default function DatabaseDashboardPage() {
                       {(activeTab === 'tables'
                         ? tablesData?.schemas
                         : functionsData?.schemas
-                      )?.map((schema: string) => (
+                      )?.filter((schema: string) => schema).map((schema: string) => (
                         <SelectItem key={schema} value={schema}>
                           {schema}
                         </SelectItem>
