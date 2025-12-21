@@ -29,21 +29,17 @@ export async function sendMessageToAssistant(
   }
 
   // Envia mensagem para o assistente
-  const messageRes = await fetch(
-    `https://api.openai.com/v1/threads/${currentThreadId}/messages`,
-    {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${OPENAI_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        role: 'user',
-        content: message,
-      }),
-    }
-  );
-  const messageData = await messageRes.json();
+  await fetch(`https://api.openai.com/v1/threads/${currentThreadId}/messages`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${OPENAI_API_KEY}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      role: 'user',
+      content: message,
+    }),
+  });
 
   // Executa o assistente
   const runRes = await fetch(
@@ -61,12 +57,56 @@ export async function sendMessageToAssistant(
   );
   const runData = await runRes.json();
 
-  // (Opcional) Poll para resposta final
-  // ...
+  // Polling para resposta final
+  let status = runData.status;
+  let attempts = 0;
+  const maxAttempts = 20;
+  const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
+
+  while (
+    status !== 'completed' &&
+    status !== 'failed' &&
+    attempts < maxAttempts
+  ) {
+    await delay(1500);
+    const checkRes = await fetch(
+      `https://api.openai.com/v1/threads/${currentThreadId}/runs/${runData.id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${OPENAI_API_KEY}`,
+        },
+      }
+    );
+    const checkData = await checkRes.json();
+    status = checkData.status;
+    attempts++;
+  }
+
+  // Buscar mensagens do assistant
+  const messagesRes = await fetch(
+    `https://api.openai.com/v1/threads/${currentThreadId}/messages`,
+    {
+      headers: {
+        Authorization: `Bearer ${OPENAI_API_KEY}`,
+      },
+    }
+  );
+  const messagesData = await messagesRes.json();
+  type AssistantMsg = {
+    id: string;
+    object: string;
+    created_at: number;
+    thread_id: string;
+    role: 'user' | 'assistant';
+    content: Array<{ type: string; text: { value: string } }>;
+  };
+  const assistantMessage = (messagesData.data as AssistantMsg[])
+    ?.reverse()
+    .find((msg) => msg.role === 'assistant');
 
   return {
     threadId: currentThreadId,
-    message: messageData,
-    run: runData,
+    content: assistantMessage?.content?.[0]?.text?.value || null,
+    status,
   };
 }

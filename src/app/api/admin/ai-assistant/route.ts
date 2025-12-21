@@ -11,9 +11,10 @@ export async function POST(req: NextRequest) {
       );
     }
     const result = await sendMessageToAssistant(message);
-    // Aqui você pode customizar a resposta conforme o retorno do assistant
+    // Retorna o conteúdo gerado pelo assistant
     return NextResponse.json({
-      result: result?.run?.status || 'Consulta enviada ao agente.',
+      result: result?.content || 'Nenhuma resposta do assistente.',
+      status: result?.status,
     });
   } catch (error) {
     console.error('[API /admin/ai-assistant]', error);
