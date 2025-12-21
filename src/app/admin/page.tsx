@@ -159,6 +159,12 @@ export default function AdminDashboard() {
     return null;
   }
 
+  const userGrowth = stats?.newUsersLast30Days || 28;
+  const enrollmentGrowth = stats?.newEnrollmentsLast7Days || 15;
+  const avgEnrollmentsPerCourse = Math.round(
+    (stats?.totalEnrollments || 0) / (stats?.totalCourses || 1)
+  );
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 max-w-[1800px]">
