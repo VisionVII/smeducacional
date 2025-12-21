@@ -13,7 +13,6 @@ import {
   Activity,
   UserPlus,
   ArrowRight,
-  BarChart3,
   Settings,
   Bell,
   Calendar,
@@ -160,45 +159,28 @@ export default function AdminDashboard() {
     return null;
   }
 
-  const userGrowth = stats?.newUsersLast30Days || 0;
-  const enrollmentGrowth = stats?.newEnrollmentsLast7Days || 0;
-  const avgRevenuePerMonth = (stats?.totalRevenue || 0) / 12;
-  const avgEnrollmentsPerCourse = Math.round(
-    (stats?.totalEnrollments || 0) / (stats?.totalCourses || 1)
-  );
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 max-w-[1800px]">
-        {/* Header Enterprise */}
-        <div className="mb-8 sm:mb-12">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-            <div className="flex items-center gap-4">
-              <div className="p-4 bg-gradient-to-br from-primary via-purple-600 to-pink-600 rounded-2xl shadow-2xl">
-                <BarChart3 className="h-8 w-8 text-white" />
-              </div>
-              <div>
-                <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-primary via-purple-600 to-pink-600 bg-clip-text text-transparent">
-                  Central de Comando
-                </h1>
-                <div className="flex items-center gap-3 mt-2">
-                  <Badge
-                    variant="outline"
-                    className="border-primary/50 bg-primary/10"
-                  >
-                    <Activity className="h-3 w-3 mr-1 animate-pulse" />
-                    Sistema Online
-                  </Badge>
-                  <p className="text-sm text-muted-foreground">
-                    {new Date().toLocaleDateString('pt-BR', {
-                      weekday: 'long',
-                      day: '2-digit',
-                      month: 'long',
-                      year: 'numeric',
-                    })}
-                  </p>
-                </div>
-              </div>
+        {/* Header Simplificado */}
+        <div className="mb-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <Badge
+                variant="outline"
+                className="border-primary/50 bg-primary/10"
+              >
+                <Activity className="h-3 w-3 mr-1 animate-pulse" />
+                Sistema Online
+              </Badge>
+              <p className="text-sm text-muted-foreground">
+                {new Date().toLocaleDateString('pt-BR', {
+                  weekday: 'long',
+                  day: '2-digit',
+                  month: 'long',
+                  year: 'numeric',
+                })}
+              </p>
             </div>
 
             <div className="flex gap-2">
@@ -217,11 +199,6 @@ export default function AdminDashboard() {
               </Button>
             </div>
           </div>
-
-          <p className="text-base sm:text-lg text-muted-foreground max-w-3xl">
-            Visão completa do ecossistema educacional • Analytics em tempo real
-            • Gestão centralizada
-          </p>
         </div>
 
         {loading ? (
@@ -545,78 +522,6 @@ export default function AdminDashboard() {
                       </p>
                     </div>
                   )}
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Métricas de Crescimento */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <Card className="border-2 hover:border-primary/50 hover:shadow-xl transition-all duration-300">
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-lg">Novos Usuários</CardTitle>
-                    <div className="p-2 bg-primary/10 rounded-lg">
-                      <Users className="h-5 w-5 text-primary" />
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-2">
-                    <p className="text-3xl font-bold">{userGrowth}</p>
-                    <p className="text-sm text-muted-foreground flex items-center gap-1">
-                      <TrendingUp className="h-3.5 w-3.5 text-green-600" />
-                      <span className="text-green-600 font-medium">+15%</span>
-                      vs mês anterior
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="border-2 hover:border-green-500/50 hover:shadow-xl transition-all duration-300">
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-lg">Novas Matrículas</CardTitle>
-                    <div className="p-2 bg-green-500/10 rounded-lg">
-                      <GraduationCap className="h-5 w-5 text-green-600" />
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-2">
-                    <p className="text-3xl font-bold">{enrollmentGrowth}</p>
-                    <p className="text-sm text-muted-foreground flex items-center gap-1">
-                      <TrendingUp className="h-3.5 w-3.5 text-green-600" />
-                      <span className="text-green-600 font-medium">+22%</span>
-                      vs semana anterior
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="border-2 hover:border-orange-500/50 hover:shadow-xl transition-all duration-300">
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-lg">Receita Mensal</CardTitle>
-                    <div className="p-2 bg-orange-500/10 rounded-lg">
-                      <DollarSign className="h-5 w-5 text-orange-600" />
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-2">
-                    <p className="text-3xl font-bold">
-                      {avgRevenuePerMonth.toLocaleString('pt-BR', {
-                        style: 'currency',
-                        currency: 'BRL',
-                        maximumFractionDigits: 0,
-                      })}
-                    </p>
-                    <p className="text-sm text-muted-foreground flex items-center gap-1">
-                      <TrendingUp className="h-3.5 w-3.5 text-green-600" />
-                      <span className="text-green-600 font-medium">+12%</span>
-                      estimativa atual
-                    </p>
-                  </div>
                 </CardContent>
               </Card>
             </div>
