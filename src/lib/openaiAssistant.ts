@@ -60,7 +60,7 @@ export async function sendMessageToAssistant(
   // Polling para resposta final
   let status = runData.status;
   let attempts = 0;
-  const maxAttempts = 20;
+  const maxAttempts = 40;
   const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
 
   while (
@@ -92,6 +92,13 @@ export async function sendMessageToAssistant(
     }
   );
   const messagesData = await messagesRes.json();
+  // Log para depuração (apenas em dev)
+  if (process.env.NODE_ENV !== 'production') {
+    console.log(
+      '[OpenAI Assistant] messagesData:',
+      JSON.stringify(messagesData, null, 2)
+    );
+  }
   type AssistantMsg = {
     id: string;
     object: string;
