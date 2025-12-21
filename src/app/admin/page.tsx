@@ -13,6 +13,7 @@ import {
   Activity,
   UserPlus,
   ArrowRight,
+  BarChart3,
   Settings,
   Bell,
   Calendar,
