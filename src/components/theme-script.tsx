@@ -18,16 +18,17 @@ import { auth } from '@/lib/auth';
 import { getUserTheme } from '@/lib/themes/get-user-theme';
 import { getAdminThemePreset } from '@/lib/themes/get-admin-theme';
 import { generateCssVariables } from '@/lib/themes/presets';
+import type { Session } from 'next-auth';
 
 export async function ThemeScript() {
   let lightVars = '';
   let darkVars = '';
-  let session = null;
+  let session: Session | null = null;
 
   try {
     // Busca sessão do usuário (pode falhar em rotas estáticas)
     session = await auth().catch(() => null);
-  } catch (authError) {
+  } catch {
     console.debug(
       '[ThemeScript] Não foi possível obter sessão, usando tema admin'
     );
