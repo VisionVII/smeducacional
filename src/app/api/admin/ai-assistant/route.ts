@@ -11,6 +11,17 @@ export async function POST(req: NextRequest) {
       );
     }
     const result = await sendMessageToAssistant(message);
+    // Se houver erro, retorna erro detalhado para o frontend
+    if (result?.error) {
+      return NextResponse.json(
+        {
+          error: result.error,
+          status: result.status,
+          details: result.messagesData || result.error,
+        },
+        { status: 500 }
+      );
+    }
     // Retorna o conteúdo gerado pelo assistant
     return NextResponse.json({
       result: result?.content || 'Nenhuma resposta do assistente.',
