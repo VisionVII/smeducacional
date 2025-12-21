@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/db';
-import { writeFile, mkdir } from 'fs/promises';
-import path from 'path';
+import { uploadFile, deleteFile } from '@/lib/supabase';
 
 export async function POST(req: NextRequest) {
   try {
@@ -44,36 +43,49 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Criar diretório se não existir
-    const uploadDir = path.join(process.cwd(), 'public', 'uploads', 'avatars');
-    await mkdir(uploadDir, { recursive: true });
-
     // Gerar nome único para arquivo
     const timestamp = Date.now();
     const fileExtension = file.name.split('.').pop();
     const fileName = `${session.user.id}-${timestamp}.${fileExtension}`;
-    const filePath = path.join(uploadDir, fileName);
+    const filePath = `avatars/${fileName}`;
 
-    // Salvar arquivo
-    const buffer = Buffer.from(await file.arrayBuffer());
-    await writeFile(filePath, buffer);
+    // Deletar avatar anterior se existir
+    const currentUser = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { avatar: true },
+    });
 
-    // URL pública do arquivo
-    const avatarUrl = `/uploads/avatars/${fileName}`;
+    if (currentUser?.avatar) {
+      const oldPath = currentUser.avatar.split('/images/').pop();
+      if (oldPath && oldPath.startsWith('avatars/')) {
+        await deleteFile('images', oldPath);
+      }
+    }
+
+    // Upload para Supabase Storage
+    const { url, error } = await uploadFile(file, 'images', filePath);
+
+    if (error || !url) {
+      console.error('[teacher][avatar] Erro no upload Supabase:', error);
+      return NextResponse.json(
+        { error: error || 'Erro ao fazer upload de avatar' },
+        { status: 500 }
+      );
+    }
 
     // Atualizar avatar do usuário no banco
     await prisma.user.update({
       where: { id: session.user.id },
-      data: { avatar: avatarUrl },
+      data: { avatar: url },
     });
 
     return NextResponse.json({
       success: true,
-      avatarUrl,
+      avatarUrl: url,
       message: 'Avatar atualizado com sucesso',
     });
   } catch (error) {
-    console.error('Erro ao fazer upload de avatar:', error);
+    console.error('[teacher][avatar] Erro ao fazer upload:', error);
     return NextResponse.json(
       { error: 'Erro ao fazer upload de avatar' },
       { status: 500 }
