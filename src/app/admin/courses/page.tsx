@@ -487,7 +487,7 @@ export default function AdminCoursesPage() {
                 </div>
               ) : (
                 <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4">
-                  {filteredCourses.map((course) => (
+                  {filteredCourses?.map((course) => (
                     <Card
                       key={course.id}
                       className="hover:shadow-lg transition-all duration-200 flex flex-col"

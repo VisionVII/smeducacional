@@ -446,7 +446,7 @@ export default function AdminUsersPage() {
                 </div>
               ) : (
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
-                  {filteredUsers.map((user) => (
+                  {filteredUsers?.map((user) => (
                     <Card
                       key={user.id}
                       className="hover:shadow-lg transition-all duration-200"

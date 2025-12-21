@@ -317,7 +317,7 @@ export default async function TeacherDashboard() {
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    {recentCourses.map((course) => (
+                    {recentCourses?.map((course) => (
                       <div
                         key={course.id}
                         className="border rounded-lg p-4 hover:bg-accent/50 transition-colors transition-theme"

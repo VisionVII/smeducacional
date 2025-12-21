@@ -166,7 +166,7 @@ export default async function StudentDashboard() {
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-                {enrollments.slice(0, 6).map((enrollment) => (
+                {enrollments?.slice(0, 6).map((enrollment) => (
                   <Card
                     key={enrollment.id}
                     className="relative overflow-hidden border-2 hover:border-primary/50 transition-all duration-500 hover:shadow-2xl hover:-translate-y-1 group"

@@ -214,7 +214,7 @@ export default async function TeacherCoursesPage() {
           </Card>
         ) : (
           <div className="grid grid-cols-1 gap-6">
-            {courses.map((course) => {
+            {courses?.map((course) => {
               const totalLessons = course.modules.reduce(
                 (acc, m) => acc + m._count.lessons,
                 0
