@@ -1,7 +1,6 @@
 // src/lib/openaiAssistant.ts
 // Integração com OpenAI Assistants API (Node.js/TypeScript)
 
-
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 const OPENAI_ASSISTANT_ID = process.env.OPENAI_ASSISTANT_ID;
 

@@ -45,6 +45,11 @@ export default async function AdminLayout({
       icon: <FolderTree className="h-4 w-4" />,
     },
     {
+      href: '/admin/ai-assistant',
+      label: 'Assistente IA',
+      icon: <span className="h-4 w-4">🤖</span>,
+    },
+    {
       href: '/admin/settings/theme',
       label: 'Tema',
       icon: <Palette className="h-4 w-4" />,

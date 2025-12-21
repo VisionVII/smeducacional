@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/components/ui/use-toast';
 
@@ -32,7 +31,7 @@ export default function AdminAIAssistantPage() {
       } else {
         toast({ title: 'Erro ao consultar o agente.', variant: 'destructive' });
       }
-    } catch (e) {
+    } catch {
       toast({ title: 'Erro inesperado.', variant: 'destructive' });
     } finally {
       setLoading(false);
