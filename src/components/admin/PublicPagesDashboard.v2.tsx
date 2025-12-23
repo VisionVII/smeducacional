@@ -1070,7 +1070,7 @@ export default function PublicPagesDashboard() {
           <div className="flex-1 overflow-y-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
             {TEMPLATE_LIST.map((template) => (
               <button
-                key={template.id}
+                key={template.slug}
                 onClick={() => handleApplyTemplate(template)}
                 className="text-left p-4 border rounded-lg hover:border-primary hover:bg-accent transition-colors"
               >
@@ -1079,7 +1079,7 @@ export default function PublicPagesDashboard() {
                     <Layout className="h-5 w-5 text-primary" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold mb-1">{template.name}</h3>
+                    <h3 className="font-semibold mb-1">{template.title}</h3>
                     <p className="text-sm text-muted-foreground line-clamp-2">
                       {template.description}
                     </p>
