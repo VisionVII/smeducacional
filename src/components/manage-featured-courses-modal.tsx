@@ -19,12 +19,13 @@ import { Star, Loader2 } from 'lucide-react';
 interface Course {
   id: string;
   title: string;
-  slug?: string;
+  slug: string;
   description: string;
   thumbnail?: string;
   isFeatured?: boolean;
-  status?: string;
-  category?: string | { name: string };
+  category?: {
+    name: string;
+  };
 }
 
 interface ManageFeaturedCoursesModalProps {
@@ -40,14 +41,8 @@ export function ManageFeaturedCoursesModal({
 }: ManageFeaturedCoursesModalProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  
-  // Filtrar apenas cursos publicados
-  const publishedCourses = courses.filter(
-    (c) => !c.status || c.status === 'PUBLISHED'
-  );
-  
   const [selectedCourses, setSelectedCourses] = useState<Set<string>>(
-    new Set(publishedCourses.filter((c) => c.isFeatured).map((c) => c.id))
+    new Set(courses.filter((c) => c.isFeatured).map((c) => c.id))
   );
 
   const updateFeaturedMutation = useMutation({
@@ -131,54 +126,56 @@ export function ManageFeaturedCoursesModal({
           </div>
         )}
 
-        {publishedCourses.length === 0 ? (
-          <div className="text-center py-8 text-muted-foreground">
-            <p>Nenhum curso publicado disponível para promover.</p>
-            <p className="text-sm mt-2">Publique alguns cursos primeiro.</p>
-          </div>
-        ) : (
-          <div className="space-y-3 mt-6">
-            {publishedCourses.map((course) => (
-            <label
-              key={course.id}
-              className="flex items-start gap-3 p-4 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer"
-            >
-              <Checkbox
-                checked={selectedCourses.has(course.id)}
-                onCheckedChange={() => toggleCourse(course.id)}
-                disabled={updateFeaturedMutation.isPending}
-                className="mt-1"
-              />
-              <div className="flex-1 min-w-0">
-                <div className="flex items-start justify-between gap-2">
-                  <div>
-                    <p className="font-medium text-foreground line-clamp-1">
-                      {course.title}
-                    </p>
-                    {course.category && (
-                      <Badge variant="secondary" className="mt-1">
-                        {typeof course.category === 'string' 
-                          ? course.category 
-                          : course.category.name}
-                      </Badge>
+        <div className="space-y-3 mt-6">
+          {courses.length === 0 ? (
+            <div className="text-center py-12">
+              <p className="text-muted-foreground">
+                Nenhum curso disponível para promoção.
+              </p>
+              <p className="text-sm text-muted-foreground mt-2">
+                Publique cursos primeiro para poder promovê-los.
+              </p>
+            </div>
+          ) : (
+            courses.map((course) => (
+              <label
+                key={course.id}
+                className="flex items-start gap-3 p-4 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer"
+              >
+                <Checkbox
+                  checked={selectedCourses.has(course.id)}
+                  onCheckedChange={() => toggleCourse(course.id)}
+                  disabled={updateFeaturedMutation.isPending}
+                  className="mt-1"
+                />
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <p className="font-medium text-foreground line-clamp-1">
+                        {course.title}
+                      </p>
+                      {course.category && (
+                        <Badge variant="secondary" className="mt-1">
+                          {course.category.name}
+                        </Badge>
+                      )}
+                    </div>
+                    {selectedCourses.has(course.id) && (
+                      <Star className="w-5 h-5 text-yellow-500 fill-yellow-500 flex-shrink-0" />
                     )}
                   </div>
-                  {selectedCourses.has(course.id) && (
-                    <Star className="w-5 h-5 text-yellow-500 fill-yellow-500 flex-shrink-0" />
-                  )}
+                  <p className="text-sm text-muted-foreground mt-2 line-clamp-2">
+                    {course.description}
+                  </p>
                 </div>
-                <p className="text-sm text-muted-foreground mt-2 line-clamp-2">
-                  {course.description}
-                </p>
-              </div>
-              {updateFeaturedMutation.isPending &&
-                updateFeaturedMutation.variables === course.id && (
-                  <Loader2 className="w-5 h-5 animate-spin text-primary flex-shrink-0" />
-                )}
-            </label>
-          ))}
+                {updateFeaturedMutation.isPending &&
+                  updateFeaturedMutation.variables === course.id && (
+                    <Loader2 className="w-5 h-5 animate-spin text-primary flex-shrink-0" />
+                  )}
+              </label>
+            ))
+          )}
         </div>
-        )}
 
         <div className="flex gap-3 justify-end mt-6 pt-6 border-t">
           <Button variant="outline" onClick={onClose}>

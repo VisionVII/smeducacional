@@ -41,6 +41,7 @@ export async function GET(request: Request) {
       select: {
         id: true,
         title: true,
+        slug: true,
         description: true,
         thumbnail: true,
         categoryId: true,
@@ -50,6 +51,12 @@ export async function GET(request: Request) {
         featuredAt: true,
         createdAt: true,
         updatedAt: true,
+        category: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
         instructor: {
           select: {
             id: true,
@@ -74,9 +81,11 @@ export async function GET(request: Request) {
     const formattedCourses = courses.map((course) => ({
       id: course.id,
       title: course.title,
+      slug: course.slug,
       description: course.description || '',
       thumbnail: course.thumbnail,
-      category: course.categoryId || 'Geral',
+      category: course.category,
+      categoryId: course.categoryId,
       level: course.level || 'BEGINNER',
       status: course.isPublished ? 'PUBLISHED' : 'DRAFT',
       isFeatured: course.isFeatured,

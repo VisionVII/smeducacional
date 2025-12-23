@@ -41,9 +41,14 @@ import Link from 'next/link';
 interface Course {
   id: string;
   title: string;
+  slug?: string;
   description: string;
   thumbnail?: string;
-  category: string;
+  category?: {
+    id: string;
+    name: string;
+  };
+  categoryId?: string;
   level: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
   status: 'DRAFT' | 'PUBLISHED' | 'ARCHIVED';
   isFeatured?: boolean;
@@ -246,7 +251,9 @@ export default function AdminCoursesPage() {
     const matchesSearch =
       course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       course.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      course.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (course.category?.name || '')
+        .toLowerCase()
+        .includes(searchQuery.toLowerCase()) ||
       course.teacherName.toLowerCase().includes(searchQuery.toLowerCase());
 
     let matchesTab = false;
@@ -618,7 +625,7 @@ export default function AdminCoursesPage() {
                             <div className="flex justify-between">
                               <span>Categoria:</span>
                               <span className="font-medium">
-                                {course.category}
+                                {course.category?.name || 'Sem categoria'}
                               </span>
                             </div>
                           </div>
@@ -680,7 +687,7 @@ export default function AdminCoursesPage() {
                             <div className="flex justify-between">
                               <span>Categoria:</span>
                               <span className="font-medium">
-                                {course.category}
+                                {course.category?.name || 'Sem categoria'}
                               </span>
                             </div>
                             <div className="flex justify-between">
