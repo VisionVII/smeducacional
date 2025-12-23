@@ -140,9 +140,6 @@ export default function RegisterPage() {
 
         {/* Card */}
         <Card className="w-full max-w-md relative shadow-2xl backdrop-blur-xl bg-background/80 border border-primary/20 hover:border-primary/40 transition-all duration-300" style={{ animation: 'slideInUp 0.6s ease-out 0.2s both' }}>
-      </div>
-
-      <Card className="w-full max-w-md"
         <CardHeader className="space-y-3 text-center px-6 pt-8">
           <div className="flex justify-center mb-4">
             {branding.logoUrl ? (
