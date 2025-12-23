@@ -327,7 +327,6 @@ export default function ForgotPasswordPage() {
                       ...formData,
                       confirmPassword: e.target.value,
                     })
-                                <Button type="submit" className="w-full h-11 text-base font-semibold bg-gradient-to-r from-primary via-primary to-purple-600 hover:shadow-lg hover:shadow-primary/50 transition-all duration-300" disabled={isLoading}>
                   }
                   required
                   minLength={6}
