@@ -7,6 +7,7 @@ A página de catálogo de cursos agora possui uma **"primeira camada"** interati
 ### Layouts por Dispositivo
 
 #### 📱 Mobile (< 768px)
+
 - **Estilo Shorts (TikTok/Instagram Reels)**
 - Layout vertical ocupando a altura da tela
 - Indicadores de progresso na parte superior (barras que mostram qual short está sendo visualizado)
@@ -15,6 +16,7 @@ A página de catálogo de cursos agora possui uma **"primeira camada"** interati
 - Interação: toque nos indicadores para pular para o slide desejado
 
 #### 🖥️ Desktop (≥ 768px)
+
 - **Estilo Paisagem (Video em Landscape)**
 - Carrossel horizontal em modo `slideshow`
 - Conteúdo do curso à esquerda com fade-out
@@ -30,16 +32,19 @@ A página de catálogo de cursos agora possui uma **"primeira camada"** interati
 ### 1️⃣ No Painel Admin - Selecionar Cursos Promocionados
 
 #### Acesso
+
 1. Navegue para **Painel Admin** → **Conteúdo Educacional** (Cursos)
 2. Clique no botão **"⭐ Promover Cursos"** no topo da página
 
 #### Seleção de Cursos
+
 1. A modal **"Gerenciar Cursos Promovidos"** abre com lista de todos os cursos
 2. Marque o checkbox dos cursos que deseja promover
 3. Um ícone de estrela ⭐ aparece ao lado dos cursos selecionados
 4. Cada clique no checkbox atualiza o status automaticamente
 
 #### Recomendações
+
 - **Máximo recomendado:** 5 cursos
 - Quanto mais cursos selecionados, mais rápido o carrossel passa por cada um
 - Selecione seus melhores cursos para maximizar engajamento
@@ -47,11 +52,13 @@ A página de catálogo de cursos agora possui uma **"primeira camada"** interati
 ### 2️⃣ Visualizar na Página Pública
 
 #### URL
+
 ```
 https://seu-dominio.com/courses
 ```
 
 #### Comportamento Automático
+
 - Os cursos marcados como promovidos aparcem **automaticamente** na primeira camada (carousel no topo)
 - Atualiza em tempo real quando você muda as seleções no admin
 
@@ -60,6 +67,7 @@ https://seu-dominio.com/courses
 ## Arquitetura Técnica
 
 ### Banco de Dados
+
 ```sql
 -- Campos adicionados ao modelo Course
 isFeatured    Boolean  @default(false)    -- Marca se está promovido
@@ -69,10 +77,13 @@ featuredAt    DateTime?                   -- Timestamp da promoção
 ### APIs
 
 #### 1. Buscar Cursos Promovidos
+
 ```
 GET /api/courses/featured
 ```
+
 **Resposta:**
+
 ```json
 [
   {
@@ -97,10 +108,13 @@ GET /api/courses/featured
 ```
 
 #### 2. Atualizar Status de Promoção (Admin)
+
 ```
 PUT /api/admin/courses/{courseId}/featured
 ```
+
 **Body:**
+
 ```json
 {
   "isFeatured": true
@@ -108,9 +122,12 @@ PUT /api/admin/courses/{courseId}/featured
 ```
 
 **Resposta:**
+
 ```json
 {
-  "data": { /* Course object */ },
+  "data": {
+    /* Course object */
+  },
   "message": "Curso promovido com sucesso"
 }
 ```
@@ -119,26 +136,31 @@ PUT /api/admin/courses/{courseId}/featured
 
 ## Componentes React
 
-### 1. `CoursesCarousel` 
+### 1. `CoursesCarousel`
+
 **Arquivo:** `src/components/courses-carousel.tsx`
 
 Props:
+
 ```typescript
 interface CoursesCarouselProps {
-  courses: Course[];  // Array de cursos a exibir
+  courses: Course[]; // Array de cursos a exibir
 }
 ```
 
 Funcionalidades:
+
 - Auto-play a cada 5 segundos
 - Detecta automaticamente Mobile vs Desktop
 - Controles de navegação responsivos
 - Indicadores de progresso/slides
 
 ### 2. `ManageFeaturedCoursesModal`
+
 **Arquivo:** `src/components/manage-featured-courses-modal.tsx`
 
 Props:
+
 ```typescript
 interface ManageFeaturedCoursesModalProps {
   isOpen: boolean;
@@ -148,6 +170,7 @@ interface ManageFeaturedCoursesModalProps {
 ```
 
 Funcionalidades:
+
 - Modal para seleção de cursos
 - Atualizações em tempo real
 - Feedback visual (ícone de estrela)
@@ -158,6 +181,7 @@ Funcionalidades:
 ## Estilos & Animações
 
 ### Carousel Mobile
+
 ```css
 /* Altura máxima de 600px no mobile */
 h-screen max-h-[600px]
@@ -171,6 +195,7 @@ bg-gradient-to-t from-black via-black/40 to-transparent
 ```
 
 ### Carousel Desktop
+
 ```css
 /* Altura responsiva */
 h-96 lg:h-[500px]
@@ -184,6 +209,7 @@ border-none rounded-full
 ```
 
 ### Transições
+
 ```css
 /* Fade entre slides */
 transition-opacity duration-500
@@ -232,6 +258,7 @@ GET /api/courses/featured
 ## Casos de Uso
 
 ### Cenário 1: Lançar Novo Curso Premium
+
 1. Instrutor cria o curso
 2. Admin aprova e publica
 3. Admin promove via modal
@@ -239,12 +266,14 @@ GET /api/courses/featured
 5. Aumenta visibilidade e conversão
 
 ### Cenário 2: Campanha Sazonal
+
 1. Admin seleciona 3-5 cursos sazonais
 2. Carousel destaca durante a campanha
 3. Após campanha, remove do destaque
 4. Volta para exibição normal
 
 ### Cenário 3: Cursos com Melhor Performance
+
 1. Analisar dados de engajamento
 2. Selecionar top performers
 3. Manter no destaque como "recomendados"
@@ -274,21 +303,25 @@ GET /api/courses/featured
 ## Troubleshooting
 
 ### Carousel não aparece
+
 - Verifique se há cursos com `isFeatured = true`
 - Confirme que os cursos têm `isPublished = true`
 - Check API response: `GET /api/courses/featured`
 
 ### Slides não trocam automaticamente
+
 - Verifique se `isAutoPlay` está `true`
 - Confirme que o intervalo de 5 segundos não foi alterado
 - Interação com controles pausa auto-play
 
 ### Modal não salva seleções
+
 - Verifique permissões do usuário (ADMIN only)
 - Confirme conexão com banco de dados
 - Check browser console para erros de API
 
 ### Design quebrado em resoluções específicas
+
 - Testou em breakpoints: sm (640px), md (768px), lg (1024px)?
 - Verifique Tailwind config em `tailwind.config.ts`
 - Use `next/image` para otimização
@@ -298,6 +331,7 @@ GET /api/courses/featured
 ## Próximos Passos (Sugestões)
 
 ### ✨ Futuras Melhorias
+
 1. **Ordem customizável:** Drag-and-drop para reordenar cursos no destaque
 2. **Agendamento:** Agendar promoções para datas específicas
 3. **Analytics:** Tracking de cliques no carousel
@@ -308,5 +342,6 @@ GET /api/courses/featured
 ---
 
 ## Desenvolvido com Excelência pela **VisionVII**
+
 Uma empresa focada em desenvolvimento de software, inovação tecnológica e transformação digital.  
 Nossa missão é criar soluções que impactam positivamente pessoas e empresas através da tecnologia.

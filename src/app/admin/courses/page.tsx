@@ -46,6 +46,8 @@ interface Course {
   category: string;
   level: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
   status: 'DRAFT' | 'PUBLISHED' | 'ARCHIVED';
+  isFeatured?: boolean;
+  featuredAt?: string | null;
   teacherName: string;
   enrollmentCount: number;
   moduleCount: number;
@@ -175,6 +177,8 @@ export default function AdminCoursesPage() {
   };
 
   const getLevelBadge = (level: Course['level']) => {
+    if (!level) return null;
+
     const variants = {
       BEGINNER: {
         label: 'Iniciante',
@@ -190,8 +194,11 @@ export default function AdminCoursesPage() {
         label: 'Avançado',
         className: 'bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-400',
       },
-    };
+    } as const;
+
     const config = variants[level];
+    if (!config) return null;
+
     return <Badge className={config.className}>{config.label}</Badge>;
   };
 

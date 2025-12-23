@@ -46,6 +46,8 @@ export async function GET(request: Request) {
         categoryId: true,
         level: true,
         isPublished: true,
+        isFeatured: true,
+        featuredAt: true,
         createdAt: true,
         updatedAt: true,
         instructor: {
@@ -77,6 +79,8 @@ export async function GET(request: Request) {
       category: course.categoryId || 'Geral',
       level: course.level || 'BEGINNER',
       status: course.isPublished ? 'PUBLISHED' : 'DRAFT',
+      isFeatured: course.isFeatured,
+      featuredAt: course.featuredAt?.toISOString() ?? null,
       teacherName: course.instructor.name,
       teacherId: course.instructor.id,
       teacherAvatar: course.instructor.avatar,
