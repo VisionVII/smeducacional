@@ -35,6 +35,7 @@ import {
   Star,
 } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
+import { ManageFeaturedCoursesModal } from '@/components/manage-featured-courses-modal';
 import Link from 'next/link';
 
 interface Course {
@@ -76,6 +77,7 @@ export default function AdminCoursesPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState('all');
   const [performanceFilter, setPerformanceFilter] = useState<string>('all');
+  const [isFeaturedModalOpen, setIsFeaturedModalOpen] = useState(false);
 
   const { data: courses, isLoading } = useQuery<Course[]>({
     queryKey: ['admin-courses'],
@@ -288,12 +290,22 @@ export default function AdminCoursesPage() {
               Gerencie os cursos e materiais da plataforma
             </p>
           </div>
-          <Button asChild className="w-full sm:w-auto">
-            <Link href="/admin/courses/new">
-              <Plus className="h-4 w-4 mr-2" />
-              Novo Curso
-            </Link>
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setIsFeaturedModalOpen(true)}
+              className="flex items-center gap-2"
+            >
+              <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
+              Promover Cursos
+            </Button>
+            <Button asChild className="w-full sm:w-auto">
+              <Link href="/admin/courses/new">
+                <Plus className="h-4 w-4 mr-2" />
+                Novo Curso
+              </Link>
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -737,6 +749,13 @@ export default function AdminCoursesPage() {
           </p>
         </CardContent>
       </Card>
+
+      {/* Featured Courses Modal */}
+      <ManageFeaturedCoursesModal
+        isOpen={isFeaturedModalOpen}
+        onClose={() => setIsFeaturedModalOpen(false)}
+        courses={courses || []}
+      />
     </div>
   );
 }

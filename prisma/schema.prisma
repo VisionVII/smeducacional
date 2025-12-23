@@ -130,6 +130,8 @@ model Course {
   isPaid                    Boolean                    @default(false)
   isPublished               Boolean                    @default(false)
   publishedAt               DateTime?
+  isFeatured                Boolean                    @default(false)
+  featuredAt                DateTime?
   requirements              String?
   whatYouLearn              String?
   categoryId                String

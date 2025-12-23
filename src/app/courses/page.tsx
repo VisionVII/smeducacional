@@ -14,6 +14,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { AdaptiveNavbar } from '@/components/adaptive-navbar';
 import { Footer } from '@/components/footer';
+import { CoursesCarousel } from '@/components/courses-carousel';
 import {
   BookOpen,
   Clock,
@@ -63,6 +64,7 @@ interface Category {
 function CoursesClient() {
   const [mounted, setMounted] = useState(false);
   const [courses, setCourses] = useState<Course[]>([]);
+  const [featuredCourses, setFeaturedCourses] = useState<Course[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -75,13 +77,17 @@ function CoursesClient() {
     setIsLoading(true);
     setError(null);
     try {
-      const [coursesRes, categoriesRes] = await Promise.all([
+      const [coursesRes, categoriesRes, featuredRes] = await Promise.all([
         fetch('/api/courses').catch((err) => {
           console.error('Erro ao buscar cursos:', err);
           return null;
         }),
         fetch('/api/categories').catch((err) => {
           console.error('Erro ao buscar categorias:', err);
+          return null;
+        }),
+        fetch('/api/courses/featured').catch((err) => {
+          console.error('Erro ao buscar cursos promovidos:', err);
           return null;
         }),
       ]);
@@ -124,11 +130,30 @@ function CoursesClient() {
       } else {
         setCategories([]);
       }
+
+      if (featuredRes && featuredRes.ok) {
+        const contentType = featuredRes.headers.get('content-type');
+
+        if (contentType && contentType.includes('application/json')) {
+          try {
+            const featuredData = await featuredRes.json();
+            setFeaturedCourses(featuredData);
+          } catch (jsonError) {
+            console.error('Erro ao parsear cursos promovidos:', jsonError);
+            setFeaturedCourses([]);
+          }
+        } else {
+          setFeaturedCourses([]);
+        }
+      } else {
+        setFeaturedCourses([]);
+      }
     } catch (error) {
       console.error('Erro ao carregar dados:', error);
       setError('Erro ao carregar cursos. Por favor, tente novamente.');
       setCourses([]);
       setCategories([]);
+      setFeaturedCourses([]);
     } finally {
       setIsLoading(false);
       console.log('[Courses] Carregamento finalizado');
@@ -184,6 +209,13 @@ function CoursesClient() {
     <div className="min-h-screen flex flex-col bg-background">
       {/* Menu adaptativo */}
       <AdaptiveNavbar />
+
+      {/* Featured Carousel - Primeira Camada */}
+      {featuredCourses.length > 0 && (
+        <section className="relative w-full">
+          <CoursesCarousel courses={featuredCourses} />
+        </section>
+      )}
 
       {/* Hero Section */}
       <section className="bg-primary/5 dark:bg-primary/10 py-12 md:py-16">
