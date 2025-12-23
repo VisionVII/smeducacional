@@ -71,16 +71,6 @@ function CoursesClient() {
   const [selectedLevel, setSelectedLevel] = useState<string>('all');
   const [sortBy, setSortBy] = useState<string>('recent');
 
-  useEffect(() => {
-    setMounted(true);
-    loadData();
-  }, []);
-
-  // Previne erro de hidratação SSR/CSR
-  if (!mounted) {
-    return null;
-  }
-
   const loadData = async () => {
     setIsLoading(true);
     setError(null);
@@ -144,6 +134,16 @@ function CoursesClient() {
       console.log('[Courses] Carregamento finalizado');
     }
   };
+
+  useEffect(() => {
+    setMounted(true);
+    loadData();
+  }, []);
+
+  // Previne erro de hidratação SSR/CSR
+  if (!mounted) {
+    return null;
+  }
 
   // Filtrar e ordenar cursos
   const filteredCourses = courses
