@@ -3,19 +3,11 @@ import Link from 'next/link';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import {
-  BookOpen,
-  Users,
-  Plus,
-  Edit,
-  Trash2,
-  Eye,
-  Settings,
-  Clock,
-  CheckCircle,
-  XCircle,
-} from 'lucide-react';
+import { Card, CardHeader, CardTitle } from '@/components/ui/card';
+import { BookOpen, Users, Plus, CheckCircle, Clock } from 'lucide-react';
+import { StatsCard } from '@/components/teacher/stats-card';
+import { CourseCard } from '@/components/teacher/course-card';
+import { EmptyState } from '@/components/teacher/empty-state';
 
 export default async function TeacherCoursesPage() {
   const session = await auth();
@@ -66,30 +58,43 @@ export default async function TeacherCoursesPage() {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 max-w-[1800px]">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/20 dark:from-slate-900 dark:via-slate-900 dark:to-slate-950">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 max-w-7xl space-y-8 sm:space-y-10">
         {/* Header Premium */}
-        <Card className="relative overflow-hidden border-2 hover:border-primary/50 transition-all duration-500 hover:shadow-2xl mb-6 sm:mb-8">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-primary/10 to-transparent rounded-bl-[200px]"></div>
-          <CardHeader className="relative z-10">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-              <div className="flex items-center gap-4">
-                <div className="p-4 bg-gradient-to-br from-primary to-primary/80 rounded-2xl shadow-lg">
-                  <BookOpen className="h-8 w-8 text-white" />
-                </div>
-                <div>
-                  <CardTitle className="text-3xl font-bold bg-gradient-to-r from-primary via-purple-600 to-pink-600 bg-clip-text text-transparent">
-                    Meus Cursos
-                  </CardTitle>
-                  <p className="text-muted-foreground mt-1">
-                    Gerencie e crie seus cursos
-                  </p>
+        <Card className="relative overflow-hidden border-2 shadow-2xl hover:shadow-3xl transition-all duration-500 group">
+          {/* Camada base gradiente */}
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-secondary/5 to-accent/5" />
+
+          {/* Decorações animadas de fundo */}
+          <div className="absolute inset-0 opacity-40">
+            <div className="absolute -top-24 -right-24 w-80 h-80 bg-gradient-to-br from-primary/20 via-secondary/20 to-transparent rounded-full blur-3xl group-hover:scale-110 transition-transform duration-700" />
+            <div className="absolute -bottom-24 -left-24 w-72 h-72 bg-gradient-to-tr from-accent/20 via-primary/20 to-transparent rounded-full blur-3xl group-hover:scale-110 transition-transform duration-700" />
+          </div>
+
+          {/* Linha de brilho superior */}
+          <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
+
+          <CardHeader className="relative z-10 p-8 sm:p-10">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
+              <div className="space-y-3">
+                <div className="flex items-center gap-4">
+                  <div className="p-4 bg-gradient-theme rounded-2xl shadow-xl group-hover:scale-105 transition-transform duration-300">
+                    <BookOpen className="h-7 w-7 text-white" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-3xl sm:text-4xl lg:text-5xl font-black text-gradient-theme-triple">
+                      Meus Cursos
+                    </CardTitle>
+                    <p className="text-base sm:text-lg text-muted-foreground mt-2">
+                      Gerencie seus cursos e alcance mais alunos
+                    </p>
+                  </div>
                 </div>
               </div>
-              <Link href="/teacher/courses/new">
+              <Link href="/teacher/courses/new" className="w-full sm:w-auto">
                 <Button
                   size="lg"
-                  className="bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90 shadow-lg"
+                  className="w-full sm:w-auto bg-gradient-theme hover:bg-gradient-theme-soft shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 text-white font-bold h-12 px-8"
                 >
                   <Plus className="h-5 w-5 mr-2" />
                   Criar Novo Curso
@@ -99,241 +104,80 @@ export default async function TeacherCoursesPage() {
           </CardHeader>
         </Card>
 
-        {/* Estatísticas Premium */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
-          {/* Total de Cursos */}
-          <Card className="relative overflow-hidden border-2 hover:border-primary/50 transition-all duration-500 hover:shadow-2xl hover:-translate-y-1 group">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-500/20 to-transparent rounded-bl-[100px]"></div>
-            <CardHeader className="pb-2">
-              <div className="flex items-center justify-between">
-                <div className="p-3 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-lg group-hover:scale-110 transition-transform duration-300">
-                  <BookOpen className="h-5 w-5 text-white" />
-                </div>
-              </div>
-              <CardTitle className="text-sm text-muted-foreground font-medium mt-2">
-                Total de Cursos
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold bg-gradient-to-r from-blue-500 to-blue-600 bg-clip-text text-transparent">
-                {totalCourses}
-              </div>
-              <p className="text-xs text-muted-foreground mt-1">
-                {publishedCourses} publicados, {draftCourses} rascunhos
-              </p>
-            </CardContent>
-          </Card>
+        {/* Estatísticas */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-7 lg:gap-8">
+          <StatsCard
+            title="Total de Cursos"
+            value={totalCourses}
+            description={`${publishedCourses} publicados, ${draftCourses} rascunhos`}
+            icon={BookOpen}
+            iconColor="from-blue-500 to-blue-600"
+          />
 
-          {/* Publicados */}
-          <Card className="relative overflow-hidden border-2 hover:border-green-500/50 transition-all duration-500 hover:shadow-2xl hover:-translate-y-1 group">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-green-500/20 to-transparent rounded-bl-[100px]"></div>
-            <CardHeader className="pb-2">
-              <div className="flex items-center justify-between">
-                <div className="p-3 bg-gradient-to-br from-green-500 to-green-600 rounded-xl shadow-lg group-hover:scale-110 transition-transform duration-300">
-                  <CheckCircle className="h-5 w-5 text-white" />
-                </div>
-              </div>
-              <CardTitle className="text-sm text-muted-foreground font-medium mt-2">
-                Publicados
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold bg-gradient-to-r from-green-500 to-green-600 bg-clip-text text-transparent">
-                {publishedCourses}
-              </div>
-              <p className="text-xs text-muted-foreground mt-1">
-                Disponíveis para alunos
-              </p>
-            </CardContent>
-          </Card>
+          <StatsCard
+            title="Publicados"
+            value={publishedCourses}
+            description="Disponíveis para alunos"
+            icon={CheckCircle}
+            iconColor="from-green-500 to-green-600"
+          />
 
-          {/* Rascunhos */}
-          <Card className="relative overflow-hidden border-2 hover:border-amber-500/50 transition-all duration-500 hover:shadow-2xl hover:-translate-y-1 group">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-amber-500/20 to-transparent rounded-bl-[100px]"></div>
-            <CardHeader className="pb-2">
-              <div className="flex items-center justify-between">
-                <div className="p-3 bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl shadow-lg group-hover:scale-110 transition-transform duration-300">
-                  <Clock className="h-5 w-5 text-white" />
-                </div>
-              </div>
-              <CardTitle className="text-sm text-muted-foreground font-medium mt-2">
-                Rascunhos
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold bg-gradient-to-r from-amber-500 to-amber-600 bg-clip-text text-transparent">
-                {draftCourses}
-              </div>
-              <p className="text-xs text-muted-foreground mt-1">
-                Em construção
-              </p>
-            </CardContent>
-          </Card>
+          <StatsCard
+            title="Rascunhos"
+            value={draftCourses}
+            description="Em construção"
+            icon={Clock}
+            iconColor="from-amber-500 to-amber-600"
+          />
 
-          {/* Total de Alunos */}
-          <Card className="relative overflow-hidden border-2 hover:border-purple-500/50 transition-all duration-500 hover:shadow-2xl hover:-translate-y-1 group">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-purple-500/20 to-transparent rounded-bl-[100px]"></div>
-            <CardHeader className="pb-2">
-              <div className="flex items-center justify-between">
-                <div className="p-3 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl shadow-lg group-hover:scale-110 transition-transform duration-300">
-                  <Users className="h-5 w-5 text-white" />
-                </div>
-              </div>
-              <CardTitle className="text-sm text-muted-foreground font-medium mt-2">
-                Total de Alunos
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold bg-gradient-to-r from-purple-500 to-purple-600 bg-clip-text text-transparent">
-                {totalStudents}
-              </div>
-              <p className="text-xs text-muted-foreground mt-1">Matriculados</p>
-            </CardContent>
-          </Card>
+          <StatsCard
+            title="Total de Alunos"
+            value={totalStudents}
+            description="Matriculados"
+            icon={Users}
+            iconColor="from-purple-500 to-purple-600"
+          />
         </div>
 
         {/* Lista de Cursos */}
-        {courses.length === 0 ? (
-          <Card>
-            <CardContent className="py-16 text-center">
-              <BookOpen className="h-16 w-16 mx-auto mb-4 text-gray-400" />
-              <h3 className="text-xl font-semibold mb-2">
-                Nenhum curso criado ainda
-              </h3>
-              <p className="text-gray-600 dark:text-gray-400 mb-6">
-                Comece criando seu primeiro curso e compartilhe seu
-                conhecimento!
+        <div className="space-y-6">
+          {/* Seção Header */}
+          <div className="flex items-center justify-between">
+            <div className="space-y-1">
+              <h2 className="text-2xl sm:text-3xl font-bold text-foreground">
+                Seus Cursos
+              </h2>
+              <p className="text-sm text-muted-foreground">
+                {courses.length === 0
+                  ? 'Nenhum curso criado ainda'
+                  : `${courses.length} ${
+                      courses.length === 1
+                        ? 'curso encontrado'
+                        : 'cursos encontrados'
+                    }`}
               </p>
-              <Link href="/teacher/courses/new">
-                <Button>
-                  <Plus className="h-5 w-5 mr-2" />
-                  Criar Meu Primeiro Curso
-                </Button>
-              </Link>
-            </CardContent>
-          </Card>
-        ) : (
-          <div className="grid grid-cols-1 gap-6">
-            {courses?.map((course) => {
-              const totalLessons = course.modules.reduce(
-                (acc, m) => acc + m._count.lessons,
-                0
-              );
-              const isPaid =
-                typeof course.price === 'number' && course.price > 0;
-
-              return (
-                <Card key={course.id}>
-                  <CardContent className="p-6">
-                    <div className="flex gap-6">
-                      {/* Thumbnail */}
-                      <div className="flex-shrink-0">
-                        {course.thumbnail ? (
-                          <img
-                            src={course.thumbnail}
-                            alt={course.title}
-                            className="w-48 h-32 object-cover rounded-lg"
-                          />
-                        ) : (
-                          <div className="w-48 h-32 bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center">
-                            <BookOpen className="h-12 w-12 text-gray-400" />
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Informações */}
-                      <div className="flex-1">
-                        <div className="flex items-start justify-between">
-                          <div>
-                            <div className="flex items-center gap-3 mb-2">
-                              <h3 className="text-xl font-bold">
-                                {course.title}
-                              </h3>
-                              {course.isPublished ? (
-                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
-                                  <CheckCircle className="h-3 w-3 mr-1" />
-                                  Publicado
-                                </span>
-                              ) : (
-                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
-                                  <Clock className="h-3 w-3 mr-1" />
-                                  Rascunho
-                                </span>
-                              )}
-                            </div>
-                            <p className="text-sm text-gray-600 dark:text-gray-400 mb-3 line-clamp-2">
-                              {course.description}
-                            </p>
-                            <div className="flex items-center gap-4 text-sm text-gray-500">
-                              <span className="flex items-center gap-1">
-                                <BookOpen className="h-4 w-4" />
-                                {course._count.modules} módulos
-                              </span>
-                              <span className="flex items-center gap-1">
-                                <Settings className="h-4 w-4" />
-                                {totalLessons} aulas
-                              </span>
-                              <span className="flex items-center gap-1">
-                                <Users className="h-4 w-4" />
-                                {course._count.enrollments} alunos
-                              </span>
-                              <span className="flex items-center gap-1 font-semibold">
-                                {isPaid ? (
-                                  <span className="text-green-600">
-                                    R$ {course.price?.toFixed(2)}
-                                    {course.compareAtPrice && (
-                                      <span className="ml-2 text-xs text-gray-400 line-through">
-                                        R$ {course.compareAtPrice.toFixed(2)}
-                                      </span>
-                                    )}
-                                  </span>
-                                ) : (
-                                  <span className="text-blue-600">
-                                    Gratuito
-                                  </span>
-                                )}
-                              </span>
-                              {course.level && (
-                                <span className="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded text-xs">
-                                  {course.level}
-                                </span>
-                              )}
-                            </div>
-                          </div>
-
-                          {/* Ações */}
-                          <div className="flex items-center gap-2">
-                            <Link
-                              href={`/courses/${course.slug}`}
-                              target="_blank"
-                            >
-                              <Button variant="outline" size="sm">
-                                <Eye className="h-4 w-4" />
-                              </Button>
-                            </Link>
-                            <Link href={`/teacher/courses/${course.id}/edit`}>
-                              <Button variant="outline" size="sm">
-                                <Edit className="h-4 w-4" />
-                              </Button>
-                            </Link>
-                            <Link
-                              href={`/teacher/courses/${course.id}/content`}
-                            >
-                              <Button size="sm">
-                                <Settings className="h-4 w-4 mr-2" />
-                                Conteúdo
-                              </Button>
-                            </Link>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              );
-            })}
+            </div>
           </div>
-        )}
+
+          {/* Lista ou Empty State */}
+          {courses.length === 0 ? (
+            <EmptyState
+              icon={BookOpen}
+              title="Nenhum curso criado ainda"
+              description="Comece criando seu primeiro curso e compartilhe seu conhecimento com o mundo!"
+              action={{
+                label: 'Criar Meu Primeiro Curso',
+                href: '/teacher/courses/new',
+              }}
+            />
+          ) : (
+            <div className="space-y-5 sm:space-y-6">
+              {courses.map((course) => (
+                <CourseCard key={course.id} course={course} />
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

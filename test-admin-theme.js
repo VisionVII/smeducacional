@@ -19,9 +19,9 @@ async function testAdminTheme() {
     `;
     console.log('📋 Tabela admin_themes existe:', tables);
 
-  } catch (error: any) {
-    console.error('❌ Erro:', error.message);
-    if (error.message.includes('adminTheme')) {
+  } catch (error) {
+    console.error('❌ Erro:', error?.message || error);
+    if (typeof error?.message === 'string' && error.message.includes('adminTheme')) {
       console.log('⚠️ O modelo AdminTheme ainda não está no Prisma Client.');
       console.log('➡️ Execute: npx prisma generate');
     }

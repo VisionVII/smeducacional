@@ -272,11 +272,11 @@ export default function AdminProfilePage() {
         {/* Header com gradiente */}
         <div className="mb-8 sm:mb-12">
           <div className="flex items-center gap-3 mb-3">
-            <div className="p-3 bg-gradient-to-br from-primary to-purple-600 rounded-xl shadow-lg">
+            <div className="p-3 bg-gradient-theme rounded-xl shadow-lg">
               <User className="h-7 w-7 text-white" />
             </div>
             <div>
-              <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-primary via-purple-600 to-pink-600 bg-clip-text text-transparent">
+              <h1 className="text-3xl sm:text-4xl font-bold text-gradient-theme-triple">
                 Meu Perfil
               </h1>
               <Badge variant="outline" className="mt-1">
@@ -305,7 +305,7 @@ export default function AdminProfilePage() {
                         alt="Avatar"
                         className="object-cover"
                       />
-                      <AvatarFallback className="text-4xl font-bold bg-gradient-to-br from-primary to-purple-600 text-white">
+                      <AvatarFallback className="text-4xl font-bold bg-gradient-theme text-white">
                         {session?.user?.name?.[0]?.toUpperCase() || 'A'}
                       </AvatarFallback>
                     </Avatar>

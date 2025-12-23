@@ -1,38 +1,3 @@
-model PublicPageLog {
-  id        String   @id @default(cuid())
-  pageId    String
-  userId    String
-  action    String   // 'CREATE' | 'UPDATE' | 'DELETE'
-  changes   Json?
-  createdAt DateTime @default(now())
-  page      PublicPage @relation(fields: [pageId], references: [id])
-  user      User      @relation(fields: [userId], references: [id])
-}
-model PublicPage {
-  id          String   @id @default(cuid())
-  slug        String   @unique
-  title       String
-  description String?
-  bannerUrl   String?
-  iconUrl     String?
-  content     Json?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  logs        PublicPageLog[]
-}
-model AuditReport {
-  id         String   @id @default(uuid())
-  userId     String
-  createdAt  DateTime @default(now())
-  result     Json
-  pdfUrl     String?
-  riskScore  Int
-  status     String
-  user       User     @relation(fields: [userId], references: [id])
-}
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -41,6 +6,706 @@ datasource db {
   provider  = "postgresql"
   url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
+}
+
+model PublicPageLog {
+  id        String     @id @default(cuid())
+  pageId    String
+  userId    String
+  action    String
+  changes   Json?
+  createdAt DateTime   @default(now())
+  page      PublicPage @relation(fields: [pageId], references: [id])
+  user      User       @relation(fields: [userId], references: [id])
+}
+
+model PublicPage {
+  id          String          @id @default(cuid())
+  slug        String          @unique
+  title       String
+  description String?
+  bannerUrl   String?
+  iconUrl     String?
+  content     Json?
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  isPublished Boolean         @default(false)
+  logs        PublicPageLog[]
+  version     Int             @default(1)
+  publishedAt DateTime?
+}
+
+model AuditReport {
+  id        String   @id @default(uuid())
+  userId    String
+  result    Json
+  pdfUrl    String?
+  riskScore Int
+  status    String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model User {
+  id                        String                     @id @default(cuid())
+  name                      String
+  email                     String                     @unique
+  password                  String?
+  role                      UserRole                   @default(STUDENT)
+  avatar                    String?
+  phone                     String?
+  bio                       String?
+  cpf                       String?
+  address                   String?
+  twoFactorEnabled          Boolean                    @default(false)
+  twoFactorSecret           String?
+  emailVerified             DateTime?
+  resetCode                 String?
+  resetCodeExpires          DateTime?
+  createdAt                 DateTime                   @default(now())
+  updatedAt                 DateTime                   @updatedAt
+  landingConfig             Json?
+  landingTheme              Json?
+  auditReports              AuditReport[]
+  publicPageLogs            PublicPageLog[]
+  activities                Activity[]                 @relation("ActivityCreator")
+  activityLogs              ActivityLog[]
+  certificates              Certificate[]
+  checkoutSessions          CheckoutSession[]
+  createdCourses            Course[]                   @relation("CourseCreator")
+  enrollments               Enrollment[]
+  githubIntegration         GithubIntegration?
+  invoices                  Invoice[]
+  receivedMessages          Message[]                  @relation("MessageReceiver")
+  sentMessages              Message[]                  @relation("MessageSender")
+  notifications             Notification[]
+  payments                  Payment[]
+  progress                  Progress[]
+  studentEnrollmentPayments StudentEnrollmentPayment[]
+  studentSubscription       StudentSubscription?
+  submissions               Submission[]
+  supportTickets            SupportTicket[]
+  systemLogs                SystemLog[]
+  teacherEducation          TeacherEducation[]
+  teacherFinancial          TeacherFinancial?
+  teacherSubscription       TeacherSubscription?
+  theme                     UserTheme?
+
+  @@map("users")
+}
+
+model PublicSiteConfig {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  theme     Json?
+  content   Json?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("public_site_configs")
+}
+
+model Category {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  slug        String   @unique
+  description String?
+  icon        String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  courses     Course[]
+
+  @@map("categories")
+}
+
+model Course {
+  id                        String                     @id @default(cuid())
+  title                     String
+  slug                      String                     @unique
+  description               String
+  thumbnail                 String?
+  duration                  Int?
+  level                     String?
+  price                     Float?
+  isPaid                    Boolean                    @default(false)
+  isPublished               Boolean                    @default(false)
+  publishedAt               DateTime?
+  requirements              String?
+  whatYouLearn              String?
+  categoryId                String
+  instructorId              String
+  createdAt                 DateTime                   @default(now())
+  updatedAt                 DateTime                   @updatedAt
+  compareAtPrice            Float?
+  certificates              Certificate[]
+  checkoutSessions          CheckoutSession[]
+  category                  Category                   @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  instructor                User                       @relation("CourseCreator", fields: [instructorId], references: [id], onDelete: Cascade)
+  enrollments               Enrollment[]
+  invoices                  Invoice[]
+  modules                   Module[]
+  payments                  Payment[]
+  studentEnrollmentPayments StudentEnrollmentPayment[]
+
+  @@index([categoryId])
+  @@index([instructorId])
+  @@index([slug])
+  @@map("courses")
+}
+
+model Module {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  order       Int
+  courseId    String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  lessons     Lesson[]
+  course      Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@index([courseId])
+  @@map("modules")
+}
+
+model Lesson {
+  id          String     @id @default(cuid())
+  title       String
+  description String?
+  content     String?
+  videoUrl    String?
+  duration    Int?
+  order       Int
+  isFree      Boolean    @default(false)
+  moduleId    String
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  module      Module     @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  materials   Material[]
+  progress    Progress[]
+
+  @@index([moduleId])
+  @@map("lessons")
+}
+
+model Material {
+  id        String   @id @default(cuid())
+  title     String
+  type      String
+  url       String
+  size      Int?
+  lessonId  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  lesson    Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@index([lessonId])
+  @@map("materials")
+}
+
+model Enrollment {
+  id          String           @id @default(cuid())
+  status      EnrollmentStatus @default(ACTIVE)
+  progress    Float            @default(0)
+  studentId   String
+  courseId    String
+  enrolledAt  DateTime         @default(now())
+  completedAt DateTime?
+  updatedAt   DateTime         @updatedAt
+  course      Course           @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  student     User             @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, courseId])
+  @@index([studentId])
+  @@index([courseId])
+  @@map("enrollments")
+}
+
+model Progress {
+  id           String    @id @default(cuid())
+  studentId    String
+  lessonId     String
+  isCompleted  Boolean   @default(false)
+  watchTime    Int       @default(0)
+  lastPosition Int       @default(0)
+  completedAt  DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  lesson       Lesson    @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  student      User      @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, lessonId])
+  @@index([studentId])
+  @@index([lessonId])
+  @@map("progress")
+}
+
+model Certificate {
+  id                String    @id @default(cuid())
+  certificateNumber String    @unique
+  studentId         String
+  courseId          String
+  issuedAt          DateTime  @default(now())
+  validUntil        DateTime?
+  course            Course    @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  student           User      @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@index([studentId])
+  @@index([courseId])
+  @@map("certificates")
+}
+
+model Activity {
+  id          String       @id @default(cuid())
+  title       String
+  description String
+  type        ActivityType
+  dueDate     DateTime?
+  maxScore    Float        @default(100)
+  moduleId    String?
+  createdById String
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  createdBy   User         @relation("ActivityCreator", fields: [createdById], references: [id], onDelete: Cascade)
+  grades      Grade[]
+  submissions Submission[]
+
+  @@index([createdById])
+  @@map("activities")
+}
+
+model Submission {
+  id          String   @id @default(cuid())
+  content     String
+  fileUrl     String?
+  studentId   String
+  activityId  String
+  submittedAt DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  grade       Grade?
+  activity    Activity @relation(fields: [activityId], references: [id], onDelete: Cascade)
+  student     User     @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@index([studentId])
+  @@index([activityId])
+  @@map("submissions")
+}
+
+model Grade {
+  id           String     @id @default(cuid())
+  score        Float
+  feedback     String?
+  submissionId String     @unique
+  studentId    String
+  activityId   String
+  gradedById   String
+  gradedAt     DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  activity     Activity   @relation(fields: [activityId], references: [id], onDelete: Cascade)
+  submission   Submission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+
+  @@index([studentId])
+  @@index([activityId])
+  @@index([gradedById])
+  @@map("grades")
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  title     String
+  message   String
+  type      NotificationType
+  isRead    Boolean          @default(false)
+  userId    String
+  createdAt DateTime         @default(now())
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("notifications")
+}
+
+model Message {
+  id         String   @id @default(cuid())
+  subject    String
+  content    String
+  isRead     Boolean  @default(false)
+  senderId   String
+  receiverId String
+  createdAt  DateTime @default(now())
+  receiver   User     @relation("MessageReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
+  sender     User     @relation("MessageSender", fields: [senderId], references: [id], onDelete: Cascade)
+
+  @@index([senderId])
+  @@index([receiverId])
+  @@map("messages")
+}
+
+model SupportTicket {
+  id        String   @id @default(cuid())
+  subject   String
+  message   String
+  status    String   @default("OPEN")
+  priority  String   @default("MEDIUM")
+  userId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("support_tickets")
+}
+
+model ActivityLog {
+  id        String   @id @default(cuid())
+  action    String
+  details   String?
+  ipAddress String?
+  userId    String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([createdAt])
+  @@map("activity_logs")
+}
+
+model TeacherEducation {
+  id          String   @id @default(cuid())
+  degree      String
+  institution String
+  field       String
+  year        Int
+  userId      String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("teacher_education")
+}
+
+model TeacherFinancial {
+  id                    String    @id @default(cuid())
+  bank                  String
+  agency                String
+  account               String
+  accountType           String
+  pixKey                String?
+  userId                String    @unique
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  subscriptionStatus    String    @default("inactive")
+  plan                  String    @default("free")
+  subscriptionStartDate DateTime?
+  subscriptionExpiresAt DateTime?
+  trialEndsAt           DateTime?
+  lastPaymentDate       DateTime?
+  paymentMethod         String?
+  maxStudents           Int       @default(10)
+  maxStorage            Int       @default(1000)
+  canUploadLogo         Boolean   @default(false)
+  canCustomizeDomain    Boolean   @default(false)
+  canAccessAnalytics    Boolean   @default(false)
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("teacher_financial")
+}
+
+model UserTheme {
+  id                String          @id @default(cuid())
+  userId            String          @unique
+  presetId          String          @default("academic-blue")
+  cardStyle         CardStyle       @default(FLAT)
+  cardShadow        ShadowIntensity @default(NONE)
+  cardBorder        Boolean         @default(true)
+  card3D            Boolean         @default(false)
+  cardGlass         Boolean         @default(false)
+  spacing           Spacing         @default(COMFORTABLE)
+  borderRadius      BorderRadius    @default(MEDIUM)
+  animationsEnabled Boolean         @default(true)
+  animationSpeed    AnimationSpeed  @default(NORMAL)
+  hoverEffects      Boolean         @default(true)
+  transitionEasing  String          @default("ease-in-out")
+  customColors      Json?
+  fontFamily        String?
+  fontSize          FontSize        @default(NORMAL)
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+  user              User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([presetId])
+  @@map("user_themes")
+}
+
+model Payment {
+  id                    String               @id @default(cuid())
+  userId                String
+  courseId              String?
+  stripePaymentId       String?              @unique
+  checkoutSessionId     String?
+  studentSubscriptionId String?
+  teacherSubscriptionId String?
+  amount                Float
+  currency              String               @default("BRL")
+  type                  String               @default("course")
+  paymentMethod         String
+  status                String               @default("pending")
+  stripeIntentId        String?
+  stripeStatus          String?
+  metadata              Json?
+  createdAt             DateTime             @default(now())
+  updatedAt             DateTime             @updatedAt
+  invoice               Invoice?
+  checkoutSession       CheckoutSession?     @relation(fields: [checkoutSessionId], references: [id])
+  course                Course?              @relation(fields: [courseId], references: [id])
+  studentSubscription   StudentSubscription? @relation(fields: [studentSubscriptionId], references: [id])
+  teacherSubscription   TeacherSubscription? @relation(fields: [teacherSubscriptionId], references: [id])
+  user                  User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([courseId])
+  @@index([stripePaymentId])
+  @@index([checkoutSessionId])
+  @@index([studentSubscriptionId])
+  @@index([teacherSubscriptionId])
+  @@index([status])
+  @@map("payments")
+}
+
+model Invoice {
+  id            String    @id @default(cuid())
+  userId        String
+  paymentId     String    @unique
+  courseId      String?
+  invoiceNumber String    @unique
+  amount        Float
+  currency      String    @default("BRL")
+  status        String    @default("pending")
+  issuedAt      DateTime  @default(now())
+  dueAt         DateTime
+  paidAt        DateTime?
+  description   String?
+  notes         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  course        Course?   @relation(fields: [courseId], references: [id])
+  payment       Payment   @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([paymentId])
+  @@index([invoiceNumber])
+  @@index([courseId])
+  @@index([status])
+  @@map("invoices")
+}
+
+model TeacherSubscription {
+  id               String            @id @default(cuid())
+  userId           String            @unique
+  stripeSubId      String?           @unique
+  plan             String
+  status           String            @default("inactive")
+  startDate        DateTime          @default(now())
+  renewDate        DateTime?
+  cancelDate       DateTime?
+  price            Float?
+  currency         String            @default("BRL")
+  interval         String            @default("month")
+  stripePriceId    String?
+  latestInvoiceId  String?
+  stripeCustomerId String?
+  stripeStatus     String?
+  metadata         Json?
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  checkoutSessions CheckoutSession[]
+  payments         Payment[]
+  user             User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([stripeSubId])
+  @@index([stripePriceId])
+  @@index([status])
+  @@map("teacher_subscriptions")
+}
+
+model StudentSubscription {
+  id                 String            @id @default(cuid())
+  userId             String            @unique
+  stripeSubId        String?           @unique
+  stripeCustomerId   String?
+  stripePriceId      String?
+  plan               String
+  status             String            @default("inactive")
+  price              Float
+  currency           String            @default("BRL")
+  interval           String            @default("month")
+  currentPeriodStart DateTime?
+  currentPeriodEnd   DateTime?
+  cancelAt           DateTime?
+  cancelAtPeriodEnd  Boolean           @default(false)
+  trialEndsAt        DateTime?
+  metadata           Json?
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+  checkoutSessions   CheckoutSession[]
+  payments           Payment[]
+  user               User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([stripeSubId])
+  @@index([stripePriceId])
+  @@index([status])
+  @@map("student_subscriptions")
+}
+
+model StudentEnrollmentPayment {
+  id              String   @id @default(cuid())
+  enrollmentId    String   @unique
+  userId          String
+  courseId        String
+  amount          Float
+  currency        String   @default("BRL")
+  paymentDate     DateTime @default(now())
+  stripePaymentId String?
+  status          String   @default("completed")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  course          Course   @relation(fields: [courseId], references: [id])
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([courseId])
+  @@index([enrollmentId])
+  @@map("student_enrollment_payments")
+}
+
+model CheckoutSession {
+  id                    String               @id @default(cuid())
+  userId                String
+  courseId              String?
+  studentSubscriptionId String?
+  teacherSubscriptionId String?
+  stripeSessionId       String?              @unique
+  stripeCustomerId      String?
+  paymentIntentId       String?
+  mode                  String               @default("payment")
+  status                String               @default("pending")
+  amount                Float?
+  currency              String               @default("BRL")
+  url                   String?
+  expiresAt             DateTime?
+  metadata              Json?
+  createdAt             DateTime             @default(now())
+  updatedAt             DateTime             @updatedAt
+  course                Course?              @relation(fields: [courseId], references: [id])
+  studentSubscription   StudentSubscription? @relation(fields: [studentSubscriptionId], references: [id])
+  teacherSubscription   TeacherSubscription? @relation(fields: [teacherSubscriptionId], references: [id])
+  user                  User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  payments              Payment[]
+
+  @@index([userId])
+  @@index([courseId])
+  @@index([stripeSessionId])
+  @@index([status])
+  @@map("checkout_sessions")
+}
+
+model GithubIntegration {
+  id             String    @id @default(cuid())
+  userId         String    @unique
+  githubUserId   String    @unique
+  githubUsername String
+  accessToken    String
+  refreshToken   String?
+  tokenExpiresAt DateTime?
+  connectedAt    DateTime  @default(now())
+  lastSyncedAt   DateTime?
+  isConnected    Boolean   @default(true)
+  repositories   Json?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([githubUserId])
+  @@map("github_integrations")
+}
+
+model SystemLog {
+  id          String   @id @default(cuid())
+  level       String
+  component   String
+  message     String
+  description String?
+  userId      String?
+  metadata    Json?
+  stackTrace  String?
+  createdAt   DateTime @default(now())
+  user        User?    @relation(fields: [userId], references: [id])
+
+  @@index([level])
+  @@index([component])
+  @@index([userId])
+  @@index([createdAt])
+  @@map("system_logs")
+}
+
+model DeveloperMetrics {
+  id           String   @id @default(cuid())
+  component    String
+  responseTime Int
+  statusCode   Int?
+  errorRate    Float?
+  successCount Int      @default(0)
+  errorCount   Int      @default(0)
+  createdAt    DateTime @default(now())
+
+  @@index([component])
+  @@index([createdAt])
+  @@map("developer_metrics")
+}
+
+model SystemConfig {
+  id                  String   @id @default(cuid())
+  key                 String   @unique @default("system")
+  companyName         String   @default("SM Educacional")
+  systemName          String   @default("SM Educacional")
+  companyEmail        String?
+  companyPhone        String?
+  companyAddress      String?
+  logoUrl             String?
+  faviconUrl          String?
+  loginBgUrl          String?
+  primaryColor        String?  @default("#3B82F6")
+  secondaryColor      String?  @default("#10B981")
+  metaTitle           String?
+  metaDescription     String?
+  metaKeywords        String?
+  facebookUrl         String?
+  instagramUrl        String?
+  linkedinUrl         String?
+  twitterUrl          String?
+  youtubeUrl          String?
+  maintenanceMode     Boolean  @default(false)
+  registrationEnabled Boolean  @default(true)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+  publicTheme         Json?
+  coursesDescription  String?  @default("Descubra cursos incríveis para alavancar sua carreira")
+  coursesTitle        String?  @default("Nossos Cursos")
+  homeDescription     String?  @default("Transforme seu futuro com educação de qualidade")
+  homeTitle           String?  @default("Bem-vindo ao SM Educacional")
+  loginDescription    String?  @default("Entre com suas credenciais para acessar sua conta")
+  loginTitle          String?  @default("Bem-vindo de volta")
+  navbarBgUrl         String?
+  registerDescription String?  @default("Comece sua jornada de aprendizado hoje")
+  registerTitle       String?  @default("Crie sua conta")
+  themePresetId       String?  @default("academic-blue")
+
+  @@map("system_configs")
 }
 
 enum UserRole {
@@ -69,462 +734,13 @@ enum NotificationType {
   MESSAGE
 }
 
-model User {
-    publicPageLogs PublicPageLog[]
-  id            String    @id @default(cuid())
-  name          String
-  email         String    @unique
-  password      String?
-  role          UserRole  @default(STUDENT)
-  avatar        String?
-  phone         String?
-  bio           String?
-  cpf           String?
-  address       String?
-  twoFactorEnabled Boolean @default(false)
-  twoFactorSecret String?
-  emailVerified DateTime?
-  resetCode     String?
-  resetCodeExpires DateTime?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-
-  // Relações
-  enrollments      Enrollment[]
-  auditReports     AuditReport[]
-  progress         Progress[]
-  certificates     Certificate[]
-  createdCourses   Course[]        @relation("CourseCreator")
-  activities       Activity[]      @relation("ActivityCreator")
-  submissions      Submission[]
-  notifications    Notification[]
-  sentMessages     Message[]       @relation("MessageSender")
-  receivedMessages Message[]       @relation("MessageReceiver")
-  supportTickets   SupportTicket[]
-  activityLogs     ActivityLog[]
-  teacherEducation TeacherEducation[]
-  teacherFinancial TeacherFinancial?
-  theme            UserTheme?         // Tema unificado V2.0
-  landingConfig    Json?
-  landingTheme     Json?
-  payments         Payment[]
-  invoices         Invoice[]
-  teacherSubscription TeacherSubscription?
-  studentSubscription StudentSubscription?
-  checkoutSessions CheckoutSession[]
-  githubIntegration GithubIntegration?
-  systemLogs       SystemLog[]
-  studentEnrollmentPayments StudentEnrollmentPayment[]
-
-  @@map("users")
-}
-
-model PublicSiteConfig {
-  id        String   @id @default(cuid())
-  slug      String   @unique
-  theme     Json?
-  content   Json?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@map("public_site_configs")
-}
-
-model Category {
-  id          String   @id @default(cuid())
-  name        String   @unique
-  slug        String   @unique
-  description String?
-  icon        String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  courses Course[]
-
-  @@map("categories")
-}
-
-model Course {
-  id             String   @id @default(cuid())
-  title          String
-  slug           String   @unique
-  description    String
-  thumbnail      String?
-  duration       Int? // em minutos
-  level          String? // Iniciante, Intermediário, Avançado
-  price          Float?    // Preço em BRL (null = grátis)
-  compareAtPrice Float?    // Preço "De" para mostrar desconto
-  isPaid         Boolean  @default(false)
-  isPublished    Boolean @default(false)
-  publishedAt    DateTime?
-  requirements   String?
-  whatYouLearn   String?
-  categoryId     String
-  instructorId   String
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-
-  // Relações
-  category     Category       @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  instructor   User           @relation("CourseCreator", fields: [instructorId], references: [id], onDelete: Cascade)
-  modules      Module[]
-  enrollments  Enrollment[]
-  certificates Certificate[]
-  payments       Payment[]
-  invoices       Invoice[]
-  checkoutSessions CheckoutSession[]
-  studentEnrollmentPayments StudentEnrollmentPayment[]
-
-  @@index([categoryId])
-  @@index([instructorId])
-  @@index([slug])
-  @@map("courses")
-}
-
-model Module {
-  id          String   @id @default(cuid())
-  title       String
-  description String?
-  order       Int
-  courseId    String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  // Relações
-  course  Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
-  lessons Lesson[]
-
-  @@index([courseId])
-  @@map("modules")
-}
-
-model Lesson {
-  id          String   @id @default(cuid())
-  title       String
-  description String?
-  content     String? // Texto ou embed de vídeo
-  videoUrl    String?
-  duration    Int? // em segundos
-  order       Int
-  isFree      Boolean  @default(false)
-  moduleId    String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  // Relações
-  module    Module     @relation(fields: [moduleId], references: [id], onDelete: Cascade)
-  materials Material[]
-  progress  Progress[]
-
-  @@index([moduleId])
-  @@map("lessons")
-}
-
-model Material {
-  id        String   @id @default(cuid())
-  title     String
-  type      String // PDF, DOC, IMAGE, LINK
-  url       String
-  size      Int? // em bytes
-  lessonId  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  // Relações
-  lesson Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
-
-  @@index([lessonId])
-  @@map("materials")
-}
-
-model Enrollment {
-  id         String           @id @default(cuid())
-  status     EnrollmentStatus @default(ACTIVE)
-  progress   Float            @default(0) // 0-100
-  studentId  String
-  courseId   String
-  enrolledAt DateTime         @default(now())
-  completedAt DateTime?
-  updatedAt  DateTime         @updatedAt
-
-  // Relações
-  student User @relation(fields: [studentId], references: [id], onDelete: Cascade)
-  course  Course  @relation(fields: [courseId], references: [id], onDelete: Cascade)
-
-  @@unique([studentId, courseId])
-  @@index([studentId])
-  @@index([courseId])
-  @@map("enrollments")
-}
-
-model Progress {
-  id           String   @id @default(cuid())
-  studentId    String
-  lessonId     String
-  isCompleted  Boolean  @default(false)
-  watchTime    Int      @default(0) // em segundos
-  lastPosition Int      @default(0) // última posição do vídeo em segundos
-  completedAt  DateTime?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-
-  // Relações
-  student User @relation(fields: [studentId], references: [id], onDelete: Cascade)
-  lesson  Lesson  @relation(fields: [lessonId], references: [id], onDelete: Cascade)
-
-  @@unique([studentId, lessonId])
-  @@index([studentId])
-  @@index([lessonId])
-  @@map("progress")
-}
-
-model Certificate {
-  id           String   @id @default(cuid())
-  certificateNumber String   @unique
-  studentId    String
-  courseId     String
-  issuedAt     DateTime @default(now())
-  validUntil   DateTime?
-
-  // Relações
-  student User @relation(fields: [studentId], references: [id], onDelete: Cascade)
-  course  Course  @relation(fields: [courseId], references: [id], onDelete: Cascade)
-
-  @@index([studentId])
-  @@index([courseId])
-  @@map("certificates")
-}
-
-model Activity {
-  id          String       @id @default(cuid())
-  title       String
-  description String
-  type        ActivityType
-  dueDate     DateTime?
-  maxScore    Float        @default(100)
-  moduleId    String?
-  createdById String
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-
-  // Relações
-  createdBy   User         @relation("ActivityCreator", fields: [createdById], references: [id], onDelete: Cascade)
-  submissions Submission[]
-  grades      Grade[]
-
-  @@index([createdById])
-  @@map("activities")
-}
-
-model Submission {
-  id         String   @id @default(cuid())
-  content    String
-  fileUrl    String?
-  studentId  String
-  activityId String
-  submittedAt DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-
-  // Relações
-  student  User  @relation(fields: [studentId], references: [id], onDelete: Cascade)
-  activity Activity @relation(fields: [activityId], references: [id], onDelete: Cascade)
-  grade    Grade?
-
-  @@index([studentId])
-  @@index([activityId])
-  @@map("submissions")
-}
-
-model Grade {
-  id           String   @id @default(cuid())
-  score        Float
-  feedback     String?
-  submissionId String   @unique
-  studentId    String
-  activityId   String
-  gradedById   String
-  gradedAt     DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-
-  // Relações
-  submission Submission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
-  activity   Activity   @relation(fields: [activityId], references: [id], onDelete: Cascade)
-
-  @@index([studentId])
-  @@index([activityId])
-  @@index([gradedById])
-  @@map("grades")
-}
-
-model Notification {
-  id        String           @id @default(cuid())
-  title     String
-  message   String
-  type      NotificationType
-  isRead    Boolean          @default(false)
-  userId    String
-  createdAt DateTime         @default(now())
-
-  // Relações
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-  @@map("notifications")
-}
-
-model Message {
-  id         String   @id @default(cuid())
-  subject    String
-  content    String
-  isRead     Boolean  @default(false)
-  senderId   String
-  receiverId String
-  createdAt  DateTime @default(now())
-
-  // Relações
-  sender   User @relation("MessageSender", fields: [senderId], references: [id], onDelete: Cascade)
-  receiver User @relation("MessageReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
-
-  @@index([senderId])
-  @@index([receiverId])
-  @@map("messages")
-}
-
-model SupportTicket {
-  id        String   @id @default(cuid())
-  subject   String
-  message   String
-  status    String   @default("OPEN") // OPEN, IN_PROGRESS, RESOLVED, CLOSED
-  priority  String   @default("MEDIUM") // LOW, MEDIUM, HIGH
-  userId    String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  // Relações
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-  @@map("support_tickets")
-}
-
-model ActivityLog {
-  id        String   @id @default(cuid())
-  action    String
-  details   String?
-  ipAddress String?
-  userId    String
-  createdAt DateTime @default(now())
-
-  // Relações
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-  @@index([createdAt])
-  @@map("activity_logs")
-}
-
-model TeacherEducation {
-  id          String   @id @default(cuid())
-  degree      String   // Graduação, Pós-graduação, Mestrado, Doutorado
-  institution String
-  field       String   // Área de formação
-  year        Int
-  userId      String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  // Relações
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-  @@map("teacher_education")
-}
-
-model TeacherFinancial {
-  id          String   @id @default(cuid())
-  bank        String
-  agency      String
-  account     String
-  accountType String   // Corrente, Poupança
-  pixKey      String?
-  userId      String   @unique
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  // Subscription & Billing
-  subscriptionStatus String @default("inactive") // active, inactive, trial, suspended
-  plan               String @default("free")     // free, basic, premium, enterprise
-  subscriptionStartDate DateTime?
-  subscriptionExpiresAt  DateTime?
-  trialEndsAt        DateTime?
-  lastPaymentDate    DateTime?
-  paymentMethod      String?   // credit_card, pix, boleto
-  maxStudents        Int @default(10)
-  maxStorage         Int @default(1000) // MB
-  canUploadLogo      Boolean @default(false)
-  canCustomizeDomain Boolean @default(false)
-  canAccessAnalytics Boolean @default(false)
-
-  // Relações
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@map("teacher_financial")
-}
-
-// ============================================
-// TEMA SYSTEM V2.0 - UNIFICADO E EXTENSÍVEL
-// ============================================
-
-model UserTheme {
-  id        String   @id @default(cuid())
-  userId    String   @unique
-  
-  // Preset selecionado (academic-blue, forest-green, etc.)
-  presetId  String   @default("academic-blue")
-  
-  // === CARD SYSTEM (EXTENSÍVEL) ===
-  cardStyle      CardStyle       @default(FLAT)
-  cardShadow     ShadowIntensity @default(NONE)
-  cardBorder     Boolean         @default(true)
-  card3D         Boolean         @default(false)
-  cardGlass      Boolean         @default(false)
-  
-  // === LAYOUT (EXTENSÍVEL) ===
-  spacing        Spacing         @default(COMFORTABLE)
-  borderRadius   BorderRadius    @default(MEDIUM)
-  
-  // === ANIMATIONS (EXTENSÍVEL) ===
-  animationsEnabled Boolean      @default(true)
-  animationSpeed    AnimationSpeed @default(NORMAL)
-  hoverEffects      Boolean      @default(true)
-  transitionEasing  String       @default("ease-in-out")
-  
-  // === ADVANCED OPTIONS (FUTURAS EXPANSÕES) ===
-  customColors   Json?          // Para usuários criarem temas personalizados
-  fontFamily     String?        // Permitir troca de fonte no futuro
-  fontSize       FontSize       @default(NORMAL)
-  
-  // Metadata
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  // Relações
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-  @@index([presetId])
-  @@map("user_themes")
-}
-
-// === ENUMS EXTENSÍVEIS (FÁCIL ADICIONAR NOVOS) ===
-
 enum CardStyle {
-  FLAT       // Sem sombra, borda sutil
-  ELEVATED   // Sombra suave
-  BORDERED   // Borda grossa colorida
-  GLASS      // Backdrop blur
-  NEON       // Futuro: borda brilhante
-  GRADIENT   // Futuro: fundo gradiente
+  FLAT
+  ELEVATED
+  BORDERED
+  GLASS
+  NEON
+  GRADIENT
 }
 
 enum ShadowIntensity {
@@ -532,416 +748,36 @@ enum ShadowIntensity {
   LIGHT
   MEDIUM
   STRONG
-  XL         // Futuro: sombra extra grande
+  XL
 }
 
 enum Spacing {
-  COMPACT      // 0.75rem
-  COMFORTABLE  // 1rem (padrão)
-  SPACIOUS     // 1.5rem
-  EXTRA_SPACIOUS // Futuro: 2rem
+  COMPACT
+  COMFORTABLE
+  SPACIOUS
+  EXTRA_SPACIOUS
 }
 
 enum BorderRadius {
-  NONE      // 0
-  SMALL     // 0.25rem
-  MEDIUM    // 0.5rem (padrão)
-  LARGE     // 0.75rem
-  XL        // 1rem
-  FULL      // 9999px (pill shape)
+  NONE
+  SMALL
+  MEDIUM
+  LARGE
+  XL
+  FULL
 }
 
 enum AnimationSpeed {
-  DISABLED  // 0ms
-  FAST      // 150ms
-  NORMAL    // 200ms (padrão)
-  SLOW      // 300ms
-  VERY_SLOW // Futuro: 500ms
+  DISABLED
+  FAST
+  NORMAL
+  SLOW
+  VERY_SLOW
 }
 
 enum FontSize {
-  SMALL     // 0.875rem
-  NORMAL    // 1rem (padrão)
-  LARGE     // 1.125rem
-  EXTRA_LARGE // Futuro: 1.25rem
-}
-
-// ============================================
-// PAGAMENTOS E SUBSCRIPTIONS
-// ============================================
-
-model Payment {
-  id              String   @id @default(cuid())
-  
-  // Referências
-  userId          String
-  courseId        String?
-  stripePaymentId String?  @unique
-  checkoutSessionId String?
-  studentSubscriptionId String?
-  teacherSubscriptionId String?
-  
-  // Info de pagamento
-  amount          Float    // Valor em BRL
-  currency        String   @default("BRL")
-  type            String   @default("course") // course, teacher_subscription, student_subscription
-  paymentMethod   String   // credit_card, pix, boleto
-  status          String   @default("pending") // pending, completed, failed, refunded
-  
-  // Stripe
-  stripeIntentId  String?
-  stripeStatus    String?
-  
-  // Dados
-  metadata        Json?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  
-  // Relações
-  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  course          Course?  @relation(fields: [courseId], references: [id], onDelete: SetNull)
-  checkoutSession CheckoutSession? @relation(fields: [checkoutSessionId], references: [id], onDelete: SetNull)
-  studentSubscription StudentSubscription? @relation(fields: [studentSubscriptionId], references: [id], onDelete: SetNull)
-  teacherSubscription TeacherSubscription? @relation(fields: [teacherSubscriptionId], references: [id], onDelete: SetNull)
-  invoice         Invoice?
-  
-  @@index([userId])
-  @@index([courseId])
-  @@index([stripePaymentId])
-  @@index([checkoutSessionId])
-  @@index([studentSubscriptionId])
-  @@index([teacherSubscriptionId])
-  @@index([status])
-  @@map("payments")
-}
-
-model Invoice {
-  id            String   @id @default(cuid())
-  
-  // Referências
-  userId        String
-  paymentId     String   @unique
-  courseId      String?
-  
-  // Info
-  invoiceNumber String   @unique
-  amount        Float
-  currency      String   @default("BRL")
-  status        String   @default("pending") // pending, paid, overdue, cancelled
-  
-  // Datas
-  issuedAt      DateTime @default(now())
-  dueAt         DateTime
-  paidAt        DateTime?
-  
-  // Dados
-  description   String?
-  notes         String?
-  
-  // Timestamps
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  
-  // Relações
-  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  payment       Payment  @relation(fields: [paymentId], references: [id], onDelete: Cascade)
-  course        Course?  @relation(fields: [courseId], references: [id], onDelete: SetNull)
-  
-  @@index([userId])
-  @@index([paymentId])
-  @@index([invoiceNumber])
-  @@index([courseId])
-  @@index([status])
-  @@map("invoices")
-}
-
-model TeacherSubscription {
-  id              String   @id @default(cuid())
-  
-  // Referências
-  userId          String   @unique
-  stripeSubId     String?  @unique
-  
-  // Subscription info
-  plan            String   // free, basic, premium, enterprise
-  status          String   @default("inactive") // active, inactive, cancelled, past_due
-  startDate       DateTime @default(now())
-  renewDate       DateTime?
-  cancelDate      DateTime?
-  price           Float?
-  currency        String   @default("BRL")
-  interval        String   @default("month") // month, year
-  stripePriceId   String?
-  latestInvoiceId String?
-  
-  // Stripe
-  stripeCustomerId String?
-  stripeStatus    String?
-  
-  // Dados
-  metadata        Json?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  
-  // Relações
-  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  payments        Payment[]
-  checkoutSessions CheckoutSession[]
-  
-  @@index([userId])
-  @@index([stripeSubId])
-  @@index([stripePriceId])
-  @@index([status])
-  @@map("teacher_subscriptions")
-}
-
-model StudentSubscription {
-  id              String   @id @default(cuid())
-  
-  // Referências
-  userId          String   @unique
-  stripeSubId     String?  @unique
-  stripeCustomerId String?
-  stripePriceId   String?
-
-  // Subscription info
-  plan            String   // basic, premium, etc
-  status          String   @default("inactive") // active, inactive, cancelled, past_due
-  price           Float
-  currency        String   @default("BRL")
-  interval        String   @default("month")
-  currentPeriodStart DateTime?
-  currentPeriodEnd   DateTime?
-  cancelAt         DateTime?
-  cancelAtPeriodEnd Boolean @default(false)
-  trialEndsAt      DateTime?
-
-  // Dados
-  metadata        Json?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-
-  // Relações
-  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  payments        Payment[]
-  checkoutSessions CheckoutSession[]
-
-  @@index([userId])
-  @@index([stripeSubId])
-  @@index([stripePriceId])
-  @@index([status])
-  @@map("student_subscriptions")
-}
-
-model StudentEnrollmentPayment {
-  id            String   @id @default(cuid())
-  
-  // Referências
-  enrollmentId  String   @unique
-  userId        String
-  courseId      String
-  
-  // Payment info
-  amount        Float
-  currency      String   @default("BRL")
-  paymentDate   DateTime @default(now())
-  
-  // Stripe
-  stripePaymentId String?
-  
-  // Status
-  status        String   @default("completed") // completed, failed, refunded
-  
-  // Timestamps
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  
-  // Relações
-  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  course        Course   @relation(fields: [courseId], references: [id])
-  
-  @@index([userId])
-  @@index([courseId])
-  @@index([enrollmentId])
-  @@map("student_enrollment_payments")
-}
-
-model CheckoutSession {
-  id              String   @id @default(cuid())
-
-  // Referências
-  userId          String
-  courseId        String?
-  studentSubscriptionId String?
-  teacherSubscriptionId String?
-
-  // Stripe
-  stripeSessionId String?  @unique
-  stripeCustomerId String?
-  paymentIntentId String?
-
-  // Info
-  mode            String   @default("payment") // payment, subscription
-  status          String   @default("pending") // pending, completed, failed, expired
-  amount          Float?
-  currency        String   @default("BRL")
-  url             String?
-  expiresAt       DateTime?
-  metadata        Json?
-  
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-
-  // Relações
-  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  course          Course?  @relation(fields: [courseId], references: [id], onDelete: SetNull)
-  studentSubscription StudentSubscription? @relation(fields: [studentSubscriptionId], references: [id], onDelete: SetNull)
-  teacherSubscription TeacherSubscription? @relation(fields: [teacherSubscriptionId], references: [id], onDelete: SetNull)
-  payments        Payment[]
-
-  @@index([userId])
-  @@index([courseId])
-  @@index([stripeSessionId])
-  @@index([status])
-  @@map("checkout_sessions")
-}
-
-model GithubIntegration {
-  id              String   @id @default(cuid())
-  
-  // Referências
-  userId          String   @unique
-  
-  // GitHub OAuth
-  githubUserId    String   @unique
-  githubUsername  String
-  accessToken     String
-  refreshToken    String?
-  tokenExpiresAt  DateTime?
-  
-  // Dados
-  connectedAt     DateTime @default(now())
-  lastSyncedAt    DateTime?
-  isConnected     Boolean  @default(true)
-  
-  // Metadados
-  repositories    Json?    // Cache de repos
-  
-  // Timestamps
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  
-  // Relações
-  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  @@index([userId])
-  @@index([githubUserId])
-  @@map("github_integrations")
-}
-
-model SystemLog {
-  id              String   @id @default(cuid())
-  
-  // Info
-  level           String   // error, warn, info, debug
-  component       String   // auth, payment, database, api, stripe, github
-  message         String
-  description     String?
-  
-  // Dados
-  userId          String?  // Se relacionado a user
-  metadata        Json?
-  stackTrace      String?
-  user            User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
-  
-  // Timestamps
-  createdAt       DateTime @default(now())
-  
-  @@index([level])
-  @@index([component])
-  @@index([userId])
-  @@index([createdAt])
-  @@map("system_logs")
-}
-
-model DeveloperMetrics {
-  id              String   @id @default(cuid())
-  
-  // Component
-  component       String   // database, api, storage, payment
-  
-  // Métricas
-  responseTime    Int      // ms
-  statusCode      Int?
-  errorRate       Float?   // 0-100
-  successCount    Int @default(0)
-  errorCount      Int @default(0)
-  
-  // Período
-  createdAt       DateTime @default(now())
-  
-  @@index([component])
-  @@index([createdAt])
-  @@map("developer_metrics")
-}
-model SystemConfig {
-  id              String   @id @default(cuid())
-  
-  // Identificador único (apenas um registro ativo)
-  key             String   @unique @default("system")
-  
-  // Informações da empresa/sistema
-  companyName     String   @default("SM Educacional")
-  systemName      String   @default("SM Educacional")
-  companyEmail    String?
-  companyPhone    String?
-  companyAddress  String?
-  
-  // Logos e imagens
-  logoUrl         String?  // Logo principal (navbar, emails, etc)
-  faviconUrl      String?  // Favicon do site
-  loginBgUrl      String?  // Background da tela de login
-  navbarBgUrl     String?  // Background da navbar (header)
-  
-  // Cores padrão do sistema (DEPRECATED - usar publicTheme)
-  primaryColor    String?  @default("#3B82F6")
-  secondaryColor  String?  @default("#10B981")
-  
-  // Tema público para rotas não autenticadas (home, landing, catálogo)
-  publicTheme     Json?    // { palette, layout, animations, themeName }
-  
-  // Tema global do sistema (V2.0 - Hierárquico)
-  themePresetId   String?  @default("academic-blue") // ID do preset de tema (academic-blue, forest-green, etc)
-  
-  // Configurações de páginas públicas (títulos e descrições personalizadas)
-  homeTitle       String?  @default("Bem-vindo ao SM Educacional")
-  homeDescription String?  @default("Transforme seu futuro com educação de qualidade")
-  loginTitle      String?  @default("Bem-vindo de volta")
-  loginDescription String? @default("Entre com suas credenciais para acessar sua conta")
-  registerTitle   String?  @default("Crie sua conta")
-  registerDescription String? @default("Comece sua jornada de aprendizado hoje")
-  coursesTitle    String?  @default("Nossos Cursos")
-  coursesDescription String? @default("Descubra cursos incríveis para alavancar sua carreira")
-  
-  // Configurações de SEO
-  metaTitle       String?
-  metaDescription String?
-  metaKeywords    String?
-  
-  // Redes sociais
-  facebookUrl     String?
-  instagramUrl    String?
-  linkedinUrl     String?
-  twitterUrl      String?
-  youtubeUrl      String?
-  
-  // Configurações gerais
-  maintenanceMode Boolean  @default(false)
-  registrationEnabled Boolean @default(true)
-  
-  // Timestamps
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  
-  @@map("system_configs")
+  SMALL
+  NORMAL
+  LARGE
+  EXTRA_LARGE
 }

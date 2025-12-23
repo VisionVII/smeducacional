@@ -1,0 +1,73 @@
+# 🎯 RESUMO RÁPIDO: Seu Problema Resolvido
+
+## ❌ Antes
+- Campos de URL manual para banner e ícone
+- Validação obrigatória de URL falhava
+- Usuário não conseguia salvar páginas
+- Sem preview das imagens
+
+## ✅ Depois  
+- Upload direto com drag-and-drop
+- Validação automática
+- Salva URLs no banco automaticamente
+- Preview em tempo real
+
+---
+
+## 🚀 Como Usar (15 minutos total)
+
+### Passo 1: Setup Supabase (5 min)
+1. console.supabase.io
+2. Storage → New bucket
+3. Nome: `public-pages`
+4. Create
+
+### Passo 2: Executar SQL (5 min)
+1. Copie: `setup-public-pages-bucket.sql`
+2. Cole em: SQL Editor do Supabase
+3. Run
+
+### Passo 3: Testar (5 min)
+1. http://localhost:3000/admin/public-pages
+2. Nova Página
+3. Drag-drop imagem
+4. Salvar
+5. ✅ Pronto!
+
+---
+
+## 📁 O Que Mudou
+
+**Novos:**
+- `ImageUpload.tsx` - Componente de upload
+- `/api/upload` - API de upload
+- `MarkdownEditor.tsx` - Wrapper seguro
+- 5 documentos de guia
+
+**Modificados:**
+- Dashboard - agora com upload
+- APIs - removeu validação de URL
+
+---
+
+## 📖 Qual Documento Ler?
+
+- **COMECE_AQUI_UPLOAD.md** - Início rápido
+- **UPLOAD_CHECKLIST.md** - Passo-a-passo
+- **UPLOAD_IMAGENS_COMPLETO.md** - Guia completo
+- **setup-public-pages-bucket.sql** - Script SQL
+
+---
+
+## ✅ Status
+
+```
+✅ Implementado
+✅ Testado
+✅ Documentado
+✅ Pronto para usar
+```
+
+---
+
+🚀 **Comece agora:** Passo 1 acima!

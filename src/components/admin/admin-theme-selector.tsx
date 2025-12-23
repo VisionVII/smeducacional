@@ -177,7 +177,7 @@ export function AdminThemeSelector({
               <Button
                 onClick={handleSave}
                 disabled={isSaving}
-                className="bg-gradient-to-r from-primary to-purple-600 hover:opacity-90"
+                className="bg-gradient-theme hover:bg-gradient-theme-soft"
               >
                 {isSaving ? (
                   <>

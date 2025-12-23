@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -95,6 +94,7 @@ export default function CourseContentPage({
       fetchCourse(id);
     }
     initializeCourse();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params]);
 
   const fetchCourse = async (id: string) => {
@@ -114,7 +114,7 @@ export default function CourseContentPage({
         }
 
         // Garantir que cada módulo tem um array de lessons
-        data.modules.forEach((module: any) => {
+        data.modules.forEach((module: { lessons?: unknown[] }) => {
           if (!Array.isArray(module.lessons)) {
             module.lessons = [];
           }
@@ -197,7 +197,8 @@ export default function CourseContentPage({
           variant: 'destructive',
         });
       }
-    } catch (error) {
+    } catch (err) {
+      console.error('Erro ao salvar módulo:', err);
       toast({
         title: 'Erro ao salvar módulo',
         description: 'Ocorreu um erro inesperado.',
@@ -226,6 +227,7 @@ export default function CourseContentPage({
         });
       }
     } catch (error) {
+      console.error('Erro ao deletar módulo:', error);
       toast({
         title: 'Erro ao deletar módulo',
         variant: 'destructive',
@@ -295,7 +297,8 @@ export default function CourseContentPage({
           variant: 'destructive',
         });
       }
-    } catch (error) {
+    } catch (err) {
+      console.error('Erro ao salvar aula:', err);
       toast({
         title: 'Erro ao salvar aula',
         description: 'Ocorreu um erro inesperado.',
@@ -323,7 +326,8 @@ export default function CourseContentPage({
           variant: 'destructive',
         });
       }
-    } catch (error) {
+    } catch (err) {
+      console.error('Erro ao deletar módulo:', err);
       toast({
         title: 'Erro ao deletar aula',
         variant: 'destructive',
@@ -344,336 +348,454 @@ export default function CourseContentPage({
   if (!course) return null;
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-6xl">
-      {/* Header */}
-      <div className="mb-6 flex items-center justify-between">
-        <div>
-          <BackButton href="/teacher/courses" label="Voltar para meus cursos" />
-          <h1 className="text-3xl font-bold mt-4">{course.title}</h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-1">
-            Gerenciar conteúdo do curso
-          </p>
-        </div>
-        <Button onClick={() => openModuleModal()} size="lg">
-          <Plus className="h-5 w-5 mr-2" />
-          Novo Módulo
-        </Button>
-      </div>
-
-      {/* Lista de Módulos */}
-      {!course.modules || course.modules.length === 0 ? (
-        <Card>
-          <CardContent className="py-16 text-center">
-            <FileText className="h-16 w-16 mx-auto mb-4 text-gray-400" />
-            <h3 className="text-xl font-semibold mb-2">Nenhum módulo criado</h3>
-            <p className="text-gray-600 dark:text-gray-400 mb-6">
-              Comece organizando seu curso em módulos e aulas
-            </p>
-            <Button onClick={() => openModuleModal()}>
-              <Plus className="h-5 w-5 mr-2" />
-              Criar Primeiro Módulo
-            </Button>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-12 max-w-7xl space-y-6 sm:space-y-8 lg:space-y-10">
+        {/* Premium Header Card */}
+        <Card className="border-0 shadow-2xl bg-gradient-theme-triple text-white overflow-hidden relative">
+          <div className="absolute inset-0 bg-black/10" />
+          <CardContent className="relative p-5 sm:p-6 lg:p-8">
+            <div className="mb-4 sm:mb-6">
+              <BackButton
+                href="/teacher/courses"
+                label="Voltar para meus cursos"
+              />
+            </div>
+            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 sm:gap-6">
+              <div className="space-y-2 sm:space-y-3">
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight">
+                  {course.title}
+                </h1>
+                <p className="text-base sm:text-lg text-white/90 max-w-2xl">
+                  Organize e gerencie o conteúdo do seu curso em módulos e aulas
+                </p>
+              </div>
+              <Button
+                onClick={() => openModuleModal()}
+                size="lg"
+                className="bg-white text-primary hover:bg-white/90 shadow-lg w-full lg:w-auto"
+              >
+                <Plus className="h-5 w-5 mr-2" />
+                Novo Módulo
+              </Button>
+            </div>
           </CardContent>
         </Card>
-      ) : (
-        <div className="space-y-4">
-          {course.modules?.map((module, index) => (
-            <Card key={module.id}>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3 flex-1">
-                    <button
-                      onClick={() => toggleModule(module.id)}
-                      className="hover:bg-gray-100 dark:hover:bg-gray-800 p-1 rounded"
-                    >
-                      {expandedModules.has(module.id) ? (
-                        <ChevronDown className="h-5 w-5" />
-                      ) : (
-                        <ChevronRight className="h-5 w-5" />
-                      )}
-                    </button>
-                    <GripVertical className="h-5 w-5 text-gray-400" />
-                    <div className="flex-1">
-                      <CardTitle className="text-lg">
-                        Módulo {index + 1}: {module.title}
-                      </CardTitle>
-                      {module.description && (
-                        <CardDescription className="mt-1">
-                          {module.description}
-                        </CardDescription>
-                      )}
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => openModuleModal(module)}
-                    >
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => deleteModule(module.id)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      size="sm"
-                      onClick={() => openLessonModal(module.id)}
-                    >
-                      <Plus className="h-4 w-4 mr-2" />
-                      Aula
-                    </Button>
-                  </div>
+
+        {/* Lista de Módulos */}
+        {!course.modules || course.modules.length === 0 ? (
+          <Card className="border-0 shadow-xl">
+            <CardContent className="py-12 sm:py-16 lg:py-20 text-center">
+              <div className="flex justify-center mb-6">
+                <div className="rounded-full bg-primary/10 p-6">
+                  <FileText className="h-12 w-12 sm:h-16 sm:w-16 text-primary" />
                 </div>
-              </CardHeader>
-
-              {expandedModules.has(module.id) && (
-                <CardContent>
-                  {!module.lessons || module.lessons.length === 0 ? (
-                    <div className="text-center py-8 text-gray-500">
-                      <p className="mb-4">Nenhuma aula neste módulo</p>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => openLessonModal(module.id)}
-                      >
-                        <Plus className="h-4 w-4 mr-2" />
-                        Adicionar Primeira Aula
-                      </Button>
-                    </div>
-                  ) : (
-                    <div className="space-y-2">
-                      {module.lessons?.map((lesson, lessonIndex) => (
-                        <div
-                          key={lesson.id}
-                          className="flex items-center gap-3 p-3 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800"
-                        >
-                          <GripVertical className="h-4 w-4 text-gray-400" />
-                          {lesson.videoUrl ? (
-                            <PlayCircle className="h-4 w-4 text-blue-600" />
-                          ) : (
-                            <FileText className="h-4 w-4 text-gray-600" />
-                          )}
-                          <div className="flex-1">
-                            <div className="font-medium">
-                              {lessonIndex + 1}. {lesson.title}
-                            </div>
-                            {lesson.duration && (
-                              <div className="text-xs text-gray-500">
-                                {Math.floor(lesson.duration / 60)}:
-                                {String(lesson.duration % 60).padStart(2, '0')}
-                              </div>
-                            )}
-                          </div>
-                          {lesson.isFree && (
-                            <span className="text-xs px-2 py-1 bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 rounded">
-                              Gratuita
-                            </span>
-                          )}
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => openLessonModal(module.id, lesson)}
-                          >
-                            <Edit className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => deleteLesson(lesson.id)}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </CardContent>
-              )}
-            </Card>
-          ))}
-        </div>
-      )}
-
-      {/* Modal Módulo */}
-      {showModuleModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <Card className="w-full max-w-2xl">
-            <CardHeader>
-              <CardTitle>
-                {editingModule ? 'Editar Módulo' : 'Novo Módulo'}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="module-title">Título *</Label>
-                <Input
-                  id="module-title"
-                  value={moduleForm.title}
-                  onChange={(e) =>
-                    setModuleForm((prev) => ({
-                      ...prev,
-                      title: e.target.value,
-                    }))
-                  }
-                  placeholder="Ex: Introdução ao React"
-                />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="module-description">Descrição</Label>
-                <textarea
-                  id="module-description"
-                  className="flex min-h-[100px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                  value={moduleForm.description}
-                  onChange={(e) =>
-                    setModuleForm((prev) => ({
-                      ...prev,
-                      description: e.target.value,
-                    }))
-                  }
-                  placeholder="Descreva o conteúdo deste módulo..."
-                />
-              </div>
-              <div className="flex gap-2 justify-end">
-                <Button
-                  variant="outline"
-                  onClick={() => setShowModuleModal(false)}
-                >
-                  Cancelar
-                </Button>
-                <Button onClick={saveModule} disabled={!moduleForm.title}>
-                  Salvar
-                </Button>
-              </div>
+              <h3 className="text-xl sm:text-2xl font-bold mb-3">
+                Nenhum módulo criado
+              </h3>
+              <p className="text-gray-600 dark:text-gray-400 mb-6 sm:mb-8 text-base sm:text-lg max-w-md mx-auto">
+                Comece organizando seu curso em módulos e aulas para oferecer
+                uma experiência estruturada aos alunos
+              </p>
+              <Button
+                onClick={() => openModuleModal()}
+                size="lg"
+                className="shadow-lg"
+              >
+                <Plus className="h-5 w-5 mr-2" />
+                Criar Primeiro Módulo
+              </Button>
             </CardContent>
           </Card>
-        </div>
-      )}
+        ) : (
+          <div className="space-y-4 sm:space-y-6">
+            {course.modules?.map((module, index) => (
+              <Card
+                key={module.id}
+                className="border-0 shadow-lg hover:shadow-xl transition-all duration-300"
+              >
+                <CardHeader className="pb-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                      <button
+                        onClick={() => toggleModule(module.id)}
+                        className="hover:bg-gray-100 dark:hover:bg-gray-800 p-2 rounded-lg transition-colors shrink-0"
+                      >
+                        {expandedModules.has(module.id) ? (
+                          <ChevronDown className="h-5 w-5" />
+                        ) : (
+                          <ChevronRight className="h-5 w-5" />
+                        )}
+                      </button>
+                      <div className="shrink-0 hidden sm:block">
+                        <GripVertical className="h-5 w-5 text-gray-400" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <CardTitle className="text-base sm:text-lg lg:text-xl truncate">
+                          Módulo {index + 1}: {module.title}
+                        </CardTitle>
+                        {module.description && (
+                          <CardDescription className="mt-1 sm:mt-2 line-clamp-2">
+                            {module.description}
+                          </CardDescription>
+                        )}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 justify-end sm:justify-start">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => openModuleModal(module)}
+                        className="hover:bg-primary hover:text-white transition-colors"
+                      >
+                        <Edit className="h-4 w-4" />
+                        <span className="ml-2 hidden sm:inline">Editar</span>
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => deleteModule(module.id)}
+                        className="hover:bg-red-500 hover:text-white transition-colors"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                        <span className="ml-2 hidden sm:inline">Excluir</span>
+                      </Button>
+                      <Button
+                        size="sm"
+                        onClick={() => openLessonModal(module.id)}
+                        className="shadow-md"
+                      >
+                        <Plus className="h-4 w-4 mr-2" />
+                        <span className="hidden sm:inline">Nova </span>Aula
+                      </Button>
+                    </div>
+                  </div>
+                </CardHeader>
 
-      {/* Modal Aula */}
-      {showLessonModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-2">
-          <div className="w-full max-w-2xl bg-background rounded-xl shadow-xl overflow-y-auto max-h-[90vh] my-8">
-            <Card>
-              <CardHeader>
-                <CardTitle>
-                  {editingLesson ? 'Editar Aula' : 'Nova Aula'}
+                {expandedModules.has(module.id) && (
+                  <CardContent className="pt-2">
+                    {!module.lessons || module.lessons.length === 0 ? (
+                      <div className="text-center py-8 sm:py-12 text-gray-500 bg-muted/30 rounded-lg">
+                        <p className="mb-4 text-sm sm:text-base">
+                          Nenhuma aula neste módulo
+                        </p>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => openLessonModal(module.id)}
+                        >
+                          <Plus className="h-4 w-4 mr-2" />
+                          Adicionar Primeira Aula
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="space-y-2 sm:space-y-3">
+                        {module.lessons?.map((lesson, lessonIndex) => (
+                          <div
+                            key={lesson.id}
+                            className="flex flex-col sm:flex-row sm:items-center gap-3 p-3 sm:p-4 border rounded-lg hover:bg-muted/50 dark:hover:bg-gray-800 transition-all duration-200 hover:shadow-md"
+                          >
+                            <div className="flex items-center gap-3 flex-1 min-w-0">
+                              <div className="shrink-0 hidden sm:block">
+                                <GripVertical className="h-4 w-4 text-gray-400" />
+                              </div>
+                              {lesson.videoUrl ? (
+                                <div className="shrink-0 rounded-full bg-blue-100 dark:bg-blue-900 p-2">
+                                  <PlayCircle className="h-4 w-4 text-blue-600 dark:text-blue-300" />
+                                </div>
+                              ) : (
+                                <div className="shrink-0 rounded-full bg-gray-100 dark:bg-gray-800 p-2">
+                                  <FileText className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+                                </div>
+                              )}
+                              <div className="flex-1 min-w-0">
+                                <div className="font-medium text-sm sm:text-base truncate">
+                                  {lessonIndex + 1}. {lesson.title}
+                                </div>
+                                {lesson.duration && (
+                                  <div className="text-xs sm:text-sm text-gray-500 mt-1">
+                                    Duração: {Math.floor(lesson.duration / 60)}:
+                                    {String(lesson.duration % 60).padStart(
+                                      2,
+                                      '0'
+                                    )}
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-2 justify-end sm:justify-start">
+                              {lesson.isFree && (
+                                <span className="text-xs px-2.5 py-1 bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 rounded-full font-medium">
+                                  Gratuita
+                                </span>
+                              )}
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() =>
+                                  openLessonModal(module.id, lesson)
+                                }
+                                className="hover:bg-primary hover:text-white"
+                              >
+                                <Edit className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => deleteLesson(lesson.id)}
+                                className="hover:bg-red-500 hover:text-white"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </CardContent>
+                )}
+              </Card>
+            ))}
+          </div>
+        )}
+
+        {/* Modal Módulo */}
+        {showModuleModal && (
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <Card className="w-full max-w-2xl border-0 shadow-2xl animate-in fade-in zoom-in duration-300">
+              <CardHeader className="space-y-1 pb-4">
+                <CardTitle className="text-xl sm:text-2xl">
+                  {editingModule ? 'Editar Módulo' : 'Novo Módulo'}
                 </CardTitle>
+                <CardDescription>
+                  {editingModule
+                    ? 'Atualize as informações do módulo'
+                    : 'Crie um novo módulo para organizar suas aulas'}
+                </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-4 sm:space-y-5">
                 <div className="space-y-2">
-                  <Label htmlFor="lesson-title">Título *</Label>
+                  <Label htmlFor="module-title" className="text-sm font-medium">
+                    Título <span className="text-red-500">*</span>
+                  </Label>
                   <Input
-                    id="lesson-title"
-                    value={lessonForm.title}
+                    id="module-title"
+                    value={moduleForm.title}
                     onChange={(e) =>
-                      setLessonForm((prev) => ({
+                      setModuleForm((prev) => ({
                         ...prev,
                         title: e.target.value,
                       }))
                     }
-                    placeholder="Ex: Componentes e Props"
+                    placeholder="Ex: Introdução ao React"
+                    className="h-11"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="lesson-description">Descrição</Label>
+                  <Label
+                    htmlFor="module-description"
+                    className="text-sm font-medium"
+                  >
+                    Descrição
+                  </Label>
                   <textarea
-                    id="lesson-description"
-                    className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                    value={lessonForm.description}
+                    id="module-description"
+                    className="flex min-h-[120px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                    value={moduleForm.description}
                     onChange={(e) =>
-                      setLessonForm((prev) => ({
+                      setModuleForm((prev) => ({
                         ...prev,
                         description: e.target.value,
                       }))
                     }
-                    placeholder="Descreva o conteúdo da aula..."
+                    placeholder="Descreva o conteúdo deste módulo..."
                   />
                 </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="lesson-duration">Duração (segundos)</Label>
-                    <Input
-                      id="lesson-duration"
-                      type="number"
-                      min="0"
-                      value={lessonForm.duration}
-                      onChange={(e) =>
-                        setLessonForm((prev) => ({
-                          ...prev,
-                          duration: e.target.value,
-                        }))
-                      }
-                      placeholder="600"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="lesson-free">Acesso</Label>
-                    <select
-                      id="lesson-free"
-                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                      value={lessonForm.isFree.toString()}
-                      onChange={(e) =>
-                        setLessonForm((prev) => ({
-                          ...prev,
-                          isFree: e.target.value === 'true',
-                        }))
-                      }
-                    >
-                      <option value="false">Apenas matriculados</option>
-                      <option value="true">Gratuita (preview)</option>
-                    </select>
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="lesson-video">Vídeo da Aula</Label>
-                  <VideoUploadEnhanced
-                    value={lessonForm.videoUrl}
-                    onChange={(url) =>
-                      setLessonForm((prev) => ({ ...prev, videoUrl: url }))
-                    }
-                    lessonId={editingLesson?.id}
-                    maxSizeMB={500}
-                  />
-                  <p className="text-xs text-gray-500">
-                    Faça upload de um vídeo (até 500MB) ou cole um link do
-                    YouTube/Vimeo
-                  </p>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="lesson-content">Conteúdo em Texto</Label>
-                  <textarea
-                    id="lesson-content"
-                    className="flex min-h-[150px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm font-mono"
-                    value={lessonForm.content}
-                    onChange={(e) =>
-                      setLessonForm((prev) => ({
-                        ...prev,
-                        content: e.target.value,
-                      }))
-                    }
-                    placeholder="Conteúdo adicional da aula em texto, código, etc..."
-                  />
-                </div>
-                <div className="flex gap-2 justify-end">
+                <div className="flex gap-3 justify-end pt-2">
                   <Button
                     variant="outline"
-                    onClick={() => setShowLessonModal(false)}
+                    onClick={() => setShowModuleModal(false)}
+                    className="min-w-[100px]"
                   >
                     Cancelar
                   </Button>
-                  <Button onClick={saveLesson} disabled={!lessonForm.title}>
+                  <Button
+                    onClick={saveModule}
+                    disabled={!moduleForm.title}
+                    className="min-w-[100px] shadow-md"
+                  >
                     Salvar
                   </Button>
                 </div>
               </CardContent>
             </Card>
           </div>
-        </div>
-      )}
+        )}
+
+        {/* Modal Aula */}
+        {showLessonModal && (
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-2 sm:p-4">
+            <div className="w-full max-w-2xl bg-background rounded-xl shadow-2xl overflow-y-auto max-h-[90vh] my-4 sm:my-8 animate-in fade-in zoom-in duration-300">
+              <Card className="border-0">
+                <CardHeader className="space-y-1 pb-4">
+                  <CardTitle className="text-xl sm:text-2xl">
+                    {editingLesson ? 'Editar Aula' : 'Nova Aula'}
+                  </CardTitle>
+                  <CardDescription>
+                    {editingLesson
+                      ? 'Atualize as informações da aula'
+                      : 'Adicione uma nova aula ao módulo'}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4 sm:space-y-5">
+                  <div className="space-y-2">
+                    <Label
+                      htmlFor="lesson-title"
+                      className="text-sm font-medium"
+                    >
+                      Título <span className="text-red-500">*</span>
+                    </Label>
+                    <Input
+                      id="lesson-title"
+                      value={lessonForm.title}
+                      onChange={(e) =>
+                        setLessonForm((prev) => ({
+                          ...prev,
+                          title: e.target.value,
+                        }))
+                      }
+                      placeholder="Ex: Componentes e Props"
+                      className="h-11"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label
+                      htmlFor="lesson-description"
+                      className="text-sm font-medium"
+                    >
+                      Descrição
+                    </Label>
+                    <textarea
+                      id="lesson-description"
+                      className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                      value={lessonForm.description}
+                      onChange={(e) =>
+                        setLessonForm((prev) => ({
+                          ...prev,
+                          description: e.target.value,
+                        }))
+                      }
+                      placeholder="Descreva o conteúdo da aula..."
+                    />
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label
+                        htmlFor="lesson-duration"
+                        className="text-sm font-medium"
+                      >
+                        Duração (segundos)
+                      </Label>
+                      <Input
+                        id="lesson-duration"
+                        type="number"
+                        min="0"
+                        value={lessonForm.duration}
+                        onChange={(e) =>
+                          setLessonForm((prev) => ({
+                            ...prev,
+                            duration: e.target.value,
+                          }))
+                        }
+                        placeholder="600"
+                        className="h-11"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label
+                        htmlFor="lesson-free"
+                        className="text-sm font-medium"
+                      >
+                        Acesso
+                      </Label>
+                      <select
+                        id="lesson-free"
+                        className="flex h-11 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                        value={lessonForm.isFree.toString()}
+                        onChange={(e) =>
+                          setLessonForm((prev) => ({
+                            ...prev,
+                            isFree: e.target.value === 'true',
+                          }))
+                        }
+                      >
+                        <option value="false">Apenas matriculados</option>
+                        <option value="true">Gratuita (preview)</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label
+                      htmlFor="lesson-video"
+                      className="text-sm font-medium"
+                    >
+                      Vídeo da Aula
+                    </Label>
+                    <VideoUploadEnhanced
+                      value={lessonForm.videoUrl}
+                      onChange={(url) =>
+                        setLessonForm((prev) => ({ ...prev, videoUrl: url }))
+                      }
+                      lessonId={editingLesson?.id}
+                      maxSizeMB={500}
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Faça upload de um vídeo (até 500MB) ou cole um link do
+                      YouTube/Vimeo
+                    </p>
+                  </div>
+                  <div className="space-y-2">
+                    <Label
+                      htmlFor="lesson-content"
+                      className="text-sm font-medium"
+                    >
+                      Conteúdo em Texto
+                    </Label>
+                    <textarea
+                      id="lesson-content"
+                      className="flex min-h-[150px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-primary"
+                      value={lessonForm.content}
+                      onChange={(e) =>
+                        setLessonForm((prev) => ({
+                          ...prev,
+                          content: e.target.value,
+                        }))
+                      }
+                      placeholder="Conteúdo adicional da aula em texto, código, etc..."
+                    />
+                  </div>
+                  <div className="flex gap-3 justify-end pt-2">
+                    <Button
+                      variant="outline"
+                      onClick={() => setShowLessonModal(false)}
+                      className="min-w-[100px]"
+                    >
+                      Cancelar
+                    </Button>
+                    <Button
+                      onClick={saveLesson}
+                      disabled={!lessonForm.title}
+                      className="min-w-[100px] shadow-md"
+                    >
+                      Salvar
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

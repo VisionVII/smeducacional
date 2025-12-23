@@ -84,7 +84,6 @@ export default function AdminCoursesPage() {
       if (!res.ok) throw new Error('Erro ao carregar cursos');
       const data = await res.json();
       if (typeof window !== 'undefined') {
-        // eslint-disable-next-line no-console
         console.log('[ADMIN-COURSES] Dados recebidos da API:', data);
       }
       // Mock performance data

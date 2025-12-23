@@ -50,6 +50,10 @@ export function Breadcrumbs() {
   let currentPath = '';
 
   segments.forEach((segment, index) => {
+    // Ignorar segmentos dinâmicos do tipo [slug], [id], etc.
+    if (segment.startsWith('[') && segment.endsWith(']')) {
+      return;
+    }
     currentPath += `/${segment}`;
 
     // Não adicionar IDs de curso/módulo/lição aos breadcrumbs

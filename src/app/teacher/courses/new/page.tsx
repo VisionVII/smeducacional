@@ -1,16 +1,33 @@
+// Clean rewrite to avoid parsing issues
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import {
+  Award,
+  BookOpen,
+  Clock,
+  FileText,
+  Loader2,
+  PlayCircle,
+  Save,
+} from 'lucide-react';
+
+import { BackButton } from '@/components/back-button';
+import { ImageUpload } from '@/components/image-upload';
+import { LockedCourseCard } from '@/components/LockedCourseCard';
 import { Button } from '@/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Save, Loader2 } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
-import { ImageUpload } from '@/components/image-upload';
-import { BackButton } from '@/components/back-button';
 
 interface Category {
   id: string;
@@ -21,6 +38,7 @@ interface Category {
 export default function NewCoursePage() {
   const router = useRouter();
   const { toast } = useToast();
+
   const [isLoading, setIsLoading] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
   const [formData, setFormData] = useState({
@@ -37,28 +55,26 @@ export default function NewCoursePage() {
     whatYouLearn: '',
   });
 
-  // Buscar categorias
   useEffect(() => {
-    async function fetchCategories() {
+    const fetchCategories = async () => {
       try {
         const response = await fetch('/api/categories');
-        if (response.ok) {
-          const data = await response.json();
-          setCategories(data);
-          if (data.length > 0) {
-            setFormData(prev => ({ ...prev, categoryId: data[0].id }));
-          }
+        if (!response.ok) return;
+        const data = await response.json();
+        setCategories(data);
+        if (data.length > 0) {
+          setFormData((prev) => ({ ...prev, categoryId: data[0].id }));
         }
       } catch (error) {
         console.error('Erro ao buscar categorias:', error);
       }
-    }
+    };
+
     fetchCategories();
   }, []);
 
-  // Gerar slug automaticamente
-  const generateSlug = (title: string) => {
-    return title
+  const generateSlug = (title: string) =>
+    title
       .toLowerCase()
       .normalize('NFD')
       .replace(/[\u0300-\u036f]/g, '')
@@ -66,10 +82,9 @@ export default function NewCoursePage() {
       .replace(/\s+/g, '-')
       .replace(/-+/g, '-')
       .trim();
-  };
 
   const handleTitleChange = (value: string) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       title: value,
       slug: generateSlug(value),
@@ -83,7 +98,9 @@ export default function NewCoursePage() {
     try {
       const payload = {
         ...formData,
-        duration: formData.duration ? parseInt(formData.duration) : undefined,
+        duration: formData.duration
+          ? parseInt(formData.duration, 10)
+          : undefined,
         price: parseFloat(formData.price),
         thumbnail: formData.thumbnail || undefined,
         requirements: formData.requirements || undefined,
@@ -123,204 +140,294 @@ export default function NewCoursePage() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
-      <BackButton href="/teacher/courses" label="Voltar para meus cursos" />
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/20 dark:from-slate-900 dark:via-slate-900 dark:to-slate-950">
+      <div className="container mx-auto px-4 py-8 max-w-5xl space-y-8">
+        <BackButton href="/teacher/courses" label="Voltar para meus cursos" />
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-2xl">Criar Novo Curso</CardTitle>
-          <CardDescription>
-            Preencha as informações básicas do curso. Você poderá adicionar módulos e aulas depois.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Título */}
-            <div className="space-y-2">
-              <Label htmlFor="title">
-                Título do Curso <span className="text-red-500">*</span>
-              </Label>
-              <Input
-                id="title"
-                placeholder="Ex: Introdução ao React"
-                value={formData.title}
-                onChange={(e) => handleTitleChange(e.target.value)}
-                required
-                minLength={3}
-              />
+        <Card className="relative overflow-hidden border-2 shadow-2xl">
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-secondary/5 to-accent/5" />
+          <div className="absolute -top-24 -right-24 w-80 h-80 bg-gradient-to-br from-primary/20 to-transparent rounded-full blur-3xl" />
+          <div className="absolute -bottom-24 -left-24 w-72 h-72 bg-gradient-to-tr from-accent/20 to-transparent rounded-full blur-3xl" />
+          <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-theme" />
+
+          <CardHeader className="relative z-10 p-8 sm:p-10">
+            <div className="flex items-center gap-4 mb-4">
+              <div className="p-4 bg-gradient-theme rounded-2xl shadow-xl">
+                <BookOpen className="h-8 w-8 text-white" />
+              </div>
+              <div>
+                <CardTitle className="text-3xl sm:text-4xl font-black text-gradient-theme-triple">
+                  Criar Novo Curso
+                </CardTitle>
+                <CardDescription className="text-base sm:text-lg mt-2">
+                  Preencha as informações básicas do curso. Você poderá
+                  adicionar módulos e aulas depois.
+                </CardDescription>
+              </div>
             </div>
+          </CardHeader>
+        </Card>
 
-            {/* Slug */}
-            <div className="space-y-2">
-              <Label htmlFor="slug">
-                Slug (URL) <span className="text-red-500">*</span>
-              </Label>
-              <Input
-                id="slug"
-                placeholder="introducao-ao-react"
-                value={formData.slug}
-                onChange={(e) => setFormData(prev => ({ ...prev, slug: e.target.value }))}
-                required
-                minLength={3}
-              />
-              <p className="text-xs text-gray-500">
-                URL do curso: /courses/{formData.slug || 'seu-curso'}
-              </p>
-            </div>
+        <Card className="border-2 shadow-xl">
+          <CardHeader className="border-b bg-muted/30">
+            <CardTitle className="flex items-center gap-2 text-xl">
+              <FileText className="h-5 w-5 text-primary" />
+              Informações do Curso
+            </CardTitle>
+          </CardHeader>
 
-            {/* Descrição */}
-            <div className="space-y-2">
-              <Label htmlFor="description">
-                Descrição <span className="text-red-500">*</span>
-              </Label>
-              <textarea
-                id="description"
-                className="flex min-h-[120px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                placeholder="Descreva o que os alunos aprenderão neste curso..."
-                value={formData.description}
-                onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                required
-                minLength={10}
-              />
-            </div>
-
-            {/* Categoria e Nível */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <CardContent className="p-6 sm:p-8">
+            <form onSubmit={handleSubmit} className="space-y-7">
               <div className="space-y-2">
-                <Label htmlFor="categoryId">
-                  Categoria <span className="text-red-500">*</span>
+                <Label htmlFor="title" className="text-base font-semibold">
+                  Título do Curso <span className="text-red-500">*</span>
                 </Label>
-                <select
-                  id="categoryId"
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                  value={formData.categoryId}
-                  onChange={(e) => setFormData(prev => ({ ...prev, categoryId: e.target.value }))}
+                <Input
+                  id="title"
+                  placeholder="Ex: Introdução ao React"
+                  value={formData.title}
+                  onChange={(event) => handleTitleChange(event.target.value)}
                   required
-                >
-                  {categories.map((cat) => (
-                    <option key={cat.id} value={cat.id}>
-                      {cat.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="level">Nível</Label>
-                <select
-                  id="level"
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                  value={formData.level}
-                  onChange={(e) => setFormData(prev => ({ ...prev, level: e.target.value }))}
-                >
-                  <option value="Iniciante">Iniciante</option>
-                  <option value="Intermediário">Intermediário</option>
-                  <option value="Avançado">Avançado</option>
-                </select>
-              </div>
-            </div>
-
-            {/* Duração e Preço */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="duration">Duração (minutos)</Label>
-                <Input
-                  id="duration"
-                  type="number"
-                  placeholder="120"
-                  min="0"
-                  value={formData.duration}
-                  onChange={(e) => setFormData(prev => ({ ...prev, duration: e.target.value }))}
+                  minLength={3}
+                  className="h-11"
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="price">Preço (R$)</Label>
+                <Label htmlFor="slug" className="text-base font-semibold">
+                  Slug (URL) <span className="text-red-500">*</span>
+                </Label>
                 <Input
-                  id="price"
-                  type="number"
-                  placeholder="0.00"
-                  min="0"
-                  step="0.01"
-                  value={formData.price}
-                  onChange={(e) => setFormData(prev => ({ 
-                    ...prev, 
-                    price: e.target.value,
-                    isPaid: parseFloat(e.target.value) > 0
-                  }))}
+                  id="slug"
+                  placeholder="introducao-ao-react"
+                  value={formData.slug}
+                  onChange={(event) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      slug: event.target.value,
+                    }))
+                  }
+                  required
+                  minLength={3}
+                  className="h-11"
+                />
+                <p className="text-xs text-muted-foreground flex items-center gap-1">
+                  <span className="font-medium">🔗 URL do curso:</span>{' '}
+                  /courses/{formData.slug || 'seu-curso'}
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label
+                  htmlFor="description"
+                  className="text-base font-semibold"
+                >
+                  Descrição <span className="text-red-500">*</span>
+                </Label>
+                <textarea
+                  id="description"
+                  className="flex min-h-[140px] w-full rounded-lg border-2 border-input bg-background px-4 py-3 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 transition-all"
+                  placeholder="Descreva o que os alunos aprenderão neste curso..."
+                  value={formData.description}
+                  onChange={(event) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      description: event.target.value,
+                    }))
+                  }
+                  required
+                  minLength={10}
                 />
               </div>
-            </div>
 
-            {/* Thumbnail */}
-            <div className="space-y-2">
-              <Label>Imagem de Capa do Curso</Label>
-              <ImageUpload
-                value={formData.thumbnail}
-                onChange={(url) => setFormData(prev => ({ ...prev, thumbnail: url }))}
-                path={`courses/${formData.slug || 'new'}/thumbnail.jpg`}
-                disabled={isLoading}
-              />
-              <p className="text-xs text-gray-500">
-                Recomendado: 1280x720px (16:9) • Máximo 5MB
-              </p>
-            </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <div className="space-y-2">
+                  <Label
+                    htmlFor="categoryId"
+                    className="text-base font-semibold"
+                  >
+                    Categoria <span className="text-red-500">*</span>
+                  </Label>
+                  <select
+                    id="categoryId"
+                    className="flex h-11 w-full rounded-lg border-2 border-input bg-background px-4 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 transition-all"
+                    value={formData.categoryId}
+                    onChange={(event) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        categoryId: event.target.value,
+                      }))
+                    }
+                    required
+                  >
+                    {categories.map((category) => (
+                      <option key={category.id} value={category.id}>
+                        {category.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
-            {/* O que você aprenderá */}
-            <div className="space-y-2">
-              <Label htmlFor="whatYouLearn">O que você aprenderá</Label>
-              <textarea
-                id="whatYouLearn"
-                className="flex min-h-[100px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                placeholder="- Criar aplicações React&#10;- Usar hooks&#10;- Gerenciar estado"
-                value={formData.whatYouLearn}
-                onChange={(e) => setFormData(prev => ({ ...prev, whatYouLearn: e.target.value }))}
-              />
-            </div>
+                <div className="space-y-2">
+                  <Label htmlFor="level" className="text-base font-semibold">
+                    Nível
+                  </Label>
+                  <select
+                    id="level"
+                    className="flex h-11 w-full rounded-lg border-2 border-input bg-background px-4 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 transition-all"
+                    value={formData.level}
+                    onChange={(event) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        level: event.target.value,
+                      }))
+                    }
+                  >
+                    <option value="Iniciante">🌱 Iniciante</option>
+                    <option value="Intermediário">📈 Intermediário</option>
+                    <option value="Avançado">🚀 Avançado</option>
+                  </select>
+                </div>
+              </div>
 
-            {/* Pré-requisitos */}
-            <div className="space-y-2">
-              <Label htmlFor="requirements">Pré-requisitos</Label>
-              <textarea
-                id="requirements"
-                className="flex min-h-[100px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                placeholder="- Conhecimento básico de JavaScript&#10;- HTML e CSS"
-                value={formData.requirements}
-                onChange={(e) => setFormData(prev => ({ ...prev, requirements: e.target.value }))}
-              />
-            </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <div className="space-y-2">
+                  <Label htmlFor="duration" className="text-base font-semibold">
+                    ⏱️ Duração (minutos)
+                  </Label>
+                  <Input
+                    id="duration"
+                    type="number"
+                    placeholder="120"
+                    min="0"
+                    value={formData.duration}
+                    onChange={(event) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        duration: event.target.value,
+                      }))
+                    }
+                    className="h-11"
+                  />
+                </div>
 
-            {/* Botões */}
-            <div className="flex gap-4 pt-4">
-              <Button
-                type="submit"
-                disabled={isLoading}
-                className="flex-1"
-              >
-                {isLoading ? (
-                  <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Criando...
-                  </>
-                ) : (
-                  <>
-                    <Save className="h-4 w-4 mr-2" />
-                    Criar Curso
-                  </>
-                )}
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => router.back()}
-                disabled={isLoading}
-              >
-                Cancelar
-              </Button>
-            </div>
-          </form>
-        </CardContent>
-      </Card>
+                <div className="space-y-2">
+                  <Label htmlFor="price" className="text-base font-semibold">
+                    💰 Preço (R$)
+                  </Label>
+                  <Input
+                    id="price"
+                    type="number"
+                    placeholder="0.00"
+                    min="0"
+                    step="0.01"
+                    value={formData.price}
+                    onChange={(event) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        price: event.target.value,
+                        isPaid: parseFloat(event.target.value) > 0,
+                      }))
+                    }
+                    className="h-11"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    💡 Digite 0 para curso gratuito
+                  </p>
+                </div>
+              </div>
+
+              <div className="space-y-3 p-5 bg-gradient-to-br from-muted/30 to-muted/10 rounded-xl border-2 border-dashed">
+                <Label className="text-base font-semibold">
+                  🖼️ Imagem de Capa do Curso
+                </Label>
+                <ImageUpload
+                  value={formData.thumbnail}
+                  onChange={(url) =>
+                    setFormData((prev) => ({ ...prev, thumbnail: url }))
+                  }
+                  path={`courses/${formData.slug || 'new'}/thumbnail.jpg`}
+                  disabled={isLoading}
+                />
+                <p className="text-xs text-muted-foreground font-medium">
+                  ✨ Recomendado: 1280x720px (16:9) • Máximo 5MB
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label
+                  htmlFor="whatYouLearn"
+                  className="text-base font-semibold"
+                >
+                  📚 O que você aprenderá
+                </Label>
+                <textarea
+                  id="whatYouLearn"
+                  className="flex min-h-[120px] w-full rounded-lg border-2 border-input bg-background px-4 py-3 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 transition-all"
+                  placeholder="- Criar aplicações React&#10;- Usar hooks avançados&#10;- Gerenciar estado com Context API"
+                  value={formData.whatYouLearn}
+                  onChange={(event) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      whatYouLearn: event.target.value,
+                    }))
+                  }
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label
+                  htmlFor="requirements"
+                  className="text-base font-semibold"
+                >
+                  📋 Pré-requisitos
+                </Label>
+                <textarea
+                  id="requirements"
+                  className="flex min-h-[120px] w-full rounded-lg border-2 border-input bg-background px-4 py-3 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 transition-all"
+                  placeholder="- Conhecimento básico de JavaScript&#10;- HTML e CSS intermediário&#10;- Vontade de aprender"
+                  value={formData.requirements}
+                  onChange={(event) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      requirements: event.target.value,
+                    }))
+                  }
+                />
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t-2">
+                <Button
+                  type="submit"
+                  disabled={isLoading}
+                  className="flex-1 bg-gradient-theme text-white font-bold shadow-xl hover:shadow-2xl hover:scale-105 transition-all h-12"
+                >
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+                      Criando seu curso...
+                    </>
+                  ) : (
+                    <>
+                      <Save className="h-5 w-5 mr-2" />
+                      Criar Curso
+                    </>
+                  )}
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => router.back()}
+                  disabled={isLoading}
+                  className="h-12 font-semibold border-2 hover:bg-muted"
+                >
+                  Cancelar
+                </Button>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }

@@ -72,6 +72,8 @@ export async function ThemeScript() {
     --secondary-foreground: 210 40% 98%;
     --accent: 216 34% 17%;
     --accent-foreground: 210 40% 98%;
+    --highlight: 38 92% 58%;
+    --highlight-foreground: 222 84% 5%;
     --card: 0 0% 100%;
     --card-foreground: 224 71% 4%;
     --muted: 220 14% 96%;

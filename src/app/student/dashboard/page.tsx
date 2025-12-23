@@ -57,7 +57,7 @@ export default async function StudentDashboard() {
                 Online
               </Badge>
             </div>
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-2 bg-gradient-to-r from-primary via-purple-600 to-pink-600 bg-clip-text text-transparent mt-4">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-2 text-gradient-theme-triple mt-4">
               Olá, {user.name}! 👋
             </h1>
             <p className="text-sm sm:text-base text-muted-foreground">
@@ -138,7 +138,7 @@ export default async function StudentDashboard() {
         {/* Cursos em Andamento */}
         <Card className="mb-6 sm:mb-8 border-2 hover:border-primary/30 transition-all">
           <CardHeader className="px-4 sm:px-6 py-4 sm:py-5">
-            <CardTitle className="text-base sm:text-lg bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
+            <CardTitle className="text-base sm:text-lg text-gradient-theme">
               Continuar Aprendendo
             </CardTitle>
             <CardDescription className="text-xs sm:text-sm">
@@ -159,7 +159,7 @@ export default async function StudentDashboard() {
                 </p>
                 <Button
                   asChild
-                  className="bg-gradient-to-r from-primary to-purple-600 hover:opacity-90 transition-opacity"
+                  className="bg-gradient-theme hover:bg-gradient-theme-soft transition-opacity"
                 >
                   <Link href="/courses">Explorar Cursos</Link>
                 </Button>
@@ -199,7 +199,7 @@ export default async function StudentDashboard() {
                       </div>
                       <Button
                         asChild
-                        className="w-full bg-gradient-to-r from-primary to-purple-600 hover:opacity-90 group-hover:scale-105 transition-all duration-300"
+                        className="w-full bg-gradient-theme hover:bg-gradient-theme-soft group-hover:scale-105 transition-all duration-300"
                         size="sm"
                       >
                         <Link href={`/student/courses/${enrollment.course.id}`}>

@@ -1,13 +1,7 @@
-import { Suspense } from 'react';
-import PublicPagesAdmin from '@/components/admin/PublicPagesAdmin';
+'use client';
 
-export default function PublicPagesAdminPage() {
-  return (
-    <div className="max-w-5xl mx-auto py-8">
-      <h1 className="text-2xl font-bold mb-4">Gerenciar Páginas Públicas</h1>
-      <Suspense fallback={<div>Carregando...</div>}>
-        <PublicPagesAdmin />
-      </Suspense>
-    </div>
-  );
+import PublicPagesDashboard from '@/components/admin/PublicPagesDashboard.v2';
+
+export default function PublicPagesCMSPage() {
+  return <PublicPagesDashboard />;
 }

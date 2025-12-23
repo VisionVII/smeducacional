@@ -245,7 +245,7 @@ export default function AdminDashboard() {
                 </CardHeader>
                 <CardContent>
                   <div>
-                    <p className="text-4xl font-bold bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
+                    <p className="text-4xl font-bold text-gradient-theme">
                       {stats?.totalUsers || 0}
                     </p>
                     <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1">
@@ -369,7 +369,7 @@ export default function AdminDashboard() {
               <Card className="border-2 hover:border-primary/50 transition-all hover:shadow-xl">
                 <CardHeader className="bg-gradient-to-r from-primary/5 via-purple-500/5 to-pink-500/5 border-b">
                   <div className="flex items-center gap-3">
-                    <div className="p-2.5 bg-gradient-to-br from-primary to-purple-600 rounded-lg">
+                    <div className="p-2.5 bg-gradient-theme rounded-lg">
                       <Activity className="h-5 w-5 text-white" />
                     </div>
                     <div>

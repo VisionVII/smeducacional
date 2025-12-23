@@ -53,6 +53,10 @@
     --accent: 0 0% 96%;
     --accent-foreground: 0 0% 9%;
 
+    /* Highlight (nova cor complementar) */
+    --highlight: 38 92% 58%;
+    --highlight-foreground: 222 84% 5%;
+
     /* Destructive (Errors) */
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
@@ -153,6 +157,10 @@
     /* Accent - Verde-azulado vibrante */
     --accent: 173 80% 40%;
     --accent-foreground: 210 40% 98%;
+
+    /* Highlight - Dourado para acentos do tema */
+    --highlight: 38 92% 58%;
+    --highlight-foreground: 222 84% 5%;
 
     /* Destructive - Vermelho vibrante mas não agressivo */
     --destructive: 0 72% 51%;
@@ -657,6 +665,119 @@
 }
 
 /* =============================================================================
+   GRADIENTES BASEADOS NO TEMA ATIVO
+   Usa as variáveis CSS do tema (primary, secondary, accent)
+   ============================================================================= */
+
+@layer utilities {
+  /* Gradientes de Background */
+  .bg-gradient-theme {
+    background: linear-gradient(
+      to right,
+      hsl(var(--primary)),
+      hsl(var(--secondary))
+    );
+  }
+
+  .bg-gradient-theme-accent {
+    background: linear-gradient(
+      to right,
+      hsl(var(--primary)),
+      hsl(var(--accent))
+    );
+  }
+
+  .bg-gradient-theme-triple {
+    background: linear-gradient(
+      to right,
+      hsl(var(--primary)),
+      hsl(var(--secondary)),
+      hsl(var(--accent))
+    );
+  }
+
+  /* Novo: Gradiente com 4 cores incluindo highlight */
+  .bg-gradient-theme-quad {
+    background: linear-gradient(
+      90deg,
+      hsl(var(--primary)) 0%,
+      hsl(var(--secondary)) 33%,
+      hsl(var(--accent)) 66%,
+      hsl(var(--highlight)) 100%
+    );
+  }
+
+  /* Gradientes de Texto (bg-clip-text) */
+  .text-gradient-theme {
+    background: linear-gradient(
+      to right,
+      hsl(var(--primary)),
+      hsl(var(--secondary))
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .text-gradient-theme-accent {
+    background: linear-gradient(
+      to right,
+      hsl(var(--primary)),
+      hsl(var(--accent))
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .text-gradient-theme-triple {
+    background: linear-gradient(
+      to right,
+      hsl(var(--primary)),
+      hsl(var(--secondary)),
+      hsl(var(--accent))
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  /* Texto em 4 cores com highlight */
+  .text-gradient-theme-quad {
+    background: linear-gradient(
+      to right,
+      hsl(var(--primary)),
+      hsl(var(--secondary)),
+      hsl(var(--accent)),
+      hsl(var(--highlight))
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  /* Hover states */
+  .hover\:bg-gradient-theme-soft:hover {
+    background: linear-gradient(
+      to right,
+      hsl(var(--primary) / 0.9),
+      hsl(var(--secondary) / 0.9)
+    );
+  }
+
+  /* Versão soft para o quad gradient */
+  .hover\:bg-gradient-theme-quad-soft:hover {
+    background: linear-gradient(
+      90deg,
+      hsl(var(--primary) / 0.85),
+      hsl(var(--secondary) / 0.85),
+      hsl(var(--accent) / 0.85),
+      hsl(var(--highlight) / 0.85)
+    );
+  }
+}
+
+/* =============================================================================
    FIM - Sistema pronto para expansão!
    
    PRÓXIMAS ADIÇÕES FUTURAS:
@@ -665,7 +786,7 @@
    - [ ] Modal transitions
    - [ ] Parallax effects
    - [ ] Particle backgrounds
-   - [ ] Advanced gradients
+   - [✅] Advanced gradients (IMPLEMENTADO)
    - [ ] Micro-interactions
    
    Basta adicionar novas classes em @layer components ou @layer utilities

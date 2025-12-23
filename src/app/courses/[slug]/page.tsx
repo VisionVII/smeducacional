@@ -250,7 +250,7 @@ export default async function CourseDetailPage({
                               <span className="text-sm font-medium truncate">
                                 {lessonIndex + 1}. {lesson.title}
                               </span>
-                                {lesson.isFree && (
+                              {lesson.isFree && (
                                 <span className="text-xs px-2 py-1 rounded-md bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 font-semibold flex-shrink-0">
                                   Grátis
                                 </span>

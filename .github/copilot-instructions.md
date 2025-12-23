@@ -1,4 +1,50 @@
 🚀 PROMPT MASTER 2.0 — Sistema Escolar Enterprise (Copilot MCP)
+
+---
+
+## ☑️ Checklist de Segurança VisionVII (SecureOpsAI)
+
+| Item              | O que checar                                                                | Onde/Como                                |
+| ----------------- | --------------------------------------------------------------------------- | ---------------------------------------- |
+| **Autenticação**  | Toda rota protegida chama `auth()`                                          | Exemplo: `/src/app/api/admin/*`          |
+| **Autorização**   | Checagem de `session.user.role` antes de ações sensíveis                    | Exemplo: `session.user.role === 'ADMIN'` |
+| **Validação**     | Todos inputs validados com Zod antes de qualquer lógica                     | Exemplo: `schema.safeParse(body)`        |
+| **Sanitização**   | Não aceite HTML raw, Zod previne XSS básico                                 |                                          |
+| **Rate Limiting** | Endpoints públicos usam `checkRateLimit` e `getClientIP`                    | `/src/lib/rate-limit.ts`                 |
+| **Uploads**       | Nunca use filesystem local, só Supabase Storage                             | `/src/lib/supabase.ts`                   |
+| **Secrets**       | Nunca exponha secrets no client, só `NEXT_PUBLIC_`                          |                                          |
+| **Respostas**     | Nunca retorne dados sensíveis, use `{ data }` ou `{ error }`                |                                          |
+| **Logs**          | Não logar senhas, tokens ou detalhes sensíveis                              |                                          |
+| **Senhas**        | Sempre hash com bcrypt (12 rounds), nunca plain text                        |                                          |
+| **CORS**          | Verificar config em `next.config.ts`                                        |                                          |
+| **SQL Injection** | Sempre use Prisma ORM                                                       |                                          |
+| **Campos Prisma** | Use nomes corretos: `instructor`, `isPublished`, `categoryId`, `enrolledAt` | `/prisma/schema.prisma`                  |
+
+### Exemplo de API Route Segura
+
+```typescript
+import { auth } from '@/lib/auth';
+import { z } from 'zod';
+
+const schema = z.object({ email: z.string().email() });
+
+export async function POST(req) {
+  const session = await auth();
+  if (!session || session.user.role !== 'ADMIN')
+    return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+  const body = await req.json();
+  const result = schema.safeParse(body);
+  if (!result.success)
+    return NextResponse.json(
+      { error: result.error.errors[0].message },
+      { status: 400 }
+    );
+  // ... lógica segura
+}
+```
+
+---
+
 Versão: VisionVII Enterprise Governance Blueprint
 ☑️ 1. Objetivo Estratégico
 
@@ -187,45 +233,96 @@ Arquivos de Zod
 
 entity.schema.ts
 
-☑️ 6. Padrões Críticos de Autenticação (IMUTÁVEL)
+☑️ 6. Segurança VisionVII (SecurityOpsAI)
 
-**NextAuth JWT Strategy** (`src/lib/auth.ts`):
+**Autenticação & Autorização (NextAuth JWT, RBAC)**
 
-- Sessões de 30 dias
-- Credentials provider (bcrypt) + Google OAuth opcional
-- **Environment-aware cookies**:
-  - Production: `__Secure-next-auth.session-token`
-  - Development: `next-auth.session-token`
-- Session callback enriquece JWT com `{ id, role, avatar }` do banco
-- **Todas as API routes DEVEM** chamar `auth()` de `@/lib/auth`
+- Sempre use `auth()` de `/src/lib/auth.ts` em TODAS as rotas protegidas.
+- Session JWT enriquece com `{ id, role, avatar }` (garanta que role está presente e correta).
+- Cookies de sessão: `__Secure-next-auth.session-token` (prod) e `next-auth.session-token` (dev). Nunca misture ambientes.
+- Middleware (`/src/middleware.ts`) faz RBAC estrito: bloqueia acesso por role, valida JWT com `getToken()` e respeita `PUBLIC_ROUTES`.
+- Roles: `STUDENT` (acesso restrito), `TEACHER` (criação/gestão de cursos), `ADMIN` (controle total).
 
-**Middleware RBAC** (`src/middleware.ts`):
+**Validação & Sanitização (Zod)**
 
-- Valida JWT usando `getToken()` de `next-auth/jwt`
-- Redireciona roles não autorizados (ex: STUDENT tentando `/teacher`)
-- Rotas públicas definidas em `PUBLIC_ROUTES` Set
-- **CRÍTICO**: `cookieName` deve corresponder ao ambiente (prod vs dev)
-
-**3 Roles no Sistema**:
-
-- `STUDENT`: Acessa `/student/*`, cursos matriculados, progresso
-- `TEACHER`: Acessa `/teacher/*`, cria cursos, gerencia alunos
-- `ADMIN`: Acessa `/admin/*`, controle total do sistema
-
-**Pattern Obrigatório para API Routes**:
+- Todos os inputs de API devem ser validados com Zod antes de qualquer lógica ou query.
+- Nunca processe ou armazene dados não validados.
+- Exemplo obrigatório:
 
 ```typescript
-import { auth } from '@/lib/auth';
-import { prisma } from '@/lib/db';
-
-export async function GET() {
-  const session = await auth();
-  if (!session || session.user.role !== 'TEACHER') {
-    return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
-  }
-  // ... implementação
+const result = schema.safeParse(body);
+if (!result.success) {
+  return NextResponse.json(
+    { error: result.error.errors[0].message },
+    { status: 400 }
+  );
 }
 ```
+
+**Rate Limiting**
+
+- Implemente rate limiting em endpoints públicos (login, register, reset) usando `/src/lib/rate-limit.ts`.
+- Identifique IP com `getClientIP(req)` e limite tentativas (ex: 5/minuto).
+- Exemplo:
+
+```typescript
+const ip = getClientIP(req);
+const rateLimitResult = await checkRateLimit(ip, {
+  limit: 5,
+  windowSeconds: 60,
+});
+if (!rateLimitResult.success) {
+  return NextResponse.json(
+    {
+      error: `Muitas tentativas. Tente novamente em ${rateLimitResult.retryAfter}s`,
+    },
+    { status: 429 }
+  );
+}
+```
+
+**Uploads & Storage Seguro**
+
+- Nunca use filesystem local para uploads (Vercel é ephemeral). Sempre use Supabase Storage via `/src/lib/supabase.ts`.
+- Antes de novo upload, delete o arquivo antigo (exemplo em `/api/admin/avatar`).
+- Nunca exponha secrets no client (apenas variáveis `NEXT_PUBLIC_` são seguras para client-side).
+
+**Respostas & Logging Seguro**
+
+- Nunca retorne dados sensíveis (senhas, tokens) em responses.
+- Sempre use o padrão de resposta:
+  - Sucesso: `{ data, message? }`
+  - Erro: `{ error }`, status HTTP correto
+- Logue erros apenas no server, nunca exponha detalhes sensíveis ao client.
+
+**Senhas & Bcrypt**
+
+- Sempre hash de senha com bcrypt (12 rounds). Nunca armazene plain text.
+- Exemplo:
+
+```typescript
+const hashedPassword = await bcrypt.hash(password, 12);
+const isValid = await bcrypt.compare(inputPassword, user.password);
+```
+
+**Checklist SecurityOpsAI**
+
+- [x] Auth obrigatório em rotas protegidas
+- [x] Role check antes de operações sensíveis
+- [x] Zod em todos os inputs
+- [x] Rate limiting em endpoints públicos
+- [x] Uploads apenas via Supabase
+- [x] Nunca exponha secrets ou dados sensíveis
+- [x] Logging seguro (sem leaks)
+
+**ArmadiIhas comuns**
+
+- Não misture cookies de ambientes diferentes (prod/dev)
+- Não aceite dados não validados
+- Não faça upload local
+- Não exponha stacktrace ou detalhes de erro ao client
+
+Consulte `/src/lib/auth.ts`, `/src/lib/rate-limit.ts`, `/src/lib/supabase.ts` e exemplos em `/src/app/api/admin/*` para patterns seguros.
 
 ☑️ 7. Padrões de Erro e Response (Obrigatórios)
 

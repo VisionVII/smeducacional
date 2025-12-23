@@ -80,12 +80,11 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json({
-      success: true,
-      avatarUrl: url,
+      data: { avatarUrl: url },
       message: 'Avatar atualizado com sucesso',
     });
   } catch (error) {
-    console.error('[teacher][avatar] Erro ao fazer upload:', error);
+    console.error('[teacher][avatar] POST', error);
     return NextResponse.json(
       { error: 'Erro ao fazer upload de avatar' },
       { status: 500 }

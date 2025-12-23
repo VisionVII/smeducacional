@@ -41,6 +41,9 @@ export interface ThemeColors {
   secondaryForeground: string;
   accent: string;
   accentForeground: string;
+  // Nova cor complementar para composições avançadas
+  highlight?: string;
+  highlightForeground?: string;
   card: string;
   cardForeground: string;
   muted: string;
@@ -87,24 +90,27 @@ export const THEME_PRESETS: ThemePreset[] = [
   // ========================================
   {
     id: 'academic-blue',
-    name: 'Academic Blue',
+    name: 'Aurora Academia',
     description:
-      'Azul profissional e confiável. Ideal para dashboard geral e cursos corporativos.',
+      'Paleta aurora com azul confiável e toques de energia. Ideal para dashboards e cursos corporativos.',
     category: 'professional',
     preview: {
       primaryHex: '#2563EB',
-      secondaryHex: '#3B82F6',
-      gradient: 'linear-gradient(135deg, #2563EB 0%, #3B82F6 100%)',
+      secondaryHex: '#22D3EE',
+      gradient:
+        'linear-gradient(135deg, #2563EB 0%, #22D3EE 60%, #F59E0B 100%)',
     },
     light: {
       background: '0 0% 100%',
       foreground: '224 71% 4%',
       primary: '221 83% 53%', // #2563EB
       primaryForeground: '210 40% 98%',
-      secondary: '215 28% 17%',
-      secondaryForeground: '210 40% 98%',
-      accent: '216 34% 17%',
-      accentForeground: '210 40% 98%',
+      secondary: '189 94% 43%',
+      secondaryForeground: '0 0% 100%',
+      accent: '217 91% 60%',
+      accentForeground: '222 47% 11%',
+      highlight: '38 92% 58%',
+      highlightForeground: '222 84% 5%',
       card: '0 0% 100%',
       cardForeground: '224 71% 4%',
       muted: '220 14% 96%',
@@ -122,10 +128,12 @@ export const THEME_PRESETS: ThemePreset[] = [
       foreground: '210 40% 98%',
       primary: '217 91% 60%',
       primaryForeground: '222 47% 11%',
-      secondary: '215 28% 17%',
-      secondaryForeground: '210 40% 98%',
-      accent: '216 34% 17%',
+      secondary: '189 94% 43%',
+      secondaryForeground: '0 0% 100%',
+      accent: '221 83% 53%',
       accentForeground: '210 40% 98%',
+      highlight: '38 92% 58%',
+      highlightForeground: '222 84% 5%',
       card: '224 71% 4%',
       cardForeground: '210 40% 98%',
       muted: '215 28% 17%',
@@ -150,9 +158,9 @@ export const THEME_PRESETS: ThemePreset[] = [
   // ========================================
   {
     id: 'forest-green',
-    name: 'Forest Green',
+    name: 'Verde Boreal',
     description:
-      'Verde natural que transmite crescimento. Perfeito para STEM, biologia e sustentabilidade.',
+      'Verde boreal com ar de crescimento e ciência. Perfeito para STEM, biologia e sustentabilidade.',
     category: 'educational',
     preview: {
       primaryHex: '#059669',
@@ -166,7 +174,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       primaryForeground: '0 0% 100%',
       secondary: '142 76% 36%',
       secondaryForeground: '0 0% 100%',
-      accent: '142 71% 45%',
+      accent: '173 80% 40%',
+      highlight: '221 83% 53%',
+      highlightForeground: '210 40% 98%',
       accentForeground: '0 0% 100%',
       card: '0 0% 100%',
       cardForeground: '240 10% 4%',
@@ -187,7 +197,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       primaryForeground: '0 0% 100%',
       secondary: '142 76% 36%',
       secondaryForeground: '0 0% 100%',
-      accent: '142 71% 45%',
+      accent: '173 80% 40%',
+      highlight: '221 83% 53%',
+      highlightForeground: '210 40% 98%',
       accentForeground: '0 0% 100%',
       card: '240 10% 4%',
       cardForeground: '0 0% 98%',
@@ -212,7 +224,7 @@ export const THEME_PRESETS: ThemePreset[] = [
   // ========================================
   {
     id: 'sunset-orange',
-    name: 'Sunset Orange',
+    name: 'Pôr-do-sol Ígneo',
     description:
       'Laranja vibrante que estimula criatividade. Ideal para artes, design e inovação.',
     category: 'creative',
@@ -228,7 +240,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       primaryForeground: '0 0% 100%',
       secondary: '25 95% 53%',
       secondaryForeground: '0 0% 100%',
-      accent: '24 95% 53%',
+      accent: '340 82% 58%',
+      highlight: '221 83% 53%',
+      highlightForeground: '0 0% 100%',
       accentForeground: '0 0% 100%',
       card: '0 0% 100%',
       cardForeground: '20 14% 4%',
@@ -249,7 +263,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       primaryForeground: '0 0% 100%',
       secondary: '25 95% 53%',
       secondaryForeground: '0 0% 100%',
-      accent: '24 95% 53%',
+      accent: '340 82% 58%',
+      highlight: '221 83% 53%',
+      highlightForeground: '0 0% 100%',
       accentForeground: '0 0% 100%',
       card: '20 14% 4%',
       cardForeground: '0 0% 98%',
@@ -274,7 +290,7 @@ export const THEME_PRESETS: ThemePreset[] = [
   // ========================================
   {
     id: 'royal-purple',
-    name: 'Royal Purple',
+    name: 'Imperial Violeta',
     description:
       'Roxo elegante e premium. Perfeito para cursos executivos e conteúdo exclusivo.',
     category: 'professional',
@@ -290,7 +306,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       primaryForeground: '0 0% 100%',
       secondary: '263 70% 50%',
       secondaryForeground: '0 0% 100%',
-      accent: '262 90% 50%',
+      accent: '221 83% 53%',
+      highlight: '38 92% 58%',
+      highlightForeground: '222 84% 5%',
       accentForeground: '0 0% 100%',
       card: '0 0% 100%',
       cardForeground: '224 71% 4%',
@@ -311,7 +329,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       primaryForeground: '0 0% 100%',
       secondary: '263 70% 50%',
       secondaryForeground: '0 0% 100%',
-      accent: '262 90% 50%',
+      accent: '221 83% 53%',
+      highlight: '38 92% 58%',
+      highlightForeground: '222 84% 5%',
       accentForeground: '0 0% 100%',
       card: '224 71% 4%',
       cardForeground: '0 0% 98%',
@@ -336,7 +356,7 @@ export const THEME_PRESETS: ThemePreset[] = [
   // ========================================
   {
     id: 'ocean-teal',
-    name: 'Ocean Teal',
+    name: 'Calmaria Oceânica',
     description:
       'Azul-turquesa calmante. Ideal para bibliotecas, leitura e concentração.',
     category: 'educational',
@@ -352,7 +372,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       primaryForeground: '0 0% 100%',
       secondary: '189 94% 43%',
       secondaryForeground: '0 0% 100%',
-      accent: '188 95% 43%',
+      accent: '221 83% 53%',
+      highlight: '38 92% 58%',
+      highlightForeground: '222 84% 5%',
       accentForeground: '0 0% 100%',
       card: '0 0% 100%',
       cardForeground: '240 10% 4%',
@@ -373,7 +395,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       primaryForeground: '0 0% 100%',
       secondary: '189 94% 43%',
       secondaryForeground: '0 0% 100%',
-      accent: '188 95% 43%',
+      accent: '221 83% 53%',
+      highlight: '38 92% 58%',
+      highlightForeground: '222 84% 5%',
       accentForeground: '0 0% 100%',
       card: '240 10% 4%',
       cardForeground: '0 0% 98%',
@@ -398,7 +422,7 @@ export const THEME_PRESETS: ThemePreset[] = [
   // ========================================
   {
     id: 'crimson-red',
-    name: 'Crimson Red',
+    name: 'Crimson Turbo',
     description:
       'Vermelho energizante. Para bootcamps intensivos e cursos com deadlines.',
     category: 'energetic',
@@ -414,7 +438,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       primaryForeground: '0 0% 100%',
       secondary: '0 84% 60%',
       secondaryForeground: '0 0% 100%',
-      accent: '0 90% 60%',
+      accent: '25 95% 53%',
+      highlight: '221 83% 53%',
+      highlightForeground: '0 0% 100%',
       accentForeground: '0 0% 100%',
       card: '0 0% 100%',
       cardForeground: '0 0% 4%',
@@ -435,7 +461,9 @@ export const THEME_PRESETS: ThemePreset[] = [
       primaryForeground: '0 0% 100%',
       secondary: '0 84% 60%',
       secondaryForeground: '0 0% 100%',
-      accent: '0 90% 60%',
+      accent: '25 95% 53%',
+      highlight: '221 83% 53%',
+      highlightForeground: '0 0% 100%',
       accentForeground: '0 0% 100%',
       card: '0 0% 4%',
       cardForeground: '0 0% 98%',

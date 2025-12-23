@@ -48,9 +48,9 @@ export async function GET(_req: NextRequest) {
       );
     }
 
-    return NextResponse.json(user);
+    return NextResponse.json({ data: user });
   } catch (error) {
-    console.error('Erro ao buscar perfil:', error);
+    console.error('[teacher][profile] GET', error);
     return NextResponse.json(
       { error: 'Erro ao buscar perfil' },
       { status: 500 }
@@ -71,7 +71,14 @@ export async function PUT(req: NextRequest) {
     }
 
     const body = await req.json();
-    const validatedData = profileSchema.parse(body);
+    const result = profileSchema.safeParse(body);
+    if (!result.success) {
+      return NextResponse.json(
+        { error: result.error.errors[0].message },
+        { status: 400 }
+      );
+    }
+    const validatedData = result.data;
 
     // Verificar se email já existe (se mudou)
     if (validatedData.email !== session.user.email) {
@@ -82,7 +89,7 @@ export async function PUT(req: NextRequest) {
       if (existingUser && existingUser.id !== session.user.id) {
         return NextResponse.json(
           { error: 'Email já está em uso' },
-          { status: 400 }
+          { status: 409 }
         );
       }
     }
@@ -112,19 +119,11 @@ export async function PUT(req: NextRequest) {
     });
 
     return NextResponse.json({
-      success: true,
-      user: updatedUser,
+      data: updatedUser,
       message: 'Perfil atualizado com sucesso',
     });
   } catch (error) {
-    if (error instanceof z.ZodError) {
-      return NextResponse.json(
-        { error: 'Dados inválidos', details: error.errors },
-        { status: 400 }
-      );
-    }
-
-    console.error('Erro ao atualizar perfil:', error);
+    console.error('[teacher][profile] PUT', error);
     return NextResponse.json(
       { error: 'Erro ao atualizar perfil' },
       { status: 500 }

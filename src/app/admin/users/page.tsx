@@ -93,29 +93,35 @@ export default function AdminUsersPage() {
     },
   });
 
+  // Capturar timestamp estável para cálculos
+  // eslint-disable-next-line react-hooks/purity
+  const now = useMemo(() => Date.now(), []);
+
   // Calcular estatísticas
-  const stats: DashboardStats = {
-    totalStudents: users?.filter((u) => u.role === 'STUDENT').length || 0,
-    totalTeachers: users?.filter((u) => u.role === 'TEACHER').length || 0,
-    totalAdmins: users?.filter((u) => u.role === 'ADMIN').length || 0,
-    activeStudents:
-      users?.filter(
-        (u) =>
-          u.role === 'STUDENT' &&
-          u.lastActiveAt &&
-          new Date(u.lastActiveAt) >
-            new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
-      ).length || 0,
-    studentsAtRisk:
-      users?.filter(
-        (u) => u.role === 'STUDENT' && u.performanceStatus === 'needs-attention'
-      ).length || 0,
-    avgCompletionRate:
-      (users
-        ?.filter((u) => u.role === 'STUDENT')
-        .reduce((acc, u) => acc + (u.completionRate || 0), 0) ?? 0) /
-      (users?.filter((u) => u.role === 'STUDENT').length || 1),
-  };
+  const stats: DashboardStats = useMemo(() => {
+    return {
+      totalStudents: users?.filter((u) => u.role === 'STUDENT').length || 0,
+      totalTeachers: users?.filter((u) => u.role === 'TEACHER').length || 0,
+      totalAdmins: users?.filter((u) => u.role === 'ADMIN').length || 0,
+      activeStudents:
+        users?.filter(
+          (u) =>
+            u.role === 'STUDENT' &&
+            u.lastActiveAt &&
+            new Date(u.lastActiveAt) > new Date(now - 7 * 24 * 60 * 60 * 1000)
+        ).length || 0,
+      studentsAtRisk:
+        users?.filter(
+          (u) =>
+            u.role === 'STUDENT' && u.performanceStatus === 'needs-attention'
+        ).length || 0,
+      avgCompletionRate:
+        (users
+          ?.filter((u) => u.role === 'STUDENT')
+          .reduce((acc, u) => acc + (u.completionRate || 0), 0) ?? 0) /
+        (users?.filter((u) => u.role === 'STUDENT').length || 1),
+    };
+  }, [users, now]);
 
   const deleteUserMutation = useMutation({
     mutationFn: async (userId: string) => {
@@ -197,7 +203,7 @@ export default function AdminUsersPage() {
 
   const getTimeSinceActive = (lastActiveAt?: string) => {
     if (!lastActiveAt) return 'Nunca';
-    const diff = Date.now() - new Date(lastActiveAt).getTime();
+    const diff = now - new Date(lastActiveAt).getTime();
     const days = Math.floor(diff / (1000 * 60 * 60 * 24));
     if (days === 0) return 'Hoje';
     if (days === 1) return 'Ontem';

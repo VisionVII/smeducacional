@@ -71,15 +71,15 @@ function CoursesClient() {
   const [selectedLevel, setSelectedLevel] = useState<string>('all');
   const [sortBy, setSortBy] = useState<string>('recent');
 
-  // Previne erro de hidratação SSR/CSR
-  if (!mounted) {
-    return null;
-  }
-
   useEffect(() => {
     setMounted(true);
     loadData();
   }, []);
+
+  // Previne erro de hidratação SSR/CSR
+  if (!mounted) {
+    return null;
+  }
 
   const loadData = async () => {
     setIsLoading(true);

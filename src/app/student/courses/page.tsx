@@ -69,7 +69,7 @@ export default function StudentCoursesPage() {
                 <BookOpen className="h-8 w-8 text-white" />
               </div>
               <div>
-                <CardTitle className="text-3xl font-bold bg-gradient-to-r from-primary via-purple-600 to-pink-600 bg-clip-text text-transparent">
+                <CardTitle className="text-3xl font-bold text-gradient-theme-triple">
                   Meus Cursos
                 </CardTitle>
                 <p className="text-muted-foreground mt-1">
@@ -94,7 +94,7 @@ export default function StudentCoursesPage() {
               </p>
               <Button
                 asChild
-                className="bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90"
+                className="bg-gradient-theme hover:bg-gradient-theme-soft"
               >
                 <Link href="/courses">Explorar Cursos</Link>
               </Button>
@@ -151,7 +151,7 @@ export default function StudentCoursesPage() {
 
                     <Button
                       asChild
-                      className="w-full min-h-[44px] bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90"
+                      className="w-full min-h-[44px] bg-gradient-theme hover:bg-gradient-theme-soft"
                     >
                       <Link href={`/student/courses/${course.id}`}>
                         {course.progress > 0 ? 'Continuar' : 'Começar'}

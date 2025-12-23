@@ -24,7 +24,7 @@ export default function ThemeCustomizerPage() {
                 <Palette className="h-8 w-8 text-white" />
               </div>
               <div>
-                <h1 className="text-3xl font-bold bg-gradient-to-r from-primary via-purple-600 to-pink-600 bg-clip-text text-transparent">
+                <h1 className="text-3xl font-bold text-gradient-theme-triple">
                   Personalização de Tema
                 </h1>
                 <p className="text-muted-foreground mt-1">
@@ -67,10 +67,7 @@ export default function ThemeCustomizerPage() {
               </li>
             </ul>
             <div className="pt-4">
-              <Button
-                asChild
-                className="bg-gradient-to-r from-primary to-purple-600"
-              >
+              <Button asChild className="bg-gradient-theme">
                 <Link href="/teacher/dashboard">Voltar ao Dashboard</Link>
               </Button>
             </div>

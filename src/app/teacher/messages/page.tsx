@@ -1,13 +1,14 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { MessageSquare, Search, Send } from "lucide-react";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { useState } from 'react';
+import Link from 'next/link';
+import { useQuery } from '@tanstack/react-query';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { MessageSquare, Search, Send } from 'lucide-react';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 
 interface Thread {
   id: string;
@@ -29,24 +30,26 @@ interface Message {
 
 export default function TeacherMessagesPage() {
   const [selectedThreadId, setSelectedThreadId] = useState<string | null>(null);
-  const [messageInput, setMessageInput] = useState("");
-  const [searchQuery, setSearchQuery] = useState("");
+  const [messageInput, setMessageInput] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
 
   const { data: threads, isLoading: threadsLoading } = useQuery<Thread[]>({
-    queryKey: ["teacher-threads"],
+    queryKey: ['teacher-threads'],
     queryFn: async () => {
-      const res = await fetch("/api/teacher/messages/threads");
-      if (!res.ok) throw new Error("Erro ao carregar conversas");
+      const res = await fetch('/api/teacher/messages/threads');
+      if (!res.ok) throw new Error('Erro ao carregar conversas');
       return res.json();
     },
   });
 
   const { data: messages, isLoading: messagesLoading } = useQuery<Message[]>({
-    queryKey: ["teacher-messages", selectedThreadId],
+    queryKey: ['teacher-messages', selectedThreadId],
     queryFn: async () => {
       if (!selectedThreadId) return [];
-      const res = await fetch(`/api/teacher/messages/threads/${selectedThreadId}`);
-      if (!res.ok) throw new Error("Erro ao carregar mensagens");
+      const res = await fetch(
+        `/api/teacher/messages/threads/${selectedThreadId}`
+      );
+      if (!res.ok) throw new Error('Erro ao carregar mensagens');
       return res.json();
     },
     enabled: !!selectedThreadId,
@@ -56,15 +59,18 @@ export default function TeacherMessagesPage() {
     if (!messageInput.trim() || !selectedThreadId) return;
 
     try {
-      const res = await fetch(`/api/teacher/messages/threads/${selectedThreadId}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ content: messageInput }),
-      });
+      const res = await fetch(
+        `/api/teacher/messages/threads/${selectedThreadId}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ content: messageInput }),
+        }
+      );
 
-      if (!res.ok) throw new Error("Erro ao enviar mensagem");
+      if (!res.ok) throw new Error('Erro ao enviar mensagem');
 
-      setMessageInput("");
+      setMessageInput('');
       // Refresh messages
     } catch (error) {
       console.error(error);
@@ -77,23 +83,16 @@ export default function TeacherMessagesPage() {
 
   const getInitials = (name: string) => {
     return name
-      .split(" ")
+      .split(' ')
       .map((n) => n[0])
-      .join("")
+      .join('')
       .toUpperCase()
       .slice(0, 2);
   };
 
   return (
     <div className="container mx-auto py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">Mensagens</h1>
-        <p className="text-muted-foreground">
-          Converse com alunos e outros professores
-        </p>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[calc(100vh-250px)]">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[calc(100vh-180px)]">
         {/* Lista de Conversas */}
         <Card className="lg:col-span-1">
           <CardHeader>
@@ -115,7 +114,10 @@ export default function TeacherMessagesPage() {
             {threadsLoading ? (
               <div className="p-4 space-y-2">
                 {[1, 2, 3].map((i) => (
-                  <div key={i} className="h-16 bg-gray-200 rounded animate-pulse" />
+                  <div
+                    key={i}
+                    className="h-16 bg-gray-200 rounded animate-pulse"
+                  />
                 ))}
               </div>
             ) : filteredThreads && filteredThreads.length === 0 ? (
@@ -130,7 +132,7 @@ export default function TeacherMessagesPage() {
                     key={thread.id}
                     onClick={() => setSelectedThreadId(thread.id)}
                     className={`w-full p-4 text-left hover:bg-accent transition-colors ${
-                      selectedThreadId === thread.id ? "bg-accent" : ""
+                      selectedThreadId === thread.id ? 'bg-accent' : ''
                     }`}
                   >
                     <div className="flex items-start gap-3">
@@ -150,7 +152,10 @@ export default function TeacherMessagesPage() {
                             </Badge>
                           </div>
                           {thread.unreadCount > 0 && (
-                            <Badge variant="destructive" className="rounded-full h-5 min-w-5 px-1.5 ml-2">
+                            <Badge
+                              variant="destructive"
+                              className="rounded-full h-5 min-w-5 px-1.5 ml-2"
+                            >
                               {thread.unreadCount}
                             </Badge>
                           )}
@@ -159,7 +164,9 @@ export default function TeacherMessagesPage() {
                           {thread.lastMessage}
                         </p>
                         <p className="text-xs text-muted-foreground mt-1">
-                          {new Date(thread.lastMessageAt).toLocaleString('pt-BR')}
+                          {new Date(thread.lastMessageAt).toLocaleString(
+                            'pt-BR'
+                          )}
                         </p>
                       </div>
                     </div>
@@ -186,11 +193,15 @@ export default function TeacherMessagesPage() {
                   <Avatar className="h-10 w-10">
                     <AvatarFallback>
                       {getInitials(
-                        threads?.find((t) => t.id === selectedThreadId)?.participantName || ""
+                        threads?.find((t) => t.id === selectedThreadId)
+                          ?.participantName || ''
                       )}
                     </AvatarFallback>
                   </Avatar>
-                  {threads?.find((t) => t.id === selectedThreadId)?.participantName}
+                  {
+                    threads?.find((t) => t.id === selectedThreadId)
+                      ?.participantName
+                  }
                 </CardTitle>
               </CardHeader>
 
@@ -198,7 +209,10 @@ export default function TeacherMessagesPage() {
                 {messagesLoading ? (
                   <div className="space-y-2">
                     {[1, 2, 3].map((i) => (
-                      <div key={i} className="h-12 bg-gray-200 rounded animate-pulse" />
+                      <div
+                        key={i}
+                        className="h-12 bg-gray-200 rounded animate-pulse"
+                      />
                     ))}
                   </div>
                 ) : messages && messages.length === 0 ? (
@@ -209,13 +223,15 @@ export default function TeacherMessagesPage() {
                   messages?.map((message) => (
                     <div
                       key={message.id}
-                      className={`flex ${message.isOwn ? "justify-end" : "justify-start"}`}
+                      className={`flex ${
+                        message.isOwn ? 'justify-end' : 'justify-start'
+                      }`}
                     >
                       <div
                         className={`max-w-[70%] rounded-lg p-3 ${
                           message.isOwn
-                            ? "bg-primary text-primary-foreground"
-                            : "bg-muted"
+                            ? 'bg-primary text-primary-foreground'
+                            : 'bg-muted'
                         }`}
                       >
                         {!message.isOwn && (
@@ -225,10 +241,13 @@ export default function TeacherMessagesPage() {
                         )}
                         <p className="text-sm">{message.content}</p>
                         <p className="text-xs opacity-70 mt-1">
-                          {new Date(message.createdAt).toLocaleTimeString('pt-BR', {
-                            hour: '2-digit',
-                            minute: '2-digit',
-                          })}
+                          {new Date(message.createdAt).toLocaleTimeString(
+                            'pt-BR',
+                            {
+                              hour: '2-digit',
+                              minute: '2-digit',
+                            }
+                          )}
                         </p>
                       </div>
                     </div>
@@ -243,13 +262,16 @@ export default function TeacherMessagesPage() {
                     value={messageInput}
                     onChange={(e) => setMessageInput(e.target.value)}
                     onKeyPress={(e) => {
-                      if (e.key === "Enter" && !e.shiftKey) {
+                      if (e.key === 'Enter' && !e.shiftKey) {
                         e.preventDefault();
                         handleSendMessage();
                       }
                     }}
                   />
-                  <Button onClick={handleSendMessage} disabled={!messageInput.trim()}>
+                  <Button
+                    onClick={handleSendMessage}
+                    disabled={!messageInput.trim()}
+                  >
                     <Send className="h-4 w-4" />
                   </Button>
                 </div>

@@ -452,7 +452,25 @@ export default function TeacherProfilePage() {
 
   return (
     <div className="container mx-auto py-8 max-w-6xl">
-      {/* Hero Section do Perfil */}
+      {/* Hero temático consistente */}
+      <div className="mb-8 rounded-2xl bg-gradient-theme shadow-lg">
+        <div className="flex items-center justify-between px-6 py-6 md:px-8 md:py-7">
+          <div className="flex items-center gap-4">
+            <div className="h-12 w-12 rounded-xl bg-primary/20 flex items-center justify-center">
+              <User className="h-6 w-6 text-white drop-shadow" />
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold tracking-tight text-white">
+                Meu Perfil
+              </h1>
+              <p className="text-white/80">
+                Gerencie suas informações e preferências
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+      {/* Seção principal do Perfil */}
       <div className="mb-12">
         <div className="flex flex-col md:flex-row gap-6 items-start">
           {/* Avatar */}
@@ -489,14 +507,8 @@ export default function TeacherProfilePage() {
               <Badge className="bg-green-600">Ativo</Badge>
               <Badge variant="outline">75% Completo</Badge>
             </div>
-            <p className="text-muted-foreground max-w-2xl mb-4">
+            <p className="text-muted-foreground max-w-2xl">
               {session?.user?.email}
-            </p>
-            <p className="text-sm text-muted-foreground">
-              Membro desde{' '}
-              {userCreatedAt
-                ? new Date(userCreatedAt).toLocaleDateString('pt-BR')
-                : 'Data não disponível'}
             </p>
           </div>
         </div>

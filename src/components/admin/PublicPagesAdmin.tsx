@@ -1,8 +1,10 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { RichTextEditor } from '@/components/ui/RichTextEditor';
 import { toast } from '@/components/ui/use-toast';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 
@@ -11,12 +13,14 @@ interface PublicPage {
   slug: string;
   title: string;
   description?: string;
-  bannerUrl?: string;
   iconUrl?: string;
   content?: unknown;
+  isPublished?: boolean;
 }
 
 export default function PublicPagesAdmin() {
+  // Rotas públicas padrão do sistema
+
   const [pages, setPages] = useState<PublicPage[]>([]);
   const [loading, setLoading] = useState(false);
   const [editing, setEditing] = useState<PublicPage | null>(null);
@@ -25,24 +29,25 @@ export default function PublicPagesAdmin() {
 
   async function fetchPages() {
     setLoading(true);
-    const res = await fetch('/api/admin/public-pages');
-    const data = await res.json();
-    setPages(data.data || []);
+    try {
+      const res = await fetch('/api/admin/public-pages');
+      const data = await res.json();
+      if (res.ok && Array.isArray(data.data)) {
+        setPages(data.data);
+      } else {
+        setPages([]);
+      }
+    } catch {
+      setPages([]);
+    }
     setLoading(false);
   }
-
   useEffect(() => {
     const loadPages = async () => {
       await fetchPages();
     };
     loadPages();
   }, []);
-
-  function handleEdit(page: PublicPage) {
-    setEditing(page);
-    setForm(page);
-    setShowDialog(true);
-  }
 
   function handleNew() {
     setEditing(null);
@@ -54,7 +59,7 @@ export default function PublicPagesAdmin() {
     setLoading(true);
     const method = editing ? 'PUT' : 'POST';
     const url = editing
-      ? `/api/admin/public-pages/${editing.slug}`
+      ? `/api/admin/public-pages/${editing.id}`
       : '/api/admin/public-pages';
     const res = await fetch(url, {
       method,
@@ -72,20 +77,55 @@ export default function PublicPagesAdmin() {
     setLoading(false);
   }
 
-  async function handleDelete(slug: string) {
+  async function handleDelete(id: string) {
     if (!window.confirm('Remover página?')) return;
     setLoading(true);
-    const res = await fetch(`/api/admin/public-pages/${slug}`, {
-      method: 'DELETE',
-    });
-    if (res.ok) {
-      toast({ title: 'Removido' });
-      fetchPages();
-    } else {
+    try {
+      const res = await fetch(`/api/admin/public-pages/${id}`, {
+        method: 'DELETE',
+      });
+      if (res.ok) {
+        toast({ title: 'Removido' });
+        await fetchPages();
+      } else {
+        const data = await res.json();
+        toast({
+          title: data.error || 'Erro ao remover',
+          variant: 'destructive',
+        });
+      }
+    } catch {
       toast({ title: 'Erro ao remover', variant: 'destructive' });
     }
     setLoading(false);
   }
+
+  // Mostra todas as páginas do banco (publicadas e rascunhos), e só mostra rotas padrão como "Cadastrar" se não existirem no banco
+  const allPages: PublicPage[] = useMemo(() => {
+    const publicRoutes: { slug: string; title: string }[] = [
+      { slug: 'about', title: 'Sobre' },
+      { slug: 'courses', title: 'Catálogo de Cursos' },
+      { slug: 'home', title: 'Página Inicial' },
+      // Adicione outras rotas fixas aqui se necessário
+    ];
+    // Páginas do banco (publicadas e rascunhos)
+    const dbPages = pages;
+    // Para cada rota padrão, se não existe no banco, adiciona como "Cadastrar"
+    const missingDefaults = publicRoutes
+      .filter((route) => !dbPages.some((p) => p.slug === route.slug))
+      .map((route) => ({
+        id: '',
+        slug: route.slug,
+        title: route.title,
+        description: '',
+        bannerUrl: '',
+        iconUrl: '',
+        content: '',
+        isPublished: false,
+      }));
+    // Junta todas: páginas do banco (ordem do banco), depois as rotas padrão faltantes
+    return [...dbPages, ...missingDefaults];
+  }, [pages]);
 
   return (
     <div>
@@ -93,31 +133,94 @@ export default function PublicPagesAdmin() {
         <Button onClick={handleNew}>Nova Página</Button>
       </div>
       <div className="grid gap-4">
-        {pages.map((page) => (
+        {allPages.map((page) => (
           <div
-            key={page.id}
+            key={page.slug}
             className="border rounded p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-2"
           >
             <div>
-              <div className="font-bold text-lg">{page.title}</div>
-              <div className="text-xs text-muted-foreground">/{page.slug}</div>
-              <div className="text-sm">{page.description}</div>
+              <div className="font-bold text-lg flex items-center gap-2">
+                {page.title}
+                {page.isPublished === true ? (
+                  <span className="text-xs px-2 py-0.5 rounded bg-green-600 text-white">
+                    Publicado
+                  </span>
+                ) : (
+                  <span className="text-xs px-2 py-0.5 rounded bg-gray-500 text-white">
+                    Rascunho
+                  </span>
+                )}
+                {/* Se continuar mostrando apenas rascunhos, verifique a API: ela deve retornar todas as páginas, publicadas e rascunhos, e o campo isPublished deve ser booleano correto. */}
+              </div>
+              <div className="text-xs text-muted-foreground">
+                Rota: <span className="font-mono">/public/{page.slug}</span>
+              </div>
+              <div className="text-xs text-muted-foreground">
+                API:{' '}
+                <span className="font-mono">/api/public-pages/{page.slug}</span>
+              </div>
+              <div className="text-xs text-muted-foreground">
+                Admin:{' '}
+                <span className="font-mono">
+                  /admin/public-pages/{page.slug}/edit
+                </span>
+              </div>
+              <div className="text-sm">
+                {page.description || (
+                  <span className="italic text-muted-foreground">
+                    (sem descrição)
+                  </span>
+                )}
+              </div>
             </div>
             <div className="flex gap-2">
-              <Button
-                variant="outline"
-                onClick={() => handleEdit(page)}
-                size="sm"
-              >
-                Editar
-              </Button>
-              <Button
-                variant="destructive"
-                onClick={() => handleDelete(page.slug)}
-                size="sm"
-              >
-                Remover
-              </Button>
+              {page.id ? (
+                <>
+                  <Link href={`/admin/public-pages/${page.slug}/edit`}>
+                    <Button variant="outline" size="sm">
+                      Editar Avançado
+                    </Button>
+                  </Link>
+                  <Button
+                    variant="destructive"
+                    onClick={() => handleDelete(page.id)}
+                    size="sm"
+                  >
+                    Remover
+                  </Button>
+                  <Button
+                    variant={page.isPublished ? 'secondary' : 'default'}
+                    size="sm"
+                    onClick={async () => {
+                      setLoading(true);
+                      await fetch(`/api/admin/public-pages/${page.id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                          ...page,
+                          isPublished: !page.isPublished,
+                        }),
+                      });
+                      fetchPages();
+                      setLoading(false);
+                    }}
+                  >
+                    {page.isPublished ? 'Despublicar' : 'Publicar'}
+                  </Button>
+                </>
+              ) : (
+                <Button
+                  variant="default"
+                  size="sm"
+                  onClick={() => {
+                    setEditing(null);
+                    setForm({ slug: page.slug, title: page.title });
+                    setShowDialog(true);
+                  }}
+                >
+                  Cadastrar
+                </Button>
+              )}
             </div>
           </div>
         ))}
@@ -146,7 +249,21 @@ export default function PublicPagesAdmin() {
                 setForm((f) => ({ ...f, description: e.target.value }))
               }
             />
-            {/* TODO: Upload de banner/icon, edição de conteúdo avançado */}
+            <RichTextEditor
+              value={typeof form.content === 'string' ? form.content : ''}
+              onChange={(val) => setForm((f) => ({ ...f, content: val }))}
+            />
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                id="isPublished"
+                checked={!!form.isPublished}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, isPublished: e.target.checked }))
+                }
+              />
+              <label htmlFor="isPublished">Publicado</label>
+            </div>
             <div className="flex gap-2 mt-4">
               <Button onClick={handleSave} disabled={loading}>
                 Salvar
