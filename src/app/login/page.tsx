@@ -24,10 +24,23 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { toast } from '@/components/ui/use-toast';
-import { GraduationCap, Mail, Home, ShieldCheck } from 'lucide-react';
+import { GraduationCap, Mail, Home, ShieldCheck, Sparkles } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { PasswordInput } from '@/components/password-input';
 import { useSystemBranding } from '@/hooks/use-system-branding';
+
+const keyframes = `
+  @keyframes slideInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+`;
 
 export default function LoginPage() {
   const router = useRouter();
@@ -196,7 +209,7 @@ export default function LoginPage() {
 
   const loginBgStyle = branding.loginBgUrl
     ? {
-        backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(${branding.loginBgUrl})`,
+        backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url(${branding.loginBgUrl})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat',
@@ -204,41 +217,62 @@ export default function LoginPage() {
     : {};
 
   return (
-    <div
-      className="min-h-screen flex items-center justify-center px-4 py-6 sm:p-6 lg:p-8 relative safe-top safe-bottom"
-      style={loginBgStyle}
-    >
-      {/* Fallback gradient se não houver imagem */}
-      {!branding.loginBgUrl && (
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-purple-500/5 to-pink-500/5 dark:from-primary/10 dark:via-purple-500/10 dark:to-pink-500/10" />
-      )}
+    <div className="min-h-screen w-full overflow-hidden">
+      <style>{keyframes}</style>
+      
+      {/* Background */}
+      <div className="fixed inset-0">
+        {branding.loginBgUrl ? (
+          <div
+            className="absolute inset-0"
+            style={loginBgStyle}
+          />
+        ) : (
+          <div className="absolute inset-0 bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950 dark:from-gray-950 dark:via-slate-900 dark:to-gray-950" />
+        )}
+        {/* Gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-b from-primary/20 via-transparent to-transparent opacity-40" />
+      </div>
 
-      <Card className="w-full max-w-md relative z-10 shadow-2xl backdrop-blur-sm bg-background/95 border-2 mx-auto">
-        <CardHeader className="space-y-2 text-center px-4 sm:px-6 pt-6 sm:pt-8">
-          <div className="flex justify-center mb-3 sm:mb-4">
+      {/* Content */}
+      <div className="relative z-10 min-h-screen flex flex-col items-center justify-center px-4 py-8 sm:px-6 lg:px-8">
+        {/* Header Section */}
+        <div className="text-center mb-8 sm:mb-12 max-w-2xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-700">
+          <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-2 mb-6 backdrop-blur-sm hover:border-primary/50 hover:bg-primary/20 transition-all duration-300">
+            <Sparkles className="h-4 w-4 text-primary animate-spin" style={{ animationDuration: '3s' }} />
+            <span className="text-sm font-medium text-primary">Segurança de nível enterprise</span>
+          </div>
+          <h1 className="text-4xl sm:text-5xl font-bold text-white mb-4 leading-tight">
+            Bem-vindo de <span className="bg-gradient-to-r from-primary via-purple-400 to-pink-400 bg-clip-text text-transparent">volta</span>
+          </h1>
+          <p className="text-lg text-gray-300 leading-relaxed">
+            {branding.loginDescription || 'Entre com suas credenciais para acessar sua conta'}
+          </p>
+        </div>
+
+        {/* Card */}
+        <Card className="w-full max-w-md relative shadow-2xl backdrop-blur-xl bg-background/80 border border-primary/20 hover:border-primary/40 transition-all duration-300" style={{ animation: 'slideInUp 0.6s ease-out 0.2s both' }}>
+        <CardHeader className="space-y-3 text-center px-6 pt-8">
+          <div className="flex justify-center mb-4">
             {branding.logoUrl ? (
               <img
                 src={branding.logoUrl}
                 alt={branding.companyName}
-                className="h-14 sm:h-16 w-auto max-w-[200px] object-contain"
+                className="h-12 w-auto max-w-[180px] object-contain drop-shadow-lg"
                 loading="eager"
               />
             ) : (
-              <div className="h-14 w-14 sm:h-16 sm:w-16 rounded-full bg-primary/10 flex items-center justify-center">
-                <GraduationCap className="h-8 w-8 sm:h-9 sm:w-9 text-primary" />
+              <div className="h-12 w-12 rounded-lg bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center shadow-lg">
+                <GraduationCap className="h-7 w-7 text-white" />
               </div>
             )}
           </div>
-          <CardTitle className="text-xl sm:text-2xl font-bold leading-tight">
+          <CardTitle className="text-2xl font-bold leading-tight">
             {branding.loginTitle || 'Bem-vindo de volta'}
           </CardTitle>
-          <CardDescription className="text-sm sm:text-base leading-relaxed">
-            {branding.loginDescription ||
-              'Entre com suas credenciais para acessar sua conta'}
-          </CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit}>
-          <CardContent className="space-y-5 px-4 sm:px-6">
+          <CardContent className="space-y-5 px-6">
             <div className="space-y-2">
               <Label htmlFor="email" className="text-sm font-medium">
                 Email
@@ -254,7 +288,7 @@ export default function LoginPage() {
                 required
                 autoComplete="username"
                 inputMode="email"
-                className="h-11 text-base"
+                className="h-11 text-base bg-background/50 border-primary/20 hover:border-primary/40 focus:border-primary/60 transition-colors"
               />
             </div>
 
@@ -282,24 +316,24 @@ export default function LoginPage() {
                 />
                 <label
                   htmlFor="rememberMe"
-                  className="text-sm sm:text-base font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer select-none"
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer select-none"
                 >
                   Lembrar-me
                 </label>
               </div>
               <Link
                 href="/forgot-password"
-                className="text-sm sm:text-base text-primary hover:underline touch-target no-tap-highlight font-medium min-h-[44px] flex items-center"
+                className="text-sm text-primary hover:text-primary/80 hover:underline touch-target no-tap-highlight font-medium min-h-[44px] flex items-center transition-colors"
               >
                 Esqueceu a senha?
               </Link>
             </div>
           </CardContent>
-          <CardFooter className="flex flex-col space-y-4 px-4 sm:px-6 pb-6 sm:pb-8">
+          <CardFooter className="flex flex-col space-y-4 px-6 pb-8">
             <Button
               type="button"
               variant="outline"
-              className="w-full touch-target h-11 text-base"
+              className="w-full h-11 text-base border-primary/30 hover:border-primary/60 hover:bg-primary/10 transition-all duration-300"
               onClick={handleGoogleSignIn}
               disabled={isLoading}
             >
@@ -326,10 +360,10 @@ export default function LoginPage() {
 
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t" />
+                <span className="w-full border-t border-primary/20" />
               </div>
               <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-background px-2 text-muted-foreground">
+                <span className="bg-background/80 px-2 text-muted-foreground">
                   Ou continue com
                 </span>
               </div>
@@ -337,7 +371,7 @@ export default function LoginPage() {
 
             <Button
               type="submit"
-              className="w-full h-11 text-base font-semibold"
+              className="w-full h-11 text-base font-semibold bg-gradient-to-r from-primary via-primary to-purple-600 hover:shadow-lg hover:shadow-primary/50 transition-all duration-300"
               disabled={isLoading}
             >
               {isLoading ? 'Entrando...' : 'Entrar'}
@@ -346,10 +380,10 @@ export default function LoginPage() {
             <div className="flex flex-col sm:flex-row items-center justify-between w-full gap-3 text-sm">
               <Link
                 href="/"
-                className="text-muted-foreground hover:text-primary flex items-center gap-1 touch-target no-tap-highlight"
+                className="text-muted-foreground hover:text-primary flex items-center gap-1 touch-target no-tap-highlight transition-colors"
               >
                 <Home className="h-4 w-4" />
-                <span className="text-sm sm:text-base">Voltar ao início</span>
+                <span className="text-sm">Voltar ao início</span>
               </Link>
               <p className="text-muted-foreground text-center">
                 Não tem conta?{' '}
@@ -362,7 +396,7 @@ export default function LoginPage() {
               </p>
             </div>
 
-            <div className="pt-4 border-t text-center text-xs sm:text-sm text-muted-foreground space-y-3">
+            <div className="pt-4 border-t border-primary/20 text-center text-xs text-muted-foreground space-y-3">
               <p className="leading-relaxed">
                 É professor?{' '}
                 <Link
@@ -375,6 +409,7 @@ export default function LoginPage() {
             </div>
           </CardFooter>
         </form>
+      </div>
 
         <Dialog
           open={require2FA}

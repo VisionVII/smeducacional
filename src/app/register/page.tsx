@@ -16,9 +16,22 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { toast } from '@/components/ui/use-toast';
-import { GraduationCap, Home } from 'lucide-react';
+import { GraduationCap, Home, Sparkles } from 'lucide-react';
 import { PasswordInput } from '@/components/password-input';
 import { useSystemBranding } from '@/hooks/use-system-branding';
+
+const keyframes = `
+  @keyframes slideInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+`;
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -99,33 +112,61 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-800 p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="space-y-1 text-center">
+    <div className="min-h-screen w-full overflow-hidden">
+      <style>{keyframes}</style>
+      
+      {/* Background */}
+      <div className="fixed inset-0">
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950 dark:from-gray-950 dark:via-slate-900 dark:to-gray-950" />
+        {/* Gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-b from-primary/20 via-transparent to-transparent opacity-40" />
+      </div>
+
+      {/* Content */}
+      <div className="relative z-10 min-h-screen flex flex-col items-center justify-center px-4 py-8 sm:px-6 lg:px-8">
+        {/* Header Section */}
+        <div className="text-center mb-8 sm:mb-12 max-w-2xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-700">
+          <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-2 mb-6 backdrop-blur-sm hover:border-primary/50 hover:bg-primary/20 transition-all duration-300">
+            <Sparkles className="h-4 w-4 text-primary animate-spin" style={{ animationDuration: '3s' }} />
+            <span className="text-sm font-medium text-primary">Junte-se à nossa comunidade</span>
+          </div>
+          <h1 className="text-4xl sm:text-5xl font-bold text-white mb-4 leading-tight">
+            Criar uma <span className="bg-gradient-to-r from-primary via-purple-400 to-pink-400 bg-clip-text text-transparent">nova conta</span>
+          </h1>
+          <p className="text-lg text-gray-300 leading-relaxed">
+            Preencha os dados abaixo para começar sua jornada de aprendizado
+          </p>
+        </div>
+
+        {/* Card */}
+        <Card className="w-full max-w-md relative shadow-2xl backdrop-blur-xl bg-background/80 border border-primary/20 hover:border-primary/40 transition-all duration-300" style={{ animation: 'slideInUp 0.6s ease-out 0.2s both' }}>
+      </div>
+
+      <Card className="w-full max-w-md"
+        <CardHeader className="space-y-3 text-center px-6 pt-8">
           <div className="flex justify-center mb-4">
             {branding.logoUrl ? (
               <img
                 src={branding.logoUrl}
                 alt={branding.companyName}
-                className="h-16 object-contain"
+                className="h-12 w-auto max-w-[180px] object-contain drop-shadow-lg"
               />
             ) : (
-              <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
-                <GraduationCap className="h-7 w-7 text-primary" />
+              <div className="h-12 w-12 rounded-lg bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center shadow-lg">
+                <GraduationCap className="h-7 w-7 text-white" />
               </div>
             )}
           </div>
-          <CardTitle className="text-2xl font-bold">Criar conta</CardTitle>
-          <CardDescription className="text-sm">
-            Preencha os dados abaixo para criar sua conta
-          </CardDescription>
+          <CardTitle className="text-2xl font-bold leading-tight">
+            Criar conta
+          </CardTitle>
         </CardHeader>
         <form onSubmit={handleSubmit}>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-5 px-6">
             <Button
               type="button"
               variant="outline"
-              className="w-full"
+              className="w-full h-11 text-base border-primary/30 hover:border-primary/60 hover:bg-primary/10 transition-all duration-300"
               onClick={handleGoogleSignIn}
               disabled={isLoading}
             >
@@ -152,24 +193,24 @@ export default function RegisterPage() {
 
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t" />
+                <span className="w-full border-t border-primary/20" />
               </div>
               <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-background px-2 text-muted-foreground">
+                <span className="bg-background/80 px-2 text-muted-foreground">
                   Ou registre-se com email
                 </span>
               </div>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="name" className="text-sm">
+              <Label htmlFor="name" className="text-sm font-medium">
                 Nome Completo
               </Label>
               <Input
                 id="name"
                 type="text"
                 placeholder="Seu nome"
-                className="min-h-[44px]"
+                className="h-11 text-base bg-background/50 border-primary/20 hover:border-primary/40 focus:border-primary/60 transition-colors"
                 value={formData.name}
                 onChange={(e) =>
                   setFormData({ ...formData, name: e.target.value })
@@ -178,14 +219,14 @@ export default function RegisterPage() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-sm">
+              <Label htmlFor="email" className="text-sm font-medium">
                 Email
               </Label>
               <Input
                 id="email"
                 type="email"
                 placeholder="seu@email.com"
-                className="min-h-[44px]"
+                className="h-11 text-base bg-background/50 border-primary/20 hover:border-primary/40 focus:border-primary/60 transition-colors"
                 value={formData.email}
                 onChange={(e) =>
                   setFormData({ ...formData, email: e.target.value })
@@ -218,23 +259,27 @@ export default function RegisterPage() {
               showStrength={false}
             />
           </CardContent>
-          <CardFooter className="flex flex-col space-y-4">
-            <Button type="submit" className="w-full" disabled={isLoading}>
+          <CardFooter className="flex flex-col space-y-4 px-6 pb-8">
+            <Button 
+              type="submit" 
+              className="w-full h-11 text-base font-semibold bg-gradient-to-r from-primary via-primary to-purple-600 hover:shadow-lg hover:shadow-primary/50 transition-all duration-300"
+              disabled={isLoading}
+            >
               {isLoading ? 'Criando conta...' : 'Criar conta'}
             </Button>
-            <div className="flex items-center justify-between w-full text-sm">
+            <div className="flex flex-col sm:flex-row items-center justify-between w-full gap-3 text-sm">
               <Link
                 href="/"
-                className="text-muted-foreground hover:text-primary flex items-center gap-1"
+                className="text-muted-foreground hover:text-primary flex items-center gap-1 touch-target no-tap-highlight transition-colors"
               >
                 <Home className="h-4 w-4" />
-                Voltar ao início
+                <span className="text-sm">Voltar ao início</span>
               </Link>
-              <p className="text-muted-foreground">
+              <p className="text-muted-foreground text-center">
                 Já tem uma conta?{' '}
                 <Link
                   href="/login"
-                  className="text-primary hover:underline font-medium"
+                  className="text-primary hover:underline font-medium touch-target no-tap-highlight"
                 >
                   Fazer login
                 </Link>
@@ -242,7 +287,7 @@ export default function RegisterPage() {
             </div>
           </CardFooter>
         </form>
-      </Card>
+      </div>
     </div>
   );
 }

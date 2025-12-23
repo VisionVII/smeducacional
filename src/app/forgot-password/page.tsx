@@ -15,8 +15,21 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { toast } from '@/components/ui/use-toast';
-import { GraduationCap, ArrowLeft, Mail, Home } from 'lucide-react';
+import { GraduationCap, ArrowLeft, Mail, Home, Sparkles } from 'lucide-react';
 import { PasswordInput } from '@/components/password-input';
+
+const keyframes = `
+  @keyframes slideInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+`;
 
 export default function ForgotPasswordPage() {
   const router = useRouter();
@@ -159,26 +172,50 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-800 p-4">
-      <Card className="w-full max-w-md">
+    <div className="min-h-screen w-full overflow-hidden">
+      <style>{keyframes}</style>
+      
+      {/* Background */}
+      <div className="fixed inset-0">
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950 dark:from-gray-950 dark:via-slate-900 dark:to-gray-950" />
+        {/* Gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-b from-primary/20 via-transparent to-transparent opacity-40" />
+      </div>
+
+      {/* Content */}
+      <div className="relative z-10 min-h-screen flex flex-col items-center justify-center px-4 py-8 sm:px-6 lg:px-8">
+        {/* Header Section */}
+        <div className="text-center mb-8 sm:mb-12 max-w-2xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-700">
+          <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-2 mb-6 backdrop-blur-sm hover:border-primary/50 hover:bg-primary/20 transition-all duration-300">
+            <Sparkles className="h-4 w-4 text-primary animate-spin" style={{ animationDuration: '3s' }} />
+            <span className="text-sm font-medium text-primary">Recuperação de conta</span>
+          </div>
+          <h1 className="text-4xl sm:text-5xl font-bold text-white mb-4 leading-tight">
+            Recuperar <span className="bg-gradient-to-r from-primary via-purple-400 to-pink-400 bg-clip-text text-transparent">sua senha</span>
+          </h1>
+          <p className="text-lg text-gray-300 leading-relaxed">
+            {step === 'email' && 'Digite seu email para receber o código de recuperação'}
+            {step === 'code' && 'Digite o código de 6 dígitos enviado para seu email'}
+            {step === 'newPassword' && 'Crie uma nova senha segura para sua conta'}
+          </p>
+        </div>
+
+        {/* Card */}
+        <Card className="w-full max-w-md relative shadow-2xl backdrop-blur-xl bg-background/80 border border-primary/20 hover:border-primary/40 transition-all duration-300" style={{ animation: 'slideInUp 0.6s ease-out 0.2s both' }}>
+      </div>
+
+      <Card className="w-full max-w-md"
         <CardHeader className="space-y-1 text-center">
           <div className="flex justify-center mb-4">
-            <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
-              <GraduationCap className="h-7 w-7 text-primary" />
+            <div className="h-12 w-12 rounded-lg bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center shadow-lg">
+              <GraduationCap className="h-7 w-7 text-white" />
             </div>
           </div>
-          <CardTitle className="text-2xl font-bold">
+          <CardTitle className="text-2xl font-bold leading-tight">
             {step === 'email' && 'Recuperar Senha'}
             {step === 'code' && 'Verificar Código'}
             {step === 'newPassword' && 'Nova Senha'}
           </CardTitle>
-          <CardDescription className="text-sm">
-            {step === 'email' &&
-              'Digite seu email para receber o código de recuperação'}
-            {step === 'code' &&
-              'Digite o código de 6 dígitos enviado para seu email'}
-            {step === 'newPassword' && 'Crie uma nova senha para sua conta'}
-          </CardDescription>
         </CardHeader>
 
         {step === 'email' && (
@@ -194,7 +231,7 @@ export default function ForgotPasswordPage() {
                     placeholder="seu@email.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="pl-10"
+                    className="pl-10 h-11 text-base bg-background/50 border-primary/20 hover:border-primary/40 focus:border-primary/60 transition-colors"
                     required
                     autoComplete="email"
                   />
@@ -204,6 +241,8 @@ export default function ForgotPasswordPage() {
             <CardFooter className="flex flex-col space-y-4">
               <Button type="submit" className="w-full" disabled={isLoading}>
                 {isLoading ? 'Enviando...' : 'Enviar Código'}
+              </Button>
+              <Button asChild variant="ghost" className="w-full text-sm hover:bg-primary/10 transition-colors" size="sm">
               </Button>
               <Button asChild variant="ghost" className="w-full" size="sm">
                 <Link href="/login" className="flex items-center gap-2">
@@ -241,6 +280,7 @@ export default function ForgotPasswordPage() {
               <Button
                 type="submit"
                 className="w-full"
+                                className="w-full h-11 text-base font-semibold bg-gradient-to-r from-primary via-primary to-purple-600 hover:shadow-lg hover:shadow-primary/50 transition-all duration-300"
                 disabled={isLoading || code.length !== 6}
               >
                 {isLoading ? 'Verificando...' : 'Verificar Código'}
@@ -248,6 +288,7 @@ export default function ForgotPasswordPage() {
               <Button
                 type="button"
                 variant="ghost"
+                                className="w-full text-sm hover:bg-primary/10 transition-colors"
                 className="w-full"
                 size="sm"
                 onClick={() => setStep('email')}
@@ -289,6 +330,7 @@ export default function ForgotPasswordPage() {
                       ...formData,
                       confirmPassword: e.target.value,
                     })
+                                <Button type="submit" className="w-full h-11 text-base font-semibold bg-gradient-to-r from-primary via-primary to-purple-600 hover:shadow-lg hover:shadow-primary/50 transition-all duration-300" disabled={isLoading}>
                   }
                   required
                   minLength={6}
@@ -304,6 +346,8 @@ export default function ForgotPasswordPage() {
           </form>
         )}
       </Card>
+    </div>
+      </div>
     </div>
   );
 }
