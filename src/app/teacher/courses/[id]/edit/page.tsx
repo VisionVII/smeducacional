@@ -281,7 +281,6 @@ export default function EditCoursePage({
                 <BackButton
                   href="/teacher/courses"
                   label="Voltar para meus cursos"
-                  className="text-white hover:text-white/90 mb-2"
                 />
                 <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight">
                   Editar Curso
