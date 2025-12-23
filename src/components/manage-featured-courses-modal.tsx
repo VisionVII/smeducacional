@@ -42,7 +42,7 @@ export function ManageFeaturedCoursesModal({
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [selectedCourses, setSelectedCourses] = useState<Set<string>>(
-    new Set(courses.filter(c => c.isFeatured).map(c => c.id))
+    new Set(courses.filter((c) => c.isFeatured).map((c) => c.id))
   );
 
   const updateFeaturedMutation = useMutation({
@@ -86,9 +86,7 @@ export function ManageFeaturedCoursesModal({
       toast({
         title: 'Erro',
         description:
-          error instanceof Error
-            ? error.message
-            : 'Erro ao atualizar curso',
+          error instanceof Error ? error.message : 'Erro ao atualizar curso',
         variant: 'destructive',
       });
     },

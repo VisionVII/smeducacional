@@ -3,7 +3,14 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ChevronLeft, ChevronRight, BookOpen, Users, Clock, Play } from 'lucide-react';
+import {
+  ChevronLeft,
+  ChevronRight,
+  BookOpen,
+  Users,
+  Clock,
+  Play,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface Course {
@@ -176,8 +183,14 @@ export function CoursesCarousel({ courses }: CoursesCarouselProps) {
 
                     {/* CTA */}
                     <div className="flex gap-3 pt-2">
-                      <Button asChild className="flex-1 h-11 bg-gradient-to-r from-primary via-primary to-purple-600 hover:shadow-lg hover:shadow-primary/50">
-                        <Link href={`/courses/${course.slug}`} className="flex items-center gap-2">
+                      <Button
+                        asChild
+                        className="flex-1 h-11 bg-gradient-to-r from-primary via-primary to-purple-600 hover:shadow-lg hover:shadow-primary/50"
+                      >
+                        <Link
+                          href={`/courses/${course.slug}`}
+                          className="flex items-center gap-2"
+                        >
                           <Play className="w-4 h-4" />
                           Explorar
                         </Link>
@@ -240,7 +253,9 @@ export function CoursesCarousel({ courses }: CoursesCarouselProps) {
                     )}
                     <div>
                       <p className="text-sm text-gray-300">Instrutor</p>
-                      <p className="font-semibold text-white">{course.instructor.name}</p>
+                      <p className="font-semibold text-white">
+                        {course.instructor.name}
+                      </p>
                     </div>
                   </div>
 
@@ -265,7 +280,9 @@ export function CoursesCarousel({ courses }: CoursesCarouselProps) {
                     {course._count.enrollments > 0 && (
                       <div className="flex items-center gap-2">
                         <Users className="w-5 h-5" />
-                        <span>{course._count.enrollments.toLocaleString()} alunos</span>
+                        <span>
+                          {course._count.enrollments.toLocaleString()} alunos
+                        </span>
                       </div>
                     )}
                     {course.level && (
@@ -279,8 +296,14 @@ export function CoursesCarousel({ courses }: CoursesCarouselProps) {
 
                   {/* CTA */}
                   <div className="flex gap-4 pt-4">
-                    <Button asChild className="h-12 px-8 bg-gradient-to-r from-primary via-primary to-purple-600 hover:shadow-lg hover:shadow-primary/50 text-white font-semibold">
-                      <Link href={`/courses/${course.slug}`} className="flex items-center gap-2">
+                    <Button
+                      asChild
+                      className="h-12 px-8 bg-gradient-to-r from-primary via-primary to-purple-600 hover:shadow-lg hover:shadow-primary/50 text-white font-semibold"
+                    >
+                      <Link
+                        href={`/courses/${course.slug}`}
+                        className="flex items-center gap-2"
+                      >
                         <Play className="w-5 h-5" />
                         Começar Curso
                       </Link>
