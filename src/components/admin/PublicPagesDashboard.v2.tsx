@@ -341,12 +341,12 @@ export default function PublicPagesDashboard() {
   const handleApplyTemplate = (template: PageTemplate) => {
     setFormData({
       ...formData,
-      title: template.name,
+      title: template.title,
       description: template.description,
       content: JSON.parse(JSON.stringify(template.blocks)),
     });
     setShowTemplateDialog(false);
-    toast({ title: `Template "${template.name}" aplicado!` });
+    toast({ title: `Template "${template.title}" aplicado!` });
   };
 
   // Keyboard shortcuts
