@@ -226,15 +226,18 @@ export default function HomePage() {
         `}</style>
       </section>
 
-      {/* Stats Section com Contadores Animados */}
-      <section className="bg-gradient-to-r from-primary/10 via-purple-500/5 to-transparent dark:from-primary/15 dark:to-transparent py-16 md:py-24 relative overflow-hidden">
-        <div className="absolute inset-0 opacity-20">
-          <div className="absolute top-0 left-0 w-96 h-96 bg-primary/20 rounded-full mix-blend-multiply filter blur-3xl" />
-          <div className="absolute bottom-0 right-0 w-96 h-96 bg-purple-500/20 rounded-full mix-blend-multiply filter blur-3xl" />
+      {/* Stats Section com Contadores Animados - Como Camada */}
+      <section className="bg-gradient-to-b from-transparent via-primary/5 to-purple-500/5 dark:via-primary/10 dark:to-purple-500/10 py-20 md:py-28 relative overflow-hidden">
+        <div className="absolute inset-0 opacity-30">
+          <div className="absolute top-0 left-0 w-96 h-96 bg-primary/20 rounded-full mix-blend-multiply filter blur-3xl animate-pulse" />
+          <div
+            className="absolute bottom-0 right-0 w-96 h-96 bg-purple-500/20 rounded-full mix-blend-multiply filter blur-3xl animate-pulse"
+            style={{ animationDelay: '2s' }}
+          />
         </div>
 
         <div className="relative container mx-auto px-4">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-12 max-w-5xl mx-auto">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12 max-w-5xl mx-auto">
             {[
               {
                 icon: BookOpen,
@@ -254,14 +257,19 @@ export default function HomePage() {
               <div
                 key={idx}
                 id={`counter-${stat.value}`}
-                className="text-center p-4 group"
+                className="text-center p-4 md:p-6 group transition-all duration-300 hover:scale-110"
+                style={{
+                  animation: `slideUp 0.6s ease-out ${idx * 0.1}s both`,
+                }}
               >
-                <div className="flex justify-center mb-3 group-hover:scale-110 transition-transform">
-                  <stat.icon className="h-8 w-8 md:h-10 md:w-10 text-primary opacity-60 group-hover:opacity-100 transition-opacity" />
+                <div className="flex justify-center mb-4 group-hover:scale-125 group-hover:rotate-12 transition-all duration-300">
+                  <div className="p-3 rounded-full bg-gradient-to-br from-primary/20 to-purple-500/20 group-hover:from-primary/30 group-hover:to-purple-500/30">
+                    <stat.icon className="h-8 w-8 md:h-10 md:w-10 text-primary" />
+                  </div>
                 </div>
                 <div className="text-4xl sm:text-5xl md:text-6xl font-bold text-primary mb-2 font-mono">
                   <AnimatedCounter target={stat.value} />
-                  <span className="text-2xl">{stat.suffix}</span>
+                  <span className="text-2xl ml-1">{stat.suffix}</span>
                 </div>
                 <p className="text-sm md:text-base text-muted-foreground font-medium">
                   {stat.label}
@@ -270,6 +278,19 @@ export default function HomePage() {
             ))}
           </div>
         </div>
+
+        <style>{`
+          @keyframes slideUp {
+            from {
+              opacity: 0;
+              transform: translateY(20px);
+            }
+            to {
+              opacity: 1;
+              transform: translateY(0);
+            }
+          }
+        `}</style>
       </section>
 
       {/* Benefits Section com efeitos de camada */}
@@ -340,23 +361,26 @@ export default function HomePage() {
         `}</style>
       </section>
 
-      {/* Testimonials Section Melhorada */}
-      <section className="bg-gradient-to-b from-transparent via-primary/5 to-purple-500/5 dark:via-primary/10 dark:to-purple-500/10 py-16 md:py-24 relative overflow-hidden">
-        <div className="absolute inset-0 opacity-30">
-          <div className="absolute top-10 left-10 w-80 h-80 bg-primary/10 rounded-full mix-blend-multiply filter blur-3xl animate-pulse" />
+      {/* Testimonials Section Melhorada - Como Camada */}
+      <section className="bg-gradient-to-b from-transparent via-primary/8 to-purple-500/5 dark:via-primary/12 dark:to-purple-500/8 py-20 md:py-28 relative overflow-hidden">
+        <div className="absolute inset-0 opacity-40">
+          <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/15 rounded-full mix-blend-multiply filter blur-3xl animate-pulse" />
           <div
-            className="absolute bottom-10 right-10 w-80 h-80 bg-purple-500/10 rounded-full mix-blend-multiply filter blur-3xl opacity-75 animate-pulse"
+            className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-500/15 rounded-full mix-blend-multiply filter blur-3xl opacity-75 animate-pulse"
             style={{ animationDelay: '2s' }}
           />
         </div>
 
         <div className="relative container mx-auto px-4">
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-center mb-4 px-2">
-            O que nossos alunos dizem
-          </h2>
-          <p className="text-center text-muted-foreground mb-12 md:mb-16 text-base md:text-lg">
-            Veja como estamos transformando vidas
-          </p>
+          <div className="text-center mb-12 md:mb-16">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 px-2">
+              O que nossos alunos dizem
+            </h2>
+            <p className="text-center text-muted-foreground text-base md:text-lg max-w-2xl mx-auto">
+              Veja como estamos transformando vidas de pessoas que acreditam na
+              educação contínua
+            </p>
+          </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 max-w-6xl mx-auto">
             {[
@@ -381,42 +405,45 @@ export default function HomePage() {
             ].map((testimonial, idx) => (
               <div
                 key={idx}
-                className="group bg-card/80 backdrop-blur p-6 md:p-8 rounded-xl border-2 border-primary/10 hover:border-primary/50 hover:shadow-xl hover:scale-105 transition-all duration-300 relative overflow-hidden"
+                className="group bg-gradient-to-br from-card/90 to-card/70 dark:from-card/80 dark:to-card/60 backdrop-blur-md p-6 md:p-8 rounded-2xl border-2 border-primary/20 hover:border-primary/60 hover:shadow-2xl hover:scale-105 transition-all duration-300 relative overflow-hidden"
                 style={{
                   animation: `slideUp 0.6s ease-out ${0.2 + idx * 0.15}s both`,
                 }}
               >
                 {/* Background glow */}
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+
+                {/* Decorative element */}
+                <div className="absolute -top-8 -right-8 w-24 h-24 bg-primary/5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity group-hover:scale-150 duration-300" />
 
                 {/* Stars */}
-                <div className="relative flex gap-1 mb-4">
+                <div className="relative flex gap-1 mb-5">
                   {[...Array(testimonial.stars)].map((_, i) => (
                     <Star
                       key={i}
-                      className="h-5 w-5 fill-primary text-primary group-hover:scale-110 transition-transform"
+                      className="h-5 w-5 fill-orange-400 text-orange-400 group-hover:scale-125 transition-all"
                       style={{ transitionDelay: `${i * 50}ms` }}
                     />
                   ))}
                 </div>
 
                 {/* Quote */}
-                <p className="relative text-muted-foreground mb-6 text-sm md:text-base leading-relaxed font-medium">
-                  <span className="text-3xl text-primary/30 absolute -top-2 -left-2">
+                <p className="relative text-muted-foreground mb-6 text-sm md:text-base leading-relaxed font-medium italic">
+                  <span className="text-4xl text-primary/20 absolute -top-4 -left-2">
                     &ldquo;
                   </span>
                   {testimonial.text}
-                  <span className="text-3xl text-primary/30 absolute -bottom-6 -right-2">
+                  <span className="text-4xl text-primary/20 absolute -bottom-6 -right-2">
                     &rdquo;
                   </span>
                 </p>
 
                 {/* Author */}
-                <div className="relative pt-4 border-t border-primary/10">
-                  <p className="font-bold text-foreground">
+                <div className="relative pt-6 border-t border-primary/10 group-hover:border-primary/30 transition-colors">
+                  <p className="font-bold text-foreground group-hover:text-primary transition-colors">
                     {testimonial.name}
                   </p>
-                  <p className="text-xs md:text-sm text-muted-foreground">
+                  <p className="text-xs md:text-sm text-muted-foreground group-hover:text-muted-foreground/80">
                     {testimonial.role}
                   </p>
                 </div>

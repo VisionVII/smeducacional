@@ -81,14 +81,21 @@ export function PublicNavbar() {
                 height={40}
                 className="h-10 w-auto object-contain"
                 priority
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.style.display = 'none';
+                }}
               />
-            ) : (
-              <>
-                <GraduationCap className="h-8 w-8 md:h-10 md:w-10 text-primary" />
-                <span className="hidden sm:inline font-bold text-lg">
+            ) : null}
+            {!branding.logoUrl && (
+              <div className="flex items-center gap-2">
+                <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center shadow-lg">
+                  <GraduationCap className="h-6 w-6 text-white" />
+                </div>
+                <span className="hidden sm:inline font-bold text-lg bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
                   {branding.companyName}
                 </span>
-              </>
+              </div>
             )}
           </Link>
 
@@ -152,37 +159,82 @@ export function PublicNavbar() {
           </div>
         </div>
 
-        {/* Mobile Menu */}
+        {/* Mobile Menu - Popup Elegante */}
         {mobileMenuOpen && (
-          <div className="md:hidden border-t py-4 space-y-1">
-            {/* Navigation Links Mobile */}
-            {publicLinks?.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                onClick={() => setMobileMenuOpen(false)}
-                className={cn(
-                  'flex items-center gap-3 px-3 py-3 rounded-md text-sm font-medium transition-colors',
-                  pathname === link.href
-                    ? 'bg-primary text-primary-foreground'
-                    : 'hover:bg-accent hover:text-accent-foreground'
-                )}
-              >
-                {link.icon}
-                {link.label}
-              </Link>
-            ))}
+          <>
+            {/* Backdrop com blur */}
+            <div
+              className="fixed inset-0 bg-black/50 backdrop-blur-sm md:hidden z-40"
+              onClick={() => setMobileMenuOpen(false)}
+              style={{ top: '64px' }}
+            />
 
-            {/* Auth Buttons Mobile */}
-            <div className="flex flex-col gap-2 pt-4 border-t">
-              <Button variant="ghost" className="w-full" asChild>
-                <Link href="/login">Entrar</Link>
-              </Button>
-              <Button className="w-full" asChild>
-                <Link href="/register">Cadastrar</Link>
-              </Button>
+            {/* Menu Drawer */}
+            <div className="md:hidden absolute top-16 left-0 right-0 bg-background/95 backdrop-blur-xl border-b border-primary/20 shadow-2xl animate-in slide-in-from-top-2 duration-300 z-50">
+              <div className="px-4 py-6 space-y-2">
+                {/* Navigation Links Mobile */}
+                {publicLinks?.map((link, idx) => (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={cn(
+                      'flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-all duration-300 group',
+                      pathname === link.href
+                        ? 'bg-gradient-to-r from-primary to-purple-600 text-primary-foreground shadow-lg'
+                        : 'hover:bg-primary/10 hover:translate-x-1 text-foreground'
+                    )}
+                    style={{
+                      animation: `slideIn 0.3s ease-out ${idx * 0.05}s both`,
+                    }}
+                  >
+                    <span
+                      className={cn(
+                        'group-hover:scale-110 transition-transform',
+                        pathname === link.href ? 'text-white' : 'text-primary'
+                      )}
+                    >
+                      {link.icon}
+                    </span>
+                    {link.label}
+                  </Link>
+                ))}
+
+                {/* Divider */}
+                <div className="h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent my-4" />
+
+                {/* Auth Buttons Mobile */}
+                <div className="flex flex-col gap-3 pt-2">
+                  <Button
+                    variant="outline"
+                    className="w-full h-11 font-semibold hover:scale-105 transition-transform"
+                    asChild
+                  >
+                    <Link href="/login">Entrar</Link>
+                  </Button>
+                  <Button
+                    className="w-full h-11 font-semibold shadow-lg hover:shadow-xl hover:scale-105 transition-all"
+                    asChild
+                  >
+                    <Link href="/register">Cadastrar</Link>
+                  </Button>
+                </div>
+              </div>
+
+              <style>{`
+                @keyframes slideIn {
+                  from {
+                    opacity: 0;
+                    transform: translateX(-10px);
+                  }
+                  to {
+                    opacity: 1;
+                    transform: translateX(0);
+                  }
+                }
+              `}</style>
             </div>
-          </div>
+          </>
         )}
       </div>
     </nav>
