@@ -44,7 +44,10 @@ export async function POST(req: NextRequest) {
     });
 
     if (payments.length === 0) {
-      return NextResponse.json({ data: [], message: 'Sem pagamentos no período' });
+      return NextResponse.json({
+        data: [],
+        message: 'Sem pagamentos no período',
+      });
     }
 
     const totals = new Map<string, number>();
@@ -77,6 +80,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ data: created });
   } catch (error) {
     console.error('[API /admin/payouts/generate]', error);
-    return NextResponse.json({ error: 'Erro ao gerar payouts' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Erro ao gerar payouts' },
+      { status: 500 }
+    );
   }
 }

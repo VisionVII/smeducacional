@@ -225,6 +225,22 @@ export async function processStripeWebhook(event: Stripe.Event) {
       };
     }
 
+    case 'account.updated': {
+      const account = data.object as Stripe.Account;
+      return {
+        type: 'account_updated',
+        account,
+      };
+    }
+
+    case 'payment_intent.succeeded': {
+      const paymentIntent = data.object as Stripe.PaymentIntent;
+      return {
+        type: 'payment_intent_succeeded',
+        paymentIntent,
+      };
+    }
+
     default:
       return {
         type: 'unknown',

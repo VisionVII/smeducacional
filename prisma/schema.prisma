@@ -409,6 +409,8 @@ model TeacherFinancial {
   canUploadLogo         Boolean   @default(false)
   canCustomizeDomain    Boolean   @default(false)
   canAccessAnalytics    Boolean   @default(false)
+  stripeConnectAccountId String?
+  connectOnboardingComplete Boolean @default(false)
   user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("teacher_financial")

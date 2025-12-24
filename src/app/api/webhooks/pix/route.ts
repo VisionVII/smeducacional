@@ -19,9 +19,14 @@ export async function POST(req: NextRequest) {
 
     const { sessionId, status, amount } = parsed.data;
 
-    const session = await prisma.checkoutSession.findFirst({ where: { stripeSessionId: sessionId } });
+    const session = await prisma.checkoutSession.findFirst({
+      where: { stripeSessionId: sessionId },
+    });
     if (!session) {
-      return NextResponse.json({ error: 'Sessão não encontrada' }, { status: 404 });
+      return NextResponse.json(
+        { error: 'Sessão não encontrada' },
+        { status: 404 }
+      );
     }
 
     if (status === 'paid') {
@@ -35,11 +40,21 @@ export async function POST(req: NextRequest) {
         },
       });
       await prisma.enrollment.create({
-        data: { studentId: session.userId, courseId: session.courseId, enrolledAt: new Date() },
+        data: {
+          studentId: session.userId,
+          courseId: session.courseId,
+          enrolledAt: new Date(),
+        },
       });
-      await prisma.checkoutSession.update({ where: { id: session.id }, data: { status: 'completed' } });
+      await prisma.checkoutSession.update({
+        where: { id: session.id },
+        data: { status: 'completed' },
+      });
     } else if (status === 'failed' || status === 'expired') {
-      await prisma.checkoutSession.update({ where: { id: session.id }, data: { status: 'canceled' } });
+      await prisma.checkoutSession.update({
+        where: { id: session.id },
+        data: { status: 'canceled' },
+      });
     }
 
     return NextResponse.json({ data: { ok: true } });

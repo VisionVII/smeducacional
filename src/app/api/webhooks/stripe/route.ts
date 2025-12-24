@@ -76,6 +76,13 @@ export async function POST(request: Request) {
         break;
       }
 
+      case 'account.updated': {
+        if (processed.account) {
+          await handleAccountUpdated(processed.account);
+        }
+        break;
+      }
+
       default:
         console.log('Unhandled Stripe event type:', event.type);
     }
@@ -447,37 +454,75 @@ async function handlePaymentIntentSucceeded(
     },
   });
 
-  // TODO: Implementar lógica de Stripe Connect Transfer
-  // Exemplo:
-  // if (teacher?.teacherFinancial?.stripeConnectAccountId) {
-  //   const sharePercent = 0.7; // 70% para o professor
-  //   const amount = Math.floor(course.price * sharePercent * 100); // em centavos
-  //
-  //   const stripe = getStripeClient();
-  //   const transfer = await stripe.transfers.create({
-  //     amount,
-  //     currency: 'brl',
-  //     destination: teacher.teacherFinancial.stripeConnectAccountId,
-  //     transfer_group: paymentIntent.id,
-  //     metadata: {
-  //       courseId,
-  //       teacherId: teacher.id,
-  //       type: 'course_payout',
-  //     },
-  //   });
-  //
-  //   // Registrar payout
-  //   await prisma.payout.create({
-  //     data: {
-  //       teacherId: teacher.id,
-  //       amount: course.price * sharePercent,
-  //       periodStart: new Date(),
-  //       periodEnd: new Date(),
-  //       status: 'paid',
-  //       transferId: transfer.id,
-  //     },
-  //   });
-  // }
+  // Stripe Connect Transfer para o professor
+  if (
+    teacher?.teacherFinancial?.stripeConnectAccountId &&
+    teacher.teacherFinancial.connectOnboardingComplete
+  ) {
+    try {
+      const sharePercent = 0.7; // 70% para o professor, 30% plataforma
+      const amountCents = Math.floor(course.price * sharePercent * 100); // em centavos
 
-  console.log('[Stripe Connect] Payout placeholder for course:', courseId);
+      const transfer = await stripe.transfers.create({
+        amount: amountCents,
+        currency: 'brl',
+        destination: teacher.teacherFinancial.stripeConnectAccountId,
+        transfer_group: paymentIntent.id,
+        metadata: {
+          courseId,
+          teacherId: teacher.id,
+          type: 'course_payout',
+        },
+      });
+
+      // Registrar payout
+      await prisma.payout.create({
+        data: {
+          teacherId: teacher.id,
+          amount: course.price * sharePercent,
+          periodStart: new Date(),
+          periodEnd: new Date(),
+          status: 'paid',
+          transferId: transfer.id,
+        },
+      });
+
+      console.log(
+        '[Stripe Connect] Transfer criado:',
+        transfer.id,
+        'para professor:',
+        teacher.id
+      );
+    } catch (error) {
+      console.error('[Stripe Connect] Erro ao criar transfer:', error);
+    }
+  } else {
+    console.log(
+      '[Stripe Connect] Professor sem conta Connect ou onboarding incompleto:',
+      teacher?.id
+    );
+  }
+}
+
+/**
+ * Trata atualização de conta Connect (onboarding completo)
+ */
+async function handleAccountUpdated(account: Stripe.Account) {
+  if (!account.id) return;
+
+  // Verificar se onboarding está completo
+  const isComplete = account.charges_enabled && account.payouts_enabled;
+
+  // Atualizar TeacherFinancial
+  await prisma.teacherFinancial.updateMany({
+    where: { stripeConnectAccountId: account.id },
+    data: { connectOnboardingComplete: isComplete },
+  });
+
+  console.log(
+    '[Stripe Connect] Account updated:',
+    account.id,
+    'Complete:',
+    isComplete
+  );
 }

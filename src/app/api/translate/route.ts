@@ -57,7 +57,10 @@ export async function POST(req: NextRequest) {
 
     if (!resp.ok) {
       const msg = await resp.text();
-      return NextResponse.json({ error: 'Falha na tradução', details: msg }, { status: 502 });
+      return NextResponse.json(
+        { error: 'Falha na tradução', details: msg },
+        { status: 502 }
+      );
     }
 
     const data = await resp.json();

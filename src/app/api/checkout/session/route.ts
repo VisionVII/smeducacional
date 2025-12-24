@@ -33,10 +33,16 @@ export async function POST(req: NextRequest) {
       select: { id: true, slug: true, title: true, price: true },
     });
     if (!course) {
-      return NextResponse.json({ error: 'Curso não encontrado' }, { status: 404 });
+      return NextResponse.json(
+        { error: 'Curso não encontrado' },
+        { status: 404 }
+      );
     }
     if (!course.price || course.price <= 0) {
-      return NextResponse.json({ error: 'Este curso é gratuito' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Este curso é gratuito' },
+        { status: 400 }
+      );
     }
 
     // Evitar checkout duplicado para matriculados
@@ -79,9 +85,15 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    return NextResponse.json({ sessionId: sessionData.id, url: sessionData.url });
+    return NextResponse.json({
+      sessionId: sessionData.id,
+      url: sessionData.url,
+    });
   } catch (error) {
     console.error('[API /checkout/session POST]', error);
-    return NextResponse.json({ error: 'Erro ao criar sessão de checkout' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Erro ao criar sessão de checkout' },
+      { status: 500 }
+    );
   }
 }

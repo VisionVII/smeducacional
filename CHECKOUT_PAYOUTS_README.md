@@ -52,6 +52,7 @@ Adicione no Vercel/ambiente de produção e em `.env.local` para desenvolvimento
 5. Após pagamento, webhook do provider atualiza `Payment`, `Enrollment` e `CheckoutSession.status`.
 
 Arquivos-chave:
+
 - `src/app/api/checkout/session/route.ts`
 - `src/lib/payments/*` (providers)
 - `src/app/api/webhooks/*` (confirmations)

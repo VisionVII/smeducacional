@@ -1,4 +1,8 @@
-export async function translate(text: string, to: string, from?: string): Promise<string> {
+export async function translate(
+  text: string,
+  to: string,
+  from?: string
+): Promise<string> {
   const resp = await fetch('/api/translate', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { useState } from 'react';
 import { translate } from '@/lib/translate';
@@ -22,7 +22,11 @@ export function Translator() {
       const translated = await translate(text, to, from || undefined);
       setResult(translated);
     } catch (error) {
-      toast({ title: 'Erro', description: (error as Error).message, variant: 'destructive' });
+      toast({
+        title: 'Erro',
+        description: (error as Error).message,
+        variant: 'destructive',
+      });
     } finally {
       setLoading(false);
     }
@@ -33,16 +37,31 @@ export function Translator() {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div>
           <Label htmlFor="from">De (opcional)</Label>
-          <Input id="from" placeholder="pt, es, fr..." value={from} onChange={(e) => setFrom(e.target.value)} />
+          <Input
+            id="from"
+            placeholder="pt, es, fr..."
+            value={from}
+            onChange={(e) => setFrom(e.target.value)}
+          />
         </div>
         <div>
           <Label htmlFor="to">Para</Label>
-          <Input id="to" placeholder="en, pt, es..." value={to} onChange={(e) => setTo(e.target.value)} />
+          <Input
+            id="to"
+            placeholder="en, pt, es..."
+            value={to}
+            onChange={(e) => setTo(e.target.value)}
+          />
         </div>
       </div>
       <div>
         <Label htmlFor="text">Texto</Label>
-        <Input id="text" placeholder="Digite o texto" value={text} onChange={(e) => setText(e.target.value)} />
+        <Input
+          id="text"
+          placeholder="Digite o texto"
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+        />
       </div>
       <div className="flex gap-2">
         <Button onClick={onTranslate} disabled={loading || !text}>
