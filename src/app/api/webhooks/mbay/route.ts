@@ -29,6 +29,13 @@ export async function POST(req: NextRequest) {
     }
 
     if (status === 'paid') {
+      if (!session.courseId) {
+        return NextResponse.json(
+          { error: 'CourseId n\u00e3o encontrado na sess\u00e3o' },
+          { status: 400 }
+        );
+      }
+
       await prisma.payment.create({
         data: {
           userId: session.userId,
