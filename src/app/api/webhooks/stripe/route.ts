@@ -440,6 +440,7 @@ async function handleInvoiceFailed(invoice: Stripe.Invoice) {
 async function handlePaymentIntentSucceeded(
   paymentIntent: Stripe.PaymentIntent
 ) {
+  const stripe = getStripeClient();
   const metadata = paymentIntent.metadata as Record<string, string>;
 
   // Apenas para compras de curso (não subscriptions)
