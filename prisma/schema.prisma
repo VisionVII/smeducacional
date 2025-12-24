@@ -90,6 +90,7 @@ model User {
   teacherFinancial          TeacherFinancial?
   teacherSubscription       TeacherSubscription?
   theme                     UserTheme?
+  payouts                   Payout[]
 
   @@map("users")
 }

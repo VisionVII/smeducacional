@@ -69,6 +69,13 @@ export async function POST(request: Request) {
         break;
       }
 
+      case 'payment_intent_succeeded': {
+        if (processed.paymentIntent) {
+          await handlePaymentIntentSucceeded(processed.paymentIntent);
+        }
+        break;
+      }
+
       default:
         console.log('Unhandled Stripe event type:', event.type);
     }
@@ -394,4 +401,83 @@ async function handleInvoiceFailed(invoice: Stripe.Invoice) {
   }
 
   console.log('Invoice failed:', invoice.id);
+}
+
+/**
+ * Trata payment intent succeeded (para Stripe Connect transfers)
+ */
+async function handlePaymentIntentSucceeded(
+  paymentIntent: Stripe.PaymentIntent
+) {
+  const metadata = paymentIntent.metadata as Record<string, string>;
+
+  // Apenas para compras de curso (não subscriptions)
+  if (metadata?.type !== 'course_purchase' || !metadata?.courseId) {
+    return;
+  }
+
+  const courseId = metadata.courseId;
+
+  // Buscar curso e instrutor
+  const course = await prisma.course.findUnique({
+    where: { id: courseId },
+    select: {
+      id: true,
+      instructorId: true,
+      price: true,
+    },
+  });
+
+  if (!course || !course.price) {
+    console.error('Course not found or no price:', courseId);
+    return;
+  }
+
+  // Buscar connected account do professor (se existir)
+  const teacher = await prisma.user.findUnique({
+    where: { id: course.instructorId },
+    select: {
+      id: true,
+      teacherFinancial: {
+        select: {
+          id: true,
+          // Adicionar campo stripeConnectAccountId no schema se necessário
+        },
+      },
+    },
+  });
+
+  // TODO: Implementar lógica de Stripe Connect Transfer
+  // Exemplo:
+  // if (teacher?.teacherFinancial?.stripeConnectAccountId) {
+  //   const sharePercent = 0.7; // 70% para o professor
+  //   const amount = Math.floor(course.price * sharePercent * 100); // em centavos
+  //
+  //   const stripe = getStripeClient();
+  //   const transfer = await stripe.transfers.create({
+  //     amount,
+  //     currency: 'brl',
+  //     destination: teacher.teacherFinancial.stripeConnectAccountId,
+  //     transfer_group: paymentIntent.id,
+  //     metadata: {
+  //       courseId,
+  //       teacherId: teacher.id,
+  //       type: 'course_payout',
+  //     },
+  //   });
+  //
+  //   // Registrar payout
+  //   await prisma.payout.create({
+  //     data: {
+  //       teacherId: teacher.id,
+  //       amount: course.price * sharePercent,
+  //       periodStart: new Date(),
+  //       periodEnd: new Date(),
+  //       status: 'paid',
+  //       transferId: transfer.id,
+  //     },
+  //   });
+  // }
+
+  console.log('[Stripe Connect] Payout placeholder for course:', courseId);
 }
