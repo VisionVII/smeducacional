@@ -36,7 +36,9 @@ export async function POST(req: NextRequest) {
           courseId: session.courseId,
           amount,
           status: 'COMPLETED',
-          provider: 'stripe_pix',
+          paymentMethod: 'pix',
+          type: 'course',
+          currency: 'BRL',
         },
       });
       await prisma.enrollment.create({

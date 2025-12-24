@@ -35,7 +35,9 @@ export async function POST(req: NextRequest) {
           courseId: session.courseId,
           amount,
           status: 'COMPLETED',
-          provider: 'mbay',
+          paymentMethod: 'mbway',
+          type: 'course',
+          currency: 'BRL',
         },
       });
       await prisma.enrollment.create({
