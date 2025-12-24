@@ -19,7 +19,7 @@ import { Star, Loader2 } from 'lucide-react';
 interface Course {
   id: string;
   title: string;
-  slug: string;
+  slug?: string;
   description: string;
   thumbnail?: string;
   isFeatured?: boolean;
