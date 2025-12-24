@@ -13,8 +13,9 @@ export async function POST(req: NextRequest) {
     const ip = getClientIP(req);
     const limit = await checkRateLimit(ip, { limit: 30, windowSeconds: 60 });
     if (!limit.success) {
+      const retryAfter = Math.ceil((limit.resetTime - Date.now()) / 1000);
       return NextResponse.json(
-        { error: `Muitas tentativas. Tente novamente em ${limit.retryAfter}s` },
+        { error: `Muitas tentativas. Tente novamente em ${retryAfter}s` },
         { status: 429 }
       );
     }
