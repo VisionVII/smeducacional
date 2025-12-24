@@ -7,7 +7,7 @@ const schema = z.object({
   teacherId: z.string().min(1).optional(),
   periodStart: z.string().datetime(),
   periodEnd: z.string().datetime(),
-  sharePercent: z.number().min(0).max(1).default(0.7),
+  // sharePercent removido - será calculado dinamicamente por professor
 });
 
 export async function POST(req: NextRequest) {
@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { teacherId, periodStart, periodEnd, sharePercent } = parsed.data;
+    const { teacherId, periodStart, periodEnd } = parsed.data;
     const start = new Date(periodStart);
     const end = new Date(periodEnd);
 
@@ -39,7 +39,21 @@ export async function POST(req: NextRequest) {
       },
       select: {
         amount: true,
-        course: { select: { instructorId: true } },
+        course: {
+          select: {
+            instructorId: true,
+            instructor: {
+              select: {
+                id: true,
+                teacherFinancial: {
+                  select: {
+                    subscriptionStatus: true,
+                  },
+                },
+              },
+            },
+          },
+        },
       },
     });
 
@@ -50,16 +64,28 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    const totals = new Map<string, number>();
+    const totals = new Map<string, { total: number; hasPaidPlan: boolean }>();
     for (const p of payments) {
-      const tId = p.course?.instructorId;
-      if (!tId) continue;
-      totals.set(tId, (totals.get(tId) ?? 0) + p.amount);
+      const instructor = p.course?.instructor;
+      if (!instructor) continue;
+
+      const tId = instructor.id;
+      const hasPaidPlan =
+        instructor.teacherFinancial?.subscriptionStatus === 'active';
+
+      if (!totals.has(tId)) {
+        totals.set(tId, { total: 0, hasPaidPlan });
+      }
+
+      const current = totals.get(tId)!;
+      current.total += p.amount;
     }
 
     const payoutsToCreate = [] as Array<{ teacherId: string; amount: number }>;
-    for (const [tId, total] of totals.entries()) {
-      const amount = Number((total * sharePercent).toFixed(2));
+    for (const [tId, data] of totals.entries()) {
+      // NOVA LÓGICA: 100% se plano pago, 70% se free
+      const sharePercent = data.hasPaidPlan ? 1.0 : 0.7;
+      const amount = Number((data.total * sharePercent).toFixed(2));
       payoutsToCreate.push({ teacherId: tId, amount });
     }
 

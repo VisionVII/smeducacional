@@ -285,6 +285,22 @@ async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
       },
     });
 
+    // ATUALIZAR TeacherFinancial.subscriptionStatus para refletir status da subscription
+    await prisma.teacherFinancial.updateMany({
+      where: { userId },
+      data: {
+        subscriptionStatus: status,
+        plan: plan,
+        subscriptionStartDate: new Date(
+          (subscription as any).current_period_start * 1000
+        ),
+        subscriptionExpiresAt: new Date(
+          (subscription as any).current_period_end * 1000
+        ),
+        lastPaymentDate: new Date(),
+      },
+    });
+
     console.log('Teacher subscription updated:', userId);
   }
 }
@@ -313,6 +329,14 @@ async function handleSubscriptionCancelled(subscription: Stripe.Subscription) {
     await prisma.teacherSubscription.update({
       where: { userId },
       data: { status: 'cancelled', cancelDate: new Date() },
+    });
+
+    // ATUALIZAR TeacherFinancial.subscriptionStatus para inactive
+    await prisma.teacherFinancial.updateMany({
+      where: { userId },
+      data: {
+        subscriptionStatus: 'inactive',
+      },
     });
 
     console.log('Teacher subscription cancelled:', userId);
@@ -448,7 +472,10 @@ async function handlePaymentIntentSucceeded(
       teacherFinancial: {
         select: {
           id: true,
-          // Adicionar campo stripeConnectAccountId no schema se necessário
+          stripeConnectAccountId: true,
+          connectOnboardingComplete: true,
+          subscriptionStatus: true,
+          plan: true,
         },
       },
     },
@@ -460,7 +487,10 @@ async function handlePaymentIntentSucceeded(
     teacher.teacherFinancial.connectOnboardingComplete
   ) {
     try {
-      const sharePercent = 0.7; // 70% para o professor, 30% plataforma
+      // NOVA LÓGICA: Professores com plano pago recebem 100%, free recebe 70%
+      const hasPaidPlan =
+        teacher.teacherFinancial.subscriptionStatus === 'active';
+      const sharePercent = hasPaidPlan ? 1.0 : 0.7; // 100% se pago, 70% se free
       const amountCents = Math.floor(course.price * sharePercent * 100); // em centavos
 
       const transfer = await stripe.transfers.create({
