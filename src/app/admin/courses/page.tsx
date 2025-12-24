@@ -637,7 +637,13 @@ export default function AdminCoursesPage() {
                               size="sm"
                               className="flex-1 text-xs"
                             >
-                              <Link href={`/courses/${course.id}`}>
+                              <Link
+                                href={
+                                  course.slug
+                                    ? `/courses/${course.slug}`
+                                    : `/admin/courses/${course.id}`
+                                }
+                              >
                                 <Eye className="h-3 w-3 mr-1" />
                                 Ver
                               </Link>
@@ -705,7 +711,13 @@ export default function AdminCoursesPage() {
                               size="sm"
                               className="flex-1 text-xs"
                             >
-                              <Link href={`/courses/${course.id}`}>
+                              <Link
+                                href={
+                                  course.slug
+                                    ? `/courses/${course.slug}`
+                                    : `/admin/courses/${course.id}`
+                                }
+                              >
                                 <Eye className="h-3 w-3 mr-1" />
                                 Preview
                               </Link>

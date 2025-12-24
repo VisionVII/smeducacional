@@ -10,6 +10,7 @@ import { calculateDiscount } from '@/lib/feature-gating';
 interface LockedCourseCardProps {
   course: {
     id: string;
+    slug?: string;
     title: string;
     price: number;
     compareAtPrice?: number | null;
@@ -64,7 +65,13 @@ export function LockedCourseCard({
               size="lg"
               className="bg-white text-orange-600 hover:bg-white/90"
             >
-              <Link href={`/courses/${course?.id ?? ''}/checkout`}>
+              <Link
+                href={
+                  course?.slug
+                    ? `/courses/${course.slug}/checkout`
+                    : `/courses/${course?.id ?? ''}/checkout`
+                }
+              >
                 <ShoppingCart className="h-4 w-4 mr-2" />
                 Comprar Agora
               </Link>
@@ -107,7 +114,13 @@ export function LockedCourseCard({
             size="lg"
             className="bg-white text-gray-900 hover:bg-white/90"
           >
-            <Link href={`/courses/${course?.id ?? ''}/checkout`}>
+            <Link
+              href={
+                course?.slug
+                  ? `/courses/${course.slug}/checkout`
+                  : `/courses/${course?.id ?? ''}/checkout`
+              }
+            >
               <ShoppingCart className="h-4 w-4 mr-2" />
               Comprar Curso
             </Link>

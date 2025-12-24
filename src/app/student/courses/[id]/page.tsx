@@ -18,6 +18,7 @@ async function getCourseWithProgress(courseId: string, studentId: string) {
         select: {
           id: true,
           title: true,
+          slug: true,
           price: true,
           isPaid: true,
           modules: {
@@ -98,6 +99,7 @@ export default async function StudentCoursePage({
     <CoursePlayer
       courseId={course.id}
       courseTitle={course.title}
+      courseSlug={course.slug}
       modules={course.modules}
       isEnrolled
       isCoursePaid={isCoursePaid}

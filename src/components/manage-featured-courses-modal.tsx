@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Dialog,
@@ -45,9 +45,25 @@ export function ManageFeaturedCoursesModal({
     new Set(courses.filter((c) => c.isFeatured).map((c) => c.id))
   );
 
+  // Atualizar selectedCourses quando modal abrir ou cursos mudarem
+  useEffect(() => {
+    if (isOpen) {
+      setSelectedCourses(
+        new Set(courses.filter((c) => c.isFeatured).map((c) => c.id))
+      );
+    }
+  }, [isOpen, courses]);
+
   const updateFeaturedMutation = useMutation({
     mutationFn: async (courseId: string) => {
       const newState = !selectedCourses.has(courseId);
+      console.log(
+        '[FEATURED-MODAL] Atualizando curso:',
+        courseId,
+        'para:',
+        newState
+      );
+
       const res = await fetch(`/api/admin/courses/${courseId}/featured`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -56,9 +72,12 @@ export function ManageFeaturedCoursesModal({
 
       if (!res.ok) {
         const error = await res.json();
+        console.error('[FEATURED-MODAL] Erro na API:', error);
         throw new Error(error.error || 'Erro ao atualizar curso');
       }
 
+      const data = await res.json();
+      console.log('[FEATURED-MODAL] Resposta da API:', data);
       return { courseId, newState };
     },
     onSuccess: (data) => {

@@ -42,6 +42,7 @@ interface Lesson {
 interface CoursePlayerProps {
   courseId: string;
   courseTitle: string;
+  courseSlug?: string;
   modules: Module[];
   isEnrolled: boolean;
   isCoursePaid: boolean;
@@ -50,6 +51,7 @@ interface CoursePlayerProps {
 export function CoursePlayer({
   courseId,
   courseTitle,
+  courseSlug,
   modules,
   isEnrolled,
   isCoursePaid,
@@ -326,7 +328,13 @@ export function CoursePlayer({
                           Compre o curso para acessar esta aula
                         </p>
                         <Button asChild>
-                          <Link href={`/courses/${courseId}`}>
+                          <Link
+                            href={
+                              courseSlug
+                                ? `/courses/${courseSlug}`
+                                : `/student/courses/${courseId}`
+                            }
+                          >
                             Ver detalhes do curso
                           </Link>
                         </Button>

@@ -40,6 +40,7 @@ export function CoursesCarousel({ courses }: CoursesCarouselProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
   const [isAutoPlay, setIsAutoPlay] = useState(true);
+  const SLIDE_DURATION_MS = 5000;
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
@@ -53,7 +54,7 @@ export function CoursesCarousel({ courses }: CoursesCarouselProps) {
 
     const interval = setInterval(() => {
       setCurrentIndex((prev) => (prev + 1) % courses.length);
-    }, 5000);
+    }, SLIDE_DURATION_MS);
 
     return () => clearInterval(interval);
   }, [isAutoPlay, courses.length]);
@@ -80,10 +81,14 @@ export function CoursesCarousel({ courses }: CoursesCarouselProps) {
   const currentCourse = courses[currentIndex];
 
   return (
-    <div className="relative w-full overflow-hidden rounded-xl bg-gradient-to-br from-gray-950 via-slate-900 to-gray-950">
+    <div className="relative w-full overflow-hidden rounded-none md:rounded-xl bg-gradient-to-br from-gray-950 via-slate-900 to-gray-950">
+      {/* Progress keyframes for active indicators */}
+      <style>{`
+        @keyframes progressFill { from { width: 0% } to { width: 100% } }
+      `}</style>
       {/* Mobile Shorts Layout */}
       <div className="block md:hidden">
-        <div className="relative h-screen max-h-[600px] w-full overflow-hidden">
+        <div className="relative h-[calc(100svh-64px)] w-full overflow-hidden">
           {/* Slides */}
           <div className="relative w-full h-full">
             {courses.map((course, index) => (
@@ -114,15 +119,20 @@ export function CoursesCarousel({ courses }: CoursesCarouselProps) {
                   {/* Top: Progress Indicators */}
                   <div className="flex gap-1">
                     {courses.map((_, idx) => (
-                      <button
+                      <div
                         key={idx}
-                        onClick={() => goToSlide(idx)}
-                        className={`flex-1 h-1 rounded-full transition-all duration-300 ${
-                          idx === currentIndex
-                            ? 'bg-white'
-                            : 'bg-white/40 hover:bg-white/60'
-                        }`}
-                      />
+                        className="flex-1 h-1 rounded-full bg-white/25 overflow-hidden"
+                      >
+                        {idx === currentIndex ? (
+                          <div
+                            key={`mobile-progress-${currentIndex}`}
+                            className="h-full bg-primary"
+                            style={{
+                              animation: `progressFill ${SLIDE_DURATION_MS}ms linear forwards`,
+                            }}
+                          />
+                        ) : null}
+                      </div>
                     ))}
                   </div>
 
@@ -207,7 +217,7 @@ export function CoursesCarousel({ courses }: CoursesCarouselProps) {
       </div>
 
       {/* Desktop Landscape Layout */}
-      <div className="hidden md:block relative h-96 lg:h-[500px] w-full overflow-hidden">
+      <div className="hidden md:block relative h-[calc(100svh-64px)] w-full overflow-hidden">
         {/* Slides */}
         <div className="relative w-full h-full">
           {courses.map((course, index) => (
@@ -316,7 +326,7 @@ export function CoursesCarousel({ courses }: CoursesCarouselProps) {
         </div>
 
         {/* Controls */}
-        <div className="absolute bottom-6 right-6 flex gap-2 z-10">
+        <div className="absolute bottom-8 right-8 flex gap-2 z-10">
           <button
             onClick={goToPrevious}
             className="p-2 rounded-full bg-white/20 hover:bg-white/30 text-white transition-all duration-300 backdrop-blur-sm"
@@ -333,19 +343,25 @@ export function CoursesCarousel({ courses }: CoursesCarouselProps) {
           </button>
         </div>
 
-        {/* Indicators */}
-        <div className="absolute bottom-6 left-6 flex gap-2 z-10">
+        {/* Indicators (desktop) - centered with animated active bar */}
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-2 z-10">
           {courses.map((_, index) => (
             <button
               key={index}
               onClick={() => goToSlide(index)}
-              className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                index === currentIndex
-                  ? 'w-8 bg-white'
-                  : 'bg-white/40 hover:bg-white/60'
-              }`}
+              className="group relative h-2 w-12 rounded-full bg-white/25 overflow-hidden"
               aria-label={`Ir para slide ${index + 1}`}
-            />
+            >
+              {index === currentIndex ? (
+                <span
+                  key={`desktop-progress-${currentIndex}`}
+                  className="absolute left-0 top-0 h-full bg-primary"
+                  style={{
+                    animation: `progressFill ${SLIDE_DURATION_MS}ms linear forwards`,
+                  }}
+                />
+              ) : null}
+            </button>
           ))}
         </div>
       </div>

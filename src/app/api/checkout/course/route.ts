@@ -26,6 +26,7 @@ export async function POST(request: Request) {
       where: { id: courseId },
       select: {
         id: true,
+        slug: true,
         title: true,
         price: true,
       },
@@ -70,7 +71,9 @@ export async function POST(request: Request) {
       coursePrice: course.price,
       userEmail: session.user.email,
       successUrl: `${process.env.NEXT_PUBLIC_URL}/checkout/success?courseId=${courseId}`,
-      cancelUrl: `${process.env.NEXT_PUBLIC_URL}/courses/${courseId}`,
+      cancelUrl: course.slug
+        ? `${process.env.NEXT_PUBLIC_URL}/courses/${course.slug}`
+        : `${process.env.NEXT_PUBLIC_URL}/courses`,
     });
 
     // Salvar sessão de checkout no banco

@@ -44,10 +44,11 @@ async function getCourse(slug: string) {
 export default async function CourseDetailPage({
   params,
 }: {
-  params: CourseParams;
+  params: Promise<CourseParams>;
 }) {
+  const resolvedParams = await params;
   const session = await auth();
-  const course = await getCourse(params.slug);
+  const course = await getCourse(resolvedParams.slug);
 
   if (!course) {
     notFound();
@@ -361,6 +362,7 @@ export default async function CourseDetailPage({
                         variant="banner"
                         course={{
                           id: course.id,
+                          slug: course.slug,
                           title: course.title,
                           price: course.price || 0,
                           compareAtPrice: course.compareAtPrice,

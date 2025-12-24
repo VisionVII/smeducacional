@@ -33,7 +33,7 @@ export async function GET(request: Request) {
     }
 
     if (category) {
-      where.category = { contains: category, mode: 'insensitive' };
+      where.categoryId = category;
     }
 
     const courses = await prisma.course.findMany({
