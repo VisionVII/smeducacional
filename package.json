@@ -18,6 +18,7 @@
     "db:seed": "tsx prisma/seed-complete.ts",
     "db:seed:payments": "tsx prisma/seed-payments.ts",
     "test:cron": "node scripts/test-cron.js",
+    "check:checkout": "node check-checkout-setup.js",
     "ai:security": "tsx salao-ia/secure-ops-ai/index.ts",
     "ai:security:quick": "tsx salao-ia/secure-ops-ai/index.ts --quick",
     "ai:security:deep": "tsx salao-ia/secure-ops-ai/index.ts --deep",
