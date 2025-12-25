@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import { Inter } from 'next/font/google';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 import './globals.css';
 import { ThemeProvider } from '@/components/theme-provider';
 import { Toaster } from '@/components/ui/toaster';
@@ -116,6 +117,7 @@ export default function RootLayout({
               {children}
               <Toaster />
               <CookieBanner />
+              <SpeedInsights />
             </QueryProvider>
           </AuthProvider>
         </ThemeProvider>
