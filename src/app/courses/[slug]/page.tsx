@@ -4,6 +4,7 @@ import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 import { Button } from '@/components/ui/button';
 import { LockedCourseCard } from '@/components/LockedCourseCard';
+import { CheckoutButton } from '@/components/checkout/CheckoutButton';
 import {
   Card,
   CardContent,
@@ -343,21 +344,12 @@ export default async function CourseDetailPage({
                 ) : session?.user ? (
                   isPaidCourse ? (
                     <>
-                      <form action="/api/checkout/course" method="POST">
-                        <input
-                          type="hidden"
-                          name="courseId"
-                          value={course.id}
-                        />
-                        <Button
-                          type="submit"
-                          className="w-full bg-gradient-theme text-white font-bold shadow-xl hover:shadow-2xl hover:scale-105 transition-all"
-                          size="lg"
-                        >
-                          <Award className="h-5 w-5 mr-2" />
-                          Comprar Curso
-                        </Button>
-                      </form>
+                      <CheckoutButton
+                        courseId={course.id}
+                        price={course.price}
+                        isPaid={true}
+                        isEnrolled={false}
+                      />
                       <LockedCourseCard
                         variant="banner"
                         course={{

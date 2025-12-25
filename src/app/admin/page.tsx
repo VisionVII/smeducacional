@@ -25,6 +25,8 @@ import {
 import { DashboardGrid } from '@/components/admin/dashboard-grid';
 import { StatCard } from '@/components/admin/stat-card';
 import { DashboardCard } from '@/components/admin/dashboard-card';
+import { RecentPayments } from '@/components/admin/recent-payments';
+import { PaymentStats } from '@/components/admin/payment-stats';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
   Card,
@@ -363,8 +365,14 @@ export default function AdminDashboard() {
               </Card>
             </div>
 
-            {/* Grid 2 colunas - Ações & Atividades */}
+            {/* Stats de Pagamento */}
+            <PaymentStats />
+
+            {/* Grid 2 colunas - Pagamentos & Atividades */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Pagamentos Recentes */}
+              <RecentPayments />
+
               {/* Ações Rápidas */}
               <Card className="border-2 hover:border-primary/50 transition-all hover:shadow-xl">
                 <CardHeader className="bg-gradient-to-r from-primary/5 via-purple-500/5 to-pink-500/5 border-b">

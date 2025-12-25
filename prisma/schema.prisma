@@ -459,6 +459,7 @@ model Payment {
   stripeIntentId        String?
   stripeStatus          String?
   metadata              Json?
+  isTest                Boolean              @default(false) // Indica se é pagamento de teste
   createdAt             DateTime             @default(now())
   updatedAt             DateTime             @updatedAt
   invoice               Invoice?

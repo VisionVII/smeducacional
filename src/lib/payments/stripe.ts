@@ -26,7 +26,6 @@ export const stripeProvider: PaymentProvider = {
 export const stripePixProvider: PaymentProvider = {
   id: 'stripe_pix',
   async createSession(input: CheckoutRequest): Promise<CheckoutSession> {
-    // Se o helper suportar payment_method_types, adapte aqui
     const session = await createCourseCheckoutSession({
       userId: input.userId,
       courseId: input.courseId,
@@ -36,7 +35,7 @@ export const stripePixProvider: PaymentProvider = {
       successUrl: input.successUrl,
       cancelUrl: input.cancelUrl,
       paymentMethodTypes: ['pix'],
-    } as any);
+    });
     return { id: session.id, url: session.url! };
   },
 };

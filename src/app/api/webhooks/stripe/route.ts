@@ -138,6 +138,9 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     });
 
     if (!existingEnrollment) {
+      // Detectar se é modo teste (chave começa com sk_test_)
+      const isTest = session.livemode === false;
+
       // Criar enrollment
       const enrollment = await prisma.enrollment.create({
         data: {
@@ -148,7 +151,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       });
 
       // Criar payment
-      await prisma.payment.create({
+      const payment = await prisma.payment.create({
         data: {
           userId,
           courseId,
@@ -158,15 +161,54 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
           currency: 'BRL',
           paymentMethod: 'credit_card',
           type: 'course',
-          status: 'completed',
+          status: 'COMPLETED',
+          isTest, // Marca como teste se for ambiente de teste
           metadata: {
             paymentIntentId:
               typeof session.payment_intent === 'string'
                 ? session.payment_intent
                 : 'unknown',
+            livemode: session.livemode,
           },
         },
-      }); // Criar fatura
+      });
+
+      // Criar notificação para TODOS os admins
+      const admins = await prisma.user.findMany({
+        where: { role: 'ADMIN' },
+        select: { id: true },
+      });
+
+      const user = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { email: true, name: true },
+      });
+
+      // Criar notificações para cada admin
+      await Promise.all(
+        admins.map((admin) =>
+          prisma.notification.create({
+            data: {
+              userId: admin.id,
+              title: isTest
+                ? '💳 Pagamento de Teste Recebido'
+                : '💰 Novo Pagamento Confirmado',
+              message: `${user?.name || 'Usuário'} comprou o curso "${
+                course.title
+              }" por ${new Intl.NumberFormat('pt-BR', {
+                style: 'currency',
+                currency: 'BRL',
+              }).format(course.price || 0)}${
+                isTest ? ' (AMBIENTE DE TESTE)' : ''
+              }`,
+              type: 'PAYMENT',
+              isRead: false,
+            },
+          })
+        )
+      );
+
+      // Criar fatura
       const invoiceNumber = `INV-${Date.now()}`;
       await prisma.invoice.create({
         data: {

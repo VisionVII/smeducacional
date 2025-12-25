@@ -239,15 +239,19 @@ export function BlockStructureOverlay({
  */
 interface PageStructureMapProps {
   blocks: Block[];
-  onSelectBlock: (index: number) => void;
+  onSelectBlock?: (index: number) => void;
+  onBlockClick?: (index: number) => void; // fallback para versões antigas
   selectedBlockIndex: number | null;
 }
 
 export function PageStructureMap({
   blocks,
   onSelectBlock,
+  onBlockClick,
   selectedBlockIndex,
 }: PageStructureMapProps) {
+  const handleSelectBlock = onSelectBlock ?? onBlockClick;
+
   return (
     <div className="w-64 bg-muted/30 border-l p-4 overflow-y-auto">
       <h3 className="text-sm font-semibold mb-3 flex items-center gap-2">
@@ -263,7 +267,7 @@ export function PageStructureMap({
           return (
             <button
               key={block.id}
-              onClick={() => onSelectBlock(index)}
+              onClick={() => handleSelectBlock?.(index)}
               className={cn(
                 'w-full text-left p-3 rounded-lg border-2 transition-all hover:shadow-md',
                 isSelected

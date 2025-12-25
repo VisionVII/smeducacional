@@ -63,6 +63,15 @@ export async function POST(request: Request) {
       );
     }
 
+    // Debug: validar dados antes de enviar ao Stripe
+    console.log('[Checkout/Course] Dados para Stripe:', {
+      courseId,
+      courseTitle: course.title,
+      coursePrice: course.price,
+      userEmail: session.user.email,
+      userId: session.user.id,
+    });
+
     // Criar sessão de checkout
     const checkoutSession = await createCourseCheckoutSession({
       userId: session.user.id,
@@ -75,6 +84,11 @@ export async function POST(request: Request) {
         ? `${process.env.NEXT_PUBLIC_URL}/courses/${course.slug}`
         : `${process.env.NEXT_PUBLIC_URL}/courses`,
     });
+
+    console.log(
+      '[Checkout/Course] Sessão criada com sucesso:',
+      checkoutSession.id
+    );
 
     // Salvar sessão de checkout no banco
     await prisma.checkoutSession.create({
@@ -89,14 +103,21 @@ export async function POST(request: Request) {
       },
     });
 
+    console.log('[Checkout/Course] Sessão salva no banco de dados');
+
     return NextResponse.json({
       sessionId: checkoutSession.id,
       url: checkoutSession.url,
     });
   } catch (error) {
-    console.error('Erro ao criar sessão de checkout:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('[Checkout/Course] Erro completo:', errorMessage);
+    console.error(
+      '[Checkout/Course] Stack:',
+      error instanceof Error ? error.stack : 'N/A'
+    );
     return NextResponse.json(
-      { error: 'Erro ao criar sessão de checkout' },
+      { error: `Erro ao criar sessão de checkout: ${errorMessage}` },
       { status: 500 }
     );
   }

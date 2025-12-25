@@ -7,8 +7,9 @@ export function getStripeClient() {
     throw new Error('Stripe secret key not configured');
   }
 
+  // Versão atual da API do Stripe
   return new Stripe(key, {
-    apiVersion: '2025-11-17.clover' as any,
+    apiVersion: '2025-11-17.clover',
   });
 }
 
@@ -34,6 +35,7 @@ export async function createCourseCheckoutSession({
   userEmail,
   successUrl,
   cancelUrl,
+  paymentMethodTypes = ['card'],
 }: {
   userId: string;
   courseId: string;
@@ -42,35 +44,66 @@ export async function createCourseCheckoutSession({
   userEmail: string;
   successUrl: string;
   cancelUrl: string;
+  paymentMethodTypes?: string[];
 }) {
-  const stripe = getStripeClient();
-  const session = await stripe.checkout.sessions.create({
-    customer_email: userEmail,
-    mode: 'payment',
-    payment_method_types: ['card'],
-    line_items: [
-      {
-        price_data: {
-          currency: 'brl',
-          product_data: {
-            name: courseTitle,
-            description: `Acesso ao curso: ${courseTitle}`,
-          },
-          unit_amount: Math.round(coursePrice * 100), // Stripe usa centavos
-        },
-        quantity: 1,
-      },
-    ],
-    success_url: successUrl,
-    cancel_url: cancelUrl,
-    metadata: {
-      userId,
-      courseId,
-      type: 'course_purchase',
-    },
+  // Validação antes de criar sessão
+  if (!userEmail || userEmail.trim() === '') {
+    throw new Error('Email do usuário é obrigatório para checkout');
+  }
+
+  const unitAmount = Math.round(coursePrice * 100);
+  if (unitAmount <= 0) {
+    throw new Error(
+      `Preço inválido: ${coursePrice} (resultou em unit_amount: ${unitAmount})`
+    );
+  }
+
+  console.log('[Stripe] Criando sessão de checkout:', {
+    courseTitle,
+    coursePrice,
+    unitAmount,
+    userEmail,
+    paymentMethodTypes,
   });
 
-  return session;
+  try {
+    const stripe = getStripeClient();
+    const session = await stripe.checkout.sessions.create({
+      customer_email: userEmail,
+      mode: 'payment',
+      payment_method_types:
+        paymentMethodTypes as Stripe.Checkout.SessionCreateParams.PaymentMethodType[],
+      line_items: [
+        {
+          price_data: {
+            currency: 'brl',
+            product_data: {
+              name: courseTitle,
+              description: `Acesso ao curso: ${courseTitle}`,
+            },
+            unit_amount: unitAmount,
+          },
+          quantity: 1,
+        },
+      ],
+      success_url: successUrl,
+      cancel_url: cancelUrl,
+      metadata: {
+        userId,
+        courseId,
+        type: 'course_purchase',
+      },
+    });
+
+    console.log('[Stripe] Sessão criada com sucesso:', session.id);
+    return session;
+  } catch (error) {
+    console.error(
+      '[Stripe] Erro ao criar sessão:',
+      error instanceof Error ? error.message : String(error)
+    );
+    throw error;
+  }
 }
 
 /**
