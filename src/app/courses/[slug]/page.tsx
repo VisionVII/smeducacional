@@ -80,85 +80,126 @@ export default async function CourseDetailPage({
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-purple-50 dark:from-slate-900 dark:to-slate-950">
-      <div className="max-w-7xl mx-auto px-4 py-8 sm:py-12">
-        <Link
-          href="/courses"
-          className="inline-flex items-center gap-2 text-primary hover:text-primary hover:text-opacity-80 font-medium mb-6 transition-colors group"
-        >
-          <span className="group-hover:-translate-x-1 transition-transform" />
-          Voltar para cursos
-        </Link>
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
+      {/* Breadcrumb */}
+      <div className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-40">
+        <div className="max-w-7xl mx-auto px-4 py-3 sm:py-4">
+          <Link
+            href="/courses"
+            className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary font-medium transition-colors group"
+          >
+            <svg
+              className="w-4 h-4 group-hover:-translate-x-1 transition-transform"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 19l-7-7 7-7"
+              />
+            </svg>
+            Voltar para cursos
+          </Link>
+        </div>
+      </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-10">
-          <div className="lg:col-span-2 space-y-8">
-            {course.thumbnail && (
-              <div className="relative group">
-                <div className="absolute inset-0 bg-gradient-to-t from-primary to-transparent bg-opacity-20 rounded-2xl" />
-                <div className="w-full h-72 sm:h-80 lg:h-96 rounded-2xl overflow-hidden shadow-2xl border-2 border-primary border-opacity-10 group-hover:shadow-3xl transition-all duration-500">
-                  <img
-                    src={course.thumbnail ?? undefined}
-                    alt={course.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                  />
-                </div>
-                <div className="absolute top-4 left-4">
-                  <span className="px-4 py-2 rounded-xl text-sm font-bold bg-gradient-theme text-white shadow-xl backdrop-blur-sm">
-                    {course.category.name}
-                  </span>
-                </div>
-              </div>
-            )}
-
+      <div className="max-w-7xl mx-auto px-4 py-6 sm:py-8 lg:py-12">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
+          {/* Conteúdo Principal - Coluna Esquerda (2/3) */}
+          <div className="lg:col-span-2 space-y-6 sm:space-y-8">
+          {/* Conteúdo Principal - Coluna Esquerda (2/3) */}
+          <div className="lg:col-span-2 space-y-6 sm:space-y-8">
+            {/* Header do Curso */}
             <div className="space-y-4">
-              {!course.thumbnail && (
-                <div className="mb-4">
-                  <span className="px-4 py-2 rounded-xl text-sm font-bold bg-gradient-theme text-white shadow-lg">
-                    {course.category.name}
-                  </span>
+              {/* Thumbnail */}
+              {course.thumbnail && (
+                <div className="relative group overflow-hidden rounded-2xl border-2 border-border shadow-xl">
+                  <div className="aspect-video w-full">
+                    <img
+                      src={course.thumbnail ?? undefined}
+                      alt={course.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                    />
+                  </div>
+                  {/* Overlay Gradient */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                  
+                  {/* Badge Categoria */}
+                  <div className="absolute top-4 left-4">
+                    <span className="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-bold bg-primary text-primary-foreground shadow-lg backdrop-blur-sm border border-white/10">
+                      {course.category.name}
+                    </span>
+                  </div>
                 </div>
               )}
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-gradient-theme-triple leading-tight">
-                {course.title}
-              </h1>
-              <p className="text-lg sm:text-xl text-muted-foreground leading-relaxed">
-                {course.description}
-              </p>
+
+              {/* Título e Descrição */}
+              <div className="space-y-3">
+                {!course.thumbnail && (
+                  <span className="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-bold bg-primary text-primary-foreground shadow-lg">
+                    {course.category.name}
+                  </span>
+                )}
+                <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-foreground leading-tight tracking-tight">
+                  {course.title}
+                </h1>
+                <p className="text-base sm:text-lg text-muted-foreground leading-relaxed">
+                  {course.description}
+                </p>
+              </div>
             </div>
 
-            <Card className="border-2 shadow-lg hover:shadow-xl transition-shadow">
-              <CardContent className="p-6">
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-6">
+            {/* Stats Cards */}
+            <Card className="border-2 shadow-sm">
+              <CardContent className="p-4 sm:p-6">
+            {/* Stats Cards */}
+            <Card className="border-2 shadow-sm">
+              <CardContent className="p-4 sm:p-6">
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
                   {course.level && (
-                    <div className="flex flex-col items-center justify-center p-3 bg-muted bg-opacity-50 rounded-xl">
-                      <Signal className="h-5 w-5 text-primary mb-2" />
-                      <span className="text-sm font-semibold text-center">
-                        {course.level}
+                    <div className="flex flex-col items-center justify-center p-3 sm:p-4 bg-muted/50 rounded-xl border transition-colors hover:bg-muted">
+                      <Signal className="h-5 w-5 text-primary mb-1.5" />
+                      <span className="text-xs text-muted-foreground mb-1">
+                        Nível
                       </span>
+                      <span className="text-sm font-bold">{course.level}</span>
                     </div>
                   )}
-                  <div className="flex flex-col items-center justify-center p-3 bg-muted bg-opacity-50 rounded-xl">
-                    <Clock className="h-5 w-5 text-primary mb-2" />
-                    <span className="text-sm font-semibold text-center">
-                      {Math.floor(totalDuration / 60)}h {totalDuration % 60}min
+                  <div className="flex flex-col items-center justify-center p-3 sm:p-4 bg-muted/50 rounded-xl border transition-colors hover:bg-muted">
+                    <Clock className="h-5 w-5 text-primary mb-1.5" />
+                    <span className="text-xs text-muted-foreground mb-1">
+                      Duração
+                    </span>
+                    <span className="text-sm font-bold">
+                      {Math.floor(totalDuration / 60)}h {totalDuration % 60}m
                     </span>
                   </div>
-                  <div className="flex flex-col items-center justify-center p-3 bg-muted bg-opacity-50 rounded-xl">
-                    <Users className="h-5 w-5 text-primary mb-2" />
-                    <span className="text-sm font-semibold text-center">
-                      {course._count.enrollments} alunos
+                  <div className="flex flex-col items-center justify-center p-3 sm:p-4 bg-muted/50 rounded-xl border transition-colors hover:bg-muted">
+                    <Users className="h-5 w-5 text-primary mb-1.5" />
+                    <span className="text-xs text-muted-foreground mb-1">
+                      Alunos
+                    </span>
+                    <span className="text-sm font-bold">
+                      {course._count.enrollments}
                     </span>
                   </div>
-                  <div className="flex flex-col items-center justify-center p-3 bg-muted bg-opacity-50 rounded-xl">
-                    <PlayCircle className="h-5 w-5 text-primary mb-2" />
-                    <span className="text-sm font-semibold text-center">
-                      {totalLessons} aulas
+                  <div className="flex flex-col items-center justify-center p-3 sm:p-4 bg-muted/50 rounded-xl border transition-colors hover:bg-muted">
+                    <PlayCircle className="h-5 w-5 text-primary mb-1.5" />
+                    <span className="text-xs text-muted-foreground mb-1">
+                      Aulas
                     </span>
+                    <span className="text-sm font-bold">{totalLessons}</span>
                   </div>
-                  <div className="flex flex-col items-center justify-center p-3 bg-muted bg-opacity-50 rounded-xl">
-                    <BookOpen className="h-5 w-5 text-primary mb-2" />
-                    <span className="text-sm font-semibold text-center">
-                      {course.modules.length} modulos
+                  <div className="flex flex-col items-center justify-center p-3 sm:p-4 bg-muted/50 rounded-xl border transition-colors hover:bg-muted">
+                    <BookOpen className="h-5 w-5 text-primary mb-1.5" />
+                    <span className="text-xs text-muted-foreground mb-1">
+                      Módulos
+                    </span>
+                    <span className="text-sm font-bold">
+                      {course.modules.length}
                     </span>
                   </div>
                 </div>
@@ -308,137 +349,183 @@ export default async function CourseDetailPage({
             </Card>
           </div>
 
+          {/* Sidebar - Coluna Direita (1/3) */}
           <div className="lg:col-span-1">
-            <Card className="lg:sticky lg:top-4 border-2 shadow-2xl hover:shadow-3xl transition-all overflow-hidden">
-              <div className="h-2 bg-gradient-theme" />
-              <CardHeader className="text-center space-y-4">
-                <div className="inline-flex w-full flex-col items-center justify-center p-6 bg-muted rounded-2xl border-2">
-                  {isPaidCourse ? (
-                    <>
-                      <div className="text-4xl sm:text-5xl font-black text-gradient-theme mb-2">
-                        R$ {(course.price || 0).toFixed(2)}
+            <div className="lg:sticky lg:top-24 space-y-6">
+              {/* Card de Compra/Preço */}
+              <Card className="border-2 shadow-xl overflow-hidden">
+                {/* Accent Bar */}
+                <div className="h-1 bg-primary" />
+                
+                <CardHeader className="pb-4">
+                  {/* Preço */}
+                  <div className="flex flex-col items-center justify-center p-6 bg-primary/5 rounded-xl border-2 border-primary/10">
+                    {isPaidCourse ? (
+                      <>
+                        <div className="text-5xl font-black text-primary mb-1">
+                          R$ {(course.price || 0).toFixed(2)}
+                        </div>
+                        <p className="text-sm font-medium text-muted-foreground">
+                          Pagamento único
+                        </p>
+                      </>
+                    ) : (
+                      <div className="text-5xl font-black text-green-600">
+                        GRÁTIS
                       </div>
-                      <p className="text-sm font-semibold text-muted-foreground">
-                        Pagamento único
-                      </p>
-                    </>
-                  ) : (
-                    <div className="text-4xl sm:text-5xl font-black text-gradient-theme">
-                      GRATUITO
-                    </div>
-                  )}
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-5 sm:space-y-6">
-                {isEnrolled ? (
-                  <Button
-                    asChild
-                    className="w-full bg-gradient-theme text-white font-bold shadow-xl hover:shadow-2xl hover:scale-105 transition-all"
-                    size="lg"
-                  >
-                    <Link href={`/student/courses/${course.id}`}>
-                      <PlayCircle className="h-5 w-5 mr-2" />
-                      Continuar Estudando
-                    </Link>
-                  </Button>
-                ) : session?.user ? (
-                  isPaidCourse ? (
-                    <>
-                      <CheckoutButton
-                        courseId={course.id}
-                        price={course.price}
-                        isPaid={true}
-                        isEnrolled={false}
-                      />
-                      <LockedCourseCard
-                        variant="banner"
-                        course={{
-                          id: course.id,
-                          slug: course.slug,
-                          title: course.title,
-                          price: course.price || 0,
-                          compareAtPrice: course.compareAtPrice,
-                          thumbnail: course.thumbnail,
-                          description: course.description,
-                        }}
-                      />
-                    </>
-                  ) : (
-                    <form
-                      action={`/api/courses/${course.id}/enroll`}
-                      method="POST"
-                    >
-                      <Button
-                        type="submit"
-                        className="w-full bg-gradient-theme text-white font-bold shadow-xl hover:shadow-2xl hover:scale-105 transition-all"
-                        size="lg"
-                      >
-                        <CheckCircle className="h-5 w-5 mr-2" />
-                        Matricular-se Agora
-                      </Button>
-                    </form>
-                  )
-                ) : (
-                  <Button
-                    asChild
-                    className="w-full bg-gradient-theme text-white font-bold shadow-xl hover:shadow-2xl hover:scale-105 transition-all"
-                    size="lg"
-                  >
-                    <Link href="/login">Fazer Login para Matricular</Link>
-                  </Button>
-                )}
+                    )}
+                  </div>
+                </CardHeader>
 
-                <div className="pt-5 border-t-2 space-y-3">
-                  <h4 className="font-bold text-sm uppercase tracking-wider text-muted-foreground mb-4">
-                    Este curso inclui
-                  </h4>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                    <div className="flex flex-col items-center p-3 bg-muted bg-opacity-30 rounded-lg">
-                      <BookOpen className="h-5 w-5 text-primary mb-1" />
-                      <span className="text-xs text-muted-foreground">
-                        Módulos
-                      </span>
-                      <span className="font-bold text-lg">
-                        {course.modules.length}
-                      </span>
-                    </div>
-                    <div className="flex flex-col items-center p-3 bg-muted bg-opacity-30 rounded-lg">
-                      <PlayCircle className="h-5 w-5 text-primary mb-1" />
-                      <span className="text-xs text-muted-foreground">
-                        Aulas
-                      </span>
-                      <span className="font-bold text-lg">{totalLessons}</span>
-                    </div>
-                    <div className="flex flex-col items-center p-3 bg-muted bg-opacity-30 rounded-lg">
-                      <Clock className="h-5 w-5 text-primary mb-1" />
-                      <span className="text-xs text-muted-foreground">
-                        Duração
-                      </span>
-                      <span className="font-bold text-lg">
-                        {Math.floor(totalDuration / 60)}h
-                      </span>
-                    </div>
-                    <div className="flex flex-col items-center p-3 bg-muted bg-opacity-30 rounded-lg">
-                      <Signal className="h-5 w-5 text-primary mb-1" />
-                      <span className="text-xs text-muted-foreground">
-                        Nível
-                      </span>
-                      <span className="font-bold text-sm">
-                        {course.level || 'Todos'}
-                      </span>
+                <CardContent className="space-y-4">
+                  {/* Botões de Ação */}
+                  {isEnrolled ? (
+                    <Button
+                      asChild
+                      className="w-full h-12 bg-primary hover:bg-primary/90 text-primary-foreground font-bold shadow-lg hover:shadow-xl transition-all"
+                      size="lg"
+                    >
+                      <Link href={`/student/courses/${course.id}`}>
+                        <PlayCircle className="h-5 w-5 mr-2" />
+                        Continuar Estudando
+                      </Link>
+                    </Button>
+                  ) : session?.user ? (
+                    isPaidCourse ? (
+                      <div className="space-y-3">
+                        <CheckoutButton
+                          courseId={course.id}
+                          price={course.price}
+                          isPaid={true}
+                          isEnrolled={false}
+                        />
+                        {/* Aviso de Curso Bloqueado */}
+                        <div className="p-4 bg-orange-50 dark:bg-orange-950/20 border-2 border-orange-200 dark:border-orange-900 rounded-xl">
+                          <div className="flex items-start gap-3">
+                            <div className="p-2 bg-orange-500 rounded-lg flex-shrink-0">
+                              <svg
+                                className="w-5 h-5 text-white"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                                />
+                              </svg>
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <h4 className="font-bold text-sm text-orange-900 dark:text-orange-100 mb-1">
+                                Curso Bloqueado
+                              </h4>
+                              <p className="text-xs text-orange-700 dark:text-orange-300">
+                                Adquira o acesso completo a este curso
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      <form
+                        action={`/api/courses/${course.id}/enroll`}
+                        method="POST"
+                      >
+                        <Button
+                          type="submit"
+                          className="w-full h-12 bg-primary hover:bg-primary/90 text-primary-foreground font-bold shadow-lg hover:shadow-xl transition-all"
+                          size="lg"
+                        >
+                          <CheckCircle className="h-5 w-5 mr-2" />
+                          Matricular-se Agora
+                        </Button>
+                      </form>
+                    )
+                  ) : (
+                    <Button
+                      asChild
+                      className="w-full h-12 bg-primary hover:bg-primary/90 text-primary-foreground font-bold shadow-lg hover:shadow-xl transition-all"
+                      size="lg"
+                    >
+                      <Link href="/login">Fazer Login para Matricular</Link>
+                    </Button>
+                  )}
+
+                  {/* Recursos Incluídos */}
+                  <div className="pt-4 border-t space-y-3">
+                    <h4 className="font-bold text-sm uppercase tracking-wider text-muted-foreground">
+                      Este curso inclui
+                    </h4>
+                    <div className="grid grid-cols-2 gap-2">
+                      <div className="flex flex-col items-center p-3 bg-muted/50 rounded-lg border">
+                        <BookOpen className="h-4 w-4 text-primary mb-1" />
+                        <span className="text-xs text-muted-foreground">
+                          Módulos
+                        </span>
+                        <span className="font-bold text-sm">
+                          {course.modules.length}
+                        </span>
+                      </div>
+                      <div className="flex flex-col items-center p-3 bg-muted/50 rounded-lg border">
+                        <PlayCircle className="h-4 w-4 text-primary mb-1" />
+                        <span className="text-xs text-muted-foreground">
+                          Aulas
+                        </span>
+                        <span className="font-bold text-sm">{totalLessons}</span>
+                      </div>
+                      <div className="flex flex-col items-center p-3 bg-muted/50 rounded-lg border">
+                        <Clock className="h-4 w-4 text-primary mb-1" />
+                        <span className="text-xs text-muted-foreground">
+                          Duração
+                        </span>
+                        <span className="font-bold text-sm">
+                          {Math.floor(totalDuration / 60)}h
+                        </span>
+                      </div>
+                      <div className="flex flex-col items-center p-3 bg-muted/50 rounded-lg border">
+                        <Signal className="h-4 w-4 text-primary mb-1" />
+                        <span className="text-xs text-muted-foreground">
+                          Nível
+                        </span>
+                        <span className="font-bold text-sm">
+                          {course.level || 'Todos'}
+                        </span>
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                <div className="pt-5 border-t-2 space-y-3">
-                  <h4 className="font-bold text-sm uppercase tracking-wider text-muted-foreground mb-4">
-                    Benefícios
-                  </h4>
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-3 p-3 bg-green-50 dark:bg-green-950 dark:bg-opacity-20 rounded-lg border border-green-200 dark:border-green-900">
-                      <Award className="h-5 w-5 text-green-600 dark:text-green-500 flex-shrink-0" />
-                      <span className="text-sm font-medium">
-                        Certificado de conclusão
+                  {/* Benefícios */}
+                  <div className="pt-4 border-t space-y-3">
+                    <h4 className="font-bold text-sm uppercase tracking-wider text-muted-foreground">
+                      Benefícios
+                    </h4>
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-3 p-3 bg-green-50 dark:bg-green-950/20 rounded-lg border border-green-200 dark:border-green-900">
+                        <Award className="h-4 w-4 text-green-600 dark:text-green-500 flex-shrink-0" />
+                        <span className="text-xs font-medium">
+                          Certificado de conclusão
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-3 p-3 bg-blue-50 dark:bg-blue-950/20 rounded-lg border border-blue-200 dark:border-blue-900">
+                        <FileText className="h-4 w-4 text-blue-600 dark:text-blue-500 flex-shrink-0" />
+                        <span className="text-xs font-medium">
+                          Materiais de apoio
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-3 p-3 bg-purple-50 dark:bg-purple-950/20 rounded-lg border border-purple-200 dark:border-purple-900">
+                        <Clock className="h-4 w-4 text-purple-600 dark:text-purple-500 flex-shrink-0" />
+                        <span className="text-xs font-medium">
+                          Acesso vitalício
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
                       </span>
                     </div>
                     <div className="flex items-center gap-3 p-3 bg-blue-50 dark:bg-blue-950 dark:bg-opacity-20 rounded-lg border border-blue-200 dark:border-blue-900">
