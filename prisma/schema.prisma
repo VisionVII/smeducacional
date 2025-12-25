@@ -756,6 +756,7 @@ enum NotificationType {
   GRADE
   SYSTEM
   MESSAGE
+  PAYMENT
 }
 
 enum CardStyle {

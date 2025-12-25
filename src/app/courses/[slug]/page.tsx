@@ -110,8 +110,6 @@ export default async function CourseDetailPage({
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
           {/* Conteúdo Principal - Coluna Esquerda (2/3) */}
           <div className="lg:col-span-2 space-y-6 sm:space-y-8">
-          {/* Conteúdo Principal - Coluna Esquerda (2/3) */}
-          <div className="lg:col-span-2 space-y-6 sm:space-y-8">
             {/* Header do Curso */}
             <div className="space-y-4">
               {/* Thumbnail */}
@@ -126,7 +124,7 @@ export default async function CourseDetailPage({
                   </div>
                   {/* Overlay Gradient */}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                  
+
                   {/* Badge Categoria */}
                   <div className="absolute top-4 left-4">
                     <span className="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-bold bg-primary text-primary-foreground shadow-lg backdrop-blur-sm border border-white/10">
@@ -152,9 +150,6 @@ export default async function CourseDetailPage({
               </div>
             </div>
 
-            {/* Stats Cards */}
-            <Card className="border-2 shadow-sm">
-              <CardContent className="p-4 sm:p-6">
             {/* Stats Cards */}
             <Card className="border-2 shadow-sm">
               <CardContent className="p-4 sm:p-6">
@@ -348,7 +343,6 @@ export default async function CourseDetailPage({
               </CardContent>
             </Card>
           </div>
-
           {/* Sidebar - Coluna Direita (1/3) */}
           <div className="lg:col-span-1">
             <div className="lg:sticky lg:top-24 space-y-6">
@@ -356,7 +350,7 @@ export default async function CourseDetailPage({
               <Card className="border-2 shadow-xl overflow-hidden">
                 {/* Accent Bar */}
                 <div className="h-1 bg-primary" />
-                
+
                 <CardHeader className="pb-4">
                   {/* Preço */}
                   <div className="flex flex-col items-center justify-center p-6 bg-primary/5 rounded-xl border-2 border-primary/10">
@@ -473,7 +467,9 @@ export default async function CourseDetailPage({
                         <span className="text-xs text-muted-foreground">
                           Aulas
                         </span>
-                        <span className="font-bold text-sm">{totalLessons}</span>
+                        <span className="font-bold text-sm">
+                          {totalLessons}
+                        </span>
                       </div>
                       <div className="flex flex-col items-center p-3 bg-muted/50 rounded-lg border">
                         <Clock className="h-4 w-4 text-primary mb-1" />
@@ -525,25 +521,6 @@ export default async function CourseDetailPage({
                 </CardContent>
               </Card>
             </div>
-          </div>
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-3 p-3 bg-blue-50 dark:bg-blue-950 dark:bg-opacity-20 rounded-lg border border-blue-200 dark:border-blue-900">
-                      <FileText className="h-5 w-5 text-blue-600 dark:text-blue-500 flex-shrink-0" />
-                      <span className="text-sm font-medium">
-                        Materiais de apoio
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-3 p-3 bg-purple-50 dark:bg-purple-950 dark:bg-opacity-20 rounded-lg border border-purple-200 dark:border-purple-900">
-                      <Clock className="h-5 w-5 text-purple-600 dark:text-purple-500 flex-shrink-0" />
-                      <span className="text-sm font-medium">
-                        Acesso vitalício
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
           </div>
         </div>
       </div>

@@ -60,14 +60,13 @@ export function PaymentStats() {
       <StatCard
         title="Receita Total"
         value={formatCurrency(stats.totalRevenue)}
-        description="Pagamentos confirmados (produção)"
-        icon={<DollarSign className="h-4 w-4 text-muted-foreground" />}
+        subtitle="Pagamentos confirmados (produção)"
+        icon={DollarSign}
         trend={
           stats.paymentsLast30days > 0
             ? {
-                value: stats.paymentsLast30days,
-                label: 'últimos 30 dias',
-                isPositive: true,
+                value: `${stats.paymentsLast30days} últimos 30 dias`,
+                positive: true,
               }
             : undefined
         }
@@ -76,14 +75,13 @@ export function PaymentStats() {
       <StatCard
         title="Últimas 24h"
         value={stats.paymentsLast24h.toString()}
-        description="Pagamentos confirmados hoje"
-        icon={<TrendingUp className="h-4 w-4 text-muted-foreground" />}
+        subtitle="Pagamentos confirmados hoje"
+        icon={TrendingUp}
         trend={
           stats.paymentsLast7days > 0
             ? {
-                value: stats.paymentsLast7days,
-                label: 'últimos 7 dias',
-                isPositive: true,
+                value: `${stats.paymentsLast7days} últimos 7 dias`,
+                positive: true,
               }
             : undefined
         }
@@ -92,16 +90,16 @@ export function PaymentStats() {
       <StatCard
         title="Pagamentos Teste"
         value={stats.testPayments.toString()}
-        description="Ambiente de desenvolvimento"
-        icon={<TestTube className="h-4 w-4 text-yellow-500" />}
+        subtitle="Ambiente de desenvolvimento"
+        icon={TestTube}
         className="bg-yellow-500/5 border-yellow-500/20"
       />
 
       <StatCard
         title="Receita de Teste"
         value={formatCurrency(stats.testRevenue)}
-        description="Não contabiliza na receita real"
-        icon={<CreditCard className="h-4 w-4 text-yellow-500" />}
+        subtitle="Não contabiliza na receita real"
+        icon={CreditCard}
         className="bg-yellow-500/5 border-yellow-500/20"
       />
     </div>

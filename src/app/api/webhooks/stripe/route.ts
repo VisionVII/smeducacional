@@ -222,12 +222,9 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
           description: `Compra de curso`,
           paymentId: '', // Será atualizado
         },
-      }); // Enviar email de confirmação
-      const user = await prisma.user.findUnique({
-        where: { id: userId },
-        select: { email: true, name: true },
       });
 
+      // Enviar email de confirmação (usando user já definido anteriormente)
       if (user?.email) {
         await sendPaymentSuccessEmail({
           email: user.email,
