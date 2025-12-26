@@ -60,6 +60,51 @@ export default function BecomeInstructorPage() {
         </div>
       </section>
 
+      {/* Planos e política de receitas */}
+      <section className="mb-16">
+        <h2 className="text-3xl font-bold text-center mb-4">
+          Planos para instrutores
+        </h2>
+        <p className="text-muted-foreground text-center max-w-3xl mx-auto mb-8">
+          Transparência total: aluno paga o valor do curso ao professor. No
+          plano Free, a plataforma retém 15% por venda. Em planos pagos,
+          cobramos uma mensalidade do professor e repassamos 100% do valor das
+          vendas.
+        </p>
+
+        <div className="grid md:grid-cols-2 gap-6">
+          <div className="border rounded-xl p-6 shadow-sm bg-white">
+            <p className="text-sm font-semibold text-primary mb-2">Free</p>
+            <h3 className="text-2xl font-bold mb-2">R$ 0/mês</h3>
+            <p className="text-sm text-muted-foreground mb-4">
+              15% de taxa por venda. Ideal para começar rápido.
+            </p>
+            <ul className="space-y-2 text-sm text-muted-foreground">
+              <li>• Publicação ilimitada de cursos</li>
+              <li>• Suporte e certificação incluídos</li>
+              <li>• Receba 85% do valor por venda</li>
+              <li>• Painel financeiro em tempo real</li>
+            </ul>
+          </div>
+
+          <div className="border rounded-xl p-6 shadow-sm bg-gradient-to-br from-primary/10 via-white to-white">
+            <p className="text-sm font-semibold text-primary mb-2">
+              Plano Pago
+            </p>
+            <h3 className="text-2xl font-bold mb-2">Mensalidade ao admin</h3>
+            <p className="text-sm text-muted-foreground mb-4">
+              0% de taxa por venda. Mensalidade fixa cobrada do professor.
+            </p>
+            <ul className="space-y-2 text-sm text-muted-foreground">
+              <li>• Repasse integral (100%) por venda</li>
+              <li>• Preferência em destaque no catálogo</li>
+              <li>• Espaços de anúncios opcionais para cursos</li>
+              <li>• Suporte prioritário e analytics avançado</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
       {/* Features Section */}
       <section className="bg-muted rounded-lg p-8 mb-16">
         <h2 className="text-3xl font-bold text-center mb-8">

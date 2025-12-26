@@ -80,6 +80,7 @@ export function Breadcrumbs() {
       <Link
         href="/"
         className="hover:text-foreground transition-colors flex items-center"
+        suppressHydrationWarning
       >
         <Home className="h-4 w-4" />
       </Link>
@@ -96,6 +97,7 @@ export function Breadcrumbs() {
               <Link
                 href={crumb.href}
                 className="hover:text-foreground transition-colors"
+                suppressHydrationWarning
               >
                 {crumb.label}
               </Link>

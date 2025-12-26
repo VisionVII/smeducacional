@@ -195,6 +195,11 @@ Validação:    Zod, React Hook Form
 - 🤖 [GitHub Copilot + MCP Setup](./COPILOT_MCP_SETUP.md)
 - ⚡ [Guia Rápido Copilot](./COPILOT_QUICKSTART.md)
 - ✅ [Verificação Copilot](./COPILOT_VERIFICATION.md)
+- 💳 **[Stripe Multi-País - Índice](./STRIPE_INDEX.md)** ⭐ NOVO
+  - 🚀 [Quick Start (5 min)](./STRIPE_QUICKSTART.md)
+  - 📘 [Configuração Completa](./STRIPE_INTERNATIONAL_CONFIG.md)
+  - 📊 [Resumo Executivo](./STRIPE_IMPLEMENTATION_SUMMARY.md)
+  - 🧪 [Guia de Testes Webhook](./WEBHOOK_STRIPE_TEST_GUIDE.md) ⚡ NOVO
 
 ---
 

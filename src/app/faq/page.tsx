@@ -79,6 +79,26 @@ const faqs = [
     ],
   },
   {
+    category: 'Instrutores e receitas',
+    questions: [
+      {
+        question: 'Como o professor recebe pelas vendas?',
+        answer:
+          'O aluno paga o valor do curso ao professor. Aplicamos uma taxa conforme o plano: no plano Free o repasse é de 85% (15% de taxa por venda), e em planos pagos o repasse é de 100% com uma mensalidade cobrada do professor.',
+      },
+      {
+        question: 'Existe mensalidade para professores?',
+        answer:
+          'Sim, em planos pagos cobramos uma mensalidade do professor para liberar 0% de taxa por venda. No plano Free não há mensalidade, apenas a taxa de 15% por venda.',
+      },
+      {
+        question: 'A plataforma vende espaços de anúncios?',
+        answer:
+          'Estamos preparando slots de anúncios no catálogo de cursos para professores destacados. A compra de anúncios é opcional e independente das taxas ou mensalidades.',
+      },
+    ],
+  },
+  {
     category: 'Suporte Técnico',
     questions: [
       {

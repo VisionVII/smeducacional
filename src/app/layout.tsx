@@ -49,9 +49,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="pt-BR" suppressHydrationWarning>
-      <head>
-        {/* Dark mode detection (next-themes) */}
+      <head suppressHydrationWarning>
+        {/* Dark mode detection - must use native <script> in head for beforeInteractive */}
         <script
+          suppressHydrationWarning
           dangerouslySetInnerHTML={{
             __html: `
               (function() {
@@ -71,6 +72,7 @@ export default function RootLayout({
         <ThemeScript />
         {/* Preload logo e favicon para carregamento instantâneo */}
         <script
+          suppressHydrationWarning
           dangerouslySetInnerHTML={{
             __html: `
               (function() {
@@ -103,7 +105,10 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className={`${inter.className} mobile-safe-area antialiased`}>
+      <body
+        className={`${inter.className} mobile-safe-area antialiased`}
+        suppressHydrationWarning
+      >
         <ThemeProvider
           attribute="class"
           defaultTheme="system"

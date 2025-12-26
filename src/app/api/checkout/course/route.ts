@@ -72,6 +72,22 @@ export async function POST(request: Request) {
       userId: session.user.id,
     });
 
+    // Construir URL de sucesso com protocolo e host dinâmicos
+    const baseUrl =
+      process.env.NEXT_PUBLIC_URL ||
+      (process.env.VERCEL_URL
+        ? `https://${process.env.VERCEL_URL}`
+        : 'http://localhost:3000');
+
+    const successUrl = new URL('/checkout/success', baseUrl);
+    successUrl.searchParams.set('courseId', courseId);
+    successUrl.searchParams.set('type', 'course_purchase');
+    successUrl.searchParams.set('session_id', '{CHECKOUT_SESSION_ID}');
+
+    const cancelUrl = course.slug
+      ? `${baseUrl}/courses/${course.slug}`
+      : `${baseUrl}/courses`;
+
     // Criar sessão de checkout
     const checkoutSession = await createCourseCheckoutSession({
       userId: session.user.id,
@@ -79,10 +95,8 @@ export async function POST(request: Request) {
       courseTitle: course.title,
       coursePrice: course.price,
       userEmail: session.user.email,
-      successUrl: `${process.env.NEXT_PUBLIC_URL}/checkout/success?courseId=${courseId}`,
-      cancelUrl: course.slug
-        ? `${process.env.NEXT_PUBLIC_URL}/courses/${course.slug}`
-        : `${process.env.NEXT_PUBLIC_URL}/courses`,
+      successUrl: successUrl.toString(),
+      cancelUrl,
     });
 
     console.log(

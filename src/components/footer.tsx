@@ -68,6 +68,7 @@ export function Footer() {
                 rel="noopener noreferrer"
                 className="hover:text-primary transition-colors p-2 hover:bg-accent rounded-md"
                 aria-label="Facebook"
+                suppressHydrationWarning
               >
                 <Facebook className="h-4 w-4 md:h-5 md:w-5" />
               </Link>
@@ -77,6 +78,7 @@ export function Footer() {
                 rel="noopener noreferrer"
                 className="hover:text-primary transition-colors p-2 hover:bg-accent rounded-md"
                 aria-label="Instagram"
+                suppressHydrationWarning
               >
                 <Instagram className="h-4 w-4 md:h-5 md:w-5" />
               </Link>
@@ -86,6 +88,7 @@ export function Footer() {
                 rel="noopener noreferrer"
                 className="hover:text-primary transition-colors p-2 hover:bg-accent rounded-md"
                 aria-label="LinkedIn"
+                suppressHydrationWarning
               >
                 <Linkedin className="h-4 w-4 md:h-5 md:w-5" />
               </Link>
@@ -95,6 +98,7 @@ export function Footer() {
                 rel="noopener noreferrer"
                 className="hover:text-primary transition-colors p-2 hover:bg-accent rounded-md"
                 aria-label="Twitter"
+                suppressHydrationWarning
               >
                 <Twitter className="h-4 w-4 md:h-5 md:w-5" />
               </Link>
@@ -104,6 +108,7 @@ export function Footer() {
                 rel="noopener noreferrer"
                 className="hover:text-primary transition-colors p-2 hover:bg-accent rounded-md"
                 aria-label="YouTube"
+                suppressHydrationWarning
               >
                 <Youtube className="h-4 w-4 md:h-5 md:w-5" />
               </Link>
@@ -120,6 +125,7 @@ export function Footer() {
                 <Link
                   href="/courses"
                   className="text-muted-foreground hover:text-primary transition-colors inline-block py-1"
+                  suppressHydrationWarning
                 >
                   Catálogo de Cursos
                 </Link>
@@ -128,6 +134,7 @@ export function Footer() {
                 <Link
                   href="/about"
                   className="text-muted-foreground hover:text-primary transition-colors inline-block py-1"
+                  suppressHydrationWarning
                 >
                   Sobre Nós
                 </Link>
@@ -136,6 +143,7 @@ export function Footer() {
                 <Link
                   href="/become-instructor"
                   className="text-muted-foreground hover:text-primary transition-colors inline-block py-1"
+                  suppressHydrationWarning
                 >
                   Seja um Instrutor
                 </Link>
@@ -144,6 +152,7 @@ export function Footer() {
                 <Link
                   href="/faq"
                   className="text-muted-foreground hover:text-primary transition-colors inline-block py-1"
+                  suppressHydrationWarning
                 >
                   FAQ
                 </Link>
@@ -161,6 +170,7 @@ export function Footer() {
                 <Link
                   href="/help"
                   className="text-muted-foreground hover:text-primary transition-colors inline-block py-1"
+                  suppressHydrationWarning
                 >
                   Central de Ajuda
                 </Link>
@@ -169,6 +179,7 @@ export function Footer() {
                 <Link
                   href="/contact"
                   className="text-muted-foreground hover:text-primary transition-colors inline-block py-1"
+                  suppressHydrationWarning
                 >
                   Contato
                 </Link>
@@ -177,6 +188,7 @@ export function Footer() {
                 <Link
                   href="/terms"
                   className="text-muted-foreground hover:text-primary transition-colors inline-block py-1"
+                  suppressHydrationWarning
                 >
                   Termos de Uso
                 </Link>
@@ -185,6 +197,7 @@ export function Footer() {
                 <Link
                   href="/privacy"
                   className="text-muted-foreground hover:text-primary transition-colors inline-block py-1"
+                  suppressHydrationWarning
                 >
                   Política de Privacidade
                 </Link>
@@ -193,6 +206,7 @@ export function Footer() {
                 <Link
                   href="/cookies"
                   className="text-muted-foreground hover:text-primary transition-colors inline-block py-1"
+                  suppressHydrationWarning
                 >
                   Política de Cookies
                 </Link>
@@ -211,6 +225,7 @@ export function Footer() {
                 <a
                   href="mailto:contato@smeducacional.com.br"
                   className="text-muted-foreground hover:text-primary transition-colors break-all"
+                  suppressHydrationWarning
                 >
                   contato@smeducacional.com.br
                 </a>
@@ -220,6 +235,7 @@ export function Footer() {
                 <a
                   href="tel:+5511999999999"
                   className="text-muted-foreground hover:text-primary transition-colors"
+                  suppressHydrationWarning
                 >
                   (11) 99999-9999
                 </a>
@@ -259,24 +275,28 @@ export function Footer() {
               <Link
                 href="/terms"
                 className="hover:text-primary transition-colors"
+                suppressHydrationWarning
               >
                 Termos
               </Link>
               <Link
                 href="/privacy"
                 className="hover:text-primary transition-colors"
+                suppressHydrationWarning
               >
                 Privacidade
               </Link>
               <Link
                 href="/lgpd"
                 className="hover:text-primary transition-colors"
+                suppressHydrationWarning
               >
                 LGPD
               </Link>
               <Link
                 href="/cookies"
                 className="hover:text-primary transition-colors"
+                suppressHydrationWarning
               >
                 Cookies
               </Link>
@@ -295,6 +315,7 @@ export function Footer() {
             <a
               href="mailto:visionvidevgri@proton.me"
               className="hover:text-primary"
+              suppressHydrationWarning
             >
               visionvidevgri@proton.me
             </a>

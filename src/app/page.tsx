@@ -466,6 +466,80 @@ export default function HomePage() {
         `}</style>
       </section>
 
+      {/* Modelos de receita para professores */}
+      <section className="container mx-auto px-4 py-16 md:py-20">
+        <div className="max-w-4xl mx-auto text-center mb-10">
+          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-semibold">
+            Para professores
+          </span>
+          <h2 className="text-3xl md:text-4xl font-bold mt-4 mb-3">
+            Planos claros e receita transparente
+          </h2>
+          <p className="text-muted-foreground max-w-3xl mx-auto">
+            Aluno paga diretamente o valor do curso ao professor. No plano Free
+            aplicamos 15% de taxa por venda. Em planos pagos cobramos uma
+            mensalidade do professor e repassamos 100% das vendas.
+          </p>
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto">
+          <div className="p-6 rounded-2xl border bg-white shadow-sm">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-xl font-semibold">Plano Free</h3>
+              <span className="text-sm font-semibold text-primary">
+                15% por venda
+              </span>
+            </div>
+            <p className="text-3xl font-bold mb-3">R$ 0/mês</p>
+            <p className="text-sm text-muted-foreground mb-4">
+              Comece sem mensalidade. Repasse líquido de 85% por venda.
+            </p>
+            <ul className="space-y-2 text-sm text-muted-foreground">
+              <li className="flex items-start gap-2">
+                <CheckCircle className="h-4 w-4 text-green-600 mt-0.5" />
+                Publicação de cursos sem limite
+              </li>
+              <li className="flex items-start gap-2">
+                <CheckCircle className="h-4 w-4 text-green-600 mt-0.5" />
+                Certificados e suporte incluídos
+              </li>
+              <li className="flex items-start gap-2">
+                <CheckCircle className="h-4 w-4 text-green-600 mt-0.5" />
+                Painel financeiro em tempo real
+              </li>
+            </ul>
+          </div>
+
+          <div className="p-6 rounded-2xl border bg-gradient-to-br from-primary/10 via-white to-white shadow-sm">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-xl font-semibold">Plano Pago</h3>
+              <span className="text-sm font-semibold text-primary">
+                0% por venda
+              </span>
+            </div>
+            <p className="text-3xl font-bold mb-3">Mensalidade ao admin</p>
+            <p className="text-sm text-muted-foreground mb-4">
+              Mensalidade fixa para remover taxas por venda e destravar
+              benefícios extras.
+            </p>
+            <ul className="space-y-2 text-sm text-muted-foreground">
+              <li className="flex items-start gap-2">
+                <CheckCircle className="h-4 w-4 text-green-600 mt-0.5" />
+                Repasse integral das vendas
+              </li>
+              <li className="flex items-start gap-2">
+                <CheckCircle className="h-4 w-4 text-green-600 mt-0.5" />
+                Destaque no catálogo e slots de anúncios opcionais
+              </li>
+              <li className="flex items-start gap-2">
+                <CheckCircle className="h-4 w-4 text-green-600 mt-0.5" />
+                Analytics avançado e suporte prioritário
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
       {/* CTA Section - Comece sua jornada com efeitos chamativo */}
       <section className="container mx-auto px-4 py-16 md:py-24">
         <div className="max-w-3xl mx-auto relative">

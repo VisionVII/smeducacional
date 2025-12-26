@@ -22,7 +22,7 @@ export async function GET() {
         course: {
           instructorId: teacherId,
         },
-        status: 'completed',
+        status: 'COMPLETED',
         type: 'course',
       },
       include: {
@@ -38,15 +38,51 @@ export async function GET() {
       },
     });
 
+    const teacherFinancial = await prisma.teacherFinancial.findUnique({
+      where: { userId: teacherId },
+    });
+
+    const plan = teacherFinancial?.plan?.toLowerCase() ?? 'free';
+    const commissionRate = plan === 'free' ? 0.15 : 0;
+    const revenueShare = 1 - commissionRate;
+    const net = (value: number | null | undefined) =>
+      (value || 0) * revenueShare;
+
     // Calcular métricas
-    const totalEarnings = payments.reduce((sum, p) => sum + p.amount * 0.7, 0);
+    const totalEarnings = payments.reduce((sum, p) => sum + net(p.amount), 0);
+    const grossEarnings = payments.reduce((sum, p) => sum + (p.amount || 0), 0);
+
+    // Buscar todas as transações para histórico
+    const allPayments = await prisma.payment.findMany({
+      where: {
+        course: {
+          instructorId: teacherId,
+        },
+        status: 'COMPLETED',
+      },
+      select: {
+        id: true,
+        amount: true,
+        type: true,
+        createdAt: true,
+        course: {
+          select: {
+            title: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      take: 50,
+    });
 
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
     const monthlyEarnings = payments
       .filter((p) => p.createdAt >= thirtyDaysAgo)
-      .reduce((sum, p) => sum + p.amount * 0.7, 0);
+      .reduce((sum, p) => sum + net(p.amount), 0);
 
     const fourteenDaysAgo = new Date();
     fourteenDaysAgo.setDate(fourteenDaysAgo.getDate() - 14);
@@ -54,12 +90,12 @@ export async function GET() {
     // Saldo pendente (últimos 14 dias - hold de chargeback)
     const pendingAmount = payments
       .filter((p) => p.createdAt > fourteenDaysAgo)
-      .reduce((sum, p) => sum + p.amount * 0.7, 0);
+      .reduce((sum, p) => sum + net(p.amount), 0);
 
     // Saldo disponível (mais de 14 dias)
     const availableAmount = payments
       .filter((p) => p.createdAt <= fourteenDaysAgo)
-      .reduce((sum, p) => sum + p.amount * 0.7, 0);
+      .reduce((sum, p) => sum + net(p.amount), 0);
 
     // Total de vendas
     const totalSales = payments.length;
@@ -80,7 +116,7 @@ export async function GET() {
             sales: 0,
           };
         }
-        courseRevenue[courseId].revenue += payment.amount * 0.7;
+        courseRevenue[courseId].revenue += net(payment.amount);
         courseRevenue[courseId].sales += 1;
       }
     });
@@ -89,13 +125,33 @@ export async function GET() {
       .sort((a, b) => b.revenue - a.revenue)
       .slice(0, 5);
 
+    // Últimas transações com mais detalhes
+    const recentTransactions = allPayments.slice(0, 20).map((p) => ({
+      id: p.id,
+      amount: net(p.amount),
+      type: p.type,
+      courseTitle: p.course?.title || 'Assinatura',
+      date: p.createdAt,
+    }));
+
     return NextResponse.json({
+      plan,
+      commissionRate,
+      grossEarnings,
       totalEarnings,
       monthlyEarnings,
       pendingAmount,
       availableAmount,
       totalSales,
       topCourses,
+      recentTransactions,
+      connectStatus: {
+        isActive: teacherFinancial?.connectOnboardingComplete || false,
+        accountId: teacherFinancial?.stripeConnectAccountId || null,
+        totalTransfers: (teacherFinancial as any)?.totalTransfers || 0,
+        totalEarningsOnFile: (teacherFinancial as any)?.totalEarnings || 0,
+        pendingBalance: (teacherFinancial as any)?.pendingBalance || 0,
+      },
     });
   } catch (error) {
     console.error('[teacher/earnings] Erro:', error);

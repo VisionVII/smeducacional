@@ -97,6 +97,7 @@ export function Navbar({ user, links }: NavbarProps) {
             href={getHomeHref()}
             className="flex items-center gap-2 flex-shrink-0"
             onClick={() => setMobileMenuOpen(false)}
+            suppressHydrationWarning
           >
             {!mounted || !branding.logoUrl ? (
               <Icon3D size="md" color="primary" rounded="full">
@@ -123,6 +124,7 @@ export function Navbar({ user, links }: NavbarProps) {
                     ? 'navbar-link-active bg-primary text-primary-foreground'
                     : 'hover:bg-accent hover:text-accent-foreground'
                 )}
+                suppressHydrationWarning
               >
                 {link.icon}
                 <span className="hidden lg:inline">{link.label}</span>
@@ -277,6 +279,7 @@ export function Navbar({ user, links }: NavbarProps) {
                       ? 'bg-primary text-primary-foreground'
                       : 'hover:bg-accent hover:text-accent-foreground active:scale-95'
                   )}
+                  suppressHydrationWarning
                 >
                   {link.icon}
                   {link.label}

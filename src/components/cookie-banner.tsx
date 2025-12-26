@@ -47,11 +47,16 @@ export function CookieBanner() {
               <Link
                 href="/cookies"
                 className="text-primary hover:underline ml-1"
+                suppressHydrationWarning
               >
                 Política de Cookies
               </Link>{' '}
               e
-              <Link href="/lgpd" className="text-primary hover:underline ml-1">
+              <Link
+                href="/lgpd"
+                className="text-primary hover:underline ml-1"
+                suppressHydrationWarning
+              >
                 LGPD
               </Link>
               .
@@ -59,7 +64,9 @@ export function CookieBanner() {
           </div>
           <div className="flex flex-col md:flex-row gap-2 shrink-0">
             <Button variant="outline" asChild>
-              <Link href="/cookies">Configurar</Link>
+              <Link href="/cookies" suppressHydrationWarning>
+                Configurar
+              </Link>
             </Button>
             <Button onClick={accept}>Aceitar cookies</Button>
           </div>

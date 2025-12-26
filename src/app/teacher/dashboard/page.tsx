@@ -22,6 +22,9 @@ import {
   Calendar,
   Target,
   Activity,
+  DollarSign,
+  CreditCard,
+  ArrowUpRight,
 } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
@@ -86,6 +89,61 @@ export default async function TeacherDashboard() {
     },
   });
 
+  // Buscar dados financeiros do professor
+  const payments = await prisma.payment.findMany({
+    where: {
+      userId: user.id,
+      status: 'COMPLETED',
+    },
+    select: {
+      id: true,
+      amount: true,
+      type: true,
+      status: true,
+      createdAt: true,
+      course: {
+        select: {
+          title: true,
+        },
+      },
+    },
+    orderBy: { createdAt: 'desc' },
+    take: 10,
+  });
+
+  // Buscar student subscriptions
+  const studentSubscriptions = await prisma.studentSubscription.findMany({
+    where: {
+      status: 'ACTIVE',
+    },
+    select: {
+      id: true,
+      plan: true,
+      createdAt: true,
+    },
+  });
+
+  // Buscar teacher financial info
+  const teacherFinancial = await prisma.teacherFinancial.findUnique({
+    where: { userId: user.id },
+    select: {
+      stripeConnectAccountId: true,
+      connectOnboardingComplete: true,
+    },
+  });
+
+  // Calcular totais
+  const totalCourseRevenue = payments
+    .filter((p) => p.type === 'course')
+    .reduce((acc, p) => acc + (p.amount || 0), 0);
+
+  const totalSubscriptionRevenue = payments
+    .filter((p) => p.type === 'subscription')
+    .reduce((acc, p) => acc + (p.amount || 0), 0);
+
+  const totalRevenue = totalCourseRevenue + totalSubscriptionRevenue;
+  const activeSubscriptions = studentSubscriptions.length;
+
   // Calcular estatísticas
   const totalStudents = courses.reduce(
     (acc, course) => acc + course._count.enrollments,
@@ -123,6 +181,11 @@ export default async function TeacherDashboard() {
     totalLessons,
     pendingMessages,
     profileCompletion,
+    totalRevenue,
+    totalCourseRevenue,
+    totalSubscriptionRevenue,
+    activeSubscriptions,
+    totalPayments: payments.length,
   };
 
   return (
@@ -175,9 +238,154 @@ export default async function TeacherDashboard() {
           />
         </div>
 
+        {/* Financial KPIs */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
+          <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden">
+            <div className="h-2 bg-gradient-to-r from-green-400 via-emerald-500 to-teal-600" />
+            <CardHeader className="px-5 sm:px-6 py-5">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-base">Receita Total</CardTitle>
+                <div className="p-2 bg-green-100 dark:bg-green-900/20 rounded-lg">
+                  <DollarSign className="h-4 w-4 text-green-600 dark:text-green-500" />
+                </div>
+              </div>
+              <CardDescription>Todas as transações concluídas</CardDescription>
+            </CardHeader>
+            <CardContent className="px-5 sm:px-6 pb-6 space-y-4">
+              <div>
+                <div className="text-3xl font-bold text-green-600 dark:text-green-500">
+                  R$ {(stats.totalRevenue / 100).toFixed(2)}
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {stats.totalPayments} transação(ões)
+                </p>
+              </div>
+
+              <div className="space-y-3 text-sm border-t pt-4">
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Cursos</span>
+                  <span className="font-semibold text-green-600">
+                    R$ {(stats.totalCourseRevenue / 100).toFixed(2)}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Subscriptions</span>
+                  <span className="font-semibold text-blue-600">
+                    R$ {(stats.totalSubscriptionRevenue / 100).toFixed(2)}
+                  </span>
+                </div>
+              </div>
+
+              <Button asChild size="sm" className="w-full" variant="outline">
+                <Link href="/teacher/earnings">Ver Detalhes</Link>
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden">
+            <div className="h-2 bg-gradient-to-r from-blue-400 via-blue-500 to-cyan-500" />
+            <CardHeader className="px-5 sm:px-6 py-5">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-base">Assinantes Ativos</CardTitle>
+                <div className="p-2 bg-blue-100 dark:bg-blue-900/20 rounded-lg">
+                  <CreditCard className="h-4 w-4 text-blue-600 dark:text-blue-500" />
+                </div>
+              </div>
+              <CardDescription>Planos de estudantes ativos</CardDescription>
+            </CardHeader>
+            <CardContent className="px-5 sm:px-6 pb-6 space-y-4">
+              <div>
+                <div className="text-3xl font-bold text-blue-600 dark:text-blue-500">
+                  {stats.activeSubscriptions}
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Gerando receita recorrente
+                </p>
+              </div>
+
+              {stats.activeSubscriptions > 0 && (
+                <div className="space-y-2 text-sm border-t pt-4">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">
+                      Receita mensal estimada
+                    </span>
+                    <span className="font-semibold text-blue-600">
+                      R$ {(totalSubscriptionRevenue / 100).toFixed(2)}
+                    </span>
+                  </div>
+                </div>
+              )}
+
+              <Button asChild size="sm" className="w-full" variant="outline">
+                <Link href="/teacher/earnings">Gerenciar</Link>
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden">
+            <div className="h-2 bg-gradient-to-r from-purple-400 via-purple-500 to-pink-500" />
+            <CardHeader className="px-5 sm:px-6 py-5">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-base">Conta Stripe</CardTitle>
+                <div className="p-2 bg-purple-100 dark:bg-purple-900/20 rounded-lg">
+                  <CreditCard className="h-4 w-4 text-purple-600 dark:text-purple-500" />
+                </div>
+              </div>
+              <CardDescription>Status Stripe Connect</CardDescription>
+            </CardHeader>
+            <CardContent className="px-5 sm:px-6 pb-6 space-y-4">
+              <div>
+                <Badge
+                  variant={
+                    teacherFinancial?.connectOnboardingComplete
+                      ? 'default'
+                      : 'secondary'
+                  }
+                  className={
+                    teacherFinancial?.connectOnboardingComplete
+                      ? 'bg-green-600'
+                      : ''
+                  }
+                >
+                  {teacherFinancial?.connectOnboardingComplete
+                    ? '✓ Ativada'
+                    : 'Ativar'}
+                </Badge>
+              </div>
+
+              {!teacherFinancial?.connectOnboardingComplete && (
+                <p className="text-xs text-muted-foreground">
+                  Ative Stripe Connect para receber os ganhos diretos
+                </p>
+              )}
+
+              {teacherFinancial?.connectOnboardingComplete && (
+                <div className="space-y-2 text-sm border-t pt-4">
+                  {teacherFinancial?.stripeConnectAccountId && (
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Conta</span>
+                      <span className="font-semibold">
+                        {teacherFinancial.stripeConnectAccountId}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              <Button asChild size="sm" className="w-full" variant="outline">
+                <Link href="/teacher/earnings">
+                  {teacherFinancial?.connectOnboardingComplete
+                    ? 'Detalhes'
+                    : 'Ativar Agora'}
+                </Link>
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+
         {/* Grid Principal - Atuação e Insights */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
-          {/* Coluna Esquerda - Atuação Pedagógica */}
+          {/* Coluna Esquerda - Atuação Pedagógica e Transações */}
           <div className="lg:col-span-2 space-y-4 sm:space-y-6">
             {/* Meus Cursos */}
             <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300">
@@ -289,7 +497,85 @@ export default async function TeacherDashboard() {
               </CardContent>
             </Card>
 
-            {/* Atividades Recentes */}
+            {/* Transações Recentes */}
+            {payments.length > 0 && (
+              <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300">
+                <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 px-5 sm:px-6 lg:px-8 py-6">
+                  <div className="space-y-1">
+                    <CardTitle className="text-lg sm:text-xl flex items-center gap-2">
+                      <div className="p-2 bg-gradient-to-r from-green-400 to-emerald-500 rounded-lg">
+                        <ArrowUpRight className="h-5 w-5 text-white" />
+                      </div>
+                      Transações Recentes
+                    </CardTitle>
+                    <CardDescription className="text-sm">
+                      Últimas {Math.min(10, payments.length)} transações
+                    </CardDescription>
+                  </div>
+                  <Button
+                    asChild
+                    size="sm"
+                    className="w-full sm:w-auto shrink-0"
+                  >
+                    <Link href="/teacher/earnings">Ver Todas</Link>
+                  </Button>
+                </CardHeader>
+                <CardContent className="px-4 sm:px-6 pb-5 sm:pb-6">
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b">
+                          <th className="text-left py-3 px-3 font-semibold text-muted-foreground">
+                            Data
+                          </th>
+                          <th className="text-left py-3 px-3 font-semibold text-muted-foreground">
+                            Descrição
+                          </th>
+                          <th className="text-left py-3 px-3 font-semibold text-muted-foreground">
+                            Tipo
+                          </th>
+                          <th className="text-right py-3 px-3 font-semibold text-muted-foreground">
+                            Valor
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {payments.map((payment) => (
+                          <tr
+                            key={payment.id}
+                            className="border-b hover:bg-muted/50 transition-colors"
+                          >
+                            <td className="py-3 px-3 text-xs">
+                              {new Date(payment.createdAt).toLocaleDateString(
+                                'pt-BR'
+                              )}
+                            </td>
+                            <td className="py-3 px-3">
+                              {payment.course?.title || 'Assinatura'}
+                            </td>
+                            <td className="py-3 px-3">
+                              <Badge
+                                variant="outline"
+                                className={
+                                  payment.type === 'course'
+                                    ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 border-blue-200'
+                                    : 'bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-300 border-purple-200'
+                                }
+                              >
+                                {payment.type === 'course' ? 'Curso' : 'Plano'}
+                              </Badge>
+                            </td>
+                            <td className="py-3 px-3 text-right font-semibold text-green-600 dark:text-green-500">
+                              R$ {(payment.amount / 100).toFixed(2)}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
             <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300">
               <CardHeader className="px-5 sm:px-6 lg:px-8 py-6">
                 <CardTitle className="flex items-center gap-2 text-lg">

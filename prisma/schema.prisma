@@ -91,6 +91,7 @@ model User {
   teacherSubscription       TeacherSubscription?
   theme                     UserTheme?
   payouts                   Payout[]
+  teacherAds                Advertisement[]            @relation("TeacherAds")
 
   @@map("users")
 }
@@ -149,6 +150,7 @@ model Course {
   modules                   Module[]
   payments                  Payment[]
   studentEnrollmentPayments StudentEnrollmentPayment[]
+  advertisements            Advertisement[]
 
   @@index([categoryId])
   @@index([instructorId])
@@ -468,6 +470,7 @@ model Payment {
   studentSubscription   StudentSubscription? @relation(fields: [studentSubscriptionId], references: [id])
   teacherSubscription   TeacherSubscription? @relation(fields: [teacherSubscriptionId], references: [id])
   user                  User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  advertisement         Advertisement?
 
   @@index([userId])
   @@index([courseId])
@@ -728,6 +731,26 @@ model SystemConfig {
   registerDescription String?  @default("Comece sua jornada de aprendizado hoje")
   registerTitle       String?  @default("Crie sua conta")
   themePresetId       String?  @default("academic-blue")
+  // Configurações de mensalidade e planos
+  freePlanCommission  Float    @default(0.15) // Taxa padrão plano Free (15%)
+  basicPlanPrice      Float    @default(9900) // R$ 99/mês em centavos
+  proPlanPrice        Float    @default(19900) // R$ 199/mês em centavos
+  premiumPlanPrice    Float    @default(39900) // R$ 399/mês em centavos
+  // Configurações de anúncios
+  adSlotPrice         Float    @default(19900) // Preço base por slot/mês
+  adSlotsAvailable    Int      @default(6) // Total de slots no catálogo
+  // Configurações Stripe e Pagamentos Internacionais
+  stripePublishableKey String?
+  stripeSecretKey      String?
+  stripeWebhookSecret  String?
+  defaultCurrency      String   @default("BRL") // Moeda padrão
+  supportedCurrencies  Json?    @default("[\"BRL\",\"USD\",\"EUR\"]") // Lista de moedas suportadas
+  pricesByCountry      Json?    // Preços específicos por país/moeda
+  paymentMethods       Json?    @default("{\"card\":true,\"boleto\":true,\"pix\":true}") // Métodos de pagamento habilitados
+  taxConfiguration     Json?    // Configurações de impostos por país
+  stripeAccountId      String?  // Stripe Connect Account ID (para marketplace)
+  autoPayoutEnabled    Boolean  @default(false) // Repasse automático para professores
+  payoutSchedule       String   @default("weekly") // daily, weekly, monthly
 
   @@map("system_configs")
 }
@@ -805,4 +828,62 @@ enum FontSize {
   NORMAL
   LARGE
   EXTRA_LARGE
+}
+
+enum AdSlotPosition {
+  HERO_BANNER       // Banner principal topo do catálogo
+  SIDEBAR_TOP       // Sidebar direita topo
+  SIDEBAR_MIDDLE    // Sidebar direita meio
+  GRID_FEATURED_1   // Grid destaque posição 1
+  GRID_FEATURED_2   // Grid destaque posição 2
+  GRID_FEATURED_3   // Grid destaque posição 3
+}
+
+enum AdStatus {
+  DRAFT
+  SCHEDULED
+  ACTIVE
+  PAUSED
+  COMPLETED
+  CANCELLED
+}
+
+model Advertisement {
+  id              String          @id @default(cuid())
+  courseId        String
+  teacherId       String
+  slotPosition    AdSlotPosition
+  status          AdStatus        @default(DRAFT)
+  priority        Int             @default(0) // Maior prioridade = mais destaque
+  startDate       DateTime
+  endDate         DateTime
+  price           Float           // Valor pago pelo slot
+  isPaid          Boolean         @default(false)
+  paymentId       String?         @unique
+  clicks          Int             @default(0)
+  impressions     Int             @default(0)
+  conversions     Int             @default(0) // Matrículas vindas do anúncio
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  course          Course          @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  teacher         User            @relation("TeacherAds", fields: [teacherId], references: [id], onDelete: Cascade)
+  payment         Payment?        @relation(fields: [paymentId], references: [id])
+  analytics       AdAnalytics[]
+
+  @@map("advertisements")
+}
+
+model AdAnalytics {
+  id              String        @id @default(cuid())
+  adId            String
+  date            DateTime      @default(now())
+  clicks          Int           @default(0)
+  impressions     Int           @default(0)
+  conversions     Int           @default(0)
+  ctr             Float         @default(0) // Click-through rate
+  conversionRate  Float         @default(0)
+  ad              Advertisement @relation(fields: [adId], references: [id], onDelete: Cascade)
+
+  @@index([adId, date])
+  @@map("ad_analytics")
 }

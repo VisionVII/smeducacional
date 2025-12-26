@@ -10,6 +10,8 @@ import {
   FolderTree,
   Settings,
   Palette,
+  DollarSign,
+  Grid3x3,
 } from 'lucide-react';
 
 export default async function AdminLayout({
@@ -43,6 +45,16 @@ export default async function AdminLayout({
       href: '/admin/categories',
       label: 'Categorias',
       icon: <FolderTree className="h-4 w-4" />,
+    },
+    {
+      href: '/admin/plans',
+      label: 'Planos',
+      icon: <DollarSign className="h-4 w-4" />,
+    },
+    {
+      href: '/admin/advertisements',
+      label: 'Anúncios',
+      icon: <Grid3x3 className="h-4 w-4" />,
     },
     {
       href: '/admin/ai-assistant',

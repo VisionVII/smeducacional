@@ -17,10 +17,21 @@ import {
   Wallet,
   Settings,
   BarChart3,
+  ArrowDownRight,
+  ArrowUpRight,
+  CheckCircle,
+  AlertCircle,
+  BookOpen,
 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import Link from 'next/link';
 
 interface EarningsData {
+  plan: string;
+  commissionRate: number;
+  grossEarnings: number;
   totalEarnings: number;
   monthlyEarnings: number;
   pendingAmount: number;
@@ -31,6 +42,20 @@ interface EarningsData {
     revenue: number;
     sales: number;
   }>;
+  recentTransactions: Array<{
+    id: string;
+    amount: number;
+    type: string;
+    courseTitle: string;
+    date: string;
+  }>;
+  connectStatus: {
+    isActive: boolean;
+    accountId: string | null;
+    totalTransfers: number;
+    totalEarningsOnFile: number;
+    pendingBalance: number;
+  };
 }
 
 export default function TeacherEarningsPage() {
@@ -59,10 +84,9 @@ export default function TeacherEarningsPage() {
       <div className="container mx-auto p-6 space-y-6">
         <Skeleton className="h-12 w-64" />
         <div className="grid gap-6 md:grid-cols-4">
-          <Skeleton className="h-32" />
-          <Skeleton className="h-32" />
-          <Skeleton className="h-32" />
-          <Skeleton className="h-32" />
+          {[...Array(4)].map((_, i) => (
+            <Skeleton key={i} className="h-32" />
+          ))}
         </div>
       </div>
     );
@@ -82,176 +106,484 @@ export default function TeacherEarningsPage() {
     );
   }
 
+  const commissionPercent = Math.round((earnings.commissionRate || 0) * 100);
+  const isFreePlan = earnings.plan?.toLowerCase() === 'free';
+
   return (
-    <div className="container mx-auto p-6 space-y-8">
-      {/* KPIs */}
-      <div className="grid gap-6 md:grid-cols-4">
-        <Card className="border-2 shadow-xl hover:shadow-2xl transition">
+    <div className="container mx-auto p-6 space-y-8 max-w-7xl">
+      {/* Header */}
+      <div className="space-y-2">
+        <h1 className="text-3xl font-bold">Ganhos e Receita</h1>
+        <p className="text-muted-foreground">
+          Gerencie seus ganhos, transações e configurações financeiras
+        </p>
+      </div>
+
+      {/* KPIs Principais */}
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+        {/* Total Geral */}
+        <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden">
+          <div className="h-1.5 bg-gradient-to-r from-green-400 via-emerald-500 to-teal-600" />
           <CardHeader className="pb-2">
             <div className="flex items-center justify-between">
               <CardTitle className="text-sm font-medium text-muted-foreground">
                 Ganhos Totais
               </CardTitle>
-              <DollarSign className="h-4 w-4 text-primary" />
+              <div className="p-2 bg-green-100 dark:bg-green-900/20 rounded-lg">
+                <DollarSign className="h-4 w-4 text-green-600 dark:text-green-500" />
+              </div>
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
-              R$ {earnings.totalEarnings.toFixed(2)}
+            <div className="text-3xl font-bold text-green-600">
+              R$ {(earnings.totalEarnings / 100).toFixed(2)}
             </div>
-            <p className="text-xs text-muted-foreground mt-1">
-              Lifetime earnings
+            <p className="text-xs text-muted-foreground mt-2">
+              {earnings.totalSales} transações · valores líquidos (
+              {Math.round(earnings.commissionRate * 100)}% de taxa no plano
+              atual)
             </p>
           </CardContent>
         </Card>
 
-        <Card className="border-2 shadow-xl hover:shadow-2xl transition">
+        {/* Mês Atual */}
+        <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden">
+          <div className="h-1.5 bg-gradient-to-r from-blue-400 via-blue-500 to-cyan-500" />
           <CardHeader className="pb-2">
             <div className="flex items-center justify-between">
               <CardTitle className="text-sm font-medium text-muted-foreground">
-                Mês Atual
+                Este Mês
               </CardTitle>
-              <TrendingUp className="h-4 w-4 text-primary" />
+              <div className="p-2 bg-blue-100 dark:bg-blue-900/20 rounded-lg">
+                <TrendingUp className="h-4 w-4 text-blue-600 dark:text-blue-500" />
+              </div>
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
-              R$ {earnings.monthlyEarnings.toFixed(2)}
+            <div className="text-3xl font-bold text-blue-600">
+              R$ {(earnings.monthlyEarnings / 100).toFixed(2)}
             </div>
-            <p className="text-xs text-green-600 mt-1">
-              {earnings.totalSales} vendas
+            <p className="text-xs text-muted-foreground mt-2">
+              Últimos 30 dias
             </p>
           </CardContent>
         </Card>
 
-        <Card className="border-2 shadow-xl hover:shadow-2xl transition">
+        {/* Pendente */}
+        <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden">
+          <div className="h-1.5 bg-gradient-to-r from-amber-400 via-orange-500 to-red-500" />
           <CardHeader className="pb-2">
             <div className="flex items-center justify-between">
               <CardTitle className="text-sm font-medium text-muted-foreground">
-                Saldo Pendente
+                Pendente
               </CardTitle>
-              <Clock className="h-4 w-4 text-primary" />
+              <div className="p-2 bg-orange-100 dark:bg-orange-900/20 rounded-lg">
+                <Clock className="h-4 w-4 text-orange-600 dark:text-orange-500" />
+              </div>
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
-              R$ {earnings.pendingAmount.toFixed(2)}
+            <div className="text-3xl font-bold text-orange-600">
+              R$ {(earnings.pendingAmount / 100).toFixed(2)}
             </div>
-            <p className="text-xs text-muted-foreground mt-1">
+            <p className="text-xs text-muted-foreground mt-2">
               Hold de 14 dias
             </p>
           </CardContent>
         </Card>
 
-        <Card className="border-2 shadow-xl hover:shadow-2xl transition">
+        {/* Disponível */}
+        <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden">
+          <div className="h-1.5 bg-gradient-to-r from-emerald-400 via-teal-500 to-green-600" />
           <CardHeader className="pb-2">
             <div className="flex items-center justify-between">
               <CardTitle className="text-sm font-medium text-muted-foreground">
                 Disponível
               </CardTitle>
-              <CreditCard className="h-4 w-4 text-primary" />
+              <div className="p-2 bg-emerald-100 dark:bg-emerald-900/20 rounded-lg">
+                <Wallet className="h-4 w-4 text-emerald-600 dark:text-emerald-500" />
+              </div>
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">
-              R$ {earnings.availableAmount.toFixed(2)}
+            <div className="text-3xl font-bold text-emerald-600">
+              R$ {(earnings.availableAmount / 100).toFixed(2)}
             </div>
-            <p className="text-xs text-muted-foreground mt-1">
+            <p className="text-xs text-muted-foreground mt-2">
               Pronto para saque
             </p>
           </CardContent>
         </Card>
       </div>
 
-      {/* Top Cursos */}
-      <Card className="border-2">
-        <CardHeader>
-          <div className="flex items-center gap-2">
-            <Trophy className="h-5 w-5 text-primary" />
-            <CardTitle>Cursos Mais Vendidos</CardTitle>
+      {/* Plano e política de comissão */}
+      <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300">
+        <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <div className="space-y-1">
+            <CardTitle className="text-base">Plano do professor</CardTitle>
+            <CardDescription>
+              Modelo de receitas: aluno paga o curso ao professor; a plataforma
+              retém a taxa do plano.
+            </CardDescription>
           </div>
-          <CardDescription>Seus cursos com maior receita</CardDescription>
+          <Badge
+            variant={isFreePlan ? 'secondary' : 'default'}
+            className={isFreePlan ? '' : 'bg-green-600'}
+          >
+            {isFreePlan
+              ? 'Free (15% por venda)'
+              : `${earnings.plan} (0% por venda)`}
+          </Badge>
         </CardHeader>
-        <CardContent>
-          {earnings.topCourses.length > 0 ? (
-            <div className="space-y-4">
-              {(() => {
-                const maxRevenue = Math.max(
-                  ...earnings.topCourses.map((c) => c.revenue)
-                );
-                return earnings.topCourses.map((course, index) => (
-                  <div key={index} className="space-y-2 p-4 rounded-xl border">
+        <CardContent className="grid gap-4 sm:grid-cols-3">
+          <div className="p-4 rounded-lg bg-muted/60">
+            <p className="text-xs text-muted-foreground mb-1">Repasse</p>
+            <p className="text-lg font-semibold text-foreground">
+              {100 - commissionPercent}% por venda
+            </p>
+            <p className="text-xs text-muted-foreground mt-1">
+              Taxa da plataforma: {commissionPercent}% (
+              {isFreePlan ? 'apenas no plano Free' : 'isenta em planos pagos'})
+            </p>
+          </div>
+          <div className="p-4 rounded-lg bg-muted/60">
+            <p className="text-xs text-muted-foreground mb-1">Mensalidade</p>
+            <p className="text-lg font-semibold text-foreground">
+              {isFreePlan ? 'R$ 0/mês' : 'Cobrança ao instrutor'}
+            </p>
+            <p className="text-xs text-muted-foreground mt-1">
+              Plano pago remove comissão por venda (configurado pelo admin)
+            </p>
+          </div>
+          <div className="p-4 rounded-lg bg-muted/60">
+            <p className="text-xs text-muted-foreground mb-1">Visão geral</p>
+            <p className="text-lg font-semibold text-foreground">
+              R$ {(earnings.grossEarnings / 100).toFixed(2)} bruto
+            </p>
+            <p className="text-xs text-muted-foreground mt-1">
+              Líquido recebido: R$ {(earnings.totalEarnings / 100).toFixed(2)}
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Status Stripe Connect */}
+      {!earnings.connectStatus.isActive && (
+        <Card className="border-l-4 border-l-amber-500 bg-amber-50/50 dark:bg-amber-900/20">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <AlertCircle className="h-5 w-5 text-amber-600" />
+                <div>
+                  <CardTitle className="text-base">
+                    Ativar Stripe Connect
+                  </CardTitle>
+                  <CardDescription>
+                    Conecte sua conta bancária para receber seus ganhos
+                  </CardDescription>
+                </div>
+              </div>
+              <Button asChild>
+                <Link href="/teacher/profile?tab=financial">Ativar Agora</Link>
+              </Button>
+            </div>
+          </CardHeader>
+        </Card>
+      )}
+
+      {earnings.connectStatus.isActive && (
+        <Card className="border-l-4 border-l-green-500 bg-green-50/50 dark:bg-green-900/20">
+          <CardHeader>
+            <div className="flex items-center gap-3">
+              <CheckCircle className="h-5 w-5 text-green-600" />
+              <div>
+                <CardTitle className="text-base">
+                  Stripe Connect Ativo
+                </CardTitle>
+                <CardDescription>
+                  Saldo total registrado: R${' '}
+                  {(earnings.connectStatus.totalEarningsOnFile / 100).toFixed(
+                    2
+                  )}{' '}
+                  | Transferências: R${' '}
+                  {(earnings.connectStatus.totalTransfers / 100).toFixed(2)}
+                </CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+        </Card>
+      )}
+
+      {/* Grid - Top Cursos + Transações */}
+      <div className="grid gap-6 lg:grid-cols-2">
+        {/* Top Cursos */}
+        <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300">
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <div className="p-2 bg-gradient-to-r from-yellow-400 to-amber-500 rounded-lg">
+                <Trophy className="h-5 w-5 text-white" />
+              </div>
+              <div>
+                <CardTitle>Cursos Mais Vendidos</CardTitle>
+                <CardDescription>Top 5 por receita</CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {earnings.topCourses.length > 0 ? (
+              <>
+                {earnings.topCourses.map((course, index) => (
+                  <div key={index} className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <div>
-                        <p className="font-semibold">{course.title}</p>
-                        <p className="text-sm text-muted-foreground">
-                          {course.sales} vendas
+                      <div className="flex-1">
+                        <p className="font-semibold text-sm line-clamp-1">
+                          {index + 1}. {course.title}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {course.sales} venda{course.sales !== 1 ? 's' : ''}
                         </p>
                       </div>
                       <div className="text-right">
-                        <p className="text-lg font-bold text-green-600">
-                          R$ {course.revenue.toFixed(2)}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          70% de comissão
+                        <p className="font-bold text-green-600">
+                          R$ {(course.revenue / 100).toFixed(2)}
                         </p>
                       </div>
                     </div>
-                    <div className="h-2 w-full rounded-md bg-muted">
+                    <div className="h-2 w-full rounded-full bg-muted overflow-hidden">
                       <div
-                        className="h-2 rounded-md bg-gradient-theme"
+                        className="h-full bg-gradient-to-r from-yellow-400 to-amber-500 rounded-full transition-all"
                         style={{
                           width: `${Math.max(
                             5,
                             Math.round(
-                              (course.revenue / (maxRevenue || 1)) * 100
+                              (course.revenue /
+                                Math.max(
+                                  ...earnings.topCourses.map((c) => c.revenue),
+                                  1
+                                )) *
+                                100
                             )
                           )}%`,
                         }}
                       />
                     </div>
                   </div>
-                ));
-              })()}
-            </div>
-          ) : (
-            <p className="text-center text-muted-foreground py-8">
-              Nenhuma venda ainda. Publique seus cursos para começar a ganhar!
-            </p>
-          )}
-        </CardContent>
-      </Card>
+                ))}
+              </>
+            ) : (
+              <div className="text-center py-8">
+                <p className="text-muted-foreground text-sm">
+                  Nenhuma venda ainda. Publique seus cursos para começar a
+                  ganhar!
+                </p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
 
-      {/* Info sobre comissões + Ações */}
-      <Card className="border-2">
+        {/* Estatísticas Rápidas */}
+        <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300">
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <div className="p-2 bg-gradient-to-r from-purple-400 to-pink-500 rounded-lg">
+                <BarChart3 className="h-5 w-5 text-white" />
+              </div>
+              <div>
+                <CardTitle>Resumo Financeiro</CardTitle>
+                <CardDescription>Visão geral de ganhos</CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="p-3 rounded-lg bg-muted/50">
+                <p className="text-xs text-muted-foreground mb-1">
+                  Total de Vendas
+                </p>
+                <p className="text-2xl font-bold">{earnings.totalSales}</p>
+              </div>
+              <div className="p-3 rounded-lg bg-muted/50">
+                <p className="text-xs text-muted-foreground mb-1">
+                  Cursos Vendidos
+                </p>
+                <p className="text-2xl font-bold">
+                  {earnings.topCourses.length}
+                </p>
+              </div>
+              <div className="p-3 rounded-lg bg-green-50 dark:bg-green-900/20">
+                <p className="text-xs text-muted-foreground mb-1">
+                  Ticket Médio
+                </p>
+                <p className="text-2xl font-bold text-green-600">
+                  R${' '}
+                  {(
+                    earnings.totalEarnings /
+                    Math.max(earnings.totalSales, 1) /
+                    100
+                  ).toFixed(2)}
+                </p>
+              </div>
+              <div className="p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20">
+                <p className="text-xs text-muted-foreground mb-1">
+                  Taxa de Conversão
+                </p>
+                <p className="text-2xl font-bold text-blue-600">-</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Transações Recentes */}
+      {earnings.recentTransactions.length > 0 && (
+        <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle>Transações Recentes</CardTitle>
+                <CardDescription>
+                  Últimas {earnings.recentTransactions.length} transações ·
+                  valores líquidos ({commissionPercent}% de taxa no plano
+                  aplicável)
+                </CardDescription>
+              </div>
+              <Button variant="outline" size="sm" asChild>
+                <Link href="#more-transactions">Ver Todas</Link>
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b">
+                    <th className="text-left py-3 px-4 font-semibold text-muted-foreground">
+                      Data
+                    </th>
+                    <th className="text-left py-3 px-4 font-semibold text-muted-foreground">
+                      Descrição
+                    </th>
+                    <th className="text-left py-3 px-4 font-semibold text-muted-foreground">
+                      Tipo
+                    </th>
+                    <th className="text-right py-3 px-4 font-semibold text-muted-foreground">
+                      Valor
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {earnings.recentTransactions.slice(0, 10).map((tx) => (
+                    <tr
+                      key={tx.id}
+                      className="border-b hover:bg-muted/50 transition-colors"
+                    >
+                      <td className="py-3 px-4 text-xs">
+                        {new Date(tx.date).toLocaleDateString('pt-BR')}
+                      </td>
+                      <td className="py-3 px-4">
+                        <div className="flex items-center gap-2">
+                          <ArrowUpRight className="h-4 w-4 text-green-600" />
+                          {tx.courseTitle}
+                        </div>
+                      </td>
+                      <td className="py-3 px-4">
+                        <Badge
+                          variant="outline"
+                          className={
+                            tx.type === 'course'
+                              ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 border-blue-200'
+                              : 'bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-300 border-purple-200'
+                          }
+                        >
+                          {tx.type === 'course' ? 'Curso' : 'Plano'}
+                        </Badge>
+                      </td>
+                      <td className="py-3 px-4 text-right font-semibold text-green-600">
+                        +R$ {(tx.amount / 100).toFixed(2)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Informações e Ações */}
+      <Card className="border-0 shadow-lg bg-gradient-to-r from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
         <CardContent className="p-6">
-          <div className="flex flex-col lg:flex-row lg:items-center gap-6">
-            <div className="flex-1">
-              <h3 className="font-semibold mb-2">Como funcionam os ganhos</h3>
-              <ul className="text-sm text-muted-foreground space-y-1">
-                <li>
-                  • Você recebe <strong>70%</strong> do valor de cada venda
+          <div className="grid md:grid-cols-2 gap-8">
+            <div>
+              <h3 className="font-semibold mb-4 text-lg">
+                Como funcionam os ganhos
+              </h3>
+              <ul className="space-y-3 text-sm text-muted-foreground">
+                <li className="flex items-start gap-3">
+                  <CheckCircle className="h-5 w-5 text-green-600 mt-0.5 shrink-0" />
+                  <span>
+                    <strong className="text-foreground">Repasse:</strong> Aluno
+                    paga o curso ao professor; plano Free repassa 85% (15% de
+                    taxa), planos pagos repassam 100%
+                  </span>
                 </li>
-                <li>• Hold de 14 dias para proteção contra chargebacks</li>
-                <li>• Saques disponíveis após período de hold</li>
-                <li>
-                  • Conecte sua conta bancária em{' '}
-                  <strong>Configurações Financeiras</strong>
+                <li className="flex items-start gap-3">
+                  <Clock className="h-5 w-5 text-orange-600 mt-0.5 shrink-0" />
+                  <span>
+                    <strong className="text-foreground">
+                      Hold de 14 dias:
+                    </strong>{' '}
+                    Proteção contra chargebacks
+                  </span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <CreditCard className="h-5 w-5 text-blue-600 mt-0.5 shrink-0" />
+                  <span>
+                    <strong className="text-foreground">Mensalidade:</strong>{' '}
+                    Planos pagos cobram mensalidade do professor e removem a
+                    taxa por venda
+                  </span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <Wallet className="h-5 w-5 text-emerald-600 mt-0.5 shrink-0" />
+                  <span>
+                    <strong className="text-foreground">Saques:</strong> Após o
+                    hold, transfira para sua conta via Stripe Connect
+                  </span>
                 </li>
               </ul>
             </div>
-            <div className="flex gap-3">
-              <a
-                href="/teacher/profile?tab=financeiro"
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border font-semibold hover:bg-muted transition"
-              >
-                <Settings className="h-4 w-4" />
-                Configurar Financeiro
-              </a>
-              <button className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-white font-semibold shadow hover:shadow-lg transition">
-                <CreditCard className="h-4 w-4" />
-                Solicitar Saque
-              </button>
+
+            <div className="space-y-4">
+              <div>
+                <h3 className="font-semibold mb-3 text-lg">Próximas Ações</h3>
+                <div className="space-y-2">
+                  <Button
+                    asChild
+                    className="w-full justify-start"
+                    variant="outline"
+                  >
+                    <Link href="/teacher/profile">
+                      <Settings className="h-4 w-4 mr-2" />
+                      Configurações Financeiras
+                    </Link>
+                  </Button>
+                  <Button
+                    asChild
+                    className="w-full justify-start"
+                    variant="outline"
+                  >
+                    <Link href="/teacher/courses">
+                      <BookOpen className="h-4 w-4 mr-2" />
+                      Criar Novo Curso
+                    </Link>
+                  </Button>
+                  <Button className="w-full justify-start">
+                    <DollarSign className="h-4 w-4 mr-2" />
+                    Solicitar Saque
+                  </Button>
+                </div>
+              </div>
             </div>
           </div>
         </CardContent>
