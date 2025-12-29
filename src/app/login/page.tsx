@@ -22,7 +22,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { GraduationCap, Home, ShieldCheck, Sparkles } from 'lucide-react';
+import { GraduationCap, Home, ShieldCheck } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { PasswordInput } from '@/components/password-input';
 import { useSystemBranding } from '@/hooks/use-system-branding';
@@ -38,6 +38,15 @@ const keyframes = `
     to {
       opacity: 1;
       transform: translateY(0);
+    }
+  }
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
     }
   }
 `;
@@ -192,69 +201,61 @@ export default function LoginPage() {
         {branding.loginBgUrl ? (
           <div className="absolute inset-0" style={loginBgStyle} />
         ) : (
-          <div className="absolute inset-0 bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950 dark:from-gray-950 dark:via-slate-900 dark:to-gray-950" />
+          <div className="absolute inset-0 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950" />
         )}
-        {/* Gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-b from-primary/20 via-transparent to-transparent opacity-40" />
+        {/* Gradient overlays para efeito mais sofisticado */}
+        <div className="absolute inset-0 bg-gradient-to-b from-primary/10 via-transparent to-primary/5 opacity-60" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-96 bg-primary/20 rounded-full filter blur-3xl opacity-20" />
+        <div className="absolute bottom-0 right-0 w-96 h-96 bg-purple-600/10 rounded-full filter blur-3xl opacity-20" />
       </div>
 
       {/* Content - só renderiza após mounted para evitar hydration mismatch */}
       {!mounted ? (
-        <div className="relative z-10 min-h-screen flex items-center justify-center">
+        <div className="relative z-10 h-screen flex items-center justify-center">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
         </div>
       ) : (
-        <div className="relative z-10 min-h-screen flex flex-col items-center justify-center px-4 py-8 sm:px-6 lg:px-8">
-          {/* Header Section */}
-          <div className="text-center mb-8 sm:mb-12 max-w-2xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-700">
-            <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-2 mb-6 backdrop-blur-sm hover:border-primary/50 hover:bg-primary/20 transition-all duration-300">
-              <Sparkles
-                className="h-4 w-4 text-primary animate-spin"
-                style={{ animationDuration: '3s' }}
-              />
-              <span className="text-sm font-medium text-primary">
-                Segurança de nível enterprise
-              </span>
-            </div>
-            <h1 className="text-4xl sm:text-5xl font-bold text-white mb-4 leading-tight">
-              {t.auth.login.welcomeBack}
-            </h1>
-            <p className="text-lg text-gray-300 leading-relaxed">
-              {branding.loginDescription || t.auth.login.subtitle}
-            </p>
-          </div>
-
-          {/* Card */}
+        <div className="relative z-10 h-screen w-full flex items-center justify-center px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+          {/* Card com design sofisticado */}
           <Card
-            className="w-full max-w-md relative shadow-2xl backdrop-blur-xl bg-background/80 border border-primary/20 hover:border-primary/40 transition-all duration-300"
-            style={{ animation: 'slideInUp 0.6s ease-out 0.2s both' }}
+            className="w-full max-w-sm relative shadow-2xl backdrop-blur-2xl bg-gradient-to-br from-background/95 to-background/90 border border-primary/30 hover:border-primary/50 transition-all duration-500"
+            style={{ animation: 'slideInUp 0.8s ease-out both' }}
           >
-            <CardHeader className="space-y-3 text-center px-6 pt-8">
-              <div className="flex justify-center mb-4">
+            {/* Borda luminosa subtle */}
+            <div className="absolute -inset-px bg-gradient-to-r from-primary/50 via-primary/20 to-primary/50 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10 blur-sm" />
+
+            <CardHeader className="space-y-2 text-center px-6 pt-8 pb-4">
+              <div className="flex justify-center mb-6">
                 {branding.logoUrl ? (
                   <Image
                     src={branding.logoUrl}
                     alt={branding.companyName}
                     width={180}
                     height={48}
-                    className="h-12 w-auto max-w-[180px] object-contain drop-shadow-lg"
+                    className="h-10 w-auto max-w-[160px] object-contain drop-shadow-lg"
                     priority
                     unoptimized
                   />
                 ) : (
-                  <div className="h-12 w-12 rounded-lg bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center shadow-lg">
-                    <GraduationCap className="h-7 w-7 text-white" />
+                  <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-primary via-primary to-purple-600 flex items-center justify-center shadow-lg">
+                    <GraduationCap className="h-6 w-6 text-white" />
                   </div>
                 )}
               </div>
-              <CardTitle className="text-2xl font-bold leading-tight">
+              <CardTitle className="text-xl font-semibold leading-tight text-foreground">
                 {branding.loginTitle || t.auth.login.title}
               </CardTitle>
+              <p className="text-xs text-muted-foreground">
+                {t.auth.login.subtitle || 'Acesse sua conta para continuar'}
+              </p>
             </CardHeader>
             <form onSubmit={handleSubmit}>
-              <CardContent className="space-y-5 px-6">
+              <CardContent className="space-y-4 px-6">
                 <div className="space-y-2">
-                  <Label htmlFor="email" className="text-sm font-medium">
+                  <Label
+                    htmlFor="email"
+                    className="text-xs font-semibold uppercase tracking-wide"
+                  >
                     {t.auth.login.email}
                   </Label>
                   <Input
@@ -268,7 +269,7 @@ export default function LoginPage() {
                     required
                     autoComplete="username"
                     inputMode="email"
-                    className="h-11 text-base bg-background/50 border-primary/20 hover:border-primary/40 focus:border-primary/60 transition-colors"
+                    className="h-10 text-sm bg-background/40 border border-primary/20 hover:border-primary/40 focus:border-primary/60 focus:ring-1 focus:ring-primary/30 transition-colors rounded-md"
                   />
                 </div>
 
@@ -284,8 +285,8 @@ export default function LoginPage() {
                   autoComplete="current-password"
                 />
 
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-2">
-                  <div className="flex items-center space-x-2 min-h-[44px]">
+                <div className="flex items-center justify-between pt-2">
+                  <div className="flex items-center space-x-2">
                     <Checkbox
                       id="rememberMe"
                       checked={formData.rememberMe}
@@ -295,28 +296,28 @@ export default function LoginPage() {
                           rememberMe: checked as boolean,
                         })
                       }
-                      className="touch-target h-5 w-5"
+                      className="h-4 w-4"
                     />
                     <label
                       htmlFor="rememberMe"
-                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer select-none"
+                      className="text-xs font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer select-none"
                     >
                       {t.auth.login.rememberMe}
                     </label>
                   </div>
                   <Link
                     href="/forgot-password"
-                    className="text-sm text-primary hover:text-primary/80 hover:underline touch-target no-tap-highlight font-medium min-h-[44px] flex items-center transition-colors"
+                    className="text-xs text-primary hover:text-primary/80 hover:underline font-medium transition-colors"
                   >
                     {t.auth.login.forgotPassword}
                   </Link>
                 </div>
               </CardContent>
-              <CardFooter className="flex flex-col space-y-4 px-6 pb-8">
+              <CardFooter className="flex flex-col space-y-3 px-6 pb-6 pt-2">
                 <Button
                   type="button"
                   variant="outline"
-                  className="w-full h-11 text-base border-primary/30 hover:border-primary/60 hover:bg-primary/10 transition-all duration-300"
+                  className="w-full h-10 text-sm border border-primary/30 hover:border-primary/60 hover:bg-primary/5 transition-all duration-300"
                   onClick={handleGoogleSignIn}
                   disabled={isLoading}
                 >
@@ -341,12 +342,12 @@ export default function LoginPage() {
                   {t.auth.login.withGoogle}
                 </Button>
 
-                <div className="relative">
+                <div className="relative py-2">
                   <div className="absolute inset-0 flex items-center">
-                    <span className="w-full border-t border-primary/20" />
+                    <span className="w-full border-t border-primary/15" />
                   </div>
-                  <div className="relative flex justify-center text-xs uppercase">
-                    <span className="bg-background/80 px-2 text-muted-foreground">
+                  <div className="relative flex justify-center text-xs">
+                    <span className="bg-background/90 px-2 text-muted-foreground">
                       {t.auth.login.or}
                     </span>
                   </div>
@@ -354,41 +355,31 @@ export default function LoginPage() {
 
                 <Button
                   type="submit"
-                  className="w-full h-11 text-base font-semibold bg-gradient-to-r from-primary via-primary to-purple-600 hover:shadow-lg hover:shadow-primary/50 transition-all duration-300"
+                  className="w-full h-10 text-sm font-semibold bg-gradient-to-r from-primary via-primary to-purple-600 hover:shadow-lg hover:shadow-primary/40 transition-all duration-300"
                   disabled={isLoading}
                 >
                   {isLoading ? t.common.loading : t.auth.login.submit}
                 </Button>
 
-                <div className="flex flex-col sm:flex-row items-center justify-between w-full gap-3 text-sm">
-                  <Link
-                    href="/"
-                    className="text-muted-foreground hover:text-primary flex items-center gap-1 touch-target no-tap-highlight transition-colors"
-                  >
-                    <Home className="h-4 w-4" />
-                    <span className="text-sm">{t.common.back}</span>
-                  </Link>
-                  <p className="text-muted-foreground text-center">
-                    {t.auth.login.noAccount}{' '}
+                <div className="pt-3 border-t border-primary/10">
+                  <div className="space-y-2 text-center text-xs">
+                    <p className="text-muted-foreground">
+                      {t.auth.login.noAccount}{' '}
+                      <Link
+                        href="/register"
+                        className="text-primary hover:text-primary/80 font-semibold hover:underline"
+                      >
+                        {t.auth.login.signUp}
+                      </Link>
+                    </p>
                     <Link
-                      href="/register"
-                      className="text-primary hover:underline font-medium touch-target no-tap-highlight"
+                      href="/"
+                      className="text-muted-foreground hover:text-primary inline-flex items-center gap-1 transition-colors"
                     >
-                      {t.auth.login.signUp}
+                      <Home className="h-3 w-3" />
+                      <span>{t.common.back}</span>
                     </Link>
-                  </p>
-                </div>
-
-                <div className="pt-4 border-t border-primary/20 text-center text-xs text-muted-foreground space-y-3">
-                  <p className="leading-relaxed">
-                    {t.auth.login.isTeacher}{' '}
-                    <Link
-                      href="/teacher"
-                      className="text-primary hover:underline font-medium touch-target no-tap-highlight"
-                    >
-                      {t.auth.login.joinProgram}
-                    </Link>
-                  </p>
+                  </div>
                 </div>
               </CardFooter>
             </form>
