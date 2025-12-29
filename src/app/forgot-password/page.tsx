@@ -189,7 +189,7 @@ export default function ForgotPasswordPage() {
 
         {/* Card */}
         <Card
-          className="w-full max-w-md relative shadow-2xl backdrop-blur-xl bg-background/80 border border-primary/20 hover:border-primary/40 transition-all duration-300"
+          className="w-full max-w-sm relative shadow-2xl backdrop-blur-2xl bg-gradient-to-br from-background/95 to-background/90 border border-primary/30 hover:border-primary/50 transition-all duration-500"
           style={{ animation: 'slideInUp 0.6s ease-out 0.2s both' }}
         >
           <CardHeader className="space-y-1 text-center">

@@ -134,7 +134,7 @@ export default function TeacherLoginPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-emerald-50 to-white dark:from-gray-900 dark:to-gray-800 p-4">
-      <Card className="w-full max-w-md">
+      <Card className="w-full max-w-sm relative shadow-2xl backdrop-blur-2xl bg-gradient-to-br from-background/95 to-background/90 border border-primary/30 hover:border-primary/50 transition-all duration-500">
         <CardHeader className="space-y-1 text-center">
           <div className="flex justify-center mb-4">
             <div className="h-12 w-12 rounded-full bg-emerald-100 flex items-center justify-center">
