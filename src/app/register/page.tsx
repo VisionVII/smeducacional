@@ -116,31 +116,13 @@ export default function RegisterPage() {
       {/* Content */}
       <div className="relative z-10 h-screen w-full flex items-center justify-center px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
         {/* Card com design sofisticado */}
-              style={{ animationDuration: '3s' }}
-            />
-            <span className="text-sm font-medium text-primary">
-              {mounted
-                ? t.auth.register.subtitle
-                : 'Junte-se à nossa comunidade'}
-            </span>
-          </div>
-          <h1 className="text-4xl sm:text-5xl font-bold text-white mb-4 leading-tight">
-            {mounted ? t.auth.register.title : 'Criar uma nova conta'}
-          </h1>
-          <p className="text-lg text-gray-300 leading-relaxed">
-            {mounted
-              ? t.auth.register.subtitle
-              : 'Preencha os dados abaixo para começar sua jornada de aprendizado'}
-          </p>
-        </div>
-
         <Card
           className="w-full max-w-sm relative shadow-2xl backdrop-blur-2xl bg-gradient-to-br from-background/95 to-background/90 border border-primary/30 hover:border-primary/50 transition-all duration-500"
           style={{ animation: 'slideInUp 0.8s ease-out both' }}
         >
           {/* Borda luminosa subtle */}
           <div className="absolute -inset-px bg-gradient-to-r from-primary/50 via-primary/20 to-primary/50 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10 blur-sm" />
-          
+
           <CardHeader className="space-y-2 text-center px-6 pt-8 pb-4">
             <div className="flex justify-center mb-6">
               {branding.logoUrl ? (
@@ -163,7 +145,9 @@ export default function RegisterPage() {
               {mounted ? t.auth.register.title : 'Criar conta'}
             </CardTitle>
             <p className="text-xs text-muted-foreground">
-              {mounted ? t.auth.register.subtitle : 'Preencha os dados para começar'}
+              {mounted
+                ? t.auth.register.subtitle
+                : 'Preencha os dados para começar'}
             </p>
           </CardHeader>
           <form onSubmit={handleSubmit}>
@@ -208,7 +192,10 @@ export default function RegisterPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="name" className="text-xs font-semibold uppercase tracking-wide">
+                <Label
+                  htmlFor="name"
+                  className="text-xs font-semibold uppercase tracking-wide"
+                >
                   {mounted ? t.auth.register.name : 'Nome Completo'}
                 </Label>
                 <Input
@@ -224,7 +211,10 @@ export default function RegisterPage() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="email" className="text-xs font-semibold uppercase tracking-wide">
+                <Label
+                  htmlFor="email"
+                  className="text-xs font-semibold uppercase tracking-wide"
+                >
                   {mounted ? t.auth.register.email : 'Email'}
                 </Label>
                 <Input
@@ -302,9 +292,7 @@ export default function RegisterPage() {
                     className="text-muted-foreground hover:text-primary inline-flex items-center gap-1 transition-colors"
                   >
                     <Home className="h-3 w-3" />
-                    <span>
-                      {mounted ? t.common.back : 'Voltar'}
-                    </span>
+                    <span>{mounted ? t.common.back : 'Voltar'}</span>
                   </Link>
                 </div>
               </div>
