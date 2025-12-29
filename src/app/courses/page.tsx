@@ -63,6 +63,7 @@ function CoursesClient() {
   const [mounted, setMounted] = useState(false);
   const [courses, setCourses] = useState<Course[]>([]);
   const [featuredCourses, setFeaturedCourses] = useState<Course[]>([]);
+  const [isFeaturedLoading, setIsFeaturedLoading] = useState(true);
   const [categories, setCategories] = useState<Category[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -73,6 +74,7 @@ function CoursesClient() {
 
   const loadData = async () => {
     setIsLoading(true);
+    setIsFeaturedLoading(true);
     setError(null);
     try {
       const [coursesRes, categoriesRes, featuredRes] = await Promise.all([
@@ -136,15 +138,19 @@ function CoursesClient() {
           try {
             const featuredData = await featuredRes.json();
             setFeaturedCourses(featuredData);
+            setIsFeaturedLoading(false);
           } catch (jsonError) {
             console.error('Erro ao parsear cursos promovidos:', jsonError);
             setFeaturedCourses([]);
+            setIsFeaturedLoading(false);
           }
         } else {
           setFeaturedCourses([]);
+          setIsFeaturedLoading(false);
         }
       } else {
         setFeaturedCourses([]);
+        setIsFeaturedLoading(false);
       }
     } catch (error) {
       console.error('Erro ao carregar dados:', error);
@@ -152,6 +158,7 @@ function CoursesClient() {
       setCourses([]);
       setCategories([]);
       setFeaturedCourses([]);
+      setIsFeaturedLoading(false);
     } finally {
       setIsLoading(false);
       console.log('[Courses] Carregamento finalizado');
@@ -209,11 +216,22 @@ function CoursesClient() {
       <AdaptiveNavbar />
 
       {/* Featured Carousel - Primeira Camada */}
-      {featuredCourses.length > 0 && (
-        <section className="relative w-full">
-          <CoursesCarousel courses={featuredCourses} />
-        </section>
-      )}
+      <section className="relative w-full">
+        {isFeaturedLoading ? (
+          <div className="container mx-auto px-4 py-8 grid grid-cols-1 md:grid-cols-3 gap-4">
+            {Array.from({ length: 3 }).map((_, idx) => (
+              <div
+                key={idx}
+                className="aspect-[4/3] rounded-2xl bg-muted/40 animate-pulse border border-border"
+              />
+            ))}
+          </div>
+        ) : (
+          featuredCourses.length > 0 && (
+            <CoursesCarousel courses={featuredCourses} />
+          )
+        )}
+      </section>
 
       {/* Hero Section */}
       <section className="bg-primary/5 dark:bg-primary/10 py-12 md:py-16">
