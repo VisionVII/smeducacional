@@ -46,13 +46,6 @@ const animationsSchema = z
   })
   .optional();
 
-const landingThemeSchema = z.object({
-  palette: paletteSchema,
-  layout: layoutSchema,
-  animations: animationsSchema.optional(),
-  themeName: z.string().nullable().optional(),
-});
-
 // Schema para updates parciais (permite qualquer combinação de campos)
 const partialThemeSchema = z
   .object({
@@ -111,22 +104,25 @@ export async function PUT(request: NextRequest) {
       select: { landingTheme: true },
     });
 
-    const currentTheme = currentUser?.landingTheme as any;
+    const currentTheme = currentUser?.landingTheme as Record<
+      string,
+      unknown
+    > | null;
 
     // Merge do tema atual com as atualizações
     const mergedTheme = {
-      palette: parsed.data.palette ?? currentTheme?.palette,
-      layout: parsed.data.layout ?? currentTheme?.layout,
-      animations: parsed.data.animations ?? currentTheme?.animations,
+      palette: parsed.data.palette ?? (currentTheme?.palette as any),
+      layout: parsed.data.layout ?? (currentTheme?.layout as any),
+      animations: parsed.data.animations ?? (currentTheme?.animations as any),
       themeName:
         parsed.data.themeName !== undefined
           ? parsed.data.themeName
-          : currentTheme?.themeName,
-    };
+          : (currentTheme?.themeName as string | null | undefined) ?? null,
+    } as any;
 
     const updated = await prisma.user.update({
       where: { id: session.user.id },
-      data: { landingTheme: mergedTheme },
+      data: { landingTheme: mergedTheme as any },
       select: { landingTheme: true },
     });
 

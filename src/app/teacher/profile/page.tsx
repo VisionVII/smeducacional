@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { useSession } from 'next-auth/react';
 import { useState, useEffect } from 'react';
 import {
@@ -15,7 +16,6 @@ import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/ui/use-toast';
 import {
   User,
-  Mail,
   Lock,
   Save,
   GraduationCap,
@@ -55,7 +55,6 @@ export default function TeacherProfilePage() {
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState<TabType>('pessoais');
   const [isLoading, setIsLoading] = useState(false);
-  const [userCreatedAt, setUserCreatedAt] = useState<string>('');
   const [formData, setFormData] = useState({
     name: session?.user?.name || '',
     email: session?.user?.email || '',
@@ -95,7 +94,6 @@ export default function TeacherProfilePage() {
         const profileRes = await fetch('/api/teacher/profile');
         if (profileRes.ok) {
           const profileData = await profileRes.json();
-          setUserCreatedAt(profileData.createdAt || '');
           setFormData({
             name: profileData.name || '',
             email: profileData.email || '',
@@ -165,6 +163,7 @@ export default function TeacherProfilePage() {
         description: 'Suas informações foram atualizadas com sucesso.',
       });
     } catch (error) {
+      console.error('[TeacherProfile] update profile', error);
       toast({
         title: 'Erro',
         description: 'Não foi possível atualizar o perfil.',
@@ -212,6 +211,7 @@ export default function TeacherProfilePage() {
         description: 'Sua senha foi alterada com sucesso.',
       });
     } catch (error) {
+      console.error('[TeacherProfile] change password', error);
       toast({
         title: 'Erro',
         description: 'Não foi possível alterar a senha.',
@@ -256,6 +256,7 @@ export default function TeacherProfilePage() {
         description: 'Sua qualificação foi registrada com sucesso.',
       });
     } catch (error) {
+      console.error('[TeacherProfile] add education', error);
       toast({
         title: 'Erro',
         description: 'Não foi possível adicionar qualificação.',
@@ -282,6 +283,7 @@ export default function TeacherProfilePage() {
         description: 'Registro excluído com sucesso.',
       });
     } catch (error) {
+      console.error('[TeacherProfile] remove education', error);
       toast({
         title: 'Erro',
         description: 'Não foi possível remover qualificação.',
@@ -307,7 +309,7 @@ export default function TeacherProfilePage() {
 
       if (!res.ok) throw new Error('Erro ao fazer upload');
 
-      const data = await res.json();
+      await res.json();
       await update();
 
       toast({
@@ -315,6 +317,7 @@ export default function TeacherProfilePage() {
         description: 'Sua foto foi atualizada com sucesso.',
       });
     } catch (error) {
+      console.error('[TeacherProfile] upload avatar', error);
       toast({
         title: 'Erro',
         description: 'Não foi possível fazer upload da imagem.',
@@ -343,6 +346,7 @@ export default function TeacherProfilePage() {
         description: 'Informações financeiras salvas com sucesso.',
       });
     } catch (error) {
+      console.error('[TeacherProfile] update financial', error);
       toast({
         title: 'Erro',
         description: 'Não foi possível atualizar os dados.',
@@ -362,10 +366,10 @@ export default function TeacherProfilePage() {
 
       if (!res.ok) throw new Error('Erro ao ativar 2FA');
 
-      const data = await res.json();
+      const respData = await res.json();
       setQrCodeUrl(
         `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(
-          data.data.otpauth
+          respData?.data?.otpauth ?? ''
         )}`
       );
 
@@ -374,6 +378,7 @@ export default function TeacherProfilePage() {
         description: 'Escaneie o QR Code com seu aplicativo autenticador.',
       });
     } catch (error) {
+      console.error('[TeacherProfile] enable 2FA', error);
       toast({
         title: 'Erro',
         description: 'Não foi possível ativar 2FA.',
@@ -413,6 +418,7 @@ export default function TeacherProfilePage() {
         description: 'Autenticação de dois fatores configurada com sucesso.',
       });
     } catch (error) {
+      console.error('[TeacherProfile] verify 2FA', error);
       toast({
         title: 'Erro',
         description: 'Código inválido ou expirado.',
@@ -440,6 +446,7 @@ export default function TeacherProfilePage() {
         description: 'Autenticação de dois fatores foi removida.',
       });
     } catch (error) {
+      console.error('[TeacherProfile] disable 2FA', error);
       toast({
         title: 'Erro',
         description: 'Não foi possível desativar 2FA.',
@@ -1035,10 +1042,14 @@ export default function TeacherProfilePage() {
                       </div>
                     </div>
                     <div className="flex justify-center">
-                      <img
+                      <Image
                         src={qrCodeUrl}
                         alt="QR Code 2FA"
+                        width={192}
+                        height={192}
                         className="w-48 h-48"
+                        unoptimized
+                        priority
                       />
                     </div>
                     <div className="space-y-2">

@@ -64,6 +64,7 @@ if (anonKey) {
       console.log(`   Emissor: ${payload.iss}`);
       console.log(`   Role: ${payload.role}`);
     } catch (e) {
+      console.error('   ⚠️  Não foi possível decodificar JWT', e);
       console.log('   ⚠️  Não foi possível decodificar JWT');
     }
   } else {

@@ -1,10 +1,10 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 import speakeasy from 'speakeasy';
 import QRCode from 'qrcode';
 
-export async function POST(_req: NextRequest) {
+export async function POST() {
   try {
     const session = await auth();
 

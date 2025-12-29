@@ -13,7 +13,7 @@ const DynamicReactPlayer = dynamic(() => import('react-player'), {
       <Loader2 className="h-12 w-12 animate-spin text-white" />
     </div>
   ),
-}) as any as typeof ReactPlayerType;
+}) as unknown as typeof ReactPlayerType;
 
 interface VideoPlayerProps {
   url: string;
@@ -32,7 +32,7 @@ const shouldUseReactPlayer = (url: string): boolean => {
 };
 
 export function VideoPlayer(props: VideoPlayerProps) {
-  const { url, onProgress, onComplete, initialProgress = 0 } = props;
+  const { url, onProgress, onComplete } = props;
   const [error, setError] = useState<string | null>(null);
   const isHls = url?.includes('.m3u8');
 

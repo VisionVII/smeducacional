@@ -38,12 +38,11 @@ interface CoursesCarouselProps {
 
 export function CoursesCarousel({ courses }: CoursesCarouselProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [isMobile, setIsMobile] = useState(false);
   const [isAutoPlay, setIsAutoPlay] = useState(true);
   const SLIDE_DURATION_MS = 5000;
 
   useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    const checkMobile = () => window.innerWidth < 768;
     checkMobile();
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
@@ -77,8 +76,6 @@ export function CoursesCarousel({ courses }: CoursesCarouselProps) {
   if (courses.length === 0) {
     return null;
   }
-
-  const currentCourse = courses[currentIndex];
 
   return (
     <div className="relative w-full overflow-hidden rounded-none md:rounded-xl bg-gradient-to-br from-gray-950 via-slate-900 to-gray-950">

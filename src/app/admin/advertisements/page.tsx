@@ -125,7 +125,7 @@ export default function AdvertisementsPage() {
     } finally {
       setLoading(false);
     }
-  }, [page, statusFilter, positionFilter, toast]);
+  }, [page, statusFilter, positionFilter]);
 
   useEffect(() => {
     loadAds();

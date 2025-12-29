@@ -27,7 +27,6 @@ import {
   Lock,
   FolderOpen,
   Search,
-  AlertCircle,
   CheckCircle,
   XCircle,
   RefreshCw,
@@ -35,6 +34,36 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
+
+// Tipos genéricos para queries do database
+interface DatabaseTable {
+  table_schema: string;
+  table_name: string;
+  column_count: number;
+}
+
+interface DatabaseRole {
+  rolname: string;
+  can_login: boolean;
+  is_superuser: boolean;
+}
+
+interface DatabaseFunction {
+  schema: string;
+  name: string;
+  return_type: string;
+  arguments: string;
+}
+
+interface StorageBucket {
+  id: string;
+  name: string;
+  public: boolean;
+  created_at?: string;
+  updated_at?: string;
+  file_size_limit?: number | null;
+  allowed_mime_types?: string[] | null;
+}
 
 export default function DatabaseDashboardPage() {
   const [activeTab, setActiveTab] = useState('tables');
@@ -403,7 +432,7 @@ export default function DatabaseDashboardPage() {
                           </td>
                         </tr>
                       ) : (
-                        tablesData?.data?.map((table: any) => (
+                        tablesData?.data?.map((table: DatabaseTable) => (
                           <tr
                             key={`${table.table_schema}.${table.table_name}`}
                             className="border-t hover:bg-muted/30"
@@ -466,47 +495,57 @@ export default function DatabaseDashboardPage() {
                           </td>
                         </tr>
                       ) : (
-                        rolesData?.data?.map((role: any) => (
-                          <tr
-                            key={role.rolname}
-                            className="border-t hover:bg-muted/30"
-                          >
-                            <td className="p-3 font-mono">{role.rolname}</td>
-                            <td className="p-3 text-center">
-                              {role.rolsuper ? (
-                                <CheckCircle className="h-4 w-4 text-green-600 mx-auto" />
-                              ) : (
-                                <XCircle className="h-4 w-4 text-muted-foreground mx-auto" />
-                              )}
-                            </td>
-                            <td className="p-3 text-center">
-                              {role.rolcreatedb ? (
-                                <CheckCircle className="h-4 w-4 text-green-600 mx-auto" />
-                              ) : (
-                                <XCircle className="h-4 w-4 text-muted-foreground mx-auto" />
-                              )}
-                            </td>
-                            <td className="p-3 text-center">
-                              {role.rolcreaterole ? (
-                                <CheckCircle className="h-4 w-4 text-green-600 mx-auto" />
-                              ) : (
-                                <XCircle className="h-4 w-4 text-muted-foreground mx-auto" />
-                              )}
-                            </td>
-                            <td className="p-3 text-center">
-                              {role.rolcanlogin ? (
-                                <CheckCircle className="h-4 w-4 text-green-600 mx-auto" />
-                              ) : (
-                                <XCircle className="h-4 w-4 text-muted-foreground mx-auto" />
-                              )}
-                            </td>
-                            <td className="p-3 text-muted-foreground">
-                              {role.rolconnlimit === -1
-                                ? 'Ilimitado'
-                                : role.rolconnlimit}
-                            </td>
-                          </tr>
-                        ))
+                        rolesData?.data?.map(
+                          (
+                            role: DatabaseRole & {
+                              rolsuper?: boolean;
+                              rolcreatedb?: boolean;
+                              rolcreaterole?: boolean;
+                              rolcanlogin?: boolean;
+                              rolconnlimit?: number;
+                            }
+                          ) => (
+                            <tr
+                              key={role.rolname}
+                              className="border-t hover:bg-muted/30"
+                            >
+                              <td className="p-3 font-mono">{role.rolname}</td>
+                              <td className="p-3 text-center">
+                                {role.rolsuper ? (
+                                  <CheckCircle className="h-4 w-4 text-green-600 mx-auto" />
+                                ) : (
+                                  <XCircle className="h-4 w-4 text-muted-foreground mx-auto" />
+                                )}
+                              </td>
+                              <td className="p-3 text-center">
+                                {role.rolcreatedb ? (
+                                  <CheckCircle className="h-4 w-4 text-green-600 mx-auto" />
+                                ) : (
+                                  <XCircle className="h-4 w-4 text-muted-foreground mx-auto" />
+                                )}
+                              </td>
+                              <td className="p-3 text-center">
+                                {role.rolcreaterole ? (
+                                  <CheckCircle className="h-4 w-4 text-green-600 mx-auto" />
+                                ) : (
+                                  <XCircle className="h-4 w-4 text-muted-foreground mx-auto" />
+                                )}
+                              </td>
+                              <td className="p-3 text-center">
+                                {role.rolcanlogin ? (
+                                  <CheckCircle className="h-4 w-4 text-green-600 mx-auto" />
+                                ) : (
+                                  <XCircle className="h-4 w-4 text-muted-foreground mx-auto" />
+                                )}
+                              </td>
+                              <td className="p-3 text-muted-foreground">
+                                {role.rolconnlimit === -1
+                                  ? 'Ilimitado'
+                                  : role.rolconnlimit}
+                              </td>
+                            </tr>
+                          )
+                        )
                       )}
                     </tbody>
                   </table>
@@ -544,23 +583,31 @@ export default function DatabaseDashboardPage() {
                           </td>
                         </tr>
                       ) : (
-                        functionsData?.data?.map((func: any) => (
-                          <tr
-                            key={`${func.schema}.${func.name}`}
-                            className="border-t hover:bg-muted/30"
-                          >
-                            <td className="p-3">
-                              <Badge variant="outline">{func.schema}</Badge>
-                            </td>
-                            <td className="p-3 font-mono">{func.name}</td>
-                            <td className="p-3 text-xs text-muted-foreground font-mono max-w-xs truncate">
-                              {func.arguments || '()'}
-                            </td>
-                            <td className="p-3 text-xs text-muted-foreground font-mono">
-                              {func.return_type}
-                            </td>
-                          </tr>
-                        ))
+                        functionsData?.data?.map(
+                          (
+                            func: DatabaseFunction & {
+                              arguments?: string;
+                              language_name?: string;
+                              schema?: string;
+                            }
+                          ) => (
+                            <tr
+                              key={`${func.schema}.${func.name}`}
+                              className="border-t hover:bg-muted/30"
+                            >
+                              <td className="p-3">
+                                <Badge variant="outline">{func.schema}</Badge>
+                              </td>
+                              <td className="p-3 font-mono">{func.name}</td>
+                              <td className="p-3 text-xs text-muted-foreground font-mono max-w-xs truncate">
+                                {func.arguments || '()'}
+                              </td>
+                              <td className="p-3 text-xs text-muted-foreground font-mono">
+                                {func.return_type}
+                              </td>
+                            </tr>
+                          )
+                        )
                       )}
                     </tbody>
                   </table>
@@ -598,20 +645,28 @@ export default function DatabaseDashboardPage() {
                             </td>
                           </tr>
                         ) : (
-                          rlsData?.data?.map((table: any) => (
-                            <tr
-                              key={`${table.schema}.${table.name}`}
-                              className="border-t hover:bg-muted/30"
-                            >
-                              <td className="p-3">
-                                <Badge variant="outline">{table.schema}</Badge>
-                              </td>
-                              <td className="p-3 font-mono">{table.name}</td>
-                              <td className="p-3 text-center">
-                                <CheckCircle className="h-4 w-4 text-green-600 mx-auto" />
-                              </td>
-                            </tr>
-                          ))
+                          rlsData?.data?.map(
+                            (table: {
+                              schema: string;
+                              name: string;
+                              rowsecurity: boolean;
+                            }) => (
+                              <tr
+                                key={`${table.schema}.${table.name}`}
+                                className="border-t hover:bg-muted/30"
+                              >
+                                <td className="p-3">
+                                  <Badge variant="outline">
+                                    {table.schema}
+                                  </Badge>
+                                </td>
+                                <td className="p-3 font-mono">{table.name}</td>
+                                <td className="p-3 text-center">
+                                  <CheckCircle className="h-4 w-4 text-green-600 mx-auto" />
+                                </td>
+                              </tr>
+                            )
+                          )
                         )}
                       </tbody>
                     </table>
@@ -629,28 +684,44 @@ export default function DatabaseDashboardPage() {
                       </CardHeader>
                       <CardContent>
                         <div className="space-y-2">
-                          {rlsData.policies.map((policy: any, idx: number) => (
-                            <div
-                              key={idx}
-                              className="border rounded-md p-3 text-sm"
-                            >
-                              <div className="flex items-start justify-between mb-1">
-                                <span className="font-mono font-medium">
-                                  {policy.policyname}
-                                </span>
-                                <Badge variant="secondary" className="text-xs">
-                                  {policy.cmd}
-                                </Badge>
+                          {rlsData.policies.map(
+                            (
+                              policy: {
+                                policyname: string;
+                                schemaname: string;
+                                tablename: string;
+                                permissive: boolean;
+                                roles: string[];
+                                cmd: string;
+                              },
+                              idx: number
+                            ) => (
+                              <div
+                                key={idx}
+                                className="border rounded-md p-3 text-sm"
+                              >
+                                <div className="flex items-start justify-between mb-1">
+                                  <span className="font-mono font-medium">
+                                    {policy.policyname}
+                                  </span>
+                                  <Badge
+                                    variant="secondary"
+                                    className="text-xs"
+                                  >
+                                    {policy.cmd}
+                                  </Badge>
+                                </div>
+                                <div className="text-xs text-muted-foreground">
+                                  {policy.schemaname}.{policy.tablename} •{' '}
+                                  {policy.permissive
+                                    ? 'Permissive'
+                                    : 'Restrictive'}{' '}
+                                  • Roles:{' '}
+                                  {policy.roles?.join(', ') || 'public'}
+                                </div>
                               </div>
-                              <div className="text-xs text-muted-foreground">
-                                {policy.schemaname}.{policy.tablename} •{' '}
-                                {policy.permissive
-                                  ? 'Permissive'
-                                  : 'Restrictive'}{' '}
-                                • Roles: {policy.roles?.join(', ') || 'public'}
-                              </div>
-                            </div>
-                          ))}
+                            )
+                          )}
                         </div>
                       </CardContent>
                     </Card>
@@ -694,7 +765,7 @@ export default function DatabaseDashboardPage() {
                           </td>
                         </tr>
                       ) : (
-                        bucketsData?.data?.map((bucket: any) => (
+                        bucketsData?.data?.map((bucket: StorageBucket) => (
                           <tr
                             key={bucket.id}
                             className="border-t hover:bg-muted/30"

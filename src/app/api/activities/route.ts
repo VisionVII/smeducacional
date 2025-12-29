@@ -11,14 +11,13 @@ export async function GET(request: Request) {
     }
 
     const { searchParams } = new URL(request.url);
-    const courseId = searchParams.get('courseId');
     const moduleId = searchParams.get('moduleId');
 
-    const where: any = {};
+    const where: { moduleId?: string } = {};
 
     if (session.user.role === 'STUDENT') {
       // Buscar apenas atividades dos cursos matriculados
-      const enrollments = await prisma.enrollment.findMany({
+      await prisma.enrollment.findMany({
         where: { studentId: session.user.id },
         select: { courseId: true },
       });

@@ -1,20 +1,15 @@
 'use client';
 
 import { Suspense, useState, useEffect } from 'react';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import {
-  ArrowRight,
-  Check,
-  Users,
-  Star,
-  MessageCircle,
-  HelpCircle,
-} from 'lucide-react';
+import { ArrowRight, MessageCircle, HelpCircle } from 'lucide-react';
 import { ThemeProvider } from '@/components/theme-provider';
 import { AdaptiveNavbar } from '@/components/adaptive-navbar';
 import { useSearchParams } from 'next/navigation';
 import { usePublicTheme } from '@/hooks/usePublicTheme';
+import { useTranslations } from '@/hooks/use-translations';
 
 interface FAQItem {
   question: string;
@@ -48,10 +43,10 @@ interface LandingConfig {
 }
 
 function LandingPageContent({ teacherId }: { teacherId?: string }) {
-  const { theme, loading: themeLoading } = usePublicTheme();
+  const { t, mounted } = useTranslations();
+  const { theme } = usePublicTheme();
   const [config, setConfig] = useState<LandingConfig | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [landingTheme, setLandingTheme] = useState<any | null>(null);
   const [expandedFAQ, setExpandedFAQ] = useState<number | null>(null);
 
   useEffect(() => {
@@ -82,9 +77,6 @@ function LandingPageContent({ teacherId }: { teacherId?: string }) {
       if (response.ok) {
         const data = await response.json();
         setConfig(data);
-        if ((data as any).theme) {
-          setLandingTheme((data as any).theme);
-        }
       } else if (response.status === 401) {
         console.error('Usuário não autorizado');
         // Redirecionar para login se não autorizado
@@ -136,7 +128,9 @@ function LandingPageContent({ teacherId }: { teacherId?: string }) {
               {/* Conteúdo */}
               <div className="space-y-6">
                 <Badge variant="outline" className="w-fit">
-                  🚀 Seu Curso Aguarda
+                  {mounted
+                    ? t.publicPages.landingPreview.badge
+                    : '🚀 Seu Curso Aguarda'}
                 </Badge>
 
                 <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight">
@@ -163,7 +157,9 @@ function LandingPageContent({ teacherId }: { teacherId?: string }) {
                     size="lg"
                     className="rounded-lg font-semibold"
                   >
-                    Fale conosco
+                    {mounted
+                      ? t.publicPages.landingPreview.contactCta
+                      : 'Fale conosco'}
                   </Button>
                 </div>
 
@@ -190,10 +186,13 @@ function LandingPageContent({ teacherId }: { teacherId?: string }) {
               {/* Imagem Hero */}
               {config.heroImage && (
                 <div className="relative h-96 rounded-2xl overflow-hidden shadow-2xl">
-                  <img
+                  <Image
                     src={config.heroImage}
                     alt="Hero"
-                    className="w-full h-full object-cover"
+                    fill
+                    sizes="(max-width: 1024px) 100vw, 80vw"
+                    className="object-cover"
+                    unoptimized
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-background/50 to-transparent" />
                 </div>
@@ -207,10 +206,14 @@ function LandingPageContent({ teacherId }: { teacherId?: string }) {
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-12">
               <h2 className="text-3xl font-bold mb-3">
-                Por que escolher nossos cursos?
+                {mounted
+                  ? t.publicPages.landingPreview.highlightsTitle
+                  : 'Por que escolher nossos cursos?'}
               </h2>
               <p className="text-muted-foreground text-lg">
-                Tudo que você precisa para alcançar seus objetivos
+                {mounted
+                  ? t.publicPages.landingPreview.highlightsSubtitle
+                  : 'Tudo que você precisa para alcançar seus objetivos'}
               </p>
             </div>
 
@@ -250,10 +253,17 @@ function LandingPageContent({ teacherId }: { teacherId?: string }) {
             <div className="max-w-6xl mx-auto">
               <div className="text-center mb-12">
                 <h2 className="text-3xl font-bold mb-3">
-                  Estrutura do Programa
+                  {mounted
+                    ? t.publicPages.landingPreview.modulesTitle
+                    : 'Estrutura do Programa'}
                 </h2>
                 <p className="text-muted-foreground text-lg">
-                  {config.modules.length} módulos cuidadosamente organizados
+                  {mounted
+                    ? t.publicPages.landingPreview.modulesSubtitle.replace(
+                        '{count}',
+                        String(config.modules.length)
+                      )
+                    : `${config.modules.length} módulos cuidadosamente organizados`}
                 </p>
               </div>
 
@@ -300,7 +310,9 @@ function LandingPageContent({ teacherId }: { teacherId?: string }) {
               <div className="text-center mb-12">
                 <h2 className="text-3xl font-bold mb-3 flex items-center justify-center gap-2">
                   <HelpCircle className="h-8 w-8 text-primary" />
-                  Perguntas Frequentes
+                  {mounted
+                    ? t.publicPages.landingPreview.faqTitle
+                    : 'Perguntas Frequentes'}
                 </h2>
               </div>
 
@@ -343,11 +355,14 @@ function LandingPageContent({ teacherId }: { teacherId?: string }) {
         <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-primary/10 via-accent/10 to-primary/10">
           <div className="max-w-2xl mx-auto text-center space-y-6">
             <h2 className="text-3xl sm:text-4xl font-bold">
-              Pronto para começar?
+              {mounted
+                ? t.publicPages.landingPreview.finalCta.title
+                : 'Pronto para começar?'}
             </h2>
             <p className="text-lg text-muted-foreground">
-              Junte-se a centenas de alunos satisfeitos que já transformaram
-              suas carreiras
+              {mounted
+                ? t.publicPages.landingPreview.finalCta.subtitle
+                : 'Junte-se a centenas de alunos satisfeitos que já transformaram suas carreiras'}
             </p>
             <Button
               size="lg"
@@ -365,7 +380,11 @@ function LandingPageContent({ teacherId }: { teacherId?: string }) {
         {/* Footer */}
         <footer className="py-12 px-4 sm:px-6 lg:px-8 border-t border-border bg-card/50">
           <div className="max-w-6xl mx-auto text-center text-sm text-muted-foreground">
-            <p>© 2025 SM Educacional. Todos os direitos reservados.</p>
+            <p>
+              {mounted
+                ? t.publicPages.landingPreview.footer
+                : '© 2025 SM Educacional. Todos os direitos reservados.'}
+            </p>
           </div>
         </footer>
       </div>

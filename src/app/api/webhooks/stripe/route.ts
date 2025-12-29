@@ -6,6 +6,20 @@ import Stripe from 'stripe';
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET || '';
 
+// TypeScript interfaces para remover any types
+interface StripeSubscriptionWithPeriod extends Stripe.Subscription {
+  current_period_start: number;
+  current_period_end: number;
+}
+
+interface StripeInvoiceWithDetails extends Stripe.Invoice {
+  subscription?: string | Stripe.Subscription;
+  payment_intent?: string | Stripe.PaymentIntent;
+  last_payment_error?: {
+    message?: string;
+  };
+}
+
 /**
  * POST /api/webhooks/stripe
  * Processa webhooks do Stripe
@@ -142,7 +156,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       const isTest = session.livemode === false;
 
       // Criar enrollment
-      const enrollment = await prisma.enrollment.create({
+      await prisma.enrollment.create({
         data: {
           studentId: userId,
           courseId,
@@ -151,7 +165,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       });
 
       // Criar payment
-      const payment = await prisma.payment.create({
+      await prisma.payment.create({
         data: {
           userId,
           courseId,
@@ -280,10 +294,12 @@ async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
         status,
         price: (subscription.items.data[0]?.price.unit_amount || 0) / 100,
         currentPeriodStart: new Date(
-          (subscription as any).current_period_start * 1000
+          (subscription as StripeSubscriptionWithPeriod).current_period_start *
+            1000
         ),
         currentPeriodEnd: new Date(
-          (subscription as any).current_period_end * 1000
+          (subscription as StripeSubscriptionWithPeriod).current_period_end *
+            1000
         ),
       },
       update: {
@@ -291,10 +307,12 @@ async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
         stripePriceId: subscription.items.data[0]?.price.id,
         status,
         currentPeriodStart: new Date(
-          (subscription as any).current_period_start * 1000
+          (subscription as StripeSubscriptionWithPeriod).current_period_start *
+            1000
         ),
         currentPeriodEnd: new Date(
-          (subscription as any).current_period_end * 1000
+          (subscription as StripeSubscriptionWithPeriod).current_period_end *
+            1000
         ),
       },
     });
@@ -313,14 +331,23 @@ async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
         plan,
         status,
         price: (subscription.items.data[0]?.price.unit_amount || 0) / 100,
-        startDate: new Date((subscription as any).current_period_start * 1000),
-        renewDate: new Date((subscription as any).current_period_end * 1000),
+        startDate: new Date(
+          (subscription as StripeSubscriptionWithPeriod).current_period_start *
+            1000
+        ),
+        renewDate: new Date(
+          (subscription as StripeSubscriptionWithPeriod).current_period_end *
+            1000
+        ),
       },
       update: {
         stripeSubId: subscription.id,
         stripePriceId: subscription.items.data[0]?.price.id,
         status,
-        renewDate: new Date((subscription as any).current_period_end * 1000),
+        renewDate: new Date(
+          (subscription as StripeSubscriptionWithPeriod).current_period_end *
+            1000
+        ),
       },
     });
 
@@ -331,10 +358,12 @@ async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
         subscriptionStatus: status,
         plan: plan,
         subscriptionStartDate: new Date(
-          (subscription as any).current_period_start * 1000
+          (subscription as StripeSubscriptionWithPeriod).current_period_start *
+            1000
         ),
         subscriptionExpiresAt: new Date(
-          (subscription as any).current_period_end * 1000
+          (subscription as StripeSubscriptionWithPeriod).current_period_end *
+            1000
         ),
         lastPaymentDate: new Date(),
       },
@@ -386,14 +415,15 @@ async function handleSubscriptionCancelled(subscription: Stripe.Subscription) {
  * Trata fatura paga
  */
 async function handleInvoicePaid(invoice: Stripe.Invoice) {
-  if (!(invoice as any).subscription) {
+  const invoiceWithDetails = invoice as StripeInvoiceWithDetails;
+  if (!invoiceWithDetails.subscription) {
     console.log('Invoice not related to subscription');
     return;
   }
 
   // Atualizar payment status
   const payment = await prisma.payment.findFirst({
-    where: { stripePaymentId: (invoice as any).payment_intent as string },
+    where: { stripePaymentId: invoiceWithDetails.payment_intent as string },
   });
 
   if (payment) {
@@ -422,14 +452,15 @@ async function handleInvoicePaid(invoice: Stripe.Invoice) {
  * Trata falha de fatura
  */
 async function handleInvoiceFailed(invoice: Stripe.Invoice) {
-  if (!(invoice as any).subscription) {
+  const invoiceWithDetails = invoice as StripeInvoiceWithDetails;
+  if (!invoiceWithDetails.subscription) {
     console.log('Invoice not related to subscription');
     return;
   }
 
   // Atualizar payment status
   const payment = await prisma.payment.findFirst({
-    where: { stripePaymentId: (invoice as any).payment_intent as string },
+    where: { stripePaymentId: invoiceWithDetails.payment_intent as string },
   });
 
   if (payment) {
@@ -463,7 +494,8 @@ async function handleInvoiceFailed(invoice: Stripe.Invoice) {
         invoiceNumber: existingInvoice.invoiceNumber,
         amount: existingInvoice.amount,
         reason:
-          (invoice as any).last_payment_error?.message || 'Falha desconhecida',
+          invoiceWithDetails.last_payment_error?.message ||
+          'Falha desconhecida',
       }).catch((err) =>
         console.error('Error sending payment failed email:', err)
       );

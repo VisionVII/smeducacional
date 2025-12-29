@@ -17,7 +17,6 @@ export function CheckoutButton({
   price,
   isPaid,
   isEnrolled = false,
-  onSuccess,
 }: CheckoutButtonProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);

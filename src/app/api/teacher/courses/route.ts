@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 import { z } from 'zod';
-import { Prisma } from '@prisma/client';
 
 // Schema para criação de curso pelo professor
 const createCourseSchema = z.object({
@@ -31,7 +30,7 @@ export async function GET(request: NextRequest) {
     const page = Number(searchParams.get('page') || '1');
     const pageSize = Math.min(Number(searchParams.get('pageSize') || '20'), 50);
 
-    const where: Prisma.CourseWhereInput = { instructorId: session.user.id };
+    const where: any = { instructorId: session.user.id };
 
     if (search) {
       where.OR = [

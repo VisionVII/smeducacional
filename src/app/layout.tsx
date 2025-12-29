@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from 'next';
+import { headers, cookies } from 'next/headers';
 import { Inter } from 'next/font/google';
 import './globals.css';
 import { ThemeProvider } from '@/components/theme-provider';
@@ -7,6 +8,10 @@ import { QueryProvider } from '@/components/query-provider';
 import { AuthProvider } from '@/components/auth-provider';
 import { CookieBanner } from '@/components/cookie-banner';
 import { ThemeScript } from '@/components/theme-script';
+import { CurrencyProvider } from '@/components/currency-provider';
+import { TranslationsProvider } from '@/components/translations-provider';
+import { locales, type Locale } from '@/lib/locales';
+import { FloatingLanguageSwitcher } from '@/components/language-switcher';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -42,13 +47,31 @@ export const viewport: Viewport = {
   ],
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const cookieStore = await cookies();
+  const cookieLocale = cookieStore.get('preferred-locale')?.value as
+    | Locale
+    | undefined;
+
+  const headersList = await headers();
+  const headerLocale = (() => {
+    const accept = headersList.get('accept-language');
+    if (!accept) return null;
+    const preferred = accept
+      .split(',')
+      .map((entry) => entry.split(';')[0]?.trim())
+      .find((lang) => lang && locales.includes(lang as Locale));
+    return preferred ? (preferred as Locale) : null;
+  })();
+
+  const initialLocale: Locale = cookieLocale || headerLocale || 'pt-BR';
+
   return (
-    <html lang="pt-BR" suppressHydrationWarning>
+    <html lang={initialLocale} suppressHydrationWarning>
       <head suppressHydrationWarning>
         {/* Dark mode detection - must use native <script> in head for beforeInteractive */}
         <script
@@ -109,21 +132,26 @@ export default function RootLayout({
         className={`${inter.className} mobile-safe-area antialiased`}
         suppressHydrationWarning
       >
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          enableColorScheme
-          storageKey="app-theme-mode"
-        >
-          <AuthProvider>
-            <QueryProvider>
-              {children}
-              <Toaster />
-              <CookieBanner />
-            </QueryProvider>
-          </AuthProvider>
-        </ThemeProvider>
+        <TranslationsProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            enableColorScheme
+            storageKey="app-theme-mode"
+          >
+            <AuthProvider>
+              <QueryProvider>
+                <CurrencyProvider>
+                  {children}
+                  <Toaster />
+                  <CookieBanner />
+                  <FloatingLanguageSwitcher />
+                </CurrencyProvider>
+              </QueryProvider>
+            </AuthProvider>
+          </ThemeProvider>
+        </TranslationsProvider>
       </body>
     </html>
   );

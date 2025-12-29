@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useCanAccess, FeatureGate, usePlanInfo } from '@/hooks/useCanAccess';
+import { FeatureGate, usePlanInfo } from '@/hooks/useCanAccess';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -18,17 +18,8 @@ import { AlertCircle, CheckCircle2, Lock } from 'lucide-react';
  * Features desbloqueadas baseado no plano do professor
  */
 export function BrandingCustomization() {
-  const { access, loading, error } = useCanAccess();
   const planInfo = usePlanInfo();
   const [uploading, setUploading] = useState(false);
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center p-8">
-        <p className="text-gray-500">Carregando informações do plano...</p>
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-6">

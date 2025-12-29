@@ -13,9 +13,9 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 
 interface DebugData {
-  session: any;
-  user?: any;
-  enrollments: any[];
+  session: unknown;
+  user?: unknown;
+  enrollments: unknown[];
   enrollmentCount?: number;
   totalEnrollmentsInDB?: number;
   totalCoursesInDB?: number;
@@ -103,7 +103,7 @@ export default function StudentDebugPage() {
               <p className="text-red-500">❌ Erro: {debug.error}</p>
             ) : (
               <div className="space-y-4">
-                {debug.user && (
+                {Boolean(debug.user) && (
                   <div>
                     <h3 className="font-semibold mb-2">👤 Usuário:</h3>
                     <pre className="bg-gray-100 p-3 rounded text-sm">

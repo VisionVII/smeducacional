@@ -14,7 +14,6 @@ import {
   User,
   BookOpen,
 } from 'lucide-react';
-import { notFound } from 'next/navigation';
 
 interface PageProps {
   params: Promise<{

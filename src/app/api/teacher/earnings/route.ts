@@ -10,11 +10,11 @@ export async function GET() {
   try {
     const session = await auth();
 
-    if (!session?.user || (session.user as any).role !== 'TEACHER') {
+    if (!session?.user || session.user.role !== 'TEACHER') {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     }
 
-    const teacherId = (session.user as any).id;
+    const teacherId = session.user.id;
 
     // Buscar pagamentos de cursos do professor
     const payments = await prisma.payment.findMany({
@@ -148,9 +148,9 @@ export async function GET() {
       connectStatus: {
         isActive: teacherFinancial?.connectOnboardingComplete || false,
         accountId: teacherFinancial?.stripeConnectAccountId || null,
-        totalTransfers: (teacherFinancial as any)?.totalTransfers || 0,
-        totalEarningsOnFile: (teacherFinancial as any)?.totalEarnings || 0,
-        pendingBalance: (teacherFinancial as any)?.pendingBalance || 0,
+        totalTransfers: 0,
+        totalEarningsOnFile: 0,
+        pendingBalance: 0,
       },
     });
   } catch (error) {

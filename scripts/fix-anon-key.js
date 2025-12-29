@@ -41,7 +41,7 @@ function isValidJWT(token) {
     if (!payload.iss) return false;
 
     return true;
-  } catch (error) {
+  } catch {
     return false;
   }
 }

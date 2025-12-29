@@ -194,7 +194,6 @@ export class SecurityScanner {
       // Contexto do arquivo
       const context = {
         isApiRoute: file.includes('/api/'),
-        isComponent: file.endsWith('.tsx'),
         hasAuth: /await\s+auth\(\)/.test(code),
         hasValidation: /\.safeParse\(/.test(code),
       };
@@ -218,7 +217,7 @@ export class SecurityScanner {
   private async analyzeWithGPT(
     code: string,
     filePath: string,
-    context: Record<string, unknown>
+    context: { isApiRoute: boolean; hasAuth: boolean; hasValidation: boolean }
   ): Promise<SecurityIssue[]> {
     const prompt = ANALYSIS_PROMPT_TEMPLATE(code, filePath, context);
 

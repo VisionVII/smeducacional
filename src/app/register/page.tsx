@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { useState } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
@@ -10,15 +11,15 @@ import { Label } from '@/components/ui/label';
 import {
   Card,
   CardContent,
-  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { toast } from '@/components/ui/use-toast';
 import { GraduationCap, Home, Sparkles } from 'lucide-react';
 import { PasswordInput } from '@/components/password-input';
 import { useSystemBranding } from '@/hooks/use-system-branding';
+import { useTranslations } from '@/hooks/use-translations';
+import { useTranslatedToast } from '@/lib/translation-helpers';
 
 const keyframes = `
   @keyframes slideInUp {
@@ -36,6 +37,8 @@ const keyframes = `
 export default function RegisterPage() {
   const router = useRouter();
   const { branding } = useSystemBranding();
+  const { t, mounted } = useTranslations();
+  const toast = useTranslatedToast();
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
@@ -50,11 +53,7 @@ export default function RegisterPage() {
     if (isLoading) return;
 
     if (formData.password !== formData.confirmPassword) {
-      toast({
-        title: 'Erro',
-        description: 'As senhas não coincidem',
-        variant: 'destructive',
-      });
+      toast.error('passwordsDoNotMatch');
       return;
     }
 
@@ -77,21 +76,14 @@ export default function RegisterPage() {
         throw new Error(data.error || 'Erro ao criar conta');
       }
 
-      toast({
-        title: 'Conta criada com sucesso!',
-        description: 'Redirecionando para o login...',
-      });
+      toast.success('registerSuccess');
 
       setTimeout(() => {
         router.push('/login');
       }, 2000);
     } catch (error) {
-      toast({
-        title: 'Erro ao criar conta',
-        description:
-          error instanceof Error ? error.message : 'Erro desconhecido',
-        variant: 'destructive',
-      });
+      console.error('[Register] register error', error);
+      toast.error('generic');
     } finally {
       setIsLoading(false);
     }
@@ -102,11 +94,8 @@ export default function RegisterPage() {
     try {
       await signIn('google', { callbackUrl: '/student/dashboard' });
     } catch (error) {
-      toast({
-        title: 'Erro',
-        description: 'Não foi possível fazer login com Google',
-        variant: 'destructive',
-      });
+      console.error('[Register] google sign-in error', error);
+      toast.error('generic');
       setIsLoading(false);
     }
   };
@@ -132,17 +121,18 @@ export default function RegisterPage() {
               style={{ animationDuration: '3s' }}
             />
             <span className="text-sm font-medium text-primary">
-              Junte-se à nossa comunidade
+              {mounted
+                ? t.auth.register.subtitle
+                : 'Junte-se à nossa comunidade'}
             </span>
           </div>
           <h1 className="text-4xl sm:text-5xl font-bold text-white mb-4 leading-tight">
-            Criar uma{' '}
-            <span className="bg-gradient-to-r from-primary via-purple-400 to-pink-400 bg-clip-text text-transparent">
-              nova conta
-            </span>
+            {mounted ? t.auth.register.title : 'Criar uma nova conta'}
           </h1>
           <p className="text-lg text-gray-300 leading-relaxed">
-            Preencha os dados abaixo para começar sua jornada de aprendizado
+            {mounted
+              ? t.auth.register.subtitle
+              : 'Preencha os dados abaixo para começar sua jornada de aprendizado'}
           </p>
         </div>
 
@@ -154,10 +144,14 @@ export default function RegisterPage() {
           <CardHeader className="space-y-3 text-center px-6 pt-8">
             <div className="flex justify-center mb-4">
               {branding.logoUrl ? (
-                <img
+                <Image
                   src={branding.logoUrl}
                   alt={branding.companyName}
+                  width={180}
+                  height={48}
                   className="h-12 w-auto max-w-[180px] object-contain drop-shadow-lg"
+                  priority
+                  unoptimized
                 />
               ) : (
                 <div className="h-12 w-12 rounded-lg bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center shadow-lg">
@@ -166,7 +160,7 @@ export default function RegisterPage() {
               )}
             </div>
             <CardTitle className="text-2xl font-bold leading-tight">
-              Criar conta
+              {mounted ? t.auth.register.title : 'Criar conta'}
             </CardTitle>
           </CardHeader>
           <form onSubmit={handleSubmit}>
@@ -196,7 +190,7 @@ export default function RegisterPage() {
                     fill="#EA4335"
                   />
                 </svg>
-                Continuar com Google
+                {mounted ? t.auth.login.withGoogle : 'Continuar com Google'}
               </Button>
 
               <div className="relative">
@@ -205,19 +199,19 @@ export default function RegisterPage() {
                 </div>
                 <div className="relative flex justify-center text-xs uppercase">
                   <span className="bg-background/80 px-2 text-muted-foreground">
-                    Ou registre-se com email
+                    {mounted ? t.auth.login.or : 'Ou registre-se com email'}
                   </span>
                 </div>
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="name" className="text-sm font-medium">
-                  Nome Completo
+                  {mounted ? t.auth.register.name : 'Nome Completo'}
                 </Label>
                 <Input
                   id="name"
                   type="text"
-                  placeholder="Seu nome"
+                  placeholder={mounted ? t.auth.register.name : 'Seu nome'}
                   className="h-11 text-base bg-background/50 border-primary/20 hover:border-primary/40 focus:border-primary/60 transition-colors"
                   value={formData.name}
                   onChange={(e) =>
@@ -228,7 +222,7 @@ export default function RegisterPage() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="email" className="text-sm font-medium">
-                  Email
+                  {mounted ? t.auth.register.email : 'Email'}
                 </Label>
                 <Input
                   id="email"
@@ -246,8 +240,10 @@ export default function RegisterPage() {
 
               <PasswordInput
                 id="password"
-                label="Senha"
-                placeholder="Mínimo 8 caracteres"
+                label={mounted ? t.auth.register.password : 'Senha'}
+                placeholder={
+                  mounted ? t.auth.register.password : 'Mínimo 8 caracteres'
+                }
                 value={formData.password}
                 onChange={(value) =>
                   setFormData({ ...formData, password: value })
@@ -258,8 +254,14 @@ export default function RegisterPage() {
 
               <PasswordInput
                 id="confirmPassword"
-                label="Confirmar senha"
-                placeholder="Digite a senha novamente"
+                label={
+                  mounted ? t.auth.register.confirmPassword : 'Confirmar senha'
+                }
+                placeholder={
+                  mounted
+                    ? t.auth.register.confirmPassword
+                    : 'Digite a senha novamente'
+                }
                 value={formData.confirmPassword}
                 onChange={(value) =>
                   setFormData({ ...formData, confirmPassword: value })
@@ -273,7 +275,13 @@ export default function RegisterPage() {
                 className="w-full h-11 text-base font-semibold bg-gradient-to-r from-primary via-primary to-purple-600 hover:shadow-lg hover:shadow-primary/50 transition-all duration-300"
                 disabled={isLoading}
               >
-                {isLoading ? 'Criando conta...' : 'Criar conta'}
+                {isLoading
+                  ? mounted
+                    ? t.common.loading
+                    : 'Criando conta...'
+                  : mounted
+                  ? t.auth.register.submit
+                  : 'Criar conta'}
               </Button>
               <div className="flex flex-col sm:flex-row items-center justify-between w-full gap-3 text-sm">
                 <Link
@@ -281,15 +289,17 @@ export default function RegisterPage() {
                   className="text-muted-foreground hover:text-primary flex items-center gap-1 touch-target no-tap-highlight transition-colors"
                 >
                   <Home className="h-4 w-4" />
-                  <span className="text-sm">Voltar ao início</span>
+                  <span className="text-sm">
+                    {mounted ? t.common.back : 'Voltar ao início'}
+                  </span>
                 </Link>
                 <p className="text-muted-foreground text-center">
-                  Já tem uma conta?{' '}
+                  {mounted ? t.auth.register.hasAccount : 'Já tem uma conta?'}{' '}
                   <Link
                     href="/login"
                     className="text-primary hover:underline font-medium touch-target no-tap-highlight"
                   >
-                    Fazer login
+                    {mounted ? t.auth.register.signIn : 'Fazer login'}
                   </Link>
                 </p>
               </div>

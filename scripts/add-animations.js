@@ -7,7 +7,7 @@ async function addAnimationsSupport() {
     console.log('🔧 Adding animations column via raw SQL...');
 
     // Try to add the column if it doesn't exist
-    const result = await prisma.$executeRawUnsafe(`
+    await prisma.$executeRawUnsafe(`
       ALTER TABLE "public"."teacher_themes" 
       ADD COLUMN IF NOT EXISTS "animations" jsonb 
       DEFAULT '{"enabled":true,"duration":"normal","easing":"ease-in-out","transitions":["all"],"hover":true,"focus":true,"pageTransitions":true}';

@@ -68,7 +68,7 @@ export async function PUT(
     const updateData: any = {
       name: data.name,
       email: data.email,
-      role: data.role,
+      role: data.role as string,
     };
 
     // Se foi enviada uma nova senha, fazer hash

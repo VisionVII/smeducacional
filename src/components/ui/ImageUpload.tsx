@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState, useId } from 'react';
-import { Button } from '@/components/ui/button';
+import Image from 'next/image';
 import { Input } from '@/components/ui/input';
 import { Upload, X, Loader } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
@@ -125,11 +125,14 @@ export function ImageUpload({
       {/* Preview */}
       {value && (
         <div className="relative h-40 rounded-lg border overflow-hidden bg-muted">
-          <img
+          <Image
             id={inputId}
             src={value}
             alt="Preview"
-            className="w-full h-full object-cover"
+            fill
+            unoptimized
+            className="object-cover"
+            sizes="(max-width: 768px) 100vw, 50vw"
           />
           <button
             type="button"

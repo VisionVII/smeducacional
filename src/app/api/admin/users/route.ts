@@ -19,7 +19,7 @@ export async function GET(request: Request) {
     const where: any = {};
 
     if (role) {
-      where.role = role;
+      where.role = role as any;
     }
 
     if (search) {

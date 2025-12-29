@@ -2,10 +2,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { generateCertificatePDF } from '@/lib/certificates';
 
-export async function GET(request: NextRequest, { params }: any) {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
     const session = await auth();
-    const { id } = params as { id: string };
+    const { id } = await params;
 
     if (!session) {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });

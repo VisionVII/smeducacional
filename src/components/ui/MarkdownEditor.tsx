@@ -1,12 +1,18 @@
 'use client';
 
 import dynamic from 'next/dynamic';
+import type { ComponentType } from 'react';
+
+type MarkdownComponent = ComponentType<{
+  source: string;
+  style?: React.CSSProperties;
+}>;
 
 // Uso dinâmico para evitar SSR e contornar tipagens do pacote
-const Markdown = dynamic<any>(
+const Markdown = dynamic<{ source: string; style?: React.CSSProperties }>(
   () =>
-    import('@uiw/react-md-editor').then((mod: any) => {
-      return mod.default?.Markdown || mod.Markdown || (() => null);
+    import('@uiw/react-markdown-preview').then((mod: any) => {
+      return mod.default || mod.Markdown || (() => null);
     }),
   { ssr: false }
 );

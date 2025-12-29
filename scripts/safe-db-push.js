@@ -10,7 +10,7 @@
  * 4. Implementar retry com backoff
  */
 
-const { execSync, spawn } = require('child_process');
+const { spawn } = require('child_process');
 const path = require('path');
 const fs = require('fs');
 
@@ -56,6 +56,7 @@ class SafeDbPush {
         this.log(`Query engine em cache`, 'INFO');
       }
     } catch (error) {
+      console.error('[safe-db-push] Cache check error:', error);
       this.log(`Sem cache anterior (OK)`, 'INFO');
     }
   }

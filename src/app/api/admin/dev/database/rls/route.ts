@@ -2,11 +2,26 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 
+interface RLSTable {
+  schema: string;
+  name: string;
+  rowsecurity: boolean;
+}
+
+interface RLSPolicy {
+  schemaname: string;
+  tablename: string;
+  policyname: string;
+  permissive: boolean;
+  roles: string[];
+  cmd: string;
+}
+
 export async function GET(request: NextRequest) {
   try {
     const session = await auth();
 
-    if (!session?.user || (session.user as any).role !== 'ADMIN') {
+    if (!session?.user || session.user.role !== 'ADMIN') {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     }
 
@@ -28,10 +43,10 @@ export async function GET(request: NextRequest) {
 
     query += ` ORDER BY schemaname, tablename LIMIT 100;`;
 
-    const rlsTables = await prisma.$queryRawUnsafe<any[]>(query);
+    const rlsTables = await prisma.$queryRawUnsafe<RLSTable[]>(query);
 
     // Get policies for RLS tables
-    const policies = await prisma.$queryRawUnsafe<any[]>(`
+    const policies = await prisma.$queryRawUnsafe<RLSPolicy[]>(`
       SELECT 
         schemaname,
         tablename,

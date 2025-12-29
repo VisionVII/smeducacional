@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/db';
+// Prisma enums indisponíveis em TypeScript durante build sem geração; usar strings.
 import { z } from 'zod';
 
 /**
@@ -11,7 +12,7 @@ export async function GET(req: NextRequest) {
   try {
     const session = await auth();
 
-    if (!session?.user || (session.user as any).role !== 'ADMIN') {
+    if (!session?.user || session.user.role !== 'ADMIN') {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     }
 
@@ -24,11 +25,11 @@ export async function GET(req: NextRequest) {
     const where: any = {};
 
     if (status) {
-      where.status = status;
+      where.status = status as any;
     }
 
     if (position) {
-      where.slotPosition = position;
+      where.slotPosition = position as any;
     }
 
     const [ads, total] = await Promise.all([
@@ -92,7 +93,7 @@ export async function POST(req: NextRequest) {
   try {
     const session = await auth();
 
-    if (!session?.user || (session.user as any).role !== 'ADMIN') {
+    if (!session?.user || session.user.role !== 'ADMIN') {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     }
 

@@ -65,8 +65,8 @@ interface StripeConfig {
   defaultCurrency: string;
   supportedCurrencies: string[];
   pricesByCountry: CountryPrice[];
-  paymentMethods: Record<string, any>;
-  taxConfiguration: Record<string, any>;
+  paymentMethods: Record<string, boolean>;
+  taxConfiguration: Record<string, string | number | boolean>;
   stripeAccountId?: string;
   autoPayoutEnabled: boolean;
   payoutSchedule: string;
@@ -276,7 +276,6 @@ export default function StripeConfigPage() {
   };
 
   const formatCurrency = (amount: number, currency: string) => {
-    const curr = CURRENCIES.find((c) => c.code === currency);
     return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
       currency: currency,

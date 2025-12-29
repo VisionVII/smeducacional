@@ -13,8 +13,9 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { toast } from '@/components/ui/use-toast';
 import { GraduationCap, ArrowLeft, Mail, Sparkles } from 'lucide-react';
+import { useTranslations } from '@/hooks/use-translations';
+import { useTranslatedToast } from '@/lib/translation-helpers';
 
 const keyframes = `
   @keyframes slideInUp {
@@ -31,6 +32,8 @@ const keyframes = `
 
 export default function ForgotPasswordPage() {
   const router = useRouter();
+  const { t, mounted } = useTranslations();
+  const toast = useTranslatedToast();
   const [step, setStep] = useState<'email' | 'code' | 'newPassword'>('email');
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState('');
@@ -57,19 +60,12 @@ export default function ForgotPasswordPage() {
         throw new Error(data.error || 'Erro ao enviar código');
       }
 
-      toast({
-        title: 'Código enviado!',
-        description: 'Verifique seu email para obter o código de recuperação.',
-      });
+      toast.success('codeSent');
 
       setStep('code');
     } catch (error) {
-      toast({
-        title: 'Erro',
-        description:
-          error instanceof Error ? error.message : 'Erro ao enviar código',
-        variant: 'destructive',
-      });
+      console.error('[forgot-password step1]', error);
+      toast.error('generic');
     } finally {
       setIsLoading(false);
     }
@@ -92,18 +88,12 @@ export default function ForgotPasswordPage() {
         throw new Error(data.error || 'Código inválido');
       }
 
-      toast({
-        title: 'Código verificado!',
-        description: 'Agora você pode criar uma nova senha.',
-      });
+      toast.success('codeVerified');
 
       setStep('newPassword');
     } catch (error) {
-      toast({
-        title: 'Erro',
-        description: error instanceof Error ? error.message : 'Código inválido',
-        variant: 'destructive',
-      });
+      console.error('[forgot-password step2]', error);
+      toast.error('generic');
     } finally {
       setIsLoading(false);
     }
@@ -113,20 +103,12 @@ export default function ForgotPasswordPage() {
     e.preventDefault();
 
     if (formData.password !== formData.confirmPassword) {
-      toast({
-        title: 'Erro',
-        description: 'As senhas não coincidem',
-        variant: 'destructive',
-      });
+      toast.error('passwordsDoNotMatch');
       return;
     }
 
     if (formData.password.length < 6) {
-      toast({
-        title: 'Erro',
-        description: 'A senha deve ter no mínimo 6 caracteres',
-        variant: 'destructive',
-      });
+      toast.error('passwordTooShort');
       return;
     }
 
@@ -149,21 +131,14 @@ export default function ForgotPasswordPage() {
         throw new Error(data.error || 'Erro ao redefinir senha');
       }
 
-      toast({
-        title: 'Senha redefinida!',
-        description: 'Sua senha foi alterada com sucesso. Redirecionando...',
-      });
+      toast.success('passwordReset');
 
       setTimeout(() => {
         router.push('/login');
       }, 2000);
     } catch (error) {
-      toast({
-        title: 'Erro',
-        description:
-          error instanceof Error ? error.message : 'Erro ao redefinir senha',
-        variant: 'destructive',
-      });
+      console.error('[forgot-password step3]', error);
+      toast.error('generic');
     } finally {
       setIsLoading(false);
     }
@@ -190,22 +165,25 @@ export default function ForgotPasswordPage() {
               style={{ animationDuration: '3s' }}
             />
             <span className="text-sm font-medium text-primary">
-              Recuperação de conta
+              {mounted ? t.auth.forgotPassword.title : 'Recuperação de conta'}
             </span>
           </div>
           <h1 className="text-4xl sm:text-5xl font-bold text-white mb-4 leading-tight">
-            Recuperar{' '}
-            <span className="bg-gradient-to-r from-primary via-purple-400 to-pink-400 bg-clip-text text-transparent">
-              sua senha
-            </span>
+            {mounted ? t.auth.forgotPassword.title : 'Recuperar sua senha'}
           </h1>
           <p className="text-lg text-gray-300 leading-relaxed">
             {step === 'email' &&
-              'Digite seu email para receber o código de recuperação'}
+              (mounted
+                ? t.auth.forgotPassword.subtitle
+                : 'Digite seu email para receber o código de recuperação')}
             {step === 'code' &&
-              'Digite o código de 6 dígitos enviado para seu email'}
+              (mounted
+                ? t.auth.forgotPassword.codeSubtitle
+                : 'Digite o código de 6 dígitos enviado para seu email')}
             {step === 'newPassword' &&
-              'Crie uma nova senha segura para sua conta'}
+              (mounted
+                ? t.auth.forgotPassword.newPasswordSubtitle
+                : 'Crie uma nova senha segura para sua conta')}
           </p>
         </div>
 
@@ -221,9 +199,16 @@ export default function ForgotPasswordPage() {
               </div>
             </div>
             <CardTitle className="text-2xl font-bold leading-tight">
-              {step === 'email' && 'Recuperar Senha'}
-              {step === 'code' && 'Verificar Código'}
-              {step === 'newPassword' && 'Nova Senha'}
+              {step === 'email' &&
+                (mounted ? t.auth.forgotPassword.title : 'Recuperar Senha')}
+              {step === 'code' &&
+                (mounted
+                  ? t.auth.forgotPassword.codeTitle
+                  : 'Verificar Código')}
+              {step === 'newPassword' &&
+                (mounted
+                  ? t.auth.forgotPassword.newPasswordTitle
+                  : 'Nova Senha')}
             </CardTitle>
           </CardHeader>
 
@@ -231,7 +216,9 @@ export default function ForgotPasswordPage() {
             <form onSubmit={handleSendCode}>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
+                  <Label htmlFor="email">
+                    {mounted ? t.auth.forgotPassword.email : 'Email'}
+                  </Label>
                   <div className="relative">
                     <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
@@ -253,12 +240,20 @@ export default function ForgotPasswordPage() {
                   className="w-full h-11 text-base font-semibold bg-gradient-to-r from-primary via-primary to-purple-600 hover:shadow-lg hover:shadow-primary/50 transition-all duration-300"
                   disabled={isLoading}
                 >
-                  {isLoading ? 'Enviando...' : 'Enviar Código'}
+                  {isLoading
+                    ? mounted
+                      ? t.common.loading
+                      : 'Enviando...'
+                    : mounted
+                    ? t.auth.forgotPassword.submit
+                    : 'Enviar Código'}
                 </Button>
                 <Button asChild variant="ghost" className="w-full" size="sm">
                   <Link href="/login" className="flex items-center gap-2">
                     <ArrowLeft className="h-4 w-4" />
-                    Voltar para o login
+                    {mounted
+                      ? t.auth.forgotPassword.backToLogin
+                      : 'Voltar para o login'}
                   </Link>
                 </Button>
               </CardFooter>
@@ -269,7 +264,11 @@ export default function ForgotPasswordPage() {
             <form onSubmit={handleVerifyCode}>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="code">Código de Verificação</Label>
+                  <Label htmlFor="code">
+                    {mounted
+                      ? t.auth.forgotPassword.code
+                      : 'Código de Verificação'}
+                  </Label>
                   <Input
                     id="code"
                     type="text"
@@ -283,7 +282,10 @@ export default function ForgotPasswordPage() {
                     required
                   />
                   <p className="text-xs text-center text-muted-foreground">
-                    Código enviado para <strong>{email}</strong>
+                    {mounted
+                      ? t.auth.forgotPassword.codeSubtitle
+                      : 'Código enviado para'}{' '}
+                    <strong>{email}</strong>
                   </p>
                 </div>
               </CardContent>
@@ -293,7 +295,13 @@ export default function ForgotPasswordPage() {
                   className="w-full h-11 text-base font-semibold bg-gradient-to-r from-primary via-primary to-purple-600 hover:shadow-lg hover:shadow-primary/50 transition-all duration-300"
                   disabled={isLoading || code.length !== 6}
                 >
-                  {isLoading ? 'Verificando...' : 'Verificar Código'}
+                  {isLoading
+                    ? mounted
+                      ? t.common.loading
+                      : 'Verificando...'
+                    : mounted
+                    ? t.auth.forgotPassword.verify
+                    : 'Verificar Código'}
                 </Button>
                 <Button
                   type="button"
@@ -303,7 +311,7 @@ export default function ForgotPasswordPage() {
                   onClick={() => setStep('email')}
                 >
                   <ArrowLeft className="h-4 w-4 mr-2" />
-                  Voltar
+                  {mounted ? t.common.back : 'Voltar'}
                 </Button>
               </CardFooter>
             </form>
@@ -313,7 +321,9 @@ export default function ForgotPasswordPage() {
             <form onSubmit={handleResetPassword}>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="password">Nova Senha</Label>
+                  <Label htmlFor="password">
+                    {mounted ? t.auth.forgotPassword.newPassword : 'Nova Senha'}
+                  </Label>
                   <Input
                     id="password"
                     type="password"
@@ -328,7 +338,11 @@ export default function ForgotPasswordPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="confirmPassword">Confirmar Nova Senha</Label>
+                  <Label htmlFor="confirmPassword">
+                    {mounted
+                      ? t.auth.forgotPassword.confirmPassword
+                      : 'Confirmar Nova Senha'}
+                  </Label>
                   <Input
                     id="confirmPassword"
                     type="password"
@@ -348,7 +362,13 @@ export default function ForgotPasswordPage() {
               </CardContent>
               <CardFooter className="flex flex-col space-y-4">
                 <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? 'Salvando...' : 'Redefinir Senha'}
+                  {isLoading
+                    ? mounted
+                      ? t.common.loading
+                      : 'Salvando...'
+                    : mounted
+                    ? t.auth.forgotPassword.reset
+                    : 'Redefinir Senha'}
                 </Button>
               </CardFooter>
             </form>

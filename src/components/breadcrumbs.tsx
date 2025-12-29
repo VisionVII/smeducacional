@@ -49,7 +49,7 @@ export function Breadcrumbs() {
   const breadcrumbs: BreadcrumbItem[] = [];
   let currentPath = '';
 
-  segments.forEach((segment, index) => {
+  segments.forEach((segment) => {
     // Ignorar segmentos dinâmicos do tipo [slug], [id], etc.
     if (segment.startsWith('[') && segment.endsWith(']')) {
       return;
@@ -85,8 +85,8 @@ export function Breadcrumbs() {
         <Home className="h-4 w-4" />
       </Link>
 
-      {breadcrumbs?.map((crumb, index) => {
-        const isLast = index === breadcrumbs.length - 1;
+      {breadcrumbs?.map((crumb) => {
+        const isLast = breadcrumbs[breadcrumbs.length - 1] === crumb;
 
         return (
           <Fragment key={crumb.href}>

@@ -9,22 +9,18 @@ import {
   GraduationCap,
   DollarSign,
   TrendingUp,
-  TrendingDown,
-  Activity,
+  Clock,
+  Award,
   UserPlus,
   ArrowRight,
   BarChart3,
   Settings,
   Bell,
   Calendar,
-  Award,
-  Clock,
   CheckCircle2,
-  CreditCard,
+  Activity as ActivityIcon,
 } from 'lucide-react';
-import { DashboardGrid } from '@/components/admin/dashboard-grid';
-import { StatCard } from '@/components/admin/stat-card';
-import { DashboardCard } from '@/components/admin/dashboard-card';
+import { useTranslations } from '@/hooks/use-translations';
 import { RecentPayments } from '@/components/admin/recent-payments';
 import { PaymentStats } from '@/components/admin/payment-stats';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -37,7 +33,6 @@ import {
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
 
 interface DashboardStats {
   totalUsers: number;
@@ -62,6 +57,7 @@ interface Activity {
 
 export default function AdminDashboard() {
   const { data: session, status } = useSession();
+  const { t } = useTranslations();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [activities, setActivities] = useState<Activity[]>([]);
   const [loading, setLoading] = useState(true);
@@ -180,8 +176,8 @@ export default function AdminDashboard() {
                 variant="outline"
                 className="border-primary/50 bg-primary/10 text-xs"
               >
-                <Activity className="h-3 w-3 mr-1 animate-pulse" />
-                Sistema Online
+                <ActivityIcon className="h-3 w-3 mr-1 animate-pulse" />
+                {t.dashboard.systemOnline}
               </Badge>
               <p className="text-xs text-muted-foreground">
                 {new Date().toLocaleDateString('pt-BR', {
@@ -242,7 +238,7 @@ export default function AdminDashboard() {
                     </Badge>
                   </div>
                   <CardTitle className="text-sm text-muted-foreground font-medium">
-                    Total de Usuários
+                    {t.dashboard.admin.totalUsers}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -251,7 +247,7 @@ export default function AdminDashboard() {
                       {stats?.totalUsers || 0}
                     </p>
                     <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1">
-                      <Clock className="h-3 w-3" />+{userGrowth} este mês
+                      <Clock className="h-3 w-3" />+{userGrowth}
                     </p>
                   </div>
                 </CardContent>
@@ -274,7 +270,7 @@ export default function AdminDashboard() {
                     </Badge>
                   </div>
                   <CardTitle className="text-sm text-muted-foreground font-medium">
-                    Cursos Disponíveis
+                    {t.dashboard.admin.totalCourses}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -284,7 +280,8 @@ export default function AdminDashboard() {
                     </p>
                     <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1">
                       <Award className="h-3 w-3" />
-                      {avgEnrollmentsPerCourse} média por curso
+                      {avgEnrollmentsPerCourse}{' '}
+                      {t.dashboard.admin.stats.avgEnrollments}
                     </p>
                   </div>
                 </CardContent>
@@ -306,7 +303,7 @@ export default function AdminDashboard() {
                     </Badge>
                   </div>
                   <CardTitle className="text-sm text-muted-foreground font-medium">
-                    Matrículas Ativas
+                    {t.dashboard.admin.totalEnrollments}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -339,7 +336,7 @@ export default function AdminDashboard() {
                     </Badge>
                   </div>
                   <CardTitle className="text-sm text-muted-foreground font-medium">
-                    Receita Total
+                    {t.dashboard.admin.totalRevenue}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="px-4 pb-4">
@@ -378,10 +375,12 @@ export default function AdminDashboard() {
                 <CardHeader className="bg-gradient-to-r from-primary/5 via-purple-500/5 to-pink-500/5 border-b">
                   <div className="flex items-center gap-3">
                     <div className="p-2.5 bg-gradient-theme rounded-lg">
-                      <Activity className="h-5 w-5 text-white" />
+                      <ActivityIcon className="h-5 w-5 text-white" />
                     </div>
                     <div>
-                      <CardTitle className="text-xl">Ações Rápidas</CardTitle>
+                      <CardTitle className="text-xl">
+                        {t.dashboard.admin.cards.quickActions}
+                      </CardTitle>
                       <CardDescription>
                         Acesso direto às principais funcionalidades
                       </CardDescription>
@@ -394,19 +393,19 @@ export default function AdminDashboard() {
                       {
                         href: '/admin/users',
                         icon: Users,
-                        label: 'Usuários',
+                        label: t.dashboard.admin.users,
                         color: 'primary',
                       },
                       {
                         href: '/admin/courses',
                         icon: BookOpen,
-                        label: 'Cursos',
+                        label: t.dashboard.admin.courses,
                         color: 'green',
                       },
                       {
                         href: '/admin/settings',
                         icon: Settings,
-                        label: 'Configurações',
+                        label: t.dashboard.admin.settings,
                         color: 'orange',
                       },
                       {
@@ -446,11 +445,11 @@ export default function AdminDashboard() {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div className="p-2.5 bg-gradient-to-br from-purple-600 to-pink-600 rounded-lg">
-                        <Activity className="h-5 w-5 text-white" />
+                        <ActivityIcon className="h-5 w-5 text-white" />
                       </div>
                       <div>
                         <CardTitle className="text-xl">
-                          Atividades Recentes
+                          {t.dashboard.recentActivity}
                         </CardTitle>
                         <CardDescription>
                           Últimas ações no sistema
@@ -458,7 +457,7 @@ export default function AdminDashboard() {
                       </div>
                     </div>
                     <Button variant="ghost" size="sm" className="gap-2">
-                      Ver todas
+                      {t.dashboard.viewAll}
                       <ArrowRight className="h-4 w-4" />
                     </Button>
                   </div>
@@ -518,10 +517,10 @@ export default function AdminDashboard() {
                   ) : (
                     <div className="text-center py-12">
                       <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-muted/50 flex items-center justify-center">
-                        <Activity className="h-8 w-8 text-muted-foreground/30" />
+                        <ActivityIcon className="h-8 w-8 text-muted-foreground/30" />
                       </div>
                       <p className="text-sm text-muted-foreground">
-                        Nenhuma atividade recente
+                        {t.dashboard.admin.activities.noActivity}
                       </p>
                     </div>
                   )}

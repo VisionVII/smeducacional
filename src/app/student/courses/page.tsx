@@ -1,7 +1,7 @@
 'use client';
 
-import { useSession } from 'next-auth/react';
 import { useQuery } from '@tanstack/react-query';
+import Image from 'next/image';
 import {
   Card,
   CardContent,
@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { BookOpen, Clock, Award } from 'lucide-react';
+import { BookOpen, Clock } from 'lucide-react';
 import Link from 'next/link';
 
 interface Course {
@@ -26,8 +26,6 @@ interface Course {
 }
 
 export default function StudentCoursesPage() {
-  const { data: session } = useSession();
-
   const { data: courses, isLoading } = useQuery<Course[]>({
     queryKey: ['student-courses'],
     queryFn: async () => {
@@ -118,10 +116,13 @@ export default function StudentCoursesPage() {
                 </CardHeader>
                 <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6 relative z-10">
                   {course.thumbnail && (
-                    <img
+                    <Image
                       src={course.thumbnail}
                       alt={course.title}
+                      width={640}
+                      height={360}
                       className="w-full h-40 object-cover rounded-md mb-4 group-hover:scale-105 transition-transform duration-300"
+                      unoptimized
                     />
                   )}
 

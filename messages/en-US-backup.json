@@ -1,0 +1,447 @@
+{
+  "common": {
+    "loading": "Carregando...",
+    "save": "Salvar",
+    "cancel": "Cancelar",
+    "delete": "Excluir",
+    "edit": "Editar",
+    "close": "Fechar",
+    "search": "Pesquisar",
+    "filter": "Filtrar",
+    "actions": "Ações",
+    "yes": "Sim",
+    "no": "Não",
+    "ok": "OK",
+    "error": "Erro",
+    "success": "Sucesso",
+    "warning": "Aviso",
+    "info": "Informação",
+    "back": "Voltar",
+    "next": "Próximo",
+    "previous": "Anterior",
+    "submit": "Enviar",
+    "confirm": "Confirmar",
+    "view": "Visualizar",
+    "download": "Baixar",
+    "upload": "Enviar",
+    "required": "Obrigatório",
+    "optional": "Opcional",
+    "add": "Adicionar",
+    "remove": "Remover",
+    "update": "Atualizar",
+    "create": "Criar",
+    "new": "Novo",
+    "all": "Todos"
+  },
+  "languages": {
+    "ptBR": "Português (BR)",
+    "enUS": "English",
+    "esES": "Español"
+  },
+  "languageSwitcher": {
+    "label": "Idioma",
+    "placeholder": "Selecionar idioma"
+  },
+  "languagesAria": {
+    "button": "Abrir seleção de idioma"
+  },
+  "nav": {
+    "home": "Início",
+    "courses": "Cursos",
+    "about": "Sobre Nós",
+    "contact": "Contato",
+    "login": "Entrar",
+    "register": "Cadastrar",
+    "dashboard": "Dashboard",
+    "profile": "Perfil",
+    "settings": "Configurações",
+    "logout": "Sair",
+    "becomeInstructor": "Seja um Instrutor",
+    "users": "Usuários",
+    "categories": "Categorias",
+    "payments": "Pagamentos",
+    "plans": "Planos",
+    "advertisements": "Anúncios",
+    "reports": "Relatórios",
+    "myCourses": "Meus Cursos",
+    "certificates": "Certificados",
+    "progress": "Progresso"
+  },
+  "footer": {
+    "aboutTitle": "SM Educacional",
+    "aboutText": "Plataforma completa de ensino online com cursos de qualidade para seu desenvolvimento profissional.",
+    "quickLinks": "Links Rápidos",
+    "courseCatalog": "Catálogo de Cursos",
+    "aboutUs": "Sobre Nós",
+    "becomeInstructor": "Seja um Instrutor",
+    "faq": "FAQ",
+    "support": "Suporte",
+    "helpCenter": "Central de Ajuda",
+    "contact": "Contato",
+    "termsOfUse": "Termos de Uso",
+    "privacyPolicy": "Política de Privacidade",
+    "cookiePolicy": "Política de Cookies",
+    "contactTitle": "Contato",
+    "rights": "© {year} VisionVII. Todos os direitos reservados.",
+    "accessAt": "Acesso em: {datetime}",
+    "securityWarning": "Atenção: Para sua segurança, filtros avançados de proteção, autenticação e monitoramento estão ativos neste sistema.",
+    "terms": "Termos",
+    "privacy": "Privacidade",
+    "lgpd": "LGPD",
+    "cookies": "Cookies",
+    "developedBy": "Desenvolvido com excelência pela VisionVII.",
+    "developerPrincipal": "Desenvolvedor Principal: Victor Hugo"
+  },
+  "home": {
+    "hero": {
+      "badge": "Transforme sua carreira agora",
+      "title": "Aprenda no seu ritmo,",
+      "titleHighlight": "conquiste seus objetivos",
+      "subtitle": "Plataforma completa de ensino com cursos estruturados, certificados reconhecidos e acompanhamento personalizado.",
+      "cta": "Explorar Cursos",
+      "ctaSecondary": "Saiba Mais"
+    },
+    "features": {
+      "courses": {
+        "title": "Cursos Completos",
+        "description": "Aulas em vídeo, materiais extras e exercícios práticos"
+      },
+      "certificates": {
+        "title": "Certificados",
+        "description": "Certificado digital ao concluir cada curso"
+      },
+      "support": {
+        "title": "Suporte 24/7",
+        "description": "Tire suas dúvidas a qualquer momento"
+      },
+      "quality": {
+        "title": "Instrutores Qualificados",
+        "description": "Aprenda com os melhores profissionais"
+      },
+      "flexible": {
+        "title": "Horários Flexíveis",
+        "description": "Estude quando e onde quiser"
+      },
+      "progress": {
+        "title": "Acompanhamento",
+        "description": "Monitore seu progresso em tempo real"
+      }
+    },
+    "stats": {
+      "students": "Alunos Ativos",
+      "courses": "Cursos Disponíveis",
+      "hours": "Horas de Conteúdo",
+      "satisfaction": "Taxa de Satisfação"
+    },
+    "testimonials": {
+      "title": "O que nossos alunos dizem",
+      "subtitle": "Veja como estamos transformando vidas de pessoas que acreditam na educação contínua",
+      "quote1": "Excelente plataforma! Os cursos são muito bem estruturados e os professores são atenciosos.",
+      "author1": "Maria Silva",
+      "role1": "Desenvolvedora Web",
+      "quote2": "Consegui mudar de carreira graças aos cursos da plataforma. Recomendo muito!",
+      "author2": "João Santos",
+      "role2": "Analista de Dados",
+      "quote3": "Material de qualidade e certificados que realmente agregam valor ao currículo.",
+      "author3": "Ana Costa",
+      "role3": "Designer UX/UI"
+    },
+    "cta": {
+      "title": "Comece sua jornada de aprendizado hoje",
+      "subtitle": "Junte-se a milhares de alunos e transforme sua carreira.",
+      "button": "Criar conta gratuita",
+      "noCreditCard": "Sem cartão de crédito",
+      "badge": "Oferta Especial"
+    }
+  },
+  "courses": {
+    "title": "Catálogo de Cursos",
+    "subtitle": "Explore nossa coleção de cursos",
+    "searchPlaceholder": "Buscar cursos...",
+    "filterByCategory": "Filtrar por categoria",
+    "allCategories": "Todas as Categorias",
+    "noCoursesFound": "Nenhum curso encontrado",
+    "enrollNow": "Matricular Agora",
+    "learnMore": "Saiba Mais",
+    "free": "Grátis",
+    "price": "{price}",
+    "duration": "{hours}h",
+    "students": "{count} alunos",
+    "lessons": "{count} aulas",
+    "level": "Nível",
+    "beginner": "Iniciante",
+    "intermediate": "Intermediário",
+    "advanced": "Avançado",
+    "instructor": "Instrutor",
+    "rating": "Avaliação",
+    "enrolled": "Matriculado",
+    "startCourse": "Iniciar Curso",
+    "continueCourse": "Continuar Curso"
+  },
+  "pricing": {
+    "currency": "R$",
+    "perMonth": "/mês",
+    "perYear": "/ano",
+    "billed": "cobrado {period}",
+    "monthly": "mensalmente",
+    "yearly": "anualmente",
+    "selectPlan": "Selecionar Plano",
+    "currentPlan": "Plano Atual",
+    "changePlan": "Alterar Plano",
+    "free": "Grátis",
+    "basic": "Básico",
+    "pro": "Profissional",
+    "premium": "Premium"
+  },
+  "auth": {
+    "login": {
+      "title": "Entrar",
+      "subtitle": "Acesse sua conta",
+      "email": "Email",
+      "password": "Senha",
+      "forgotPassword": "Esqueceu a senha?",
+      "submit": "Entrar",
+      "noAccount": "Não tem uma conta?",
+      "signUp": "Cadastre-se",
+      "or": "ou",
+      "withGoogle": "Entrar com Google",
+      "rememberMe": "Lembrar-me",
+      "welcomeBack": "Bem-vindo de volta!"
+    },
+    "register": {
+      "title": "Cadastrar",
+      "subtitle": "Crie sua conta",
+      "name": "Nome completo",
+      "email": "Email",
+      "password": "Senha",
+      "confirmPassword": "Confirmar senha",
+      "submit": "Criar conta",
+      "hasAccount": "Já tem uma conta?",
+      "signIn": "Entre",
+      "agreeTerms": "Concordo com os",
+      "terms": "Termos de Uso",
+      "and": "e",
+      "privacy": "Política de Privacidade",
+      "welcome": "Bem-vindo ao SM Educa!"
+    },
+    "forgotPassword": {
+      "title": "Recuperar Senha",
+      "subtitle": "Digite seu email para receber um código de recuperação",
+      "email": "Email",
+      "submit": "Enviar Código",
+      "codeTitle": "Verificar Código",
+      "codeSubtitle": "Digite o código enviado para seu email",
+      "code": "Código de Verificação",
+      "verify": "Verificar Código",
+      "newPasswordTitle": "Nova Senha",
+      "newPasswordSubtitle": "Crie uma nova senha segura",
+      "newPassword": "Nova Senha",
+      "confirmPassword": "Confirmar Nova Senha",
+      "reset": "Redefinir Senha",
+      "backToLogin": "Voltar para o Login",
+      "success": "Senha redefinida com sucesso!"
+    }
+  },
+  "dashboard": {
+    "welcome": "Bem-vindo(a)",
+    "overview": "Visão Geral",
+    "statistics": "Estatísticas",
+    "recentActivity": "Atividade Recente",
+    "systemOnline": "Sistema Online",
+    "notifications": "Notificações",
+    "viewAll": "Ver Todos",
+    "student": {
+      "title": "Painel do Aluno",
+      "greeting": "Olá, {name}! 👋",
+      "subtitle": "Continue seu aprendizado onde você parou",
+      "myCourses": "Meus Cursos",
+      "inProgress": "Em Progresso",
+      "completed": "Concluídos",
+      "certificates": "Certificados",
+      "progress": "Progresso",
+      "continueLearning": "Continuar Aprendendo",
+      "coursesInProgress": "Seus cursos em andamento",
+      "stats": {
+        "activeCourses": "Cursos Ativos",
+        "completedCourses": "Concluídos",
+        "certificates": "Certificados",
+        "studyHours": "Horas de Estudo",
+        "inProgress": "em andamento",
+        "completeCourses": "cursos completos",
+        "earned": "conquistados",
+        "totalTime": "tempo total"
+      },
+      "empty": {
+        "noCourses": "Você ainda não está matriculado em nenhum curso",
+        "exploreText": "Explore nosso catálogo e comece a aprender hoje!",
+        "exploreCourses": "Explorar Cursos"
+      },
+      "progress": "Progresso",
+      "continueCourse": "Continuar Curso"
+    },
+    "teacher": {
+      "myCourses": "Meus Cursos",
+      "createCourse": "Criar Curso",
+      "students": "Alunos",
+      "signup": {
+        "title": "Torne-se um Instrutor",
+        "subtitle": "Compartilhe seu conhecimento e transforme vidas",
+        "description": "Crie cursos online, ganhe dinheiro e impacte a vida de milhares de pessoas",
+        "cta": "Começar Agora",
+        "features": {
+          "courseManagement": {
+            "title": "Gerenciamento de Cursos",
+            "description": "Crie, organize e gerencie seus cursos com ferramentas intuitivas"
+          },
+          "unlimitedClasses": {
+            "title": "Turmas Ilimitadas",
+            "description": "Ensine quantos alunos quiser em múltiplos cursos simultâneos"
+          },
+          "directMonetization": {
+            "title": "Monetização Direta",
+            "description": "Receba pagamentos diretos pelos seus cursos sem intermediários"
+          },
+          "detailedAnalytics": {
+            "title": "Analíticos Detalhados",
+            "description": "Acompanhe o desempenho de seus alunos em tempo real"
+          },
+          "totalFlexibility": {
+            "title": "Flexibilidade Total",
+            "description": "Trabalhe no seu próprio ritmo e horário"
+          },
+          "guaranteedGrowth": {
+            "title": "Crescimento Garantido",
+            "description": "Ferramentas integradas para aumentar suas vendas"
+          }
+        },
+        "benefits": [
+          "Comissão de até 70% do valor dos cursos",
+          "Dashboard analytics avançado",
+          "Suporte 24/7 dedicado",
+          "Certificados digitais automáticos",
+          "Integração com múltiplas plataformas",
+          "Marketing tools inclusos"
+        ],
+        "howItWorks": "Como Funciona",
+        "backToHome": "Voltar",
+        "alreadyInstructor": "Já é instrutor?",
+        "login": "Fazer Login"
+      }
+    },
+    "admin": {
+      "title": "Dashboard Admin",
+      "users": "Usuários",
+      "courses": "Cursos",
+      "categories": "Categorias",
+      "settings": "Configurações",
+      "totalUsers": "Total de Usuários",
+      "totalCourses": "Total de Cursos",
+      "activeStudents": "Alunos Ativos",
+      "totalEnrollments": "Total de Matrículas",
+      "totalRevenue": "Receita Total",
+      "stats": {
+        "users": "usuários",
+        "courses": "cursos",
+        "enrollments": "matrículas",
+        "revenue": "receita",
+        "newUsers": "novos usuários (30d)",
+        "newEnrollments": "novas matrículas (7d)",
+        "avgRevenue": "receita média/mês",
+        "avgEnrollments": "matrículas/curso"
+      },
+      "cards": {
+        "quickActions": "Ações Rápidas",
+        "recentActivity": "Atividade Recente",
+        "systemHealth": "Saúde do Sistema",
+        "keyMetrics": "Métricas Principais"
+      },
+      "activities": {
+        "newUser": "Novo usuário registrado",
+        "newEnrollment": "Nova matrícula",
+        "newCourse": "Novo curso criado",
+        "viewAll": "Ver Todas",
+        "noActivity": "Nenhuma atividade recente"
+      }
+    }
+  },
+  "admin": {
+    "title": "Dashboard Admin",
+    "users": "Usuários",
+    "courses": "Cursos",
+    "categories": "Categorias",
+    "payments": "Pagamentos",
+    "settings": "Configurações",
+    "plans": "Planos",
+    "advertisements": "Anúncios",
+    "profile": "Perfil",
+    "administrator": "Administrador"
+  },
+  "about": {
+    "title": "Sobre a SM Educacional",
+    "subtitle": "Transformando vidas através da educação de qualidade e acessível",
+    "mission": {
+      "title": "Nossa Missão",
+      "text": "Democratizar o acesso à educação de qualidade, oferecendo cursos online que capacitem profissionais e transformem carreiras em todo o Brasil."
+    },
+    "vision": {
+      "title": "Nossa Visão",
+      "text": "Ser referência em educação online no Brasil, reconhecida pela excelência dos cursos e pelo impacto positivo na vida dos nossos alunos."
+    },
+    "stats": {
+      "students": "Alunos",
+      "courses": "Cursos",
+      "certificates": "Certificados",
+      "satisfaction": "Satisfação"
+    },
+    "cta": {
+      "title": "Pronto para começar?",
+      "subtitle": "Junte-se a milhares de alunos e transforme sua carreira hoje",
+      "button": "Começar Agora"
+    }
+  },
+  "profile": {
+    "title": "Perfil",
+    "editProfile": "Editar Perfil",
+    "personalInfo": "Informações Pessoais",
+    "accountSettings": "Configurações da Conta",
+    "name": "Nome",
+    "email": "Email",
+    "phone": "Telefone",
+    "bio": "Biografia",
+    "avatar": "Avatar",
+    "changePassword": "Alterar Senha",
+    "saveChanges": "Salvar Alterações"
+  },
+  "toasts": {
+    "success": {
+      "saved": "Salvo com sucesso!",
+      "updated": "Atualizado com sucesso!",
+      "deleted": "Excluído com sucesso!",
+      "created": "Criado com sucesso!",
+      "loginSuccess": "Login realizado com sucesso!",
+      "registerSuccess": "Cadastro realizado com sucesso!"
+    },
+    "error": {
+      "generic": "Ocorreu um erro. Tente novamente.",
+      "unauthorized": "Você não tem permissão para esta ação.",
+      "invalidCredentials": "Email ou senha inválidos.",
+      "emailInUse": "Este email já está em uso.",
+      "requiredFields": "Preencha todos os campos obrigatórios."
+    },
+    "validation": {
+      "required": "Este campo é obrigatório",
+      "email": "Digite um email válido",
+      "minLength": "Mínimo de {min} caracteres",
+      "passwordMatch": "As senhas devem coincidir"
+    },
+    "confirmation": {
+      "delete": "Tem certeza que deseja excluir?",
+      "logout": "Tem certeza que deseja sair?"
+    },
+    "upload": {
+      "start": "Iniciando upload...",
+      "success": "Upload concluído!",
+      "error": "Erro no upload."
+    }
+  }
+}

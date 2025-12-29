@@ -28,8 +28,8 @@ export function NativeVideoPlayer({
   const [duration, setDuration] = useState(0);
   const [seeking, setSeeking] = useState(false);
   const [playbackRate, setPlaybackRate] = useState(1);
-  const [showControls, setShowControls] = useState(true);
   const [buffered, setBuffered] = useState(0);
+  const [showControls, setShowControls] = useState(true);
   const [errorState, setErrorState] = useState<{
     code?: number;
     message?: string;
@@ -49,15 +49,19 @@ export function NativeVideoPlayer({
 
   // Cleanup: pausar vídeo ao desmontar componente
   useEffect(() => {
+    const currentVideo = videoRef.current;
+    const currentProgressInterval = progressIntervalRef.current;
+    const currentControlsTimeout = controlsTimeoutRef.current;
+
     return () => {
-      if (videoRef.current) {
-        videoRef.current.pause();
+      if (currentVideo) {
+        currentVideo.pause();
       }
-      if (progressIntervalRef.current) {
-        clearInterval(progressIntervalRef.current);
+      if (currentProgressInterval) {
+        clearInterval(currentProgressInterval);
       }
-      if (controlsTimeoutRef.current) {
-        clearTimeout(controlsTimeoutRef.current);
+      if (currentControlsTimeout) {
+        clearTimeout(currentControlsTimeout);
       }
     };
   }, []);

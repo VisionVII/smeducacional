@@ -14,10 +14,12 @@ import {
 import { useSession, signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { User, Settings, LogOut, LayoutDashboard } from 'lucide-react';
+import { useTranslations } from '@/hooks/use-translations';
 
 export function UserNav() {
   const { data: session } = useSession();
   const router = useRouter();
+  const { t, mounted } = useTranslations();
 
   if (!session?.user) {
     return null;
@@ -28,12 +30,15 @@ export function UserNav() {
   };
 
   const getRoleName = (role: string) => {
-    const roles = {
-      ADMIN: 'Administrador',
-      TEACHER: 'Professor',
-      STUDENT: 'Aluno',
-    };
-    return roles[role as keyof typeof roles] || role;
+    if (!mounted || !t.roles) {
+      const roles = {
+        ADMIN: 'Administrador',
+        TEACHER: 'Professor',
+        STUDENT: 'Aluno',
+      };
+      return roles[role as keyof typeof roles] || role;
+    }
+    return t.roles[role.toLowerCase() as keyof typeof t.roles] || role;
   };
 
   const getDashboardRoute = () => {
@@ -82,7 +87,7 @@ export function UserNav() {
         <DropdownMenuGroup>
           <DropdownMenuItem onClick={() => router.push(getDashboardRoute())}>
             <LayoutDashboard className="mr-2 h-4 w-4" />
-            <span>Dashboard</span>
+            <span>{mounted ? t.nav.dashboard : 'Dashboard'}</span>
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={() =>
@@ -90,19 +95,19 @@ export function UserNav() {
             }
           >
             <User className="mr-2 h-4 w-4" />
-            <span>Perfil</span>
+            <span>{mounted ? t.nav.profile : 'Perfil'}</span>
           </DropdownMenuItem>
           {session.user.role === 'ADMIN' && (
             <DropdownMenuItem onClick={() => router.push('/admin/settings')}>
               <Settings className="mr-2 h-4 w-4" />
-              <span>Configurações</span>
+              <span>{mounted ? t.nav.settings : 'Configurações'}</span>
             </DropdownMenuItem>
           )}
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={handleSignOut}>
           <LogOut className="mr-2 h-4 w-4" />
-          <span>Sair</span>
+          <span>{mounted ? t.nav.logout : 'Sair'}</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

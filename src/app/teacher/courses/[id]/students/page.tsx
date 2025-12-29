@@ -1,13 +1,19 @@
-"use client";
+'use client';
 
-import { useQuery } from "@tanstack/react-query";
-import { useParams } from "next/navigation";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { Users, Mail, BookOpen, Award } from "lucide-react";
-import Link from "next/link";
+import { useQuery } from '@tanstack/react-query';
+import { useParams } from 'next/navigation';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { Users, Mail, BookOpen } from 'lucide-react';
+import Link from 'next/link';
 
 interface Student {
   id: string;
@@ -25,19 +31,19 @@ export default function TeacherCourseStudentsPage() {
   const courseId = params.id as string;
 
   const { data: students, isLoading } = useQuery<Student[]>({
-    queryKey: ["teacher-course-students", courseId],
+    queryKey: ['teacher-course-students', courseId],
     queryFn: async () => {
       const res = await fetch(`/api/teacher/courses/${courseId}/students`);
-      if (!res.ok) throw new Error("Erro ao carregar alunos");
+      if (!res.ok) throw new Error('Erro ao carregar alunos');
       return res.json();
     },
   });
 
   const { data: courseInfo } = useQuery({
-    queryKey: ["teacher-course", courseId],
+    queryKey: ['teacher-course', courseId],
     queryFn: async () => {
       const res = await fetch(`/api/teacher/courses/${courseId}`);
-      if (!res.ok) throw new Error("Erro ao carregar curso");
+      if (!res.ok) throw new Error('Erro ao carregar curso');
       return res.json();
     },
   });
@@ -60,9 +66,9 @@ export default function TeacherCourseStudentsPage() {
 
   const getInitials = (name: string) => {
     return name
-      .split(" ")
+      .split(' ')
       .map((n) => n[0])
-      .join("")
+      .join('')
       .toUpperCase()
       .slice(0, 2);
   };
@@ -72,7 +78,7 @@ export default function TeacherCourseStudentsPage() {
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">Alunos do Curso</h1>
         <p className="text-muted-foreground">
-          {courseInfo?.title || "Carregando..."}
+          {courseInfo?.title || 'Carregando...'}
         </p>
         <div className="flex gap-4 mt-4">
           <Badge variant="secondary" className="text-base px-4 py-1">
@@ -86,7 +92,9 @@ export default function TeacherCourseStudentsPage() {
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-12">
             <Users className="h-12 w-12 text-muted-foreground mb-4" />
-            <h3 className="text-lg font-semibold mb-2">Nenhum aluno matriculado</h3>
+            <h3 className="text-lg font-semibold mb-2">
+              Nenhum aluno matriculado
+            </h3>
             <p className="text-muted-foreground text-center">
               Ainda não há alunos matriculados neste curso
             </p>
@@ -95,7 +103,10 @@ export default function TeacherCourseStudentsPage() {
       ) : (
         <div className="space-y-4">
           {students?.map((student) => (
-            <Card key={student.id} className="hover:shadow-md transition-shadow">
+            <Card
+              key={student.id}
+              className="hover:shadow-md transition-shadow"
+            >
               <CardHeader>
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-4">
@@ -142,11 +153,15 @@ export default function TeacherCourseStudentsPage() {
                     </p>
                   </div>
                   <div className="space-y-1">
-                    <p className="text-sm text-muted-foreground">Último Acesso</p>
+                    <p className="text-sm text-muted-foreground">
+                      Último Acesso
+                    </p>
                     <p className="text-sm font-medium">
                       {student.lastAccessAt
-                        ? new Date(student.lastAccessAt).toLocaleDateString('pt-BR')
-                        : "Nunca"}
+                        ? new Date(student.lastAccessAt).toLocaleDateString(
+                            'pt-BR'
+                          )
+                        : 'Nunca'}
                     </p>
                   </div>
                 </div>

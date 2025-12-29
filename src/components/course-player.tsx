@@ -88,7 +88,8 @@ export function CoursePlayer({
             modules.forEach((module) => {
               module.lessons.forEach((lesson) => {
                 const progress = data.lessonsProgress.find(
-                  (p: any) => p.lessonId === lesson.id
+                  (p: { lessonId: string; isCompleted: boolean }) =>
+                    p.lessonId === lesson.id
                 );
                 if (progress?.isCompleted) {
                   lesson.isCompleted = true;
@@ -184,10 +185,7 @@ export function CoursePlayer({
     };
   }, [selectedLesson]);
 
-  const handleVideoProgress = async (
-    watchedSeconds: number,
-    totalSeconds: number
-  ) => {
+  const handleVideoProgress = async (watchedSeconds: number) => {
     if (!selectedLesson || (isCourseLocked && !selectedLesson.isFree)) return;
 
     try {

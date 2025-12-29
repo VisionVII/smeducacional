@@ -1,7 +1,6 @@
 // SecureOpsAI - Agente de Segurança e Compliance VisionVII
 // Todas as funções são modulares, com comentários explicativos.
 
-// importações removidas pois não utilizadas
 import PDFDocument from 'pdfkit';
 import { uploadFile } from '@/lib/supabase';
 
@@ -87,7 +86,7 @@ export async function askPreferredLanguageStyle(): Promise<
  * @param lang Estilo de linguagem ('tecnico' | 'executivo' | 'hibrido' | 'didatico')
  */
 export function adaptResponseLanguage(
-  analysis: any,
+  analysis: unknown,
   lang: 'tecnico' | 'executivo' | 'hibrido' | 'didatico'
 ) {
   // TODO: adaptar texto conforme linguagem
@@ -161,7 +160,7 @@ export async function deliverPdfToUser(pdfBuffer: Buffer) {
 }
 
 // Todos os logs devem ser auditáveis (sem dados sensíveis)
-function auditLog(action: string, details?: any) {
+function auditLog(action: string, details?: Record<string, unknown>) {
   // Exemplo de log auditável
   console.log(
     `[SecureOpsAI][${new Date().toISOString()}]`,

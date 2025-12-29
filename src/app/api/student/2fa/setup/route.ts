@@ -1,10 +1,9 @@
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 import { NextResponse } from 'next/server';
-import { z } from 'zod';
 import { buildOtpauthURL, generateSecretBase32 } from '@/lib/totp';
 
-export async function POST(request: Request) {
+export async function POST() {
   const session = await auth();
   if (!session) {
     return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });

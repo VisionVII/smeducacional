@@ -56,6 +56,7 @@ try {
   }
 } catch (error) {
   log('⚠️  Não foi possível carregar .env.local', 'yellow');
+  console.error('[diagnose-upload] Erro ao carregar .env.local', error);
 }
 
 async function diagnoseUpload() {
@@ -239,6 +240,7 @@ async function diagnoseUpload() {
             log(`   ⚠️  URL retornou status ${response.status}`, 'yellow');
           }
         } catch (error) {
+          console.error('[diagnose-upload] Erro ao verificar URL pública', error);
           log('   ⚠️  Não foi possível verificar URL pública', 'yellow');
         }
       }

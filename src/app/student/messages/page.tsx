@@ -1,13 +1,12 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { MessageSquare, Search, Send } from "lucide-react";
-import { Avatar } from "@/components/ui/avatar";
+import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { MessageSquare, Search, Send } from 'lucide-react';
 
 interface Thread {
   id: string;
@@ -29,24 +28,26 @@ interface Message {
 
 export default function StudentMessagesPage() {
   const [selectedThreadId, setSelectedThreadId] = useState<string | null>(null);
-  const [messageInput, setMessageInput] = useState("");
-  const [searchQuery, setSearchQuery] = useState("");
+  const [messageInput, setMessageInput] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
 
   const { data: threads, isLoading: threadsLoading } = useQuery<Thread[]>({
-    queryKey: ["student-threads"],
+    queryKey: ['student-threads'],
     queryFn: async () => {
-      const res = await fetch("/api/student/messages/threads");
-      if (!res.ok) throw new Error("Erro ao carregar conversas");
+      const res = await fetch('/api/student/messages/threads');
+      if (!res.ok) throw new Error('Erro ao carregar conversas');
       return res.json();
     },
   });
 
   const { data: messages, isLoading: messagesLoading } = useQuery<Message[]>({
-    queryKey: ["student-messages", selectedThreadId],
+    queryKey: ['student-messages', selectedThreadId],
     queryFn: async () => {
       if (!selectedThreadId) return [];
-      const res = await fetch(`/api/student/messages/threads/${selectedThreadId}`);
-      if (!res.ok) throw new Error("Erro ao carregar mensagens");
+      const res = await fetch(
+        `/api/student/messages/threads/${selectedThreadId}`
+      );
+      if (!res.ok) throw new Error('Erro ao carregar mensagens');
       return res.json();
     },
     enabled: !!selectedThreadId,
@@ -56,15 +57,18 @@ export default function StudentMessagesPage() {
     if (!messageInput.trim() || !selectedThreadId) return;
 
     try {
-      const res = await fetch(`/api/student/messages/threads/${selectedThreadId}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ content: messageInput }),
-      });
+      const res = await fetch(
+        `/api/student/messages/threads/${selectedThreadId}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ content: messageInput }),
+        }
+      );
 
-      if (!res.ok) throw new Error("Erro ao enviar mensagem");
+      if (!res.ok) throw new Error('Erro ao enviar mensagem');
 
-      setMessageInput("");
+      setMessageInput('');
       // Refresh messages
     } catch (error) {
       console.error(error);
@@ -106,7 +110,10 @@ export default function StudentMessagesPage() {
             {threadsLoading ? (
               <div className="p-4 space-y-2">
                 {[1, 2, 3].map((i) => (
-                  <div key={i} className="h-16 bg-gray-200 rounded animate-pulse" />
+                  <div
+                    key={i}
+                    className="h-16 bg-gray-200 rounded animate-pulse"
+                  />
                 ))}
               </div>
             ) : filteredThreads && filteredThreads.length === 0 ? (
@@ -121,18 +128,23 @@ export default function StudentMessagesPage() {
                     key={thread.id}
                     onClick={() => setSelectedThreadId(thread.id)}
                     className={`w-full p-4 text-left hover:bg-accent transition-colors ${
-                      selectedThreadId === thread.id ? "bg-accent" : ""
+                      selectedThreadId === thread.id ? 'bg-accent' : ''
                     }`}
                   >
                     <div className="flex items-start justify-between mb-1">
                       <div className="flex items-center gap-2">
-                        <div className="font-semibold">{thread.participantName}</div>
+                        <div className="font-semibold">
+                          {thread.participantName}
+                        </div>
                         <Badge variant="outline" className="text-xs">
                           {thread.participantRole}
                         </Badge>
                       </div>
                       {thread.unreadCount > 0 && (
-                        <Badge variant="destructive" className="rounded-full h-5 min-w-5 px-1.5">
+                        <Badge
+                          variant="destructive"
+                          className="rounded-full h-5 min-w-5 px-1.5"
+                        >
                           {thread.unreadCount}
                         </Badge>
                       )}
@@ -163,7 +175,10 @@ export default function StudentMessagesPage() {
             <>
               <CardHeader className="border-b">
                 <CardTitle>
-                  {threads?.find((t) => t.id === selectedThreadId)?.participantName}
+                  {
+                    threads?.find((t) => t.id === selectedThreadId)
+                      ?.participantName
+                  }
                 </CardTitle>
               </CardHeader>
 
@@ -171,7 +186,10 @@ export default function StudentMessagesPage() {
                 {messagesLoading ? (
                   <div className="space-y-2">
                     {[1, 2, 3].map((i) => (
-                      <div key={i} className="h-12 bg-gray-200 rounded animate-pulse" />
+                      <div
+                        key={i}
+                        className="h-12 bg-gray-200 rounded animate-pulse"
+                      />
                     ))}
                   </div>
                 ) : messages && messages.length === 0 ? (
@@ -182,13 +200,15 @@ export default function StudentMessagesPage() {
                   messages?.map((message) => (
                     <div
                       key={message.id}
-                      className={`flex ${message.isOwn ? "justify-end" : "justify-start"}`}
+                      className={`flex ${
+                        message.isOwn ? 'justify-end' : 'justify-start'
+                      }`}
                     >
                       <div
                         className={`max-w-[70%] rounded-lg p-3 ${
                           message.isOwn
-                            ? "bg-primary text-primary-foreground"
-                            : "bg-muted"
+                            ? 'bg-primary text-primary-foreground'
+                            : 'bg-muted'
                         }`}
                       >
                         {!message.isOwn && (
@@ -198,10 +218,13 @@ export default function StudentMessagesPage() {
                         )}
                         <p className="text-sm">{message.content}</p>
                         <p className="text-xs opacity-70 mt-1">
-                          {new Date(message.createdAt).toLocaleTimeString('pt-BR', {
-                            hour: '2-digit',
-                            minute: '2-digit',
-                          })}
+                          {new Date(message.createdAt).toLocaleTimeString(
+                            'pt-BR',
+                            {
+                              hour: '2-digit',
+                              minute: '2-digit',
+                            }
+                          )}
                         </p>
                       </div>
                     </div>
@@ -216,13 +239,16 @@ export default function StudentMessagesPage() {
                     value={messageInput}
                     onChange={(e) => setMessageInput(e.target.value)}
                     onKeyPress={(e) => {
-                      if (e.key === "Enter" && !e.shiftKey) {
+                      if (e.key === 'Enter' && !e.shiftKey) {
                         e.preventDefault();
                         handleSendMessage();
                       }
                     }}
                   />
-                  <Button onClick={handleSendMessage} disabled={!messageInput.trim()}>
+                  <Button
+                    onClick={handleSendMessage}
+                    disabled={!messageInput.trim()}
+                  >
                     <Send className="h-4 w-4" />
                   </Button>
                 </div>

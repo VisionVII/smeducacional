@@ -41,7 +41,6 @@ function addSecurityHeaders(response: NextResponse): NextResponse {
   );
 
   // Content Security Policy - Permitir Next.js HMR e scripts inline
-  const nonce = Buffer.from(crypto.randomUUID()).toString('base64');
   const cspHeader = `
     default-src 'self';
     script-src 'self' 'unsafe-eval' 'unsafe-inline' https://cdn.jsdelivr.net https://www.googletagmanager.com;

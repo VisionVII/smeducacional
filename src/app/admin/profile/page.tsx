@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { useSession } from 'next-auth/react';
 import { useState, useRef } from 'react';
 import {
@@ -48,12 +49,18 @@ export default function AdminProfilePage() {
     newPassword: '',
     confirmPassword: '',
   });
+  const initialTwoFactorEnabled =
+    session?.user && 'twoFactorEnabled' in session.user
+      ? Boolean(
+          (session.user as { twoFactorEnabled?: boolean }).twoFactorEnabled
+        )
+      : false;
   const [twoFA, setTwoFA] = useState<{
     secret?: string;
     otpauth?: string;
     enabled?: boolean;
   }>({
-    enabled: (session?.user as any)?.twoFactorEnabled ?? false,
+    enabled: initialTwoFactorEnabled,
   });
   const [showVerifyModal, setShowVerifyModal] = useState(false);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(
@@ -79,6 +86,7 @@ export default function AdminProfilePage() {
         description: 'Suas informações foram atualizadas com sucesso.',
       });
     } catch (error) {
+      console.error('[admin-profile] Update profile error:', error);
       toast({
         title: 'Erro',
         description: 'Não foi possível atualizar o perfil.',
@@ -135,6 +143,7 @@ export default function AdminProfilePage() {
         description: 'Sua senha foi alterada com sucesso.',
       });
     } catch (error) {
+      console.error('[admin-profile] Password change error:', error);
       toast({
         title: 'Erro',
         description: 'Não foi possível alterar a senha.',
@@ -162,6 +171,7 @@ export default function AdminProfilePage() {
         description: 'Escaneie o QR com seu app de autenticação.',
       });
     } catch (e) {
+      console.error('[admin-profile] Setup 2FA error:', e);
       toast({
         title: 'Erro',
         description: 'Não foi possível iniciar o 2FA.',
@@ -200,6 +210,7 @@ export default function AdminProfilePage() {
         description: 'Você pode habilitar novamente quando quiser.',
       });
     } catch (e) {
+      console.error('[admin-profile] Disable 2FA error:', e);
       toast({
         title: 'Erro',
         description: 'Não foi possível desabilitar o 2FA.',
@@ -255,10 +266,15 @@ export default function AdminProfilePage() {
         title: 'Foto atualizada',
         description: 'Sua foto de perfil foi atualizada com sucesso.',
       });
-    } catch (error: any) {
+    } catch (error) {
+      console.error('[admin-profile] Avatar upload error:', error);
+      const message =
+        error instanceof Error
+          ? error.message
+          : 'Não foi possível fazer upload da foto';
       toast({
         title: 'Erro',
-        description: error.message || 'Não foi possível fazer upload da foto',
+        description: message,
         variant: 'destructive',
       });
     } finally {
@@ -684,9 +700,12 @@ export default function AdminProfilePage() {
                             Authy, etc.) e escaneie o código abaixo:
                           </p>
                           <div className="flex flex-col sm:flex-row items-center gap-4 bg-white dark:bg-gray-900 p-4 rounded-lg">
-                            <img
+                            <Image
                               alt="QR Code 2FA"
-                              className="w-48 h-48 rounded-lg border-2 shadow-lg"
+                              width={240}
+                              height={240}
+                              className="rounded-lg border-2 shadow-lg"
+                              unoptimized
                               src={`https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=${encodeURIComponent(
                                 twoFA.otpauth!
                               )}`}

@@ -6,7 +6,7 @@ export async function GET(request: NextRequest) {
   try {
     const session = await auth();
 
-    if (!session?.user || (session.user as any).role !== 'ADMIN') {
+    if (!session?.user || session.user.role !== 'ADMIN') {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     }
 
@@ -40,11 +40,24 @@ export async function GET(request: NextRequest) {
     query += ` ORDER BY name LIMIT 100;`;
 
     try {
-      const buckets = await prisma.$queryRawUnsafe<any[]>(query);
+      const buckets = await prisma.$queryRawUnsafe<
+        Array<{
+          id: string;
+          name: string;
+          public: boolean;
+          created_at: Date;
+          updated_at: Date;
+          file_size_limit: number | null;
+          allowed_mime_types: string[] | null;
+        }>
+      >(query);
       return NextResponse.json({ data: buckets });
     } catch (queryError) {
       // Storage.buckets pode não existir em alguns ambientes
-      console.warn('[API][dev][database][buckets] Storage não disponível');
+      console.warn(
+        '[API][dev][database][buckets] Storage não disponível:',
+        queryError
+      );
       return NextResponse.json({ data: [] });
     }
   } catch (error) {

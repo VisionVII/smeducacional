@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { useSession } from 'next-auth/react';
 import { useState } from 'react';
 import {
@@ -15,13 +16,13 @@ import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/ui/use-toast';
 import {
   User,
-  Mail,
   Lock,
   Save,
   Upload,
   ShieldCheck,
   ShieldOff,
   QrCode,
+  Mail,
 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
@@ -38,13 +39,17 @@ export default function StudentProfilePage() {
     newPassword: '',
     confirmPassword: '',
   });
+  const twoFactorEnabled =
+    (session?.user as { twoFactorEnabled?: boolean })?.twoFactorEnabled ??
+    false;
+
   const [twoFA, setTwoFA] = useState<{
     secret?: string;
     otpauth?: string;
     code?: string;
     enabled?: boolean;
   }>({
-    enabled: (session?.user as any)?.twoFactorEnabled ?? false,
+    enabled: twoFactorEnabled,
   });
 
   const handleProfileUpdate = async (e: React.FormEvent) => {
@@ -65,7 +70,8 @@ export default function StudentProfilePage() {
         title: 'Perfil atualizado',
         description: 'Suas informações foram atualizadas com sucesso.',
       });
-    } catch (error) {
+    } catch (err) {
+      console.error('[StudentProfile] update profile', err);
       toast({
         title: 'Erro',
         description: 'Não foi possível atualizar o perfil.',
@@ -113,6 +119,7 @@ export default function StudentProfilePage() {
         description: 'Sua senha foi alterada com sucesso.',
       });
     } catch (error) {
+      console.error('[StudentProfile] change password', error);
       toast({
         title: 'Erro',
         description: 'Não foi possível alterar a senha.',
@@ -162,6 +169,7 @@ export default function StudentProfilePage() {
                   description: 'Sua foto foi atualizada com sucesso.',
                 });
               } catch (err) {
+                console.error('[student/profile] Avatar upload error:', err);
                 toast({
                   title: 'Erro',
                   description: 'Não foi possível atualizar a foto.',
@@ -374,6 +382,7 @@ export default function StudentProfilePage() {
                           'Você pode habilitar novamente quando quiser.',
                       });
                     } catch (e) {
+                      console.error('[student/profile] Disable 2FA error:', e);
                       toast({
                         title: 'Erro',
                         description: 'Não foi possível desabilitar o 2FA.',
@@ -416,6 +425,7 @@ export default function StudentProfilePage() {
                             'Escaneie o QR com seu app de autenticação.',
                         });
                       } catch (e) {
+                        console.error('[StudentProfile] init 2FA', e);
                         toast({
                           title: 'Erro',
                           description: 'Não foi possível iniciar o 2FA.',
@@ -437,12 +447,15 @@ export default function StudentProfilePage() {
                     </p>
                     <div className="flex items-center gap-4">
                       {/* Para exibir QR sem lib extra, usamos uma URL para um gerador externo confiável */}
-                      <img
+                      <Image
                         alt="QR Code 2FA"
                         className="w-40 h-40 rounded border"
                         src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(
                           twoFA.otpauth!
                         )}`}
+                        width={200}
+                        height={200}
+                        unoptimized
                       />
                       <div className="text-xs break-all">
                         <div className="font-medium mb-1">otpauth URL</div>
@@ -497,6 +510,7 @@ export default function StudentProfilePage() {
                             description: 'Sua conta agora requer 2FA no login.',
                           });
                         } catch (e) {
+                          console.error('[StudentProfile] verify 2FA', e);
                           toast({
                             title: 'Erro',
                             description: 'Código incorreto. Tente novamente.',

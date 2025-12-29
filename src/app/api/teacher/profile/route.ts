@@ -13,7 +13,7 @@ const profileSchema = z.object({
   avatar: z.string().url().optional().or(z.literal('')),
 });
 
-export async function GET(_req: NextRequest) {
+export async function GET() {
   try {
     const session = await auth();
 

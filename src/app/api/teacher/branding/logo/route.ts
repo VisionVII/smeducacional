@@ -81,7 +81,7 @@ export async function POST(request: Request) {
     // await supabase.storage.from('logos').upload(`${userId}/logo.${ext}`, buffer);
 
     // 4. Salvar referência no banco
-    const user = await prisma.user.update({
+    await prisma.user.update({
       where: { id: session.user.id },
       data: {
         // Se tiver logo field

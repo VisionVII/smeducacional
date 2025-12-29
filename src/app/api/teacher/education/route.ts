@@ -10,7 +10,7 @@ const educationSchema = z.object({
   year: z.number().int().min(1950).max(new Date().getFullYear()),
 });
 
-export async function GET(_req: NextRequest) {
+export async function GET() {
   try {
     const session = await auth();
 

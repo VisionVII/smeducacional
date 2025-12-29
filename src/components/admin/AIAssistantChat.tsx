@@ -12,7 +12,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { useToast } from '@/components/ui/use-toast';
+import { useTranslatedToast } from '@/lib/translation-helpers';
 import { cn } from '@/lib/utils';
 
 const AGENTS = [
@@ -28,7 +28,7 @@ const AGENTS = [
 ];
 
 export function AIAssistantChat() {
-  const { toast } = useToast();
+  const toast = useTranslatedToast();
   const AGENTS_FILTERED = AGENTS.filter((a) => !!a.id && a.id !== '');
   const [selectedAgent, setSelectedAgent] = useState(
     AGENTS_FILTERED[0] || {
@@ -60,7 +60,7 @@ export function AIAssistantChat() {
 
   const handleSend = async () => {
     if (!input.trim()) {
-      toast({ title: 'Digite sua mensagem.' });
+      toast.error('generic');
       return;
     }
     setLoading(true);
@@ -92,10 +92,10 @@ export function AIAssistantChat() {
           },
         ]);
       } else {
-        toast({ title: 'Erro ao consultar o agente.', variant: 'destructive' });
+        toast.error('generic');
       }
     } catch {
-      toast({ title: 'Erro inesperado.', variant: 'destructive' });
+      toast.error('generic');
     } finally {
       setLoading(false);
     }

@@ -2,11 +2,20 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 
+interface DatabaseRole {
+  rolname: string;
+  rolsuper: boolean;
+  rolcreatedb: boolean;
+  rolcreaterole: boolean;
+  rolcanlogin: boolean;
+  rolconnlimit: number;
+}
+
 export async function GET(request: NextRequest) {
   try {
     const session = await auth();
 
-    if (!session?.user || (session.user as any).role !== 'ADMIN') {
+    if (!session?.user || session.user.role !== 'ADMIN') {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     }
 
@@ -38,7 +47,7 @@ export async function GET(request: NextRequest) {
 
     query += ` ORDER BY rolname LIMIT 100;`;
 
-    const roles = await prisma.$queryRawUnsafe<any[]>(query);
+    const roles = await prisma.$queryRawUnsafe<DatabaseRole[]>(query);
 
     return NextResponse.json({ data: roles });
   } catch (error) {

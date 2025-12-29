@@ -11,7 +11,7 @@ export async function GET() {
   try {
     const session = await auth();
 
-    if (!session?.user || (session.user as any).role !== 'ADMIN') {
+    if (!session?.user || session.user.role !== 'ADMIN') {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     }
 
@@ -103,7 +103,7 @@ export async function PUT(req: NextRequest) {
   try {
     const session = await auth();
 
-    if (!session?.user || (session.user as any).role !== 'ADMIN') {
+    if (!session?.user || session.user.role !== 'ADMIN') {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     }
 
@@ -162,7 +162,19 @@ export async function PUT(req: NextRequest) {
     }
 
     // Preparar dados para salvar (JSON fields)
-    const updateData: any = {};
+    const updateData: {
+      stripePublishableKey?: string;
+      stripeSecretKey?: string;
+      stripeWebhookSecret?: string;
+      defaultCurrency?: string;
+      stripeAccountId?: string | null;
+      autoPayoutEnabled?: boolean;
+      payoutSchedule?: string;
+      supportedCurrencies?: unknown;
+      pricesByCountry?: unknown;
+      paymentMethods?: unknown;
+      taxConfiguration?: unknown;
+    } = {};
 
     if (result.data.stripePublishableKey !== undefined)
       updateData.stripePublishableKey = result.data.stripePublishableKey;
@@ -180,21 +192,44 @@ export async function PUT(req: NextRequest) {
 
     // JSON fields
     if (result.data.supportedCurrencies !== undefined)
-      updateData.supportedCurrencies = result.data.supportedCurrencies;
+      updateData.supportedCurrencies = result.data
+        .supportedCurrencies as unknown;
     if (result.data.pricesByCountry !== undefined)
-      updateData.pricesByCountry = result.data.pricesByCountry;
+      updateData.pricesByCountry = result.data.pricesByCountry as unknown;
     if (result.data.paymentMethods !== undefined)
-      updateData.paymentMethods = result.data.paymentMethods;
+      updateData.paymentMethods = result.data.paymentMethods as unknown;
     if (result.data.taxConfiguration !== undefined)
-      updateData.taxConfiguration = result.data.taxConfiguration;
+      updateData.taxConfiguration = result.data.taxConfiguration as unknown;
 
     const config = await prisma.systemConfig.upsert({
       where: { key: 'system' },
       create: {
         key: 'system',
-        ...updateData,
+        stripePublishableKey: updateData.stripePublishableKey,
+        stripeSecretKey: updateData.stripeSecretKey,
+        stripeWebhookSecret: updateData.stripeWebhookSecret,
+        defaultCurrency: updateData.defaultCurrency,
+        stripeAccountId: updateData.stripeAccountId ?? null,
+        autoPayoutEnabled: updateData.autoPayoutEnabled ?? false,
+        payoutSchedule: updateData.payoutSchedule ?? 'weekly',
+        supportedCurrencies: updateData.supportedCurrencies as any,
+        pricesByCountry: updateData.pricesByCountry as any,
+        paymentMethods: updateData.paymentMethods as any,
+        taxConfiguration: updateData.taxConfiguration as any,
       },
-      update: updateData,
+      update: {
+        stripePublishableKey: updateData.stripePublishableKey,
+        stripeSecretKey: updateData.stripeSecretKey,
+        stripeWebhookSecret: updateData.stripeWebhookSecret,
+        defaultCurrency: updateData.defaultCurrency,
+        stripeAccountId: updateData.stripeAccountId ?? null,
+        autoPayoutEnabled: updateData.autoPayoutEnabled ?? undefined,
+        payoutSchedule: updateData.payoutSchedule,
+        supportedCurrencies: updateData.supportedCurrencies as any,
+        pricesByCountry: updateData.pricesByCountry as any,
+        paymentMethods: updateData.paymentMethods as any,
+        taxConfiguration: updateData.taxConfiguration as any,
+      },
     });
 
     return NextResponse.json({

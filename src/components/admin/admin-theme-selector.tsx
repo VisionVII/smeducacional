@@ -11,7 +11,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Loader2, Palette, RotateCcw, AlertTriangle } from 'lucide-react';
-import { toast } from '@/components/ui/use-toast';
+import { useTranslatedToast } from '@/lib/translation-helpers';
 import { THEME_PRESETS } from '@/lib/themes/presets';
 import type { ThemePresetId } from '@/lib/themes/presets';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -27,6 +27,7 @@ interface AdminThemeSelectorProps {
 export function AdminThemeSelector({
   currentPresetId,
 }: AdminThemeSelectorProps) {
+  const toast = useTranslatedToast();
   const [selectedPreset, setSelectedPreset] =
     useState<ThemePresetId>(currentPresetId);
   const [isSaving, setIsSaving] = useState(false);
@@ -55,22 +56,13 @@ export function AdminThemeSelector({
         throw new Error(error.error || 'Erro ao salvar tema');
       }
 
-      toast({
-        title: 'Tema do sistema atualizado!',
-        description:
-          'O tema foi aplicado em todas as rotas públicas e administrativas.',
-      });
+      toast.success('updated');
 
       // Reload para aplicar tema SSR
       setTimeout(() => window.location.reload(), 500);
     } catch (error) {
       console.error('[AdminThemeSelector] Erro ao salvar:', error);
-      toast({
-        title: 'Erro ao salvar tema',
-        description:
-          error instanceof Error ? error.message : 'Tente novamente mais tarde',
-        variant: 'destructive',
-      });
+      toast.error('generic');
     } finally {
       setIsSaving(false);
     }
@@ -90,19 +82,12 @@ export function AdminThemeSelector({
         throw new Error('Erro ao resetar tema');
       }
 
-      toast({
-        title: 'Tema resetado!',
-        description: 'Voltando para Academic Blue...',
-      });
+      toast.success('deleted');
 
       setTimeout(() => window.location.reload(), 500);
     } catch (error) {
       console.error('[AdminThemeSelector] Erro ao resetar:', error);
-      toast({
-        title: 'Erro ao resetar tema',
-        description: 'Tente novamente mais tarde',
-        variant: 'destructive',
-      });
+      toast.error('generic');
     } finally {
       setIsResetting(false);
     }

@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/db';
-import { Prisma } from '@prisma/client';
 
 export async function GET() {
   try {
@@ -75,7 +74,7 @@ export async function GET() {
       );
     }
 
-    const landing = teacher.landingConfig as any;
+    const landing = teacher.landingConfig as Record<string, unknown> | null;
     const merged = {
       ...(landing ?? {}),
       theme: teacher.landingTheme ?? landing?.theme ?? null,
@@ -142,7 +141,7 @@ export async function DELETE() {
         prisma.user.update({
           where: { id: session.user.id },
           data: {
-            landingConfig: Prisma.JsonNull,
+            landingConfig: undefined as any,
           },
         }),
         new Promise((_, reject) =>

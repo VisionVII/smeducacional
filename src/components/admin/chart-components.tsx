@@ -16,6 +16,7 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
+  type TooltipProps,
 } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
@@ -34,7 +35,7 @@ const COLORS = {
 interface ChartDataPoint {
   name: string;
   value: number;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 interface ChartProps {
@@ -45,16 +46,23 @@ interface ChartProps {
 }
 
 // Tooltip personalizado
-const CustomTooltip = ({ active, payload, label }: any) => {
+const CustomTooltip = ({
+  active,
+  payload,
+  label,
+}: TooltipProps<number, string>) => {
   if (active && payload && payload.length) {
     return (
       <div className="bg-background border border-border rounded-lg shadow-lg p-3">
         <p className="font-semibold text-sm mb-1">{label}</p>
-        {payload?.map((entry: any, index: number) => (
-          <p key={index} className="text-sm" style={{ color: entry.color }}>
-            {entry.name}: {entry.value}
-          </p>
-        ))}
+        {payload?.map((entry: any, index: number) => {
+          if (!entry?.name) return null;
+          return (
+            <p key={index} className="text-sm" style={{ color: entry.color }}>
+              {entry.name}: {entry.value}
+            </p>
+          );
+        })}
       </div>
     );
   }
@@ -238,8 +246,13 @@ export function PieChartComponent({
 }
 
 // Gráfico de barras múltiplas
+type MultiBarChartDatum = {
+  name: string;
+  [key: string]: number | string;
+};
+
 interface MultiBarChartProps {
-  data: any[];
+  data: MultiBarChartDatum[];
   title?: string;
   description?: string;
   dataKeys: { key: string; name: string; color: string }[];

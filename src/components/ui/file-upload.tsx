@@ -2,6 +2,7 @@
 
 import { useState, useRef, ChangeEvent, DragEvent } from 'react';
 import { Upload, X, Image as ImageIcon, Loader2 } from 'lucide-react';
+import Image from 'next/image';
 import { Button } from './button';
 import { cn } from '@/lib/utils';
 
@@ -103,6 +104,12 @@ export function FileUpload({
   const maxSize = maxSizeMB || config.maxSize;
   const Icon = config.icon;
   const loading = externalLoading || isUploading;
+  const previewDims =
+    type === 'logo'
+      ? { width: 256, height: 64 }
+      : type === 'favicon'
+      ? { width: 32, height: 32 }
+      : { width: 256, height: 128 };
 
   const validateFile = (file: File): string | null => {
     // Validar tipo
@@ -228,9 +235,11 @@ export function FileUpload({
           {/* Preview da imagem */}
           {config.preview && (
             <div className="flex items-center justify-center mb-3">
-              <img
-                src={currentUrl}
+              <Image
+                src={currentUrl as string}
                 alt="Preview"
+                {...previewDims}
+                unoptimized
                 className={cn(
                   'object-contain',
                   type === 'logo' && 'h-16',

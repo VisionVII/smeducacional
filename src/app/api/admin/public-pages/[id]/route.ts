@@ -106,7 +106,22 @@ export async function PUT(
       }
     }
 
-    const updateData: any = {};
+    const updateData: {
+      slug?: string;
+      title?: string;
+      description?: string | null;
+      bannerUrl?: string | null;
+      iconUrl?: string | null;
+      content?: string;
+      isPublished?: boolean;
+      publishedAt?: Date;
+      metaTitle?: string | null;
+      metaDescription?: string | null;
+      featuredOnNav?: boolean;
+      navOrder?: number | null;
+      version?: number;
+    } = {};
+
     if (slug !== undefined) updateData.slug = slug;
     if (title !== undefined) updateData.title = title;
     if (description !== undefined) updateData.description = description;

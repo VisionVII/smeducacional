@@ -56,7 +56,7 @@ export function TwoFactorModal({
       setCode('');
       onClose();
     } catch (error) {
-      // Error handled by parent
+      console.error('[two-factor-modal] Verification error:', error);
     } finally {
       setIsLoading(false);
     }

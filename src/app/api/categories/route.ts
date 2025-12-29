@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 
 // GET /api/categories - Listar todas as categorias
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
     const categories = await prisma.category.findMany({
       include: {

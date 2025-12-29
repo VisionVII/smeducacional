@@ -36,11 +36,10 @@ export async function POST(request: NextRequest) {
       message: 'Certificado emitido com sucesso',
       certificateId,
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error('[certificates/issue] Erro:', error);
-    return NextResponse.json(
-      { error: error.message || 'Erro ao emitir certificado' },
-      { status: 500 }
-    );
+    const errorMessage =
+      error instanceof Error ? error.message : 'Erro ao emitir certificado';
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }

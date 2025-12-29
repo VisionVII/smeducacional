@@ -7,7 +7,7 @@ import { NextResponse } from 'next/server';
  * Retorna status completo de acesso do professor autenticado
  * Usado pelo hook useCanAccess para verificar features disponíveis
  */
-export async function GET(request: Request) {
+export async function GET() {
   try {
     const session = await auth();
 

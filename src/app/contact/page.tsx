@@ -1,3 +1,5 @@
+'use client';
+
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -5,8 +7,11 @@ import { Label } from '@/components/ui/label';
 import { AdaptiveNavbar } from '@/components/adaptive-navbar';
 import { Footer } from '@/components/footer';
 import { Mail, Phone, MapPin } from 'lucide-react';
+import { useTranslations } from '@/hooks/use-translations';
+import Link from 'next/link';
 
 export default function ContactPage() {
+  const { t, mounted } = useTranslations();
   return (
     <div className="min-h-screen flex flex-col">
       <AdaptiveNavbar />
@@ -17,11 +22,12 @@ export default function ContactPage() {
           <div className="container mx-auto px-4">
             <div className="max-w-3xl mx-auto text-center">
               <h1 className="text-4xl md:text-5xl font-bold mb-6">
-                Entre em Contato
+                {mounted ? t.contact.heroTitle : 'Entre em Contato'}
               </h1>
               <p className="text-xl opacity-90">
-                Estamos aqui para ajudar. Envie sua mensagem e retornaremos em
-                breve.
+                {mounted
+                  ? t.contact.heroSubtitle
+                  : 'Estamos aqui para ajudar. Envie sua mensagem e retornaremos em breve.'}
               </p>
             </div>
           </div>
@@ -32,10 +38,14 @@ export default function ContactPage() {
             <div className="grid md:grid-cols-2 gap-8">
               {/* Contact Form */}
               <Card className="p-8">
-                <h2 className="text-2xl font-bold mb-6">Envie sua Mensagem</h2>
+                <h2 className="text-2xl font-bold mb-6">
+                  {mounted ? t.contact.formTitle : 'Envie sua Mensagem'}
+                </h2>
                 <form className="space-y-4">
                   <div>
-                    <Label htmlFor="name">Nome Completo</Label>
+                    <Label htmlFor="name">
+                      {mounted ? t.contact.name : 'Nome Completo'}
+                    </Label>
                     <Input
                       id="name"
                       type="text"
@@ -45,7 +55,9 @@ export default function ContactPage() {
                   </div>
 
                   <div>
-                    <Label htmlFor="email">E-mail</Label>
+                    <Label htmlFor="email">
+                      {mounted ? t.contact.email : 'E-mail'}
+                    </Label>
                     <Input
                       id="email"
                       type="email"
@@ -56,7 +68,9 @@ export default function ContactPage() {
                   </div>
 
                   <div>
-                    <Label htmlFor="phone">Telefone</Label>
+                    <Label htmlFor="phone">
+                      {mounted ? t.contact.phone : 'Telefone'}
+                    </Label>
                     <Input
                       id="phone"
                       type="tel"
@@ -65,7 +79,9 @@ export default function ContactPage() {
                   </div>
 
                   <div>
-                    <Label htmlFor="subject">Assunto</Label>
+                    <Label htmlFor="subject">
+                      {mounted ? t.contact.subject : 'Assunto'}
+                    </Label>
                     <Input
                       id="subject"
                       type="text"
@@ -75,7 +91,9 @@ export default function ContactPage() {
                   </div>
 
                   <div>
-                    <Label htmlFor="message">Mensagem</Label>
+                    <Label htmlFor="message">
+                      {mounted ? t.contact.message : 'Mensagem'}
+                    </Label>
                     <textarea
                       id="message"
                       className="w-full min-h-[150px] px-3 py-2 border rounded-md"
@@ -85,7 +103,7 @@ export default function ContactPage() {
                   </div>
 
                   <Button type="submit" className="w-full">
-                    Enviar Mensagem
+                    {mounted ? t.contact.sendMessage : 'Enviar Mensagem'}
                   </Button>
                 </form>
               </Card>
@@ -96,7 +114,9 @@ export default function ContactPage() {
                   <div className="flex items-start gap-4">
                     <Mail className="w-6 h-6 text-blue-600 mt-1" />
                     <div>
-                      <h3 className="font-bold mb-1">E-mail</h3>
+                      <h3 className="font-bold mb-1">
+                        {mounted ? t.contact.infoEmailTitle : 'E-mail'}
+                      </h3>
                       <p className="text-gray-600">contato@smeducacional.com</p>
                       <p className="text-gray-600">visiondevgrid@proton.me</p>
                     </div>
@@ -107,7 +127,9 @@ export default function ContactPage() {
                   <div className="flex items-start gap-4">
                     <Phone className="w-6 h-6 text-blue-600 mt-1" />
                     <div>
-                      <h3 className="font-bold mb-1">Telefone</h3>
+                      <h3 className="font-bold mb-1">
+                        {mounted ? t.contact.infoPhoneTitle : 'Telefone'}
+                      </h3>
                       <p className="text-gray-600">(11) 1234-5678</p>
                       <p className="text-gray-600">Seg-Sex: 9h às 18h</p>
                     </div>
@@ -118,7 +140,9 @@ export default function ContactPage() {
                   <div className="flex items-start gap-4">
                     <MapPin className="w-6 h-6 text-blue-600 mt-1" />
                     <div>
-                      <h3 className="font-bold mb-1">Endereço</h3>
+                      <h3 className="font-bold mb-1">
+                        {mounted ? t.contact.infoAddressTitle : 'Endereço'}
+                      </h3>
                       <p className="text-gray-600">
                         Rua Exemplo, 123 - Sala 45
                         <br />
@@ -131,13 +155,18 @@ export default function ContactPage() {
                 </Card>
 
                 <Card className="p-6 bg-blue-50">
-                  <h3 className="font-bold mb-2">Perguntas Frequentes</h3>
+                  <h3 className="font-bold mb-2">
+                    {mounted ? t.contact.faqTitle : 'Perguntas Frequentes'}
+                  </h3>
                   <p className="text-gray-600 mb-4">
-                    Antes de entrar em contato, confira nossa página de FAQ.
-                    Muitas dúvidas já estão respondidas lá!
+                    {mounted
+                      ? t.contact.faqSubtitle
+                      : 'Antes de entrar em contato, confira nossa página de FAQ. Muitas dúvidas já estão respondidas lá!'}
                   </p>
-                  <Button variant="outline" className="w-full">
-                    Ver FAQ
+                  <Button variant="outline" className="w-full" asChild>
+                    <Link href="/faq">
+                      {mounted ? t.contact.faqButton : 'Ver FAQ'}
+                    </Link>
                   </Button>
                 </Card>
               </div>

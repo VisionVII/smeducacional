@@ -3,7 +3,6 @@
 import { useState, useRef, ChangeEvent } from 'react';
 import { Upload, X, Loader2, Video } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
 import { uploadFile } from '@/lib/supabase';
 
@@ -42,7 +41,11 @@ export function VideoUpload({
     // Validar tamanho
     const fileSizeMB = file.size / (1024 * 1024);
     if (fileSizeMB > maxSizeMB) {
-      setError(`O vídeo deve ter no máximo ${maxSizeMB}MB. Tamanho atual: ${fileSizeMB.toFixed(2)}MB`);
+      setError(
+        `O vídeo deve ter no máximo ${maxSizeMB}MB. Tamanho atual: ${fileSizeMB.toFixed(
+          2
+        )}MB`
+      );
       return;
     }
 
@@ -64,7 +67,7 @@ export function VideoUpload({
 
       const timestamp = Date.now();
       const fileExt = file.name.split('.').pop();
-      const fileName = lessonId 
+      const fileName = lessonId
         ? `lessons/${lessonId}/${timestamp}.${fileExt}`
         : `temp/${timestamp}.${fileExt}`;
 
@@ -87,9 +90,11 @@ export function VideoUpload({
       setTimeout(() => {
         setUploadProgress(0);
       }, 2000);
-    } catch (err: any) {
+    } catch (err) {
       console.error('Erro no upload:', err);
-      setError(err.message || 'Erro ao fazer upload do vídeo.');
+      setError(
+        err instanceof Error ? err.message : 'Erro ao fazer upload do vídeo.'
+      );
       setVideoUrl('');
     } finally {
       setIsUploading(false);
@@ -102,7 +107,7 @@ export function VideoUpload({
       videoRef.current.pause();
       videoRef.current.src = '';
     }
-    
+
     setVideoUrl('');
     onChange('');
     if (inputRef.current) {
@@ -201,7 +206,9 @@ export function VideoUpload({
                 <>
                   <Video className="h-12 w-12 text-gray-400 mb-4" />
                   <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
-                    <span className="font-semibold">Clique para fazer upload</span>{' '}
+                    <span className="font-semibold">
+                      Clique para fazer upload
+                    </span>{' '}
                     ou arraste o vídeo
                   </p>
                   <p className="text-xs text-gray-500 dark:text-gray-400">
@@ -223,7 +230,8 @@ export function VideoUpload({
       {!videoUrl && !error && (
         <div className="p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
           <p className="text-xs text-blue-600 dark:text-blue-400">
-            💡 <strong>Dica:</strong> Apenas vídeos enviados por upload são aceitos.
+            💡 <strong>Dica:</strong> Apenas vídeos enviados por upload são
+            aceitos.
           </p>
         </div>
       )}

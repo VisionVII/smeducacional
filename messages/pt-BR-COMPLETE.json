@@ -1,0 +1,628 @@
+{
+  "common": {
+    "loading": "Carregando...",
+    "save": "Salvar",
+    "cancel": "Cancelar",
+    "delete": "Excluir",
+    "edit": "Editar",
+    "close": "Fechar",
+    "search": "Pesquisar",
+    "filter": "Filtrar",
+    "actions": "Ações",
+    "yes": "Sim",
+    "no": "Não",
+    "ok": "OK",
+    "error": "Erro",
+    "success": "Sucesso",
+    "warning": "Aviso",
+    "info": "Informação",
+    "viewAll": "Ver Todos",
+    "manage": "Gerenciar",
+    "configure": "Configurar",
+    "back": "Voltar",
+    "next": "Próximo",
+    "previous": "Anterior",
+    "continue": "Continuar",
+    "selectAll": "Selecionar Todos",
+    "deselectAll": "Desmarcar Todos",
+    "noData": "Sem dados disponíveis",
+    "nothingFound": "Nada encontrado",
+    "refresh": "Atualizar",
+    "export": "Exportar",
+    "import": "Importar",
+    "download": "Baixar",
+    "upload": "Upload",
+    "preview": "Visualizar",
+    "publish": "Publicar",
+    "draft": "Rascunho",
+    "active": "Ativo",
+    "inactive": "Inativo",
+    "all": "Todos",
+    "none": "Nenhum",
+    "other": "Outro",
+    "more": "Mais",
+    "less": "Menos",
+    "show": "Mostrar",
+    "hide": "Ocultar"
+  },
+  "roles": {
+    "admin": "Administrador",
+    "teacher": "Professor",
+    "student": "Aluno",
+    "user": "Usuário"
+  },
+  "nav": {
+    "home": "Início",
+    "courses": "Cursos",
+    "about": "Sobre Nós",
+    "contact": "Contato",
+    "login": "Entrar",
+    "register": "Cadastrar",
+    "dashboard": "Dashboard",
+    "profile": "Perfil",
+    "logout": "Sair",
+    "settings": "Configurações",
+    "messages": "Mensagens",
+    "notifications": "Notificações",
+    "becomeInstructor": "Seja um Instrutor",
+    "help": "Ajuda",
+    "support": "Suporte"
+  },
+  "footer": {
+    "aboutTitle": "SM Educacional",
+    "aboutText": "Plataforma completa de ensino online com cursos de qualidade para seu desenvolvimento profissional.",
+    "quickLinks": "Links Rápidos",
+    "courseCatalog": "Catálogo de Cursos",
+    "aboutUs": "Sobre Nós",
+    "becomeInstructor": "Seja um Instrutor",
+    "faq": "FAQ",
+    "support": "Suporte",
+    "helpCenter": "Central de Ajuda",
+    "contact": "Contato",
+    "termsOfUse": "Termos de Uso",
+    "privacyPolicy": "Política de Privacidade",
+    "cookiePolicy": "Política de Cookies",
+    "contactTitle": "Contato",
+    "rights": "© {year} VisionVII. Todos os direitos reservados.",
+    "accessAt": "Acesso em: {datetime}",
+    "securityWarning": "Atenção: Para sua segurança, filtros avançados de proteção, autenticação e monitoramento estão ativos neste sistema. Qualquer tentativa de acesso não autorizado será registrada.",
+    "terms": "Termos",
+    "privacy": "Privacidade",
+    "lgpd": "LGPD",
+    "cookies": "Cookies",
+    "developedBy": "Desenvolvido com excelência pela VisionVII — Transformando educação através da tecnologia.",
+    "developerPrincipal": "Desenvolvedor Principal"
+  },
+  "auth": {
+    "login": {
+      "title": "Entrar",
+      "subtitle": "Acesse sua conta",
+      "welcomeBack": "Bem-vindo de volta!",
+      "enterAccount": "Entre na sua conta",
+      "email": "Email",
+      "emailPlaceholder": "seu@email.com",
+      "password": "Senha",
+      "passwordPlaceholder": "Digite sua senha",
+      "rememberMe": "Lembrar de mim",
+      "forgotPassword": "Esqueceu a senha?",
+      "submit": "Entrar",
+      "noAccount": "Não tem uma conta?",
+      "signUp": "Cadastre-se",
+      "twoFactorRequired": "Autenticação de Dois Fatores",
+      "twoFactorCode": "Código de Verificação",
+      "twoFactorPlaceholder": "Digite o código de 6 dígitos",
+      "verify": "Verificar",
+      "errors": {
+        "invalidCredentials": "Email ou senha incorretos",
+        "userNotFound": "Usuário não encontrado",
+        "twoFactorInvalid": "Código de verificação inválido",
+        "accountLocked": "Conta bloqueada. Contate o suporte.",
+        "networkError": "Erro de conexão. Tente novamente."
+      }
+    },
+    "register": {
+      "title": "Cadastrar",
+      "subtitle": "Crie sua conta",
+      "createAccount": "Crie sua conta",
+      "joinUs": "Junte-se a nós",
+      "name": "Nome completo",
+      "namePlaceholder": "Seu nome completo",
+      "email": "Email",
+      "emailPlaceholder": "seu@email.com",
+      "password": "Senha",
+      "passwordPlaceholder": "Crie uma senha forte",
+      "confirmPassword": "Confirmar senha",
+      "confirmPasswordPlaceholder": "Digite a senha novamente",
+      "agreeToTerms": "Concordo com os",
+      "termsAndConditions": "Termos e Condições",
+      "and": "e",
+      "privacyPolicy": "Política de Privacidade",
+      "submit": "Criar conta",
+      "hasAccount": "Já tem uma conta?",
+      "signIn": "Entre",
+      "errors": {
+        "passwordMismatch": "As senhas não coincidem",
+        "emailExists": "Email já está em uso",
+        "weakPassword": "Senha muito fraca. Use pelo menos 8 caracteres.",
+        "invalidEmail": "Email inválido",
+        "nameRequired": "Nome é obrigatório",
+        "termsRequired": "Você deve concordar com os termos"
+      }
+    },
+    "forgotPassword": {
+      "title": "Esqueceu a senha?",
+      "subtitle": "Recupere sua senha",
+      "instruction": "Digite seu email e enviaremos instruções para redefinir sua senha",
+      "email": "Email",
+      "emailPlaceholder": "seu@email.com",
+      "submit": "Enviar instruções",
+      "emailSent": "Email enviado! Verifique sua caixa de entrada.",
+      "backToLogin": "Voltar para login",
+      "errors": {
+        "emailNotFound": "Email não encontrado",
+        "tooManyAttempts": "Muitas tentativas. Tente novamente mais tarde."
+      }
+    },
+    "resetPassword": {
+      "title": "Redefinir senha",
+      "subtitle": "Crie uma nova senha",
+      "newPassword": "Nova senha",
+      "newPasswordPlaceholder": "Digite sua nova senha",
+      "confirmPassword": "Confirmar nova senha",
+      "confirmPasswordPlaceholder": "Digite a senha novamente",
+      "submit": "Redefinir senha",
+      "success": "Senha redefinida com sucesso!",
+      "errors": {
+        "invalidToken": "Link inválido ou expirado",
+        "passwordMismatch": "As senhas não coincidem"
+      }
+    }
+  },
+  "dashboard": {
+    "student": {
+      "title": "Dashboard do Aluno",
+      "welcome": "Olá, {name}! 👋",
+      "subtitle": "Continue seu aprendizado onde você parou",
+      "stats": {
+        "activeCourses": "Cursos Ativos",
+        "completedCourses": "Cursos Concluídos",
+        "certificates": "Certificados",
+        "studyHours": "Horas de Estudo"
+      },
+      "sections": {
+        "continueLearning": "Continuar Aprendendo",
+        "myCourses": "Meus Cursos",
+        "progress": "Seu progresso",
+        "recentActivity": "Atividade Recente",
+        "recommendedCourses": "Cursos Recomendados"
+      },
+      "empty": {
+        "noCourses": "Você ainda não está matriculado em nenhum curso",
+        "noProgress": "Nenhum progresso registrado ainda",
+        "browseConrses": "Explorar Cursos"
+      }
+    },
+    "teacher": {
+      "title": "Dashboard do Professor",
+      "welcome": "Bem-vindo, {name}!",
+      "stats": {
+        "totalCourses": "Total de Cursos",
+        "totalStudents": "Total de Alunos",
+        "revenue": "Receita",
+        "messages": "Mensagens",
+        "publishedCourses": "Cursos Publicados",
+        "draftCourses": "Em Rascunho",
+        "activeSubscriptions": "Assinaturas Ativas"
+      },
+      "sections": {
+        "myCourses": "Meus Cursos",
+        "students": "Alunos",
+        "earnings": "Ganhos",
+        "popularCourse": "Curso Mais Popular",
+        "recentPayments": "Últimos Pagamentos",
+        "analytics": "Análise"
+      },
+      "empty": {
+        "noCourses": "Você ainda não criou nenhum curso",
+        "noStudents": "Nenhum aluno matriculado ainda",
+        "noEarnings": "Nenhum ganho registrado",
+        "createCourse": "Criar Curso"
+      }
+    },
+    "admin": {
+      "title": "Dashboard Admin",
+      "welcome": "Painel Administrativo",
+      "stats": {
+        "totalUsers": "Usuários Totais",
+        "totalCourses": "Cursos Ativos",
+        "totalEnrollments": "Matrículas",
+        "totalRevenue": "Receita Total",
+        "newUsersMonth": "Novos usuários (30 dias)",
+        "newEnrollmentsWeek": "Novas matrículas (7 dias)",
+        "activeUsers": "Usuários Ativos",
+        "pendingApprovals": "Aprovações Pendentes"
+      },
+      "sections": {
+        "recentActivity": "Atividades Recentes",
+        "recentPayments": "Pagamentos Recentes",
+        "analytics": "Estatísticas",
+        "quickActions": "Ações Rápidas",
+        "systemHealth": "Saúde do Sistema",
+        "userGrowth": "Crescimento de Usuários"
+      },
+      "actions": {
+        "manageUsers": "Gerenciar Usuários",
+        "manageCourses": "Gerenciar Cursos",
+        "viewReports": "Ver Relatórios",
+        "systemSettings": "Configurações do Sistema"
+      }
+    }
+  },
+  "admin": {
+    "title": "Administração",
+    "sidebar": {
+      "dashboard": "Dashboard",
+      "users": "Usuários",
+      "allUsers": "Todos os Usuários",
+      "students": "Alunos",
+      "teachers": "Professores",
+      "administrators": "Administradores",
+      "courses": "Cursos",
+      "allCourses": "Todos os Cursos",
+      "categories": "Categorias",
+      "enrollments": "Matrículas",
+      "financial": "Financeiro",
+      "payments": "Pagamentos",
+      "invoices": "Faturas",
+      "subscriptions": "Assinaturas",
+      "analytics": "Analytics",
+      "reports": "Relatórios",
+      "messages": "Mensagens",
+      "notifications": "Notificações",
+      "settings": "Configurações",
+      "systemSettings": "Configurações do Sistema",
+      "plans": "Planos",
+      "advertisements": "Anúncios",
+      "publicPages": "Páginas Públicas",
+      "theme": "Tema",
+      "integrations": "Integrações"
+    },
+    "users": {
+      "title": "Gerenciar Usuários",
+      "addNew": "Adicionar Usuário",
+      "allUsers": "Todos os Usuários",
+      "students": "Alunos",
+      "teachers": "Professores",
+      "administrators": "Administradores",
+      "filters": {
+        "search": "Buscar usuários...",
+        "role": "Filtrar por função",
+        "status": "Filtrar por status",
+        "dateCreated": "Data de criação"
+      },
+      "table": {
+        "name": "Nome",
+        "email": "Email",
+        "role": "Função",
+        "status": "Status",
+        "createdAt": "Criado em",
+        "actions": "Ações"
+      },
+      "actions": {
+        "edit": "Editar",
+        "delete": "Excluir",
+        "activate": "Ativar",
+        "deactivate": "Desativar",
+        "resetPassword": "Redefinir Senha",
+        "viewProfile": "Ver Perfil"
+      }
+    },
+    "courses": {
+      "title": "Gerenciar Cursos",
+      "addNew": "Adicionar Curso",
+      "published": "Publicados",
+      "draft": "Rascunhos",
+      "filters": {
+        "search": "Buscar cursos...",
+        "category": "Filtrar por categoria",
+        "instructor": "Filtrar por instrutor",
+        "status": "Filtrar por status"
+      },
+      "table": {
+        "title": "Título",
+        "instructor": "Instrutor",
+        "category": "Categoria",
+        "students": "Alunos",
+        "status": "Status",
+        "createdAt": "Criado em",
+        "actions": "Ações"
+      }
+    }
+  },
+  "teacher": {
+    "title": "Professor",
+    "courses": {
+      "title": "Meus Cursos",
+      "createNew": "Criar Novo Curso",
+      "myCourses": "Meus Cursos",
+      "published": "Publicados",
+      "draft": "Rascunhos",
+      "students": "Alunos",
+      "content": "Conteúdo",
+      "settings": "Configurações",
+      "noCoursesYet": "Você ainda não criou nenhum curso",
+      "createFirst": "Criar seu primeiro curso"
+    },
+    "earnings": {
+      "title": "Ganhos",
+      "totalRevenue": "Receita Total",
+      "thisMonth": "Este Mês",
+      "lastMonth": "Mês Passado",
+      "pending": "Pendente",
+      "available": "Disponível",
+      "withdrawn": "Sacado",
+      "requestPayout": "Solicitar Saque",
+      "paymentHistory": "Histórico de Pagamentos"
+    },
+    "messages": {
+      "title": "Mensagens",
+      "inbox": "Caixa de Entrada",
+      "sent": "Enviadas",
+      "compose": "Escrever",
+      "noMessages": "Nenhuma mensagem",
+      "sendMessage": "Enviar Mensagem"
+    },
+    "profile": {
+      "title": "Perfil do Professor",
+      "bio": "Biografia",
+      "experience": "Experiência",
+      "qualifications": "Qualificações",
+      "socialLinks": "Links Sociais"
+    }
+  },
+  "student": {
+    "title": "Aluno",
+    "courses": {
+      "title": "Meus Cursos",
+      "myCourses": "Meus Cursos",
+      "active": "Ativos",
+      "completed": "Concluídos",
+      "browseAll": "Explorar Todos os Cursos",
+      "noCourses": "Você não está matriculado em nenhum curso ainda",
+      "browseCatalog": "Explorar Catálogo"
+    },
+    "certificates": {
+      "title": "Certificados",
+      "earned": "Certificados Conquistados",
+      "download": "Baixar",
+      "share": "Compartilhar",
+      "noCertificates": "Você ainda não ganhou nenhum certificado",
+      "completeCourses": "Complete cursos para ganhar certificados"
+    },
+    "activities": {
+      "title": "Atividades",
+      "pending": "Pendentes",
+      "completed": "Concluídas",
+      "noActivities": "Nenhuma atividade pendente",
+      "viewAll": "Ver Todas"
+    },
+    "progress": {
+      "title": "Meu Progresso",
+      "overallProgress": "Progresso Geral",
+      "completionRate": "Taxa de Conclusão",
+      "timeSpent": "Tempo Investido"
+    }
+  },
+  "courses": {
+    "title": "Catálogo de Cursos",
+    "subtitle": "Explore nossa coleção completa de cursos",
+    "searchPlaceholder": "Buscar cursos...",
+    "filterByCategory": "Filtrar por categoria",
+    "filterByLevel": "Filtrar por nível",
+    "sortBy": {
+      "label": "Ordenar por",
+      "recent": "Mais Recentes",
+      "popular": "Mais Populares",
+      "priceAsc": "Preço (Menor)",
+      "priceDesc": "Preço (Maior)",
+      "rating": "Melhor Avaliados"
+    },
+    "levels": {
+      "all": "Todos os Níveis",
+      "beginner": "Iniciante",
+      "intermediate": "Intermediário",
+      "advanced": "Avançado"
+    },
+    "card": {
+      "free": "Grátis",
+      "enrollNow": "Matricular Agora",
+      "learnMore": "Saiba Mais",
+      "duration": "{hours}h",
+      "students": "{count} alunos",
+      "lessons": "{count} aulas",
+      "instructor": "Instrutor",
+      "rating": "Avaliação",
+      "bestseller": "Mais Vendido",
+      "new": "Novo"
+    },
+    "empty": {
+      "noCoursesFound": "Nenhum curso encontrado",
+      "tryAnotherSearch": "Tente outra busca ou filtro",
+      "clearFilters": "Limpar Filtros"
+    },
+    "details": {
+      "overview": "Visão Geral",
+      "curriculum": "Currículo",
+      "instructor": "Instrutor",
+      "reviews": "Avaliações",
+      "requirements": "Requisitos",
+      "whatYouWillLearn": "O que você vai aprender",
+      "courseIncludes": "Este curso inclui",
+      "videoLectures": "Aulas em vídeo",
+      "downloadableResources": "Recursos para download",
+      "certificate": "Certificado de conclusão",
+      "lifetimeAccess": "Acesso vitalício"
+    }
+  },
+  "home": {
+    "hero": {
+      "badge": "Transforme sua carreira agora",
+      "title": "Aprenda no seu ritmo,",
+      "titleHighlight": "conquiste seus objetivos",
+      "subtitle": "Plataforma completa de ensino com cursos estruturados, certificados reconhecidos e acompanhamento personalizado. Junte-se a mais de 5.000 alunos em busca de transformação.",
+      "cta": "Explorar Cursos",
+      "ctaSecondary": "Saiba Mais"
+    },
+    "features": {
+      "courses": {
+        "title": "Cursos Completos",
+        "description": "Aulas em vídeo, materiais extras e exercícios práticos"
+      },
+      "certificates": {
+        "title": "Certificados",
+        "description": "Certificado digital ao concluir cada curso"
+      },
+      "support": {
+        "title": "Suporte 24/7",
+        "description": "Tire suas dúvidas a qualquer momento"
+      },
+      "quality": {
+        "title": "Instrutores Qualificados",
+        "description": "Aprenda com os melhores profissionais"
+      },
+      "flexible": {
+        "title": "Horários Flexíveis",
+        "description": "Estude quando e onde quiser"
+      },
+      "progress": {
+        "title": "Acompanhamento",
+        "description": "Monitore seu progresso em tempo real"
+      }
+    },
+    "stats": {
+      "students": "Alunos Ativos",
+      "courses": "Cursos Disponíveis",
+      "hours": "Horas de Conteúdo",
+      "satisfaction": "Taxa de Satisfação"
+    },
+    "testimonials": {
+      "title": "O que nossos alunos dizem",
+      "subtitle": "Veja como estamos transformando vidas de pessoas que acreditam na educação contínua"
+    },
+    "cta": {
+      "title": "Comece sua jornada de aprendizado hoje",
+      "subtitle": "Junte-se a milhares de alunos e transforme sua carreira. Experimente grátis por 7 dias com acesso a cursos de qualidade. Sem cartão de crédito. Sem compromisso.",
+      "button": "Criar conta gratuita",
+      "noCreditCard": "Sem cartão de crédito"
+    }
+  },
+  "toasts": {
+    "success": {
+      "saved": "Salvo com sucesso!",
+      "created": "Criado com sucesso!",
+      "updated": "Atualizado com sucesso!",
+      "deleted": "Excluído com sucesso!",
+      "uploaded": "Upload concluído!",
+      "published": "Publicado com sucesso!",
+      "generic": "Operação realizada com sucesso!"
+    },
+    "error": {
+      "generic": "Ocorreu um erro. Tente novamente.",
+      "network": "Erro de conexão. Verifique sua internet.",
+      "validation": "Verifique os campos e tente novamente.",
+      "unauthorized": "Você não tem permissão para esta ação.",
+      "notFound": "Recurso não encontrado.",
+      "serverError": "Erro no servidor. Tente mais tarde."
+    },
+    "upload": {
+      "uploading": "Fazendo upload...",
+      "success": "Upload concluído com sucesso!",
+      "error": "Erro no upload. Tente novamente.",
+      "sizeLimit": "Arquivo muito grande. Tamanho máximo: {size}MB",
+      "typeNotAllowed": "Tipo de arquivo não permitido."
+    }
+  },
+  "modals": {
+    "confirmDelete": {
+      "title": "Confirmar Exclusão",
+      "message": "Tem certeza que deseja excluir? Esta ação não pode ser desfeita.",
+      "confirm": "Sim, excluir",
+      "cancel": "Cancelar"
+    },
+    "confirmAction": {
+      "title": "Confirmar Ação",
+      "message": "Tem certeza que deseja continuar?",
+      "confirm": "Confirmar",
+      "cancel": "Cancelar"
+    },
+    "unsavedChanges": {
+      "title": "Alterações não salvas",
+      "message": "Você tem alterações não salvas. Deseja sair mesmo assim?",
+      "save": "Salvar",
+      "discard": "Descartar",
+      "cancel": "Cancelar"
+    }
+  },
+  "forms": {
+    "validation": {
+      "required": "Este campo é obrigatório",
+      "invalidEmail": "Email inválido",
+      "minLength": "Mínimo de {min} caracteres",
+      "maxLength": "Máximo de {max} caracteres",
+      "passwordStrength": "A senha deve ter pelo menos 8 caracteres",
+      "urlInvalid": "URL inválida",
+      "numberOnly": "Apenas números são permitidos",
+      "phoneInvalid": "Telefone inválido"
+    },
+    "profile": {
+      "updateSuccess": "Perfil atualizado com sucesso!",
+      "updateError": "Erro ao atualizar perfil",
+      "avatarUpdated": "Avatar atualizado!",
+      "passwordChanged": "Senha alterada com sucesso!",
+      "emailSent": "Email de confirmação enviado!"
+    },
+    "course": {
+      "createSuccess": "Curso criado com sucesso!",
+      "updateSuccess": "Curso atualizado!",
+      "deleteSuccess": "Curso excluído!",
+      "publishSuccess": "Curso publicado!",
+      "unpublishSuccess": "Curso despublicado!"
+    }
+  },
+  "pricing": {
+    "currency": "R$",
+    "perMonth": "/mês",
+    "perYear": "/ano",
+    "billed": "cobrado {period}",
+    "monthly": "mensalmente",
+    "yearly": "anualmente",
+    "selectPlan": "Selecionar Plano",
+    "currentPlan": "Plano Atual",
+    "changePlan": "Alterar Plano",
+    "upgrade": "Fazer Upgrade",
+    "downgrade": "Fazer Downgrade",
+    "freePlan": "Plano Gratuito",
+    "basicPlan": "Plano Básico",
+    "proPlan": "Plano Pro",
+    "premiumPlan": "Plano Premium"
+  },
+  "about": {
+    "title": "Sobre Nós",
+    "subtitle": "Conheça nossa história e missão",
+    "ourMission": "Nossa Missão",
+    "ourVision": "Nossa Visão",
+    "ourTeam": "Nossa Equipe",
+    "ourValues": "Nossos Valores"
+  },
+  "contact": {
+    "title": "Entre em Contato",
+    "subtitle": "Estamos aqui para ajudar",
+    "name": "Nome",
+    "email": "Email",
+    "subject": "Assunto",
+    "message": "Mensagem",
+    "send": "Enviar Mensagem",
+    "sendSuccess": "Mensagem enviada com sucesso!",
+    "sendError": "Erro ao enviar mensagem. Tente novamente."
+  }
+}

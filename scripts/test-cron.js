@@ -56,6 +56,7 @@ const req = protocol.request(url, options, (res) => {
         process.exit(1);
       }
     } catch (e) {
+      console.error('Erro ao parsear JSON da resposta:', e);
       console.log(`📝 Response (texto): ${data}\n`);
       process.exit(res.statusCode === 200 ? 0 : 1);
     }

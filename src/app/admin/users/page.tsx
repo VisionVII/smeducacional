@@ -21,13 +21,11 @@ import {
   Mail,
   Trash2,
   Edit,
-  Plus,
   GraduationCap,
   BookOpen,
-  TrendingUp,
-  TrendingDown,
-  Award,
   AlertTriangle,
+  TrendingUp,
+  Award,
   UserPlus,
   Filter,
   Download,
@@ -37,6 +35,7 @@ import {
   BarChart3,
 } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
+import { useTranslations } from '@/hooks/use-translations';
 
 interface User {
   id: string;
@@ -62,6 +61,8 @@ interface DashboardStats {
 }
 
 export default function AdminUsersPage() {
+  const { t } = useTranslations();
+  const pageT = t.adminUsersPage;
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [searchQuery, setSearchQuery] = useState('');
@@ -73,7 +74,7 @@ export default function AdminUsersPage() {
     queryKey: ['admin-users'],
     queryFn: async () => {
       const res = await fetch('/api/admin/users');
-      if (!res.ok) throw new Error('Erro ao carregar usuários');
+      if (!res.ok) throw new Error(pageT.toasts.loadError);
       const data = await res.json();
       // Mock performance data
       return data.map((user: User) => ({
@@ -128,20 +129,20 @@ export default function AdminUsersPage() {
       const res = await fetch(`/api/admin/users/${userId}`, {
         method: 'DELETE',
       });
-      if (!res.ok) throw new Error('Erro ao excluir usuário');
+      if (!res.ok) throw new Error(pageT.toasts.deleteErrorTitle);
       return res.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-users'] });
       toast({
-        title: 'Usuário removido',
-        description: 'O usuário foi excluído do sistema com sucesso.',
+        title: pageT.toasts.deleteSuccessTitle,
+        description: pageT.toasts.deleteSuccessDescription,
       });
     },
     onError: () => {
       toast({
-        title: 'Erro ao excluir',
-        description: 'Não foi possível remover o usuário. Tente novamente.',
+        title: pageT.toasts.deleteErrorTitle,
+        description: pageT.toasts.deleteErrorDescription,
         variant: 'destructive',
       });
     },
@@ -152,28 +153,28 @@ export default function AdminUsersPage() {
 
     const variants = {
       excellent: {
-        label: 'Destaque',
+        label: pageT.badges.excellent,
         variant: 'default' as const,
         icon: Award,
         className:
           'bg-green-100 text-green-800 dark:bg-green-950 dark:text-green-400',
       },
       good: {
-        label: 'Ativo',
+        label: pageT.badges.good,
         variant: 'secondary' as const,
         icon: TrendingUp,
         className:
           'bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-400',
       },
       'needs-attention': {
-        label: 'Precisa Atenção',
+        label: pageT.badges.needsAttention,
         variant: 'destructive' as const,
         icon: AlertTriangle,
         className:
           'bg-orange-100 text-orange-800 dark:bg-orange-950 dark:text-orange-400',
       },
       inactive: {
-        label: 'Inativo',
+        label: pageT.badges.inactive,
         variant: 'outline' as const,
         icon: Clock,
         className:
@@ -202,13 +203,16 @@ export default function AdminUsersPage() {
   };
 
   const getTimeSinceActive = (lastActiveAt?: string) => {
-    if (!lastActiveAt) return 'Nunca';
+    if (!lastActiveAt) return pageT.metrics.never;
     const diff = now - new Date(lastActiveAt).getTime();
     const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-    if (days === 0) return 'Hoje';
-    if (days === 1) return 'Ontem';
-    if (days < 7) return `${days} dias atrás`;
-    return `${Math.floor(days / 7)} semanas atrás`;
+    if (days === 0) return pageT.metrics.today;
+    if (days === 1) return pageT.metrics.yesterday;
+    if (days < 7) return pageT.metrics.daysAgo.replace('{count}', String(days));
+    return pageT.metrics.weeksAgo.replace(
+      '{count}',
+      String(Math.floor(days / 7))
+    );
   };
 
   const filteredUsers = users?.filter((user) => {
@@ -256,15 +260,15 @@ export default function AdminUsersPage() {
           <div>
             <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold flex items-center gap-2">
               <Users className="h-6 w-6 sm:h-8 sm:w-8" />
-              Alunos e Professores
+              {pageT.title}
             </h1>
             <p className="text-xs sm:text-sm text-muted-foreground mt-1">
-              Gerencie a comunidade educacional da plataforma
+              {pageT.subtitle}
             </p>
           </div>
           <Button className="w-full sm:w-auto">
             <UserPlus className="h-4 w-4 mr-2" />
-            Novo Usuário
+            {pageT.newUser}
           </Button>
         </div>
       </div>
@@ -282,7 +286,7 @@ export default function AdminUsersPage() {
               {stats.totalStudents}
             </CardTitle>
             <CardDescription className="text-xs">
-              Total de Alunos
+              {pageT.stats.totalStudents}
             </CardDescription>
           </CardHeader>
         </Card>
@@ -298,7 +302,7 @@ export default function AdminUsersPage() {
               {stats.activeStudents}
             </CardTitle>
             <CardDescription className="text-xs">
-              Ativos (7 dias)
+              {pageT.stats.activeStudents}
             </CardDescription>
           </CardHeader>
         </Card>
@@ -313,7 +317,9 @@ export default function AdminUsersPage() {
             <CardTitle className="text-xl sm:text-2xl lg:text-3xl font-bold">
               {stats.totalTeachers}
             </CardTitle>
-            <CardDescription className="text-xs">Professores</CardDescription>
+            <CardDescription className="text-xs">
+              {pageT.stats.totalTeachers}
+            </CardDescription>
           </CardHeader>
         </Card>
 
@@ -328,7 +334,7 @@ export default function AdminUsersPage() {
               {stats.studentsAtRisk}
             </CardTitle>
             <CardDescription className="text-xs">
-              Precisam Atenção
+              {pageT.stats.studentsAtRisk}
             </CardDescription>
           </CardHeader>
         </Card>
@@ -342,29 +348,37 @@ export default function AdminUsersPage() {
               <TabsList className="grid grid-cols-3 w-full sm:w-auto">
                 <TabsTrigger value="students" className="text-xs sm:text-sm">
                   <GraduationCap className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-                  <span className="hidden sm:inline">Alunos</span>
-                  <span className="sm:hidden">Alunos</span>
+                  <span className="hidden sm:inline">
+                    {pageT.tabs.students}
+                  </span>
+                  <span className="sm:hidden">{pageT.tabs.students}</span>
                 </TabsTrigger>
                 <TabsTrigger value="teachers" className="text-xs sm:text-sm">
                   <BookOpen className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-                  <span className="hidden sm:inline">Professores</span>
-                  <span className="sm:hidden">Profs</span>
+                  <span className="hidden sm:inline">
+                    {pageT.tabs.teachers}
+                  </span>
+                  <span className="sm:hidden">{pageT.tabs.teachersShort}</span>
                 </TabsTrigger>
                 <TabsTrigger value="admins" className="text-xs sm:text-sm">
                   <Users className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-                  <span className="hidden sm:inline">Admins</span>
-                  <span className="sm:hidden">Adm</span>
+                  <span className="hidden sm:inline">{pageT.tabs.admins}</span>
+                  <span className="sm:hidden">{pageT.tabs.adminsShort}</span>
                 </TabsTrigger>
               </TabsList>
 
               <div className="flex gap-2">
                 <Button variant="outline" size="sm" className="text-xs">
                   <Download className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-                  <span className="hidden sm:inline">Exportar</span>
+                  <span className="hidden sm:inline">
+                    {pageT.actions.export}
+                  </span>
                 </Button>
                 <Button variant="outline" size="sm" className="text-xs">
                   <Filter className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-                  <span className="hidden sm:inline">Filtros</span>
+                  <span className="hidden sm:inline">
+                    {pageT.actions.filters}
+                  </span>
                 </Button>
               </div>
             </div>
@@ -373,13 +387,13 @@ export default function AdminUsersPage() {
             <div className="relative mb-4">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder={`Buscar ${
+                placeholder={
                   activeTab === 'students'
-                    ? 'alunos'
+                    ? pageT.searchPlaceholder.students
                     : activeTab === 'teachers'
-                    ? 'professores'
-                    : 'administradores'
-                }...`}
+                    ? pageT.searchPlaceholder.teachers
+                    : pageT.searchPlaceholder.admins
+                }
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-9"
@@ -395,7 +409,7 @@ export default function AdminUsersPage() {
                   onClick={() => setStatusFilter('all')}
                   className="text-xs"
                 >
-                  Todos
+                  {pageT.statusFilters.all}
                 </Button>
                 <Button
                   variant={statusFilter === 'excellent' ? 'default' : 'outline'}
@@ -404,7 +418,7 @@ export default function AdminUsersPage() {
                   className="text-xs"
                 >
                   <Award className="h-3 w-3 mr-1" />
-                  Destaque
+                  {pageT.statusFilters.excellent}
                 </Button>
                 <Button
                   variant={statusFilter === 'good' ? 'default' : 'outline'}
@@ -413,7 +427,7 @@ export default function AdminUsersPage() {
                   className="text-xs"
                 >
                   <TrendingUp className="h-3 w-3 mr-1" />
-                  Ativos
+                  {pageT.statusFilters.good}
                 </Button>
                 <Button
                   variant={
@@ -424,7 +438,7 @@ export default function AdminUsersPage() {
                   className="text-xs"
                 >
                   <AlertTriangle className="h-3 w-3 mr-1" />
-                  Atenção
+                  {pageT.statusFilters.attention}
                 </Button>
                 <Button
                   variant={statusFilter === 'inactive' ? 'default' : 'outline'}
@@ -433,7 +447,7 @@ export default function AdminUsersPage() {
                   className="text-xs"
                 >
                   <Clock className="h-3 w-3 mr-1" />
-                  Inativos
+                  {pageT.statusFilters.inactive}
                 </Button>
               </div>
             )}
@@ -444,10 +458,10 @@ export default function AdminUsersPage() {
                 <div className="text-center py-8 sm:py-12">
                   <Users className="h-12 w-12 sm:h-16 sm:w-16 mx-auto text-muted-foreground/30 mb-3" />
                   <h3 className="text-base sm:text-lg font-semibold mb-2">
-                    Nenhum usuário encontrado
+                    {pageT.empty.title}
                   </h3>
                   <p className="text-xs sm:text-sm text-muted-foreground">
-                    Ajuste os filtros ou adicione novos usuários
+                    {pageT.empty.description}
                   </p>
                 </div>
               ) : (
@@ -487,7 +501,7 @@ export default function AdminUsersPage() {
                               <Target className="h-4 w-4 text-primary flex-shrink-0" />
                               <div>
                                 <p className="text-xs text-muted-foreground">
-                                  Conclusão
+                                  {pageT.metrics.completion}
                                 </p>
                                 <p className="text-sm sm:text-base font-bold">
                                   {user.completionRate || 0}%
@@ -499,7 +513,7 @@ export default function AdminUsersPage() {
                               <BookOpen className="h-4 w-4 text-green-600 flex-shrink-0" />
                               <div>
                                 <p className="text-xs text-muted-foreground">
-                                  Cursos
+                                  {pageT.metrics.courses}
                                 </p>
                                 <p className="text-sm sm:text-base font-bold">
                                   {user.enrollmentCount || 0}
@@ -511,7 +525,7 @@ export default function AdminUsersPage() {
                               <Clock className="h-4 w-4 text-orange-600 flex-shrink-0" />
                               <div>
                                 <p className="text-xs text-muted-foreground">
-                                  Estudo
+                                  {pageT.metrics.studyTime}
                                 </p>
                                 <p className="text-sm sm:text-base font-bold">
                                   {user.avgStudyTime || 0}h
@@ -522,7 +536,7 @@ export default function AdminUsersPage() {
 
                           <div className="flex items-center justify-between text-xs text-muted-foreground border-t pt-3">
                             <span>
-                              Último acesso:{' '}
+                              {pageT.metrics.lastAccess}{' '}
                               {getTimeSinceActive(user.lastActiveAt)}
                             </span>
                           </div>
@@ -535,7 +549,7 @@ export default function AdminUsersPage() {
                               className="flex-1 text-xs"
                             >
                               <BarChart3 className="h-3 w-3 mr-1" />
-                              Progresso
+                              {pageT.actions.progress}
                             </Button>
                             <Button
                               variant="outline"
@@ -543,7 +557,7 @@ export default function AdminUsersPage() {
                               className="flex-1 text-xs"
                             >
                               <MessageSquare className="h-3 w-3 mr-1" />
-                              Mensagem
+                              {pageT.actions.message}
                             </Button>
                             <Button variant="outline" size="sm">
                               <Edit className="h-3 w-3" />
@@ -568,7 +582,7 @@ export default function AdminUsersPage() {
                               <BookOpen className="h-4 w-4 text-primary flex-shrink-0" />
                               <div>
                                 <p className="text-xs text-muted-foreground">
-                                  Cursos
+                                  {pageT.metrics.courses}
                                 </p>
                                 <p className="text-sm sm:text-base font-bold">
                                   {user.courseCount || 0}
@@ -580,7 +594,7 @@ export default function AdminUsersPage() {
                               <GraduationCap className="h-4 w-4 text-green-600 flex-shrink-0" />
                               <div>
                                 <p className="text-xs text-muted-foreground">
-                                  Alunos
+                                  {pageT.metrics.students}
                                 </p>
                                 <p className="text-sm sm:text-base font-bold">
                                   {user.enrollmentCount || 0}
@@ -591,7 +605,7 @@ export default function AdminUsersPage() {
 
                           <div className="flex items-center justify-between text-xs text-muted-foreground border-t pt-3">
                             <span>
-                              Último acesso:{' '}
+                              {pageT.metrics.lastAccess}{' '}
                               {getTimeSinceActive(user.lastActiveAt)}
                             </span>
                           </div>
@@ -603,7 +617,7 @@ export default function AdminUsersPage() {
                               className="flex-1 text-xs"
                             >
                               <BookOpen className="h-3 w-3 mr-1" />
-                              Ver Cursos
+                              {pageT.actions.viewCourses}
                             </Button>
                             <Button
                               variant="outline"
@@ -611,7 +625,7 @@ export default function AdminUsersPage() {
                               className="flex-1 text-xs"
                             >
                               <MessageSquare className="h-3 w-3 mr-1" />
-                              Mensagem
+                              {pageT.actions.message}
                             </Button>
                             <Button variant="outline" size="sm">
                               <Edit className="h-3 w-3" />
@@ -633,7 +647,7 @@ export default function AdminUsersPage() {
                         <CardContent className="p-3 sm:p-4 pt-0">
                           <div className="flex items-center justify-between text-xs text-muted-foreground mb-3">
                             <span>
-                              Último acesso:{' '}
+                              {pageT.metrics.lastAccess}{' '}
                               {getTimeSinceActive(user.lastActiveAt)}
                             </span>
                           </div>
@@ -645,7 +659,7 @@ export default function AdminUsersPage() {
                               className="flex-1 text-xs"
                             >
                               <MessageSquare className="h-3 w-3 mr-1" />
-                              Mensagem
+                              {pageT.actions.message}
                             </Button>
                             <Button variant="outline" size="sm">
                               <Edit className="h-3 w-3" />
@@ -674,11 +688,15 @@ export default function AdminUsersPage() {
       <Card className="bg-muted/50">
         <CardContent className="p-3 sm:p-4 text-center">
           <p className="text-xs sm:text-sm text-muted-foreground">
-            <strong>{filteredUsers?.length || 0}</strong> de{' '}
-            <strong>{users?.length || 0}</strong> usuários exibidos
+            {pageT.footer.showing
+              .replace('{visible}', String(filteredUsers?.length || 0))
+              .replace('{total}', String(users?.length || 0))}
             {stats.studentsAtRisk > 0 && (
               <span className="ml-2 text-orange-600 dark:text-orange-400 font-medium">
-                • {stats.studentsAtRisk} alunos precisam de atenção
+                {pageT.footer.attention.replace(
+                  '{count}',
+                  String(stats.studentsAtRisk)
+                )}
               </span>
             )}
           </p>

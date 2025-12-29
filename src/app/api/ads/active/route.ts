@@ -52,7 +52,7 @@ export async function GET(req: NextRequest) {
 
     const ads = await prisma.advertisement.findMany({
       where: {
-        slotPosition: position as any,
+        slotPosition: position,
         status: 'ACTIVE',
         startDate: { lte: now },
         endDate: { gte: now },

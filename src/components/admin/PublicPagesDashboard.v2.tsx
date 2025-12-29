@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -27,13 +27,6 @@ import {
   Smartphone,
   Menu,
   X,
-  Grid,
-  Columns,
-  AlignLeft,
-  Copy,
-  Settings,
-  ChevronLeft,
-  ChevronRight,
   Layers,
   PanelLeftClose,
   PanelLeftOpen,
@@ -56,13 +49,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+// Select components removidos por não uso
 
 interface PublicPage {
   id: string;
@@ -236,10 +223,10 @@ export default function PublicPagesDashboard() {
   });
 
   // Handlers
-  const handleSave = () => {
+  const handleSave = useCallback(() => {
     if (!selectedPageId) return;
     updateMutation.mutate({ id: selectedPageId, data: formData });
-  };
+  }, [selectedPageId, formData, updateMutation]);
 
   const handleCreate = () => {
     if (!formData.slug || !formData.title) {
@@ -366,7 +353,7 @@ export default function PublicPagesDashboard() {
 
     window.addEventListener('keydown', handleKeyPress);
     return () => window.removeEventListener('keydown', handleKeyPress);
-  }, [selectedPageId, formData]);
+  }, [selectedPageId, formData, handleSave]);
 
   const filteredPages = pages.filter(
     (p) =>

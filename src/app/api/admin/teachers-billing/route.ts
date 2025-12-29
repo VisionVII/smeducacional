@@ -7,7 +7,7 @@ import { NextResponse } from 'next/server';
  * Retorna lista de todos os professores com status de plano
  * Requer: Role ADMIN
  */
-export async function GET(request: Request) {
+export async function GET() {
   try {
     const session = await auth();
 

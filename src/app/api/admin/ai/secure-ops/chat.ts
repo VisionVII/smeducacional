@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import {
   initializeContext,
   presentAnalysisToUser,
@@ -8,7 +8,7 @@ import {
 } from '@/lib/secureOpsAI';
 
 // Endpoint: /api/admin/ai/secure-ops/chat
-export async function POST(_req: NextRequest) {
+export async function POST() {
   // Log auditável
   console.log('[SecureOpsAI][chat] Nova query recebida');
   try {

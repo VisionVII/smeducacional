@@ -54,14 +54,16 @@ async function getCourseWithProgress(courseId: string, studentId: string) {
     },
   });
 
-  const progressMap = new Map(progress.map((p) => [p.lessonId, p]));
+  const progressMap = new Map<string, { isCompleted?: boolean }>(
+    progress.map((p) => [p.lessonId, p as { isCompleted?: boolean }])
+  );
 
   // Adicionar informação de conclusão nas aulas
   const modulesWithProgress = enrollment.course.modules.map((module) => ({
     ...module,
     lessons: module.lessons.map((lesson) => ({
       ...lesson,
-      isCompleted: progressMap.get(lesson.id)?.isCompleted || false,
+      isCompleted: !!progressMap.get(lesson.id)?.isCompleted,
     })),
   }));
 
@@ -92,7 +94,7 @@ export default async function StudentCoursePage({
     notFound();
   }
 
-  const { course, enrollment } = data;
+  const { course } = data;
   const isCoursePaid = course.isPaid ?? (course.price || 0) > 0;
 
   return (

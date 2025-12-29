@@ -2,21 +2,11 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import {
-  Award,
-  BookOpen,
-  Clock,
-  FileText,
-  Loader2,
-  PlayCircle,
-  Save,
-} from 'lucide-react';
+import { BookOpen, FileText, Loader2, Save } from 'lucide-react';
 
 import { BackButton } from '@/components/back-button';
 import { ImageUpload } from '@/components/image-upload';
-import { LockedCourseCard } from '@/components/LockedCourseCard';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -128,7 +118,7 @@ export default function NewCoursePage() {
           variant: 'destructive',
         });
       }
-    } catch (error) {
+    } catch {
       toast({
         title: 'Erro ao criar curso',
         description: 'Ocorreu um erro inesperado.',

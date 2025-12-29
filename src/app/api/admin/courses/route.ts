@@ -19,7 +19,16 @@ export async function GET(request: Request) {
     const status = searchParams.get('status'); // DRAFT, PUBLISHED, ARCHIVED
     const category = searchParams.get('category');
 
-    const where: any = {};
+    type WhereClause = {
+      OR?: Array<{
+        title?: { contains: string; mode: 'insensitive' };
+        description?: { contains: string; mode: 'insensitive' };
+      }>;
+      isPublished?: boolean;
+      categoryId?: string;
+    };
+
+    const where: WhereClause = {};
 
     if (search) {
       where.OR = [

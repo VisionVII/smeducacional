@@ -8,9 +8,6 @@
  * 3. Políticas existem
  */
 
-const fs = require('fs');
-const path = require('path');
-
 // Carregar variáveis de ambiente
 require('dotenv').config({ path: '.env.local' });
 

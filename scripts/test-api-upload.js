@@ -2,32 +2,7 @@
  * Testa a API de upload-branding simulando uma requisição real do browser
  */
 
-import { readFileSync } from 'fs';
-import { join } from 'path';
-
 const API_URL = 'http://localhost:3000/api/admin/upload-branding';
-
-// Lê .env.local para pegar o NEXTAUTH_SECRET (se precisar de auth)
-function getEnvVars() {
-  try {
-    const envPath = join(process.cwd(), '.env.local');
-    const content = readFileSync(envPath, 'utf-8');
-    const vars = {};
-
-    content.split('\n').forEach(line => {
-      const trimmed = line.trim();
-      if (trimmed && !trimmed.startsWith('#')) {
-        const [key, ...valueParts] = trimmed.split('=');
-        const value = valueParts.join('=').replace(/^["']|["']$/g, '');
-        vars[key.trim()] = value;
-      }
-    });
-
-    return vars;
-  } catch (error) {
-    return {};
-  }
-}
 
 async function testUpload() {
   console.log('\n🧪 TESTANDO API DE UPLOAD\n');
@@ -49,7 +24,6 @@ async function testUpload() {
 
     // Cria FormData
     const FormData = (await import('formdata-node')).FormData;
-    const { File } = await import('buffer');
 
     const formData = new FormData();
     const blob = new Blob([testFile], { type: 'image/png' });

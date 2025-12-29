@@ -1,65 +1,60 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-
-// Log de diagnóstico
-if (typeof window === 'undefined') {
-  // Server-side
-  console.log('[Supabase] Inicializando no servidor...');
-  console.log(
-    '[Supabase] URL:',
-    supabaseUrl ? '✅ Definida' : '❌ NÃO DEFINIDA'
-  );
-  console.log(
-    '[Supabase] ANON_KEY:',
-    supabaseAnonKey
-      ? `✅ Definida (${supabaseAnonKey.substring(0, 20)}...)`
-      : '❌ NÃO DEFINIDA'
-  );
-}
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
 if (!supabaseUrl || !supabaseAnonKey) {
   const missing: string[] = [];
   if (!supabaseUrl) missing.push('NEXT_PUBLIC_SUPABASE_URL');
   if (!supabaseAnonKey) missing.push('NEXT_PUBLIC_SUPABASE_ANON_KEY');
+  // Não logamos valores para evitar vazar secrets
   throw new Error(
     `Missing Supabase environment variables: ${missing.join(', ')}`
   );
+}
+
+if (typeof window === 'undefined') {
+  console.log('[Supabase] Client inicializado no servidor (vars presentes)');
 }
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 /**
  * Upload de arquivo para o Supabase Storage
- * @param file Arquivo a ser enviado
- * @param bucket Nome do bucket (ex: 'course-thumbnails')
- * @param path Caminho do arquivo (ex: 'curso-123/thumbnail.jpg')
- * @returns URL pública do arquivo
- */
-/**
- * Upload de arquivo para o Supabase Storage
- * Aceita Buffer (Node.js) ou File (browser)
- * @param file Buffer (Node.js) ou File (browser)
+ * Aceita Buffer (Node.js) ou File/Blob (browser)
+ * @param file Buffer (Node.js) ou File/Blob (browser)
  * @param bucket Nome do bucket
  * @param path Caminho do arquivo
  */
 export async function uploadFile(
-  file: any, // Buffer (Node.js) ou File (browser)
+  file: File | Blob | Buffer,
   bucket: string,
   path: string
 ): Promise<{ url: string; error?: string }> {
   try {
-    // Detecta ambiente Node.js (Buffer) ou browser (File)
-    let uploadData: any = file;
-    let options: any = { cacheControl: '3600', upsert: true };
+    const uploadData: File | Blob | Buffer = file;
+    const options: {
+      cacheControl: string;
+      upsert: boolean;
+      contentType?: string;
+    } = {
+      cacheControl: '3600',
+      upsert: true,
+    };
 
-    // Se for Buffer, define contentType genérico
-    if (typeof Buffer !== 'undefined' && file instanceof Buffer) {
-      options.contentType = 'application/pdf';
+    if (typeof File !== 'undefined' && file instanceof File && file.type) {
+      options.contentType = file.type;
+    } else if (
+      typeof Blob !== 'undefined' &&
+      file instanceof Blob &&
+      file.type
+    ) {
+      options.contentType = file.type;
+    } else if (typeof Buffer !== 'undefined' && file instanceof Buffer) {
+      options.contentType = 'application/octet-stream';
     }
 
-    const { data, error } = await supabase.storage
+    const { error } = await supabase.storage
       .from(bucket)
       .upload(path, uploadData, options);
 

@@ -17,7 +17,6 @@ import {
   Wallet,
   Settings,
   BarChart3,
-  ArrowDownRight,
   ArrowUpRight,
   CheckCircle,
   AlertCircle,

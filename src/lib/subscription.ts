@@ -118,7 +118,6 @@ export async function getTeacherAccessControl(
   const now = new Date();
   const isExpired =
     financial.subscriptionExpiresAt && financial.subscriptionExpiresAt < now;
-  const isTrialEnded = financial.trialEndsAt && financial.trialEndsAt < now;
   const isActive =
     financial.subscriptionStatus === 'active' &&
     !isExpired &&
@@ -221,7 +220,7 @@ export async function activatePlan(
     now.getTime() + durationDays * 24 * 60 * 60 * 1000
   );
 
-  const financial = await prisma.teacherFinancial.update({
+  await prisma.teacherFinancial.update({
     where: { userId },
     data: {
       subscriptionStatus: 'active' as string,

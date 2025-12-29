@@ -19,7 +19,14 @@ export default function TestEmailPage() {
   const [code, setCode] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [step, setStep] = useState<'send' | 'verify'>('send');
-  const [result, setResult] = useState<any>(null);
+  type Result = {
+    success: boolean;
+    message: string;
+    code?: string;
+    verified?: boolean;
+  } | null;
+
+  const [result, setResult] = useState<Result>(null);
   const { toast } = useToast();
 
   const handleSendCode = async () => {

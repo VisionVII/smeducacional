@@ -28,7 +28,17 @@ export async function GET(req: NextRequest) {
     const isPublished = searchParams.get('isPublished');
     const search = searchParams.get('search');
 
-    const where: any = {};
+    type WhereClause = {
+      categoryId?: string;
+      instructorId?: string;
+      isPublished?: boolean;
+      OR?: Array<{
+        title?: { contains: string; mode: 'insensitive' };
+        description?: { contains: string; mode: 'insensitive' };
+      }>;
+    };
+
+    const where: WhereClause = {};
 
     if (categoryId) where.categoryId = categoryId;
     if (instructorId) where.instructorId = instructorId;

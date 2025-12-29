@@ -4,6 +4,7 @@ import { Card } from '@/components/ui/card';
 import { BookOpen, Users, Video, Eye, Edit, Settings } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
+import type { Translation } from '@/components/translations-provider';
 
 interface CourseCardProps {
   course: {
@@ -29,9 +30,11 @@ interface CourseCardProps {
       };
     }>;
   };
+  t?: Translation;
+  mounted?: boolean;
 }
 
-export function CourseCard({ course }: CourseCardProps) {
+export function CourseCard({ course, t, mounted }: CourseCardProps) {
   const totalLessons = course.modules.reduce(
     (acc, m) => acc + m._count.lessons,
     0
@@ -65,7 +68,13 @@ export function CourseCard({ course }: CourseCardProps) {
                   variant={course.isPublished ? 'default' : 'secondary'}
                   className="text-xs shadow-lg backdrop-blur-sm"
                 >
-                  {course.isPublished ? '✓ Publicado' : '○ Rascunho'}
+                  {course.isPublished
+                    ? mounted && t
+                      ? `✓ ${t.dashboard.teacher.published}`
+                      : '✓ Publicado'
+                    : mounted && t
+                    ? `○ ${t.dashboard.teacher.draft}`
+                    : '○ Rascunho'}
                 </Badge>
               </div>
             </div>
@@ -89,7 +98,13 @@ export function CourseCard({ course }: CourseCardProps) {
                   variant={course.isPublished ? 'default' : 'secondary'}
                   className="text-xs flex-shrink-0"
                 >
-                  {course.isPublished ? '✓ Publicado' : '○ Rascunho'}
+                  {course.isPublished
+                    ? mounted && t
+                      ? `✓ ${t.dashboard.teacher.published}`
+                      : '✓ Publicado'
+                    : mounted && t
+                    ? `○ ${t.dashboard.teacher.draft}`
+                    : '○ Rascunho'}
                 </Badge>
               )}
             </div>
@@ -106,17 +121,22 @@ export function CourseCard({ course }: CourseCardProps) {
             <span className="flex items-center gap-2 bg-muted/50 px-3 py-1.5 rounded-lg">
               <BookOpen className="h-4 w-4 text-primary" />
               <span className="font-medium">
-                {course._count.modules} módulos
+                {course._count.modules}{' '}
+                {mounted && t ? t.dashboard.teacher.modulesLabel : 'módulos'}
               </span>
             </span>
             <span className="flex items-center gap-2 bg-muted/50 px-3 py-1.5 rounded-lg">
               <Video className="h-4 w-4 text-primary" />
-              <span className="font-medium">{totalLessons} aulas</span>
+              <span className="font-medium">
+                {totalLessons}{' '}
+                {mounted && t ? t.dashboard.teacher.lessonsLabel : 'aulas'}
+              </span>
             </span>
             <span className="flex items-center gap-2 bg-muted/50 px-3 py-1.5 rounded-lg">
               <Users className="h-4 w-4 text-primary" />
               <span className="font-medium">
-                {course._count.enrollments} alunos
+                {course._count.enrollments}{' '}
+                {mounted && t ? t.dashboard.teacher.studentsLabel : 'alunos'}
               </span>
             </span>
             {course.level && (
@@ -140,7 +160,7 @@ export function CourseCard({ course }: CourseCardProps) {
                 </span>
               ) : (
                 <span className="text-blue-600 dark:text-blue-500">
-                  Gratuito
+                  {mounted && t ? t.dashboard.teacher.free : 'Gratuito'}
                 </span>
               )}
             </span>
@@ -156,7 +176,7 @@ export function CourseCard({ course }: CourseCardProps) {
             >
               <Link href={`/courses/${course.slug}`} target="_blank">
                 <Eye className="h-4 w-4 mr-2" />
-                Visualizar
+                {mounted && t ? t.dashboard.teacher.view : 'Visualizar'}
               </Link>
             </Button>
             <Button
@@ -167,7 +187,7 @@ export function CourseCard({ course }: CourseCardProps) {
             >
               <Link href={`/teacher/courses/${course.id}/edit`}>
                 <Edit className="h-4 w-4 mr-2" />
-                Editar
+                {mounted && t ? t.dashboard.teacher.edit : 'Editar'}
               </Link>
             </Button>
             <Button
@@ -177,7 +197,7 @@ export function CourseCard({ course }: CourseCardProps) {
             >
               <Link href={`/teacher/courses/${course.id}/content`}>
                 <Settings className="h-4 w-4 mr-2" />
-                Conteúdo
+                {mounted && t ? t.dashboard.teacher.content : 'Conteúdo'}
               </Link>
             </Button>
           </div>

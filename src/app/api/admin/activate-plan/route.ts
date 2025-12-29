@@ -1,5 +1,5 @@
 import { auth } from '@/lib/auth';
-import { activatePlan, cancelPlan } from '@/lib/subscription';
+import { activatePlan } from '@/lib/subscription';
 import { NextResponse } from 'next/server';
 import type { PlanType } from '@/lib/subscription';
 

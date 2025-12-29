@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { Lock, ShoppingCart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { calculateDiscount } from '@/lib/feature-gating';
 

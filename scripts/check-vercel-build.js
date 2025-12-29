@@ -33,6 +33,7 @@ try {
     });
     console.log(deploysOutput);
   } catch (e) {
+    console.error('ℹ️ Use o Vercel Dashboard para ver deployments:', e);
     console.log('ℹ️ Use o Vercel Dashboard para ver deployments:');
     console.log('   https://vercel.com/dashboard/projects/smeducacional');
   }

@@ -14,14 +14,15 @@ import {
   X,
   User,
   ChevronDown,
-  Settings,
-  FolderClosed,
 } from 'lucide-react';
+import Image from 'next/image';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Icon3D } from '@/components/ui/icon-3d';
 import { useTheme } from 'next-themes';
 import { signOut } from 'next-auth/react';
 import { useSystemBranding } from '@/hooks/use-system-branding';
+import { LanguageSwitcher } from '@/components/language-switcher';
+import { useTranslations } from '@/hooks/use-translations';
 
 interface NavbarProps {
   user: {
@@ -44,6 +45,7 @@ export function Navbar({ user, links }: NavbarProps) {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const { branding } = useSystemBranding();
+  const { t, mounted: translationsLoaded } = useTranslations();
 
   useEffect(() => {
     setMounted(true);
@@ -56,10 +58,20 @@ export function Navbar({ user, links }: NavbarProps) {
   };
 
   const getRoleLabel = (role: string) => {
+    // Fallback durante loading
+    if (!translationsLoaded || !t.roles) {
+      const fallbackLabels: Record<string, string> = {
+        STUDENT: 'Aluno',
+        TEACHER: 'Professor',
+        ADMIN: 'Administrador',
+      };
+      return fallbackLabels[role] || role;
+    }
+
     const labels: Record<string, string> = {
-      STUDENT: 'Aluno',
-      TEACHER: 'Professor',
-      ADMIN: 'Administrador',
+      STUDENT: t.roles.STUDENT,
+      TEACHER: t.roles.TEACHER,
+      ADMIN: t.roles.ADMIN,
     };
     return labels[role] || role;
   };
@@ -104,9 +116,12 @@ export function Navbar({ user, links }: NavbarProps) {
                 <GraduationCap className="h-6 w-6 text-primary" />
               </Icon3D>
             ) : (
-              <img
+              <Image
                 src={branding.logoUrl}
                 alt={branding.companyName}
+                width={120}
+                height={40}
+                unoptimized
                 className="h-10 object-contain"
               />
             )}
@@ -134,6 +149,9 @@ export function Navbar({ user, links }: NavbarProps) {
 
           {/* Right Side Actions */}
           <div className="flex items-center gap-2">
+            {/* Language Selector */}
+            {mounted && <LanguageSwitcher />}
+
             {/* Theme Toggle */}
             {mounted && (
               <Button

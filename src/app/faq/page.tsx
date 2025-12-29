@@ -16,111 +16,102 @@ import {
 import { AdaptiveNavbar } from '@/components/adaptive-navbar';
 import { Footer } from '@/components/footer';
 import { HelpCircle } from 'lucide-react';
+import { useTranslations } from '@/hooks/use-translations';
 
-const faqs = [
+import type { Translation } from '@/components/translations-provider';
+type TranslationsObject = Translation;
+
+const faqs = (t: TranslationsObject) => [
   {
-    category: 'Geral',
+    category: t.faq.categories.general,
     questions: [
       {
-        question: 'Como faço para me matricular em um curso?',
-        answer:
-          "Para se matricular em um curso, primeiro crie sua conta ou faça login. Depois, navegue até a página do curso desejado e clique no botão 'Matricular-se'. Alguns cursos podem ser gratuitos, enquanto outros exigem pagamento.",
+        question: t.faq.general.q1,
+        answer: t.faq.general.a1,
       },
       {
-        question: 'Posso acessar os cursos pelo celular?',
-        answer:
-          'Sim! Nossa plataforma é totalmente responsiva e pode ser acessada de qualquer dispositivo: computador, tablet ou smartphone. Você pode estudar onde e quando quiser.',
+        question: t.faq.general.q2,
+        answer: t.faq.general.a2,
       },
       {
-        question: 'Quanto tempo tenho para concluir um curso?',
-        answer:
-          'Não há limite de tempo! Você pode estudar no seu próprio ritmo. Uma vez matriculado, o acesso ao curso é vitalício, permitindo que você revise o conteúdo sempre que precisar.',
+        question: t.faq.general.q3,
+        answer: t.faq.general.a3,
       },
     ],
   },
   {
-    category: 'Certificados',
+    category: t.faq.categories.certificates,
     questions: [
       {
-        question: 'Como obtenho meu certificado?',
-        answer:
-          "Após concluir 100% das aulas do curso, seu certificado será gerado automaticamente. Você pode acessá-lo e baixá-lo na página 'Meus Certificados' dentro da sua área de aluno.",
+        question: t.faq.certificates.q1,
+        answer: t.faq.certificates.a1,
       },
       {
-        question: 'O certificado é reconhecido?',
-        answer:
-          'Nossos certificados são digitais e comprovam a conclusão do curso na plataforma. Eles podem ser utilizados para comprovação de horas complementares, enriquecimento curricular e desenvolvimento profissional.',
+        question: t.faq.certificates.q2,
+        answer: t.faq.certificates.a2,
       },
       {
-        question: 'Posso imprimir o certificado?',
-        answer:
-          'Sim! O certificado é gerado em formato PDF, que pode ser facilmente impresso ou compartilhado digitalmente.',
+        question: t.faq.certificates.q3,
+        answer: t.faq.certificates.a3,
       },
     ],
   },
   {
-    category: 'Pagamentos',
+    category: t.faq.categories.payments,
     questions: [
       {
-        question: 'Quais formas de pagamento são aceitas?',
-        answer:
-          'Aceitamos cartões de crédito, débito e PIX. Os pagamentos são processados de forma segura através de plataformas confiáveis.',
+        question: t.faq.payments.q1,
+        answer: t.faq.payments.a1,
       },
       {
-        question: 'Existe política de reembolso?',
-        answer:
-          'Sim! Você tem até 7 dias após a compra para solicitar reembolso integral, conforme o Código de Defesa do Consumidor. Após esse período, analisamos casos específicos.',
+        question: t.faq.payments.q2,
+        answer: t.faq.payments.a2,
       },
       {
-        question: 'Os cursos têm mensalidade?',
-        answer:
-          'Não! Os cursos são vendidos com pagamento único. Uma vez adquirido, você tem acesso vitalício ao conteúdo, incluindo futuras atualizações.',
+        question: t.faq.payments.q3,
+        answer: t.faq.payments.a3,
       },
     ],
   },
   {
-    category: 'Instrutores e receitas',
+    category: t.faq.categories.instructors,
     questions: [
       {
-        question: 'Como o professor recebe pelas vendas?',
-        answer:
-          'O aluno paga o valor do curso ao professor. Aplicamos uma taxa conforme o plano: no plano Free o repasse é de 85% (15% de taxa por venda), e em planos pagos o repasse é de 100% com uma mensalidade cobrada do professor.',
+        question: t.faq.instructors.q1,
+        answer: t.faq.instructors.a1,
       },
       {
-        question: 'Existe mensalidade para professores?',
-        answer:
-          'Sim, em planos pagos cobramos uma mensalidade do professor para liberar 0% de taxa por venda. No plano Free não há mensalidade, apenas a taxa de 15% por venda.',
+        question: t.faq.instructors.q2,
+        answer: t.faq.instructors.a2,
       },
       {
-        question: 'A plataforma vende espaços de anúncios?',
-        answer:
-          'Estamos preparando slots de anúncios no catálogo de cursos para professores destacados. A compra de anúncios é opcional e independente das taxas ou mensalidades.',
+        question: t.faq.instructors.q3,
+        answer: t.faq.instructors.a3,
       },
     ],
   },
   {
-    category: 'Suporte Técnico',
+    category: t.faq.categories.support,
     questions: [
       {
-        question: 'Estou com problemas para acessar as aulas, o que faço?',
-        answer:
-          'Primeiro, verifique sua conexão com a internet e tente atualizar a página. Se o problema persistir, limpe o cache do navegador ou tente acessar de outro dispositivo. Caso continue com dificuldades, entre em contato com nosso suporte.',
+        question: t.faq.support.q1,
+        answer: t.faq.support.a1,
       },
       {
-        question: 'Esqueci minha senha, como recupero?',
-        answer:
-          "Na página de login, clique em 'Esqueci minha senha'. Digite seu email cadastrado e você receberá um código de recuperação para criar uma nova senha.",
+        question: t.faq.support.q2,
+        answer: t.faq.support.a2,
       },
       {
-        question: 'Como entro em contato com o suporte?',
-        answer:
-          'Você pode entrar em contato através do email visiondevgrid@proton.me ou pelo sistema de mensagens dentro da plataforma. Nosso time responde em até 24 horas úteis.',
+        question: t.faq.support.q3,
+        answer: t.faq.support.a3,
       },
     ],
   },
 ];
 
 export default function FAQPage() {
+  const { t, mounted } = useTranslations();
+  const data = mounted ? faqs(t) : [];
   return (
     <div className="min-h-screen flex flex-col">
       <AdaptiveNavbar />
@@ -131,14 +122,18 @@ export default function FAQPage() {
             <div className="flex items-center justify-center mb-4">
               <HelpCircle className="h-12 w-12 text-primary" />
             </div>
-            <h1 className="text-4xl font-bold mb-4">Perguntas Frequentes</h1>
+            <h1 className="text-4xl font-bold mb-4">
+              {mounted ? t.faq.title : 'Perguntas Frequentes'}
+            </h1>
             <p className="text-xl text-muted-foreground">
-              Encontre respostas para as dúvidas mais comuns
+              {mounted
+                ? t.faq.subtitle
+                : 'Encontre respostas para as dúvidas mais comuns'}
             </p>
           </div>
 
           <div className="space-y-8">
-            {faqs?.map((section, idx) => (
+            {(mounted ? data : [])?.map((section, idx) => (
               <Card key={idx}>
                 <CardHeader>
                   <CardTitle>{section.category}</CardTitle>
@@ -163,22 +158,31 @@ export default function FAQPage() {
 
           <Card className="mt-12">
             <CardHeader>
-              <CardTitle>Não encontrou sua resposta?</CardTitle>
+              <CardTitle>
+                {mounted ? t.faq.notFoundTitle : 'Não encontrou sua resposta?'}
+              </CardTitle>
               <CardDescription>
-                Entre em contato com nossa equipe de suporte
+                {mounted
+                  ? t.faq.notFoundSubtitle
+                  : 'Entre em contato com nossa equipe de suporte'}
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-2 text-sm">
                 <p>
-                  <strong>Email:</strong> visiondevgrid@proton.me
+                  <strong>{mounted ? t.faq.supportEmail : 'Email'}:</strong>{' '}
+                  visiondevgrid@proton.me
                 </p>
                 <p>
-                  <strong>Horário de atendimento:</strong> Segunda a Sexta, 9h
-                  às 18h
+                  <strong>
+                    {mounted ? t.faq.supportHours : 'Horário de atendimento'}:
+                  </strong>{' '}
+                  Segunda a Sexta, 9h às 18h
                 </p>
                 <p className="text-muted-foreground">
-                  Respondemos todas as mensagens em até 24 horas úteis
+                  {mounted
+                    ? t.faq.supportSLA
+                    : 'Respondemos todas as mensagens em até 24 horas úteis'}
                 </p>
               </div>
             </CardContent>

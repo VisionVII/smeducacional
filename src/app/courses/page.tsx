@@ -1,6 +1,7 @@
 'use client';
 
 import { Suspense, useEffect, useState } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import {
   Card,
@@ -18,15 +19,12 @@ import { CoursesCarousel } from '@/components/courses-carousel';
 import {
   BookOpen,
   Clock,
-  Signal,
   Users,
   Search,
   Loader2,
   TrendingUp,
-  Star,
   AlertCircle,
 } from 'lucide-react';
-import { useSearchParams } from 'next/navigation';
 
 interface Course {
   id: string;
@@ -391,10 +389,13 @@ function CoursesClient() {
                   {/* Thumbnail */}
                   <div className="w-full h-48 relative overflow-hidden">
                     {course.thumbnail ? (
-                      <img
+                      <Image
                         src={course.thumbnail}
                         alt={course.title}
-                        className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                        fill
+                        sizes="(max-width: 1024px) 100vw, (max-width: 1280px) 50vw, 33vw"
+                        className="object-cover hover:scale-105 transition-transform duration-300"
+                        unoptimized
                       />
                     ) : (
                       <div className="w-full h-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
@@ -479,9 +480,6 @@ function CoursesClient() {
 }
 
 function CoursesPageContent() {
-  const searchParams = useSearchParams();
-  const teacherId = searchParams.get('teacherId') || undefined;
-
   return <CoursesClient />;
 }
 

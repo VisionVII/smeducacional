@@ -7,7 +7,6 @@ import {
   BookOpen,
   Plus,
   LayoutDashboard,
-  Users,
   MessageSquare,
   User,
   DollarSign,

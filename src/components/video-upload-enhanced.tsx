@@ -4,11 +4,9 @@ import { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/components/ui/use-toast';
-import { supabase } from '@/lib/supabase';
+import { uploadFile } from '@/lib/supabase';
 import {
-  Upload,
   X,
   FileVideo,
   Loader2,
@@ -32,9 +30,8 @@ export function VideoUploadEnhanced({
 }: VideoUploadProps) {
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
-  
+
   const [isUploading, setIsUploading] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState(0);
   const [showUrlInput, setShowUrlInput] = useState(false);
   const [urlInput, setUrlInput] = useState('');
 
@@ -63,52 +60,38 @@ export function VideoUploadEnhanced({
       return;
     }
 
-    await uploadFile(file);
+    await uploadSingle(file);
   };
 
-  const uploadFile = async (file: File) => {
+  const uploadSingle = async (file: File) => {
     setIsUploading(true);
-    setUploadProgress(0);
 
     try {
-      // Gerar nome único para o arquivo
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${lessonId || Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+      const fileName = `${lessonId || Date.now()}-${Math.random()
+        .toString(36)
+        .substring(7)}-${file.name}`;
       const filePath = `videos/${fileName}`;
 
-      // Upload para Supabase Storage
-      const { data, error } = await supabase.storage
-        .from('course-videos')
-        .upload(filePath, file, {
-          cacheControl: '3600',
-          upsert: false,
-        });
+      const { url, error } = await uploadFile(file, 'course-videos', filePath);
+      if (error || !url) throw new Error(error || 'Falha no upload');
 
-      if (error) {
-        throw error;
-      }
-
-      // Obter URL pública
-      const { data: { publicUrl } } = supabase.storage
-        .from('course-videos')
-        .getPublicUrl(filePath);
-
-      onChange(publicUrl);
-      
+      onChange(url);
       toast({
         title: 'Upload concluído!',
         description: 'Vídeo enviado com sucesso.',
       });
-    } catch (error: any) {
+    } catch (error) {
       console.error('Erro no upload:', error);
       toast({
         title: 'Erro no upload',
-        description: error.message || 'Não foi possível enviar o vídeo.',
+        description:
+          error instanceof Error
+            ? error.message
+            : 'Não foi possível enviar o vídeo.',
         variant: 'destructive',
       });
     } finally {
       setIsUploading(false);
-      setUploadProgress(0);
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
@@ -128,7 +111,7 @@ export function VideoUploadEnhanced({
     onChange(urlInput.trim());
     setUrlInput('');
     setShowUrlInput(false);
-    
+
     toast({
       title: 'URL adicionada!',
       description: 'Link do vídeo salvo com sucesso.',
@@ -140,11 +123,11 @@ export function VideoUploadEnhanced({
     setUrlInput('');
   };
 
-  const isExternalVideo = value && (
-    value.includes('youtube.com') || 
-    value.includes('youtu.be') || 
-    value.includes('vimeo.com')
-  );
+  const isExternalVideo =
+    value &&
+    (value.includes('youtube.com') ||
+      value.includes('youtu.be') ||
+      value.includes('vimeo.com'));
 
   return (
     <div className="space-y-4">
@@ -232,12 +215,11 @@ export function VideoUploadEnhanced({
                   className="hidden"
                   disabled={isUploading}
                 />
-                
+
                 {isUploading ? (
                   <div className="space-y-3">
                     <Loader2 className="h-12 w-12 mx-auto animate-spin text-blue-600" />
                     <p className="font-medium">Enviando vídeo...</p>
-                    <Progress value={uploadProgress} className="max-w-xs mx-auto" />
                     <p className="text-sm text-gray-600">
                       Aguarde enquanto fazemos o upload...
                     </p>
@@ -245,9 +227,7 @@ export function VideoUploadEnhanced({
                 ) : (
                   <>
                     <FileVideo className="h-12 w-12 mx-auto mb-4 text-gray-400" />
-                    <p className="font-medium mb-2">
-                      Clique para fazer upload
-                    </p>
+                    <p className="font-medium mb-2">Clique para fazer upload</p>
                     <p className="text-sm text-gray-600 dark:text-gray-400">
                       MP4, MOV, AVI (máx. {maxSizeMB}MB)
                     </p>

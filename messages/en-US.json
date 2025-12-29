@@ -1,0 +1,1490 @@
+{
+  "roles": {
+    "STUDENT": "Student",
+    "TEACHER": "Instructor",
+    "ADMIN": "Administrator"
+  },
+  "courseDetail": {
+    "breadcrumb": "Back to courses",
+    "stats": {
+      "level": "Level",
+      "duration": "Duration",
+      "students": "Students",
+      "lessons": "Lessons",
+      "modules": "Modules"
+    },
+    "whatYouLearn": "What you'll learn",
+    "requirements": "Requirements",
+    "courseContent": {
+      "title": "Course Content",
+      "meta": "{modules} modules • {lessons} lessons • {hours}h {minutes}min"
+    },
+    "badges": { "free": "Free" },
+    "instructor": "Instructor",
+    "price": {
+      "oneTime": "One-time payment",
+      "freeLabel": "FREE"
+    },
+    "actions": {
+      "continue": "Continue Learning",
+      "enroll": "Enroll Now",
+      "login": "Log in to enroll"
+    },
+    "locked": {
+      "title": "Locked Course",
+      "description": "Purchase full access to this course"
+    },
+    "includes": {
+      "title": "This course includes",
+      "modules": "Modules",
+      "lessons": "Lessons",
+      "duration": "Duration",
+      "level": "Level",
+      "allLevels": "All"
+    },
+    "benefits": {
+      "title": "Benefits",
+      "certificate": "Completion certificate",
+      "materials": "Support materials",
+      "lifetime": "Lifetime access"
+    }
+  },
+  "common": {
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "close": "Close",
+    "search": "Search",
+    "filter": "Filter",
+    "actions": "Actions",
+    "yes": "Yes",
+    "no": "No",
+    "ok": "OK",
+    "error": "Error",
+    "success": "Success",
+    "warning": "Warning",
+    "info": "Information",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "submit": "Submit",
+    "confirm": "Confirm",
+    "view": "View",
+    "download": "Download",
+    "upload": "Upload",
+    "required": "Required",
+    "optional": "Optional",
+    "add": "Add",
+    "remove": "Remove",
+    "update": "Update",
+    "create": "Create",
+    "new": "New",
+    "all": "All"
+  },
+  "languages": {
+    "ptBR": "Português (BR)",
+    "enUS": "English",
+    "esES": "Español"
+  },
+  "languageSwitcher": {
+    "label": "Language",
+    "placeholder": "Select language"
+  },
+  "languagesAria": {
+    "button": "Open language selection"
+  },
+  "nav": {
+    "home": "Home",
+    "courses": "Courses",
+    "about": "About Us",
+    "contact": "Contact",
+    "login": "Log In",
+    "register": "Sign Up",
+    "dashboard": "Dashboard",
+    "profile": "Profile",
+    "settings": "Settings",
+    "logout": "Log Out",
+    "becomeInstructor": "Become an Instructor",
+    "users": "Users",
+    "categories": "Categories",
+    "payments": "Payments",
+    "plans": "Plans",
+    "advertisements": "Ads",
+    "reports": "Reports",
+    "myCourses": "My Courses",
+    "certificates": "Certificates",
+    "progress": "Progress"
+  },
+  "footer": {
+    "aboutTitle": "SM Educational",
+    "aboutText": "Complete online teaching platform with quality courses for your professional development.",
+    "quickLinks": "Quick Links",
+    "courseCatalog": "Course Catalog",
+    "aboutUs": "About Us",
+    "becomeInstructor": "Become an Instructor",
+    "faq": "FAQ",
+    "support": "Support",
+    "helpCenter": "Help Center",
+    "contact": "Contact",
+    "termsOfUse": "Terms of Use",
+    "privacyPolicy": "Privacy Policy",
+    "cookiePolicy": "Cookie Policy",
+    "contactTitle": "Contact",
+    "rights": "© {year} VisionVII. All rights reserved.",
+    "accessAt": "Access at: {datetime}",
+    "securityWarning": "Attention: For your security, advanced protection, authentication and monitoring filters are active in this system.",
+    "terms": "Terms",
+    "privacy": "Privacy",
+    "lgpd": "GDPR",
+    "cookies": "Cookies",
+    "developedBy": "Developed with excellence by VisionVII.",
+    "developerPrincipal": "Lead Developer: Victor Hugo"
+  },
+  "contact": {
+    "heroTitle": "Get in Touch",
+    "heroSubtitle": "We are here to help. Send your message and we will reply soon.",
+    "formTitle": "Send Your Message",
+    "name": "Full Name",
+    "email": "Email",
+    "phone": "Phone",
+    "subject": "Subject",
+    "message": "Message",
+    "sendMessage": "Send Message",
+    "infoEmailTitle": "Email",
+    "infoPhoneTitle": "Phone",
+    "infoAddressTitle": "Address",
+    "faqTitle": "Frequently Asked Questions",
+    "faqSubtitle": "Before reaching out, check our FAQ page. Many questions are already answered there!",
+    "faqButton": "View FAQ"
+  },
+  "faq": {
+    "title": "Frequently Asked Questions",
+    "subtitle": "Find answers to the most common questions",
+    "notFoundTitle": "Didn't find your answer?",
+    "notFoundSubtitle": "Contact our support team",
+    "supportEmail": "Email",
+    "supportHours": "Support hours",
+    "supportSLA": "We respond to all messages within 24 business hours",
+    "categories": {
+      "general": "General",
+      "certificates": "Certificates",
+      "payments": "Payments",
+      "instructors": "Instructors and revenue",
+      "support": "Technical Support"
+    },
+    "general": {
+      "q1": "How do I enroll in a course?",
+      "a1": "To enroll in a course, first create your account or log in. Then, navigate to the desired course page and click the 'Enroll' button. Some courses may be free, while others require payment.",
+      "q2": "Can I access courses on mobile?",
+      "a2": "Yes! Our platform is fully responsive and can be accessed from any device: computer, tablet, or smartphone. Study anywhere, anytime.",
+      "q3": "How long do I have to finish a course?",
+      "a3": "There is no time limit! Study at your own pace. Once enrolled, access is lifetime, letting you revisit content whenever needed."
+    },
+    "certificates": {
+      "q1": "How do I get my certificate?",
+      "a1": "After completing 100% of the course lessons, your certificate is generated automatically. You can access and download it on the 'My Certificates' page within your student area.",
+      "q2": "Is the certificate recognized?",
+      "a2": "Our certificates are digital and prove course completion on the platform. They can be used for complementary hours, resume enrichment, and professional development.",
+      "q3": "Can I print the certificate?",
+      "a3": "Yes! The certificate is generated as a PDF, which can be easily printed or shared digitally."
+    },
+    "payments": {
+      "q1": "What payment methods are accepted?",
+      "a1": "We accept credit cards, debit cards, and PIX. Payments are processed securely through trusted platforms.",
+      "q2": "Is there a refund policy?",
+      "a2": "Yes! You have up to 7 days after purchase to request a full refund, according to consumer protection laws. After that period, we review specific cases.",
+      "q3": "Do courses have a monthly fee?",
+      "a3": "No! Courses are sold with a one-time payment. Once purchased, you have lifetime access to the content, including future updates."
+    },
+    "instructors": {
+      "q1": "How does the instructor receive payments?",
+      "a1": "The student pays the course price to the instructor. We apply a fee by plan: in the Free plan the payout is 85% (15% fee per sale), and in paid plans the payout is 100% with a monthly fee charged to the instructor.",
+      "q2": "Is there a monthly fee for instructors?",
+      "a2": "Yes, in paid plans we charge a monthly fee to unlock 0% fee per sale. In the Free plan there is no monthly fee, only the 15% fee per sale.",
+      "q3": "Does the platform sell ad slots?",
+      "a3": "We are preparing course catalog ad slots for featured instructors. Buying ads is optional and independent from fees or subscriptions."
+    },
+    "support": {
+      "q1": "I'm having trouble accessing classes, what should I do?",
+      "a1": "First, check your internet connection and try refreshing the page. If the issue persists, clear your browser cache or try another device. If you still have trouble, contact our support.",
+      "q2": "I forgot my password, how do I recover it?",
+      "a2": "On the login page, click 'Forgot my password'. Enter your registered email and you will receive a recovery code to create a new password.",
+      "q3": "How do I contact support?",
+      "a3": "You can reach us via email at visiondevgrid@proton.me or through the messaging system inside the platform. Our team replies within 24 business hours."
+    }
+  },
+  "courseDetail": {
+    "breadcrumb": "Back to courses",
+    "stats": {
+      "level": "Level",
+      "duration": "Duration",
+      "students": "Students",
+      "lessons": "Lessons",
+      "modules": "Modules"
+    },
+    "whatYouLearn": "What you will learn",
+    "requirements": "Requirements",
+    "courseContent": {
+      "title": "Course Content",
+      "meta": "{modules} modules • {lessons} lessons • {hours}h {minutes}min"
+    },
+    "badges": { "free": "Free" },
+    "instructor": "Instructor",
+    "price": {
+      "oneTime": "One-time payment",
+      "freeLabel": "FREE"
+    },
+    "actions": {
+      "continue": "Continue Learning",
+      "enroll": "Enroll Now",
+      "login": "Log in to Enroll"
+    },
+    "locked": {
+      "title": "Course Locked",
+      "description": "Purchase full access to this course"
+    },
+    "includes": {
+      "title": "This course includes",
+      "modules": "Modules",
+      "lessons": "Lessons",
+      "duration": "Duration",
+      "level": "Level",
+      "allLevels": "All"
+    },
+    "benefits": {
+      "title": "Benefits",
+      "certificate": "Completion certificate",
+      "materials": "Support materials",
+      "lifetime": "Lifetime access"
+    }
+  },
+  "publicPages": {
+    "about": {
+      "hero": {
+        "title": "About SM Educacional",
+        "subtitle": "Transforming lives with quality, accessible education"
+      },
+      "mission": {
+        "title": "Our Mission",
+        "description": "Democratize access to online education, empowering professionals and accelerating careers."
+      },
+      "vision": {
+        "title": "Our Vision",
+        "description": "Be a benchmark in digital education, recognized for the positive impact on students' lives."
+      },
+      "stats": {
+        "students": { "value": "10k+", "label": "Students" },
+        "courses": { "value": "50+", "label": "Courses" },
+        "certificates": { "value": "5k+", "label": "Certificates" },
+        "satisfaction": { "value": "95%", "label": "Satisfaction" }
+      },
+      "valuesTitle": "Our Values",
+      "values": [
+        {
+          "title": "Excellence",
+          "description": "Top quality in content, support, and learner experience."
+        },
+        {
+          "title": "Innovation",
+          "description": "Cutting-edge technology to make learning more effective."
+        },
+        {
+          "title": "Inclusion",
+          "description": "Accessible, welcoming education for every profile."
+        }
+      ],
+      "cta": {
+        "title": "Ready to start your journey?",
+        "subtitle": "Join thousands of students who already transformed their careers with our courses.",
+        "viewCourses": "View Courses",
+        "createAccount": "Create Account"
+      }
+    },
+    "help": {
+      "hero": {
+        "title": "How can we help?",
+        "subtitle": "We are here to answer your questions and ensure the best experience."
+      },
+      "contactMethods": [
+        {
+          "title": "Email",
+          "description": "Send your questions by email",
+          "action": "visiondevgrid@proton.me",
+          "href": "mailto:visiondevgrid@proton.me"
+        },
+        {
+          "title": "Live chat",
+          "description": "Talk to our team in real time",
+          "action": "Start chat"
+        },
+        {
+          "title": "Knowledge base",
+          "description": "Articles and detailed tutorials",
+          "action": "View articles",
+          "link": "/faq"
+        }
+      ],
+      "faqTitle": "Frequently asked questions",
+      "faq": [
+        {
+          "question": "How do I enroll in a course?",
+          "answer": {
+            "prefix": "Browse the catalog, choose a course, and click Enroll.",
+            "suffix": " If it is free, access is granted immediately."
+          }
+        },
+        {
+          "question": "How do I become an instructor?",
+          "answer": {
+            "prefix": "Go to",
+            "link": {
+              "label": " Become an instructor",
+              "href": "/become-instructor"
+            },
+            "suffix": " and follow the signup flow. After approval, you can publish and manage courses."
+          }
+        },
+        {
+          "question": "Can I download the materials?",
+          "answer": {
+            "prefix": "Videos are available via streaming. Supporting materials (PDFs, slides) can be downloaded when provided by the instructor.",
+            "suffix": ""
+          }
+        },
+        {
+          "question": "How do I track my progress?",
+          "answer": {
+            "prefix": "Use the student dashboard to see enrolled courses, progress, and certificates."
+          }
+        }
+      ]
+    },
+    "becomeInstructor": {
+      "hero": {
+        "title": "Share your knowledge",
+        "subtitle": "Join thousands of instructors transforming lives with online education",
+        "cta": "Start now"
+      },
+      "benefits": [
+        {
+          "title": "Create with ease",
+          "description": "Intuitive tools to launch courses in minutes",
+          "icon": "book"
+        },
+        {
+          "title": "Reach thousands",
+          "description": "Connect with students across Brazil",
+          "icon": "users"
+        },
+        {
+          "title": "Earn income",
+          "description": "Monetize your expertise with recurring payouts",
+          "icon": "trending"
+        }
+      ],
+      "plansTitle": "Plans for instructors",
+      "plansSubtitle": "Full transparency: the student pays the teacher. On the Free plan we charge 15% per sale; on paid plans, we charge a monthly fee and pass 100% of sales.",
+      "plans": [
+        {
+          "badge": "Free",
+          "title": "$0/month",
+          "description": "15% fee per sale. Ideal to start fast.",
+          "perks": [
+            "Unlimited course publishing",
+            "Support and certification included",
+            "Receive 85% of each sale",
+            "Real-time financial dashboard"
+          ]
+        },
+        {
+          "badge": "Paid Plan",
+          "title": "Monthly fee to admin",
+          "description": "0% fee per sale. Fixed monthly fee to receive full revenue.",
+          "perks": [
+            "Full revenue (100%) per sale",
+            "Catalog highlight",
+            "Optional ads for courses",
+            "Priority support and analytics"
+          ]
+        }
+      ],
+      "featuresTitle": "What you get as an instructor",
+      "features": [
+        "Full platform to manage courses",
+        "Unlimited video and material uploads",
+        "Communication tools with students",
+        "Detailed performance reports",
+        "Dedicated technical support",
+        "Secure, automated payouts"
+      ],
+      "cta": {
+        "title": "Ready to start your journey?",
+        "subtitle": "Create your account for free and publish your first course today",
+        "button": "Sign up as instructor"
+      }
+    },
+    "cookies": {
+      "title": "Cookie Policy",
+      "sections": [
+        {
+          "title": "What are cookies?",
+          "description": "Cookies are small text files stored on your device so sites work better and remember preferences."
+        },
+        {
+          "title": "How we use cookies",
+          "description": "We use cookies for platform operation, security, and personalization.",
+          "items": [
+            {
+              "title": "Essential Cookies",
+              "description": "User authentication and security. Cannot be disabled.",
+              "list": [
+                "next-auth.session-token: keeps you signed in",
+                "__Secure-next-auth.session-token: secure version over HTTPS"
+              ]
+            },
+            {
+              "title": "Functional Cookies",
+              "description": "Store theme, language preferences, and video progress."
+            },
+            {
+              "title": "Performance Cookies",
+              "description": "Help us understand platform usage for continuous improvements."
+            }
+          ]
+        },
+        {
+          "title": "Third-party cookies",
+          "description": "External services that may set cookies:",
+          "list": [
+            "Google Analytics: traffic analysis",
+            "YouTube/Vimeo: video playback",
+            "Stripe: payment processing"
+          ]
+        },
+        {
+          "title": "Manage cookies",
+          "description": "You can control cookies in your browser. Disabling essential ones may limit features.",
+          "callout": {
+            "title": "How to disable cookies:",
+            "list": [
+              "Chrome: Settings → Privacy and security → Cookies",
+              "Firefox: Options → Privacy & Security → Cookies",
+              "Safari: Preferences → Privacy → Cookies",
+              "Edge: Settings → Cookies and site permissions"
+            ]
+          }
+        },
+        {
+          "title": "Cookie duration",
+          "description": "Session cookies expire when you close the browser; persistent cookies may last up to 30 days (auth) or 1 year (preferences)."
+        },
+        {
+          "title": "Ads and advertising",
+          "description": "On free plans we use ad cookies to personalize and cap frequency. Premium plans do not load ads.",
+          "list": [
+            "ad_preference: personalizes ads",
+            "ad_session: tracks ad session",
+            "ad_frequency: caps frequency",
+            "ad_consent: records consent"
+          ]
+        }
+      ],
+      "updates": {
+        "title": "Policy updates",
+        "description": "We may update this Cookie Policy periodically. Check this page to stay informed.",
+        "lastUpdated": "Last update: December 2025"
+      }
+    },
+    "terms": {
+      "title": "Terms of Use",
+      "lastUpdated": "Last update: December 2, 2025",
+      "sections": [
+        {
+          "title": "Acceptance of Terms",
+          "body": [
+            "By using the platform, you agree to these terms and conditions of use."
+          ]
+        },
+        {
+          "title": "Service Description",
+          "body": [
+            "SM Educacional offers an online learning platform where you can:"
+          ],
+          "list": [
+            "Enroll in courses",
+            "Access educational content",
+            "Interact with teachers and students",
+            "Obtain completion certificates"
+          ]
+        },
+        {
+          "title": "Account Registration",
+          "body": ["To access resources, create an account and:"],
+          "list": [
+            "Provide accurate information",
+            "Keep credentials secure",
+            "Notify unauthorized use",
+            "Assume responsibility for account activities"
+          ]
+        },
+        {
+          "title": "Acceptable Use",
+          "body": ["You agree not to:"],
+          "list": [
+            "Share your account with third parties",
+            "Distribute or resell course content",
+            "Use the platform for illegal purposes",
+            "Reverse engineer or copy the platform",
+            "Send spam or malicious content"
+          ]
+        },
+        {
+          "title": "Intellectual Property",
+          "body": [
+            "Content, texts, videos, and learning materials are protected by copyright and belong to SM Educacional or licensors."
+          ]
+        },
+        {
+          "title": "Payments and Refunds",
+          "body": [
+            "Paid courses follow the conditions shown at purchase. Refund policy:"
+          ],
+          "list": [
+            "Cancellation within 7 days",
+            "Full refund if less than 20% of the course was accessed",
+            "Special cases evaluated individually"
+          ]
+        },
+        {
+          "title": "Certificates",
+          "body": [
+            "Issued after completing 100% of the course and, when applicable, passing assessments."
+          ]
+        },
+        {
+          "title": "Changes",
+          "body": [
+            "We may modify or discontinue features or courses at any time, with or without notice."
+          ]
+        },
+        {
+          "title": "Limitation of Liability",
+          "body": [
+            "We are not liable for direct or indirect damages from using or being unable to use the platform."
+          ]
+        },
+        {
+          "title": "Governing Law",
+          "body": ["Terms governed by Brazilian law, forum of Sao Paulo/SP."]
+        }
+      ],
+      "contact": {
+        "title": "Contact",
+        "description": "For questions about these terms, contact our legal team:",
+        "email": "legal@smeducacional.com"
+      }
+    },
+    "privacy": {
+      "title": "Privacy Policy",
+      "lastUpdated": "Last update: December 2, 2025",
+      "sections": [
+        {
+          "title": "Introduction",
+          "body": [
+            "We are committed to protecting your privacy. This policy explains how we collect, use, and protect personal data."
+          ]
+        },
+        {
+          "title": "Information we collect",
+          "subsections": [
+            {
+              "title": "Provided by you",
+              "items": [
+                "Full name and email",
+                "Hashed password (never in plain text)",
+                "Profile photo (optional)",
+                "Payment information processed by third parties"
+              ]
+            },
+            {
+              "title": "Collected automatically",
+              "items": [
+                "IP and approximate location",
+                "Browser and device type",
+                "Pages visited and time on site",
+                "Course progress and activities"
+              ]
+            }
+          ]
+        },
+        {
+          "title": "How we use your information",
+          "body": ["We use data to:"],
+          "list": [
+            "Provide access to the platform and courses",
+            "Process payments and issue certificates",
+            "Send important communications",
+            "Improve services and develop features",
+            "Personalize the learning experience",
+            "Prevent fraud and ensure security"
+          ]
+        },
+        {
+          "title": "Sharing",
+          "body": ["We may share with:"],
+          "list": [
+            "Teachers: name and progress in enrolled courses",
+            "Payment processors: data needed for transactions",
+            "Service providers: companies that operate the platform",
+            "Legal authorities: when required or to protect rights"
+          ]
+        },
+        {
+          "title": "Cookies and similar tech",
+          "body": [
+            "We use cookies to improve the experience. You can control them in your browser."
+          ]
+        },
+        {
+          "title": "Data security",
+          "body": ["Measures applied:"],
+          "list": [
+            "Encryption of sensitive data",
+            "Restricted access to personal information",
+            "Monitoring for vulnerabilities",
+            "Regular backups"
+          ]
+        },
+        {
+          "title": "Your rights",
+          "body": ["You can:"],
+          "list": [
+            "Access personal information",
+            "Correct inaccurate data",
+            "Request account and data deletion",
+            "Object to processing",
+            "Export data in a readable format"
+          ]
+        },
+        {
+          "title": "Data retention",
+          "body": [
+            "We keep information for as long as needed and for legal obligations. After deletion, some data may be retained for up to 5 years for accounting purposes."
+          ]
+        },
+        {
+          "title": "Minors' data",
+          "body": [
+            "The platform is not directed to users under 18. Guardians can contact us to remove data."
+          ]
+        },
+        {
+          "title": "Changes",
+          "body": [
+            "We may update this policy and will notify significant changes by email."
+          ]
+        }
+      ],
+      "contact": {
+        "title": "Contact",
+        "description": "For privacy questions or to exercise rights:",
+        "email": "privacy@smeducacional.com",
+        "phone": "+55 (11) 1234-5678",
+        "dpo": "DPO: dpo@smeducacional.com"
+      }
+    },
+    "lgpd": {
+      "hero": {
+        "title": "Data Protection - LGPD",
+        "subtitle": "Transparency, security, and compliance with LGPD"
+      },
+      "sections": [
+        {
+          "title": "LGPD foundations",
+          "description": "How we handle your data based on the law's principles.",
+          "bullets": [
+            "Purpose: we use data only to deliver and improve the platform",
+            "Necessity: we collect only what is needed for the service",
+            "Transparency: we communicate uses and keep records",
+            "Security: we protect data with technical and organizational controls"
+          ],
+          "icon": "shield"
+        },
+        {
+          "title": "Data subject rights",
+          "description": "You have control over your personal information.",
+          "bullets": [
+            "Confirmation and access to your data",
+            "Correction of incomplete or outdated data",
+            "Portability to another provider upon request",
+            "Deletion of unnecessary data or data processed unlawfully",
+            "Information on sharing and purpose",
+            "Consent withdrawal when applicable",
+            "Review of automated decisions that affect your interests"
+          ],
+          "icon": "search"
+        },
+        {
+          "title": "Security and prevention",
+          "description": "We protect your data with practices aligned to industry standards.",
+          "bullets": [
+            "Encryption and access controls",
+            "Monitoring and audit of events",
+            "Secure backups and redundancy",
+            "Regular staff training",
+            "Incident response plans"
+          ],
+          "icon": "lock"
+        },
+        {
+          "title": "Data collection and use",
+          "description": "We use data only to deliver and improve the learning experience.",
+          "groups": [
+            {
+              "title": "Data we collect",
+              "items": [
+                "Registration data: name, email, authentication",
+                "Usage data: course progress, interactions, and assessments",
+                "Payment data: processed by certified partners",
+                "Technical data: IP, device, and navigation for security"
+              ]
+            },
+            {
+              "title": "How we use",
+              "items": [
+                "Provide access to courses and certificates",
+                "Communicate enrollment status and support",
+                "Improve content and features",
+                "Prevent fraud and meet legal obligations"
+              ]
+            }
+          ],
+          "icon": "database"
+        },
+        {
+          "title": "Incidents and contact",
+          "description": "If a security incident occurs, we will follow LGPD and notify when required.",
+          "bullets": [
+            "Immediate logging and investigation",
+            "Communication to data subjects and authorities when applicable",
+            "Mitigation and remediation plans",
+            "Direct channel with the Data Protection Officer (DPO)"
+          ],
+          "icon": "bell"
+        }
+      ],
+      "contact": {
+        "title": "DPO Contact",
+        "description": "To exercise your rights or ask questions, contact our Data Protection Officer:",
+        "email": "dpo@smeducacional.com"
+      }
+    },
+    "landingPreview": {
+      "badge": "🚀 Your Course Awaits",
+      "contactCta": "Talk to us",
+      "highlightsTitle": "Why choose our courses?",
+      "highlightsSubtitle": "Everything you need to reach your goals",
+      "modulesTitle": "Program Structure",
+      "modulesSubtitle": "{count} modules carefully organized",
+      "faqTitle": "Frequently Asked Questions",
+      "finalCta": {
+        "title": "Ready to begin?",
+        "subtitle": "Join hundreds of happy students who already transformed their careers"
+      },
+      "footer": "© 2025 SM Educacional. All rights reserved."
+    }
+  },
+  "home": {
+    "hero": {
+      "badge": "Transform your career now",
+      "title": "Learn at your pace,",
+      "titleHighlight": "achieve your goals",
+      "subtitle": "Complete teaching platform with structured courses, recognized certificates and personalized support.",
+      "cta": "Explore Courses",
+      "ctaSecondary": "Learn More"
+    },
+    "features": {
+      "courses": {
+        "title": "Complete Courses",
+        "description": "Video classes, extra materials and practical exercises"
+      },
+      "certificates": {
+        "title": "Certificates",
+        "description": "Digital certificate upon completing each course"
+      },
+      "support": {
+        "title": "24/7 Support",
+        "description": "Get your questions answered anytime"
+      },
+      "quality": {
+        "title": "Qualified Instructors",
+        "description": "Learn from the best professionals"
+      },
+      "flexible": {
+        "title": "Flexible Schedule",
+        "description": "Study whenever and wherever you want"
+      },
+      "progress": {
+        "title": "Tracking",
+        "description": "Monitor your progress in real time"
+      }
+    },
+    "stats": {
+      "students": "Active Students",
+      "courses": "Available Courses",
+      "hours": "Content Hours",
+      "satisfaction": "Satisfaction Rate"
+    },
+    "benefits": {
+      "title": "Benefits for you",
+      "subtitle": "Everything you need to learn, grow and achieve success",
+      "learn": {
+        "title": "Learn at your own pace",
+        "description": "Access courses whenever you want, from wherever. Learn at your pace, without pressure or tight deadlines."
+      },
+      "progress": {
+        "title": "Track your progress",
+        "description": "Complete tracking system with detailed statistics and personalized reports."
+      },
+      "certification": {
+        "title": "Recognized certification",
+        "description": "Digital certificates valid that prove your knowledge and skills in the market."
+      }
+    },
+    "instructorPlans": {
+      "title": "For instructors",
+      "subtitle": "Clear plans and transparent revenue",
+      "description": "Student pays directly to the instructor. On the Free plan we charge 15% per sale. On paid plans we charge a monthly fee and pass 100% of sales.",
+      "freePlan": {
+        "badge": "Free",
+        "title": "$0/month",
+        "description": "15% fee per sale. Perfect for getting started.",
+        "perks": [
+          "Unlimited course publishing",
+          "Support and certification included",
+          "Receive 85% of the value per sale",
+          "Real-time financial dashboard"
+        ]
+      },
+      "paidPlan": {
+        "badge": "Paid Plan",
+        "title": "Monthly fee to admin",
+        "description": "0% fee per sale. Fixed monthly fee to receive full revenue.",
+        "perks": [
+          "Full revenue (100%) per sale",
+          "Catalog highlight",
+          "Optional ads for courses",
+          "Priority support and analytics"
+        ]
+      }
+    },
+    "benefits": {
+      "title": "Benefits for you",
+      "subtitle": "Everything you need to learn, grow and achieve success",
+      "learn": {
+        "title": "Learn at your own pace",
+        "description": "Access courses whenever you want, from wherever. Learn at your pace, without pressure or tight deadlines."
+      },
+      "progress": {
+        "title": "Track your progress",
+        "description": "Complete tracking system with detailed statistics and personalized reports."
+      },
+      "certification": {
+        "title": "Recognized certification",
+        "description": "Digital certificates valid that prove your knowledge and skills in the market."
+      }
+    },
+    "instructorPlans": {
+      "title": "For instructors",
+      "subtitle": "Clear plans and transparent revenue",
+      "description": "Student pays directly to the instructor. On the Free plan we charge 15% per sale. On paid plans we charge a monthly fee and pass 100% of sales.",
+      "freePlan": {
+        "badge": "Free",
+        "title": "$0/month",
+        "description": "15% fee per sale. Perfect for getting started.",
+        "perks": [
+          "Unlimited course publishing",
+          "Support and certification included",
+          "Receive 85% of the value per sale",
+          "Real-time financial dashboard"
+        ]
+      },
+      "paidPlan": {
+        "badge": "Paid Plan",
+        "title": "Monthly fee to admin",
+        "description": "0% fee per sale. Fixed monthly fee to receive full revenue.",
+        "perks": [
+          "Full revenue (100%) per sale",
+          "Catalog highlight",
+          "Optional ads for courses",
+          "Priority support and analytics"
+        ]
+      }
+    },
+    "testimonials": {
+      "title": "What our students say",
+      "subtitle": "See how we're transforming the lives of people who believe in continuing education",
+      "quote1": "Excellent platform! The courses are very well structured and the instructors are attentive.",
+      "author1": "Maria Silva",
+      "role1": "Web Developer",
+      "quote2": "I managed to change careers thanks to the platform's courses. Highly recommend!",
+      "author2": "João Santos",
+      "role2": "Data Analyst",
+      "quote3": "Quality material and certificates that really add value to the resume.",
+      "author3": "Ana Costa",
+      "role3": "UX/UI Designer"
+    },
+    "cta": {
+      "title": "Start your learning journey today",
+      "subtitle": "Join thousands of students and transform your career.",
+      "button": "Create free account",
+      "noCreditCard": "No credit card",
+      "badge": "Special Offer"
+    }
+  },
+  "courses": {
+    "title": "Course Catalog",
+    "subtitle": "Explore our course collection",
+    "searchPlaceholder": "Search courses...",
+    "filterByCategory": "Filter by category",
+    "allCategories": "All Categories",
+    "noCoursesFound": "No courses found",
+    "enrollNow": "Enroll Now",
+    "learnMore": "Learn More",
+    "free": "Free",
+    "price": "{price}",
+    "duration": "{hours}h",
+    "students": "{count} students",
+    "lessons": "{count} lessons",
+    "level": "Level",
+    "beginner": "Beginner",
+    "intermediate": "Intermediate",
+    "advanced": "Advanced",
+    "instructor": "Instructor",
+    "rating": "Rating",
+    "enrolled": "Enrolled",
+    "startCourse": "Start Course",
+    "continueCourse": "Continue Course"
+  },
+  "pricing": {
+    "currency": "$",
+    "perMonth": "/month",
+    "perYear": "/year",
+    "billed": "billed {period}",
+    "monthly": "monthly",
+    "yearly": "yearly",
+    "selectPlan": "Select Plan",
+    "currentPlan": "Current Plan",
+    "changePlan": "Change Plan",
+    "free": "Free",
+    "basic": "Basic",
+    "pro": "Professional",
+    "premium": "Premium"
+  },
+  "auth": {
+    "login": {
+      "title": "Log In",
+      "subtitle": "Access your account",
+      "email": "Email",
+      "password": "Password",
+      "forgotPassword": "Forgot password?",
+      "submit": "Log In",
+      "noAccount": "Don't have an account?",
+      "signUp": "Sign Up",
+      "or": "or",
+      "withGoogle": "Log in with Google",
+      "rememberMe": "Remember me",
+      "welcomeBack": "Welcome back!",
+      "isTeacher": "Are you an instructor?",
+      "joinProgram": "Learn about our program"
+    },
+    "register": {
+      "title": "Sign Up",
+      "subtitle": "Create your account",
+      "name": "Full name",
+      "email": "Email",
+      "password": "Password",
+      "confirmPassword": "Confirm password",
+      "submit": "Create account",
+      "hasAccount": "Already have an account?",
+      "signIn": "Log in",
+      "agreeTerms": "I agree to the",
+      "terms": "Terms of Use",
+      "and": "and",
+      "privacy": "Privacy Policy",
+      "welcome": "Welcome to SM Educa!"
+    },
+    "forgotPassword": {
+      "title": "Recover Password",
+      "subtitle": "Enter your email to receive a recovery code",
+      "email": "Email",
+      "submit": "Send Code",
+      "codeTitle": "Verify Code",
+      "codeSubtitle": "Enter the code sent to your email",
+      "code": "Verification Code",
+      "verify": "Verify Code",
+      "newPasswordTitle": "New Password",
+      "newPasswordSubtitle": "Create a secure new password",
+      "newPassword": "New Password",
+      "confirmPassword": "Confirm New Password",
+      "reset": "Reset Password",
+      "backToLogin": "Back to Login",
+      "success": "Password successfully reset!"
+    },
+    "resetPassword": {
+      "title": "Reset Password",
+      "subtitle": "Enter your email to receive reset instructions",
+      "email": "Email",
+      "submit": "Send Email",
+      "backToLogin": "Back to Login",
+      "success": "Check your email!",
+      "successDescription": "We've sent instructions to reset your password."
+    }
+  },
+  "dashboard": {
+    "welcome": "Welcome",
+    "overview": "Overview",
+    "statistics": "Statistics",
+    "recentActivity": "Recent Activity",
+    "systemOnline": "System Online",
+    "notifications": "Notifications",
+    "viewAll": "View All",
+    "student": {
+      "title": "Student Dashboard",
+      "greeting": "Hello, {name}! 👋",
+      "subtitle": "Continue your learning where you left off",
+      "myCourses": "My Courses",
+      "inProgress": "In Progress",
+      "completed": "Completed",
+      "certificates": "Certificates",
+      "progress": "Progress",
+      "continueLearning": "Continue Learning",
+      "coursesInProgress": "Your courses in progress",
+      "stats": {
+        "activeCourses": "Active Courses",
+        "completedCourses": "Completed",
+        "certificates": "Certificates",
+        "studyHours": "Study Hours",
+        "inProgress": "in progress",
+        "completeCourses": "complete courses",
+        "earned": "earned",
+        "totalTime": "total time"
+      },
+      "empty": {
+        "noCourses": "You're not enrolled in any courses yet",
+        "exploreText": "Explore our catalog and start learning today!",
+        "exploreCourses": "Explore Courses"
+      },
+      "continueCourse": "Continue Course"
+    },
+    "teacher": {
+      "myCourses": "My Courses",
+      "createCourse": "Create Course",
+      "students": "Students",
+      "headerDescription": "Manage all your courses in one place",
+      "availableForStudents": "Available for students",
+      "manageHint": "Manage and edit your educational content",
+      "emptyTitle": "No courses created yet",
+      "emptyDescription": "Start by creating your first course now",
+      "emptyAction": "Create First Course",
+      "published": "Published",
+      "draft": "Draft",
+      "studentsCount": "students",
+      "coursesPublished": "Published Courses",
+      "draftCourses": "in draft",
+      "activeStudents": "Active Students",
+      "inCoursesCount": "in {{count}} courses",
+      "contents": "Contents",
+      "classesProduced": "classes produced",
+      "totalRevenue": "Total Revenue",
+      "salesThisMonth": "sales this month",
+      "totalCourses": "Total Courses",
+      "publishedCount": "published",
+      "drafts": "Drafts",
+      "inConstruction": "In construction",
+      "totalStudents": "Total Students",
+      "enrolled": "Enrolled",
+      "yourCourses": "Your Courses",
+      "createNewCourse": "Create New Course",
+      "draftCoursesCount": "drafts",
+      "modulesLabel": "modules",
+      "lessonsLabel": "lessons",
+      "studentsLabel": "students",
+      "free": "Free",
+      "view": "View",
+      "edit": "Edit",
+      "content": "Content",
+      "dashboardPage": {
+        "kpis": {
+          "published": {
+            "title": "Published Courses",
+            "description": "{{count}} in draft"
+          },
+          "students": {
+            "title": "Active Students",
+            "description": "in {{count}} courses"
+          },
+          "contents": {
+            "title": "Contents",
+            "description": "classes produced"
+          },
+          "messages": {
+            "title": "Messages",
+            "description": "pending response"
+          }
+        },
+        "financial": {
+          "totalRevenue": {
+            "title": "Total Revenue",
+            "description": "All completed transactions",
+            "transactions": "{{count}} transaction(s)",
+            "courses": "Courses",
+            "subscriptions": "Subscriptions",
+            "cta": "View Details"
+          },
+          "activeSubscribers": {
+            "title": "Active Subscribers",
+            "description": "Active student plans",
+            "recurring": "Generating recurring revenue",
+            "estimated": "Estimated monthly revenue",
+            "cta": "Manage"
+          },
+          "stripeAccount": {
+            "title": "Stripe Account",
+            "description": "Stripe Connect Status",
+            "active": "✓ Active",
+            "activate": "Activate",
+            "hint": "Activate Stripe Connect to receive direct earnings",
+            "accountLabel": "Account",
+            "ctaDetails": "Details",
+            "ctaActivate": "Activate Now"
+          }
+        },
+        "performance": {
+          "title": "Teaching Performance",
+          "description": "Manage your courses and content",
+          "newCourse": "New Course",
+          "empty": {
+            "title": "No courses created",
+            "description": "Start by creating your first course!",
+            "cta": "Create Course"
+          },
+          "published": "Published",
+          "draft": "Draft",
+          "students": "students",
+          "modules": "modules",
+          "lessons": "lessons",
+          "manageContent": "Manage Content",
+          "viewStudents": "View Students",
+          "viewAll": "View All Courses ({{count}})"
+        },
+        "transactions": {
+          "title": "Recent Transactions",
+          "description": "Last {{count}} transactions",
+          "viewAll": "View All",
+          "date": "Date",
+          "descriptionLabel": "Description",
+          "type": "Type",
+          "value": "Value",
+          "subscription": "Subscription",
+          "course": "Course",
+          "plan": "Plan"
+        },
+        "pending": {
+          "title": "Pending Actions",
+          "draftCourses": {
+            "title": "Draft courses",
+            "description": "You have {{count}} unpublished course(s)",
+            "cta": "Review"
+          },
+          "messages": {
+            "title": "Pending messages",
+            "description": "{{count}} message(s) awaiting response",
+            "cta": "Reply"
+          },
+          "empty": {
+            "title": "All caught up!",
+            "description": "No pending actions at the moment."
+          }
+        },
+        "profile": {
+          "title": "Profile Completion",
+          "progress": "Progress",
+          "basicInfo": "Basic information",
+          "avatar": "Profile picture",
+          "cta": "Complete Profile"
+        },
+        "reputation": {
+          "title": "Rating & Reputation",
+          "noRatings": "No ratings yet",
+          "clarity": "Clarity",
+          "organization": "Organization",
+          "material": "Material"
+        },
+        "engagement": {
+          "title": "Engagement",
+          "responseTime": "Response time",
+          "messagesPerWeek": "Messages/week",
+          "responseRate": "Response rate",
+          "cta": "View Messages"
+        },
+        "quickAccess": {
+          "title": "Quick Access",
+          "newCourse": "New Course",
+          "editProfile": "Edit Profile",
+          "messages": "Messages"
+        },
+        "footer": {
+          "profileCompleted": "Profile Completed",
+          "pendingCourses": "Pending Courses",
+          "pendingMessages": "Pending Messages",
+          "totalStudents": "Total Students"
+        }
+      },
+      "signup": {
+        "title": "Become an Instructor",
+        "subtitle": "Share your knowledge and transform lives",
+        "description": "Create online courses, earn money and impact thousands of people's lives",
+        "cta": "Start Now",
+        "features": {
+          "courseManagement": {
+            "title": "Course Management",
+            "description": "Create, organize and manage your courses with intuitive tools"
+          },
+          "unlimitedClasses": {
+            "title": "Unlimited Classes",
+            "description": "Teach as many students as you want in multiple simultaneous courses"
+          },
+          "directMonetization": {
+            "title": "Direct Monetization",
+            "description": "Receive direct payments for your courses without intermediaries"
+          },
+          "detailedAnalytics": {
+            "title": "Detailed Analytics",
+            "description": "Track your students' performance in real time"
+          },
+          "totalFlexibility": {
+            "title": "Total Flexibility",
+            "description": "Work at your own pace and schedule"
+          },
+          "guaranteedGrowth": {
+            "title": "Guaranteed Growth",
+            "description": "Integrated tools to increase your sales"
+          }
+        },
+        "benefits": [
+          "Commission of up to 70% of course value",
+          "Advanced analytics dashboard",
+          "Dedicated 24/7 support",
+          "Automatic digital certificates",
+          "Integration with multiple platforms",
+          "Marketing tools included"
+        ],
+        "howItWorks": "How It Works",
+        "backToHome": "Back",
+        "alreadyInstructor": "Already an instructor?",
+        "login": "Log In"
+      }
+    },
+    "admin": {
+      "title": "Admin Dashboard",
+      "users": "Users",
+      "courses": "Courses",
+      "categories": "Categories",
+      "settings": "Settings",
+      "totalUsers": "Total Users",
+      "totalCourses": "Total Courses",
+      "activeStudents": "Active Students",
+      "totalEnrollments": "Total Enrollments",
+      "totalRevenue": "Total Revenue",
+      "stats": {
+        "users": "users",
+        "courses": "courses",
+        "enrollments": "enrollments",
+        "revenue": "revenue",
+        "newUsers": "new users (30d)",
+        "newEnrollments": "new enrollments (7d)",
+        "avgRevenue": "avg revenue/month",
+        "avgEnrollments": "enrollments/course"
+      },
+      "cards": {
+        "quickActions": "Quick Actions",
+        "recentActivity": "Recent Activity",
+        "systemHealth": "System Health",
+        "keyMetrics": "Key Metrics"
+      },
+      "activities": {
+        "newUser": "New user registered",
+        "newEnrollment": "New enrollment",
+        "newCourse": "New course created",
+        "viewAll": "View All",
+        "noActivity": "No recent activity"
+      }
+    }
+  },
+  "admin": {
+    "title": "Admin Dashboard",
+    "users": "Users",
+    "courses": "Courses",
+    "categories": "Categories",
+    "payments": "Payments",
+    "settings": "Settings",
+    "plans": "Plans",
+    "advertisements": "Ads",
+    "profile": "Profile",
+    "administrator": "Administrator"
+  },
+  "adminUsersPage": {
+    "title": "Students and Instructors",
+    "subtitle": "Manage the platform's learning community",
+    "newUser": "New User",
+    "stats": {
+      "totalStudents": "Total Students",
+      "activeStudents": "Active (7 days)",
+      "totalTeachers": "Teachers",
+      "studentsAtRisk": "Need Attention"
+    },
+    "tabs": {
+      "students": "Students",
+      "teachers": "Instructors",
+      "teachersShort": "Instr.",
+      "admins": "Admins",
+      "adminsShort": "Adm"
+    },
+    "actions": {
+      "export": "Export",
+      "filters": "Filters",
+      "progress": "Progress",
+      "message": "Message",
+      "viewCourses": "View Courses"
+    },
+    "searchPlaceholder": {
+      "students": "Search students...",
+      "teachers": "Search instructors...",
+      "admins": "Search administrators..."
+    },
+    "statusFilters": {
+      "all": "All",
+      "excellent": "Top",
+      "good": "Active",
+      "attention": "Attention",
+      "inactive": "Inactive"
+    },
+    "badges": {
+      "excellent": "Top",
+      "good": "Active",
+      "needsAttention": "Needs Attention",
+      "inactive": "Inactive"
+    },
+    "empty": {
+      "title": "No users found",
+      "description": "Adjust filters or add new users"
+    },
+    "metrics": {
+      "completion": "Completion",
+      "courses": "Courses",
+      "studyTime": "Study",
+      "students": "Students",
+      "lastAccess": "Last access:",
+      "never": "Never",
+      "today": "Today",
+      "yesterday": "Yesterday",
+      "daysAgo": "{count} days ago",
+      "weeksAgo": "{count} weeks ago"
+    },
+    "footer": {
+      "showing": "{visible} of {total} users displayed",
+      "attention": "• {count} students need attention"
+    },
+    "toasts": {
+      "deleteSuccessTitle": "User removed",
+      "deleteSuccessDescription": "The user was removed successfully.",
+      "deleteErrorTitle": "Error deleting",
+      "deleteErrorDescription": "Could not remove the user. Please try again.",
+      "loadError": "Error loading users"
+    }
+  },
+  "about": {
+    "title": "About SM Educational",
+    "subtitle": "Transforming lives through quality and accessible education",
+    "mission": {
+      "title": "Our Mission",
+      "text": "Democratize access to quality education, offering online courses that empower professionals and transform careers throughout Brazil."
+    },
+    "vision": {
+      "title": "Our Vision",
+      "text": "Be a reference in online education in Brazil, recognized for course excellence and positive impact on our students' lives."
+    },
+    "stats": {
+      "students": "Students",
+      "courses": "Courses",
+      "certificates": "Certificates",
+      "satisfaction": "Satisfaction"
+    },
+    "cta": {
+      "title": "Ready to start?",
+      "subtitle": "Join thousands of students and transform your career today",
+      "button": "Start Now"
+    }
+  },
+  "profile": {
+    "title": "Profile",
+    "editProfile": "Edit Profile",
+    "personalInfo": "Personal Information",
+    "accountSettings": "Account Settings",
+    "name": "Name",
+    "email": "Email",
+    "phone": "Phone",
+    "bio": "Bio",
+    "avatar": "Avatar",
+    "changePassword": "Change Password",
+    "saveChanges": "Save Changes"
+  },
+  "toasts": {
+    "success": {
+      "saved": "Saved successfully!",
+      "updated": "Updated successfully!",
+      "deleted": "Deleted successfully!",
+      "created": "Created successfully!",
+      "loginSuccess": "Login successful!",
+      "registerSuccess": "Registration successful!",
+      "codeSent": "Code sent successfully!",
+      "codeVerified": "Code verified successfully!",
+      "passwordReset": "Password reset successfully!"
+    },
+    "error": {
+      "generic": "An error occurred. Please try again.",
+      "unauthorized": "You don't have permission for this action.",
+      "invalidCredentials": "Invalid email or password.",
+      "emailInUse": "This email is already in use.",
+      "requiredFields": "Please fill in all required fields.",
+      "passwordsDoNotMatch": "Passwords do not match.",
+      "passwordTooShort": "Password must be at least 6 characters.",
+      "invalidCode": "Invalid code.",
+      "uploadFailed": "Upload failed.",
+      "deleteFailed": "Delete failed.",
+      "createFailed": "Create failed.",
+      "updateFailed": "Update failed.",
+      "loadFailed": "Failed to load data."
+    },
+    "validation": {
+      "required": "This field is required",
+      "email": "Enter a valid email",
+      "minLength": "Minimum {min} characters",
+      "passwordMatch": "Passwords must match",
+      "passwordTooShort": "Password must be at least 6 characters",
+      "invalidCode": "Invalid code"
+    },
+    "confirmation": {
+      "delete": "Are you sure you want to delete?",
+      "logout": "Are you sure you want to log out?"
+    },
+    "upload": {
+      "start": "Starting upload...",
+      "success": "Upload complete!",
+      "error": "Upload error."
+    }
+  }
+}

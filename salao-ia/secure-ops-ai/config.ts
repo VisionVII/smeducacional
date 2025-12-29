@@ -19,7 +19,8 @@ export const DEFAULT_SCAN_CONFIG: ScanConfig = {
   depth: (process.env.AI_SCAN_DEPTH as ScanConfig['depth']) || 'full',
   autoFix: process.env.AI_AUTO_FIX === 'true',
   blockInsecure: process.env.AI_BLOCK_INSECURE !== 'false',
-  minSeverity: (process.env.AI_MIN_SEVERITY as any) || 'MEDIUM',
+  minSeverity:
+    (process.env.AI_MIN_SEVERITY as ScanConfig['minSeverity']) || 'MEDIUM',
   maxIssues: parseInt(process.env.AI_MAX_ISSUES || '50'),
   ignorePaths: [
     'node_modules/**',
@@ -110,7 +111,11 @@ JSON com array de issues:
 export const ANALYSIS_PROMPT_TEMPLATE = (
   code: string,
   filePath: string,
-  context: any
+  context: {
+    isApiRoute: boolean;
+    hasAuth: boolean;
+    hasValidation: boolean;
+  }
 ) => `
 Analise o seguinte código TypeScript para vulnerabilidades de segurança:
 

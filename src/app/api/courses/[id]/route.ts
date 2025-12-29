@@ -117,7 +117,7 @@ export async function PUT(
 
     // Normalizar isPaid em tempo de resposta para evitar inconsistências antigas
     if (course && typeof course.price === 'number') {
-      (course as any).isPaid = course.price > 0;
+      course.isPaid = course.price > 0;
     }
 
     // Verificar permissão: apenas o instrutor do curso ou admin pode editar
@@ -149,9 +149,9 @@ export async function PUT(
       );
     }
 
-    let validatedData = validation.data as Record<string, any>;
+    const validatedData = validation.data as Record<string, unknown>;
     // Sanitizar: remover strings vazias e normalizar campos opcionais
-    const dataToUpdate: Record<string, any> = {};
+    const dataToUpdate: Record<string, unknown> = {};
     for (const [key, value] of Object.entries(validatedData)) {
       if (value === undefined) continue;
       if (typeof value === 'string' && value.trim() === '') continue;
@@ -167,26 +167,35 @@ export async function PUT(
       dataToUpdate[key] = value;
     }
     console.log('[API] Dados normalizados para update:', dataToUpdate);
-    validatedData = dataToUpdate;
+    const normalizedData = dataToUpdate as {
+      price?: number;
+      compareAtPrice?: number | null;
+      slug?: string;
+      categoryId?: string;
+      isPaid?: boolean;
+      [key: string]: unknown;
+    };
     // ✅ CRÍTICO: Derivar isPaid automaticamente baseado no preço
-    if (validatedData.price !== undefined) {
-      validatedData.isPaid = validatedData.price > 0;
+    if (normalizedData.price !== undefined) {
+      normalizedData.isPaid = normalizedData.price > 0;
       console.log(
         '[API] isPaid derivado:',
-        validatedData.isPaid,
+        normalizedData.isPaid,
         'baseado em price:',
-        validatedData.price
+        normalizedData.price
       );
     }
 
     // ✅ Validar compareAtPrice > price (se ambos estiverem presentes)
     if (
-      validatedData.compareAtPrice !== undefined &&
-      validatedData.compareAtPrice !== null
+      normalizedData.compareAtPrice !== undefined &&
+      normalizedData.compareAtPrice !== null
     ) {
       const priceToCompare =
-        validatedData.price !== undefined ? validatedData.price : course.price;
-      if (validatedData.compareAtPrice <= priceToCompare) {
+        normalizedData.price !== undefined
+          ? normalizedData.price
+          : course.price ?? 0;
+      if ((normalizedData.compareAtPrice as number) <= priceToCompare) {
         return NextResponse.json(
           { error: 'Preço comparativo deve ser maior que o preço atual' },
           { status: 400 }
@@ -195,9 +204,9 @@ export async function PUT(
     }
 
     // Se estiver alterando o slug, verificar se não existe outro curso com esse slug
-    if (validatedData.slug && validatedData.slug !== course.slug) {
+    if (normalizedData.slug && normalizedData.slug !== course.slug) {
       const existingCourse = await prisma.course.findUnique({
-        where: { slug: validatedData.slug },
+        where: { slug: normalizedData.slug },
       });
 
       if (existingCourse) {
@@ -209,9 +218,9 @@ export async function PUT(
     }
 
     // Se estiver alterando a categoria, verificar se ela existe
-    if (validatedData.categoryId) {
+    if (normalizedData.categoryId) {
       const category = await prisma.category.findUnique({
-        where: { id: validatedData.categoryId },
+        where: { id: normalizedData.categoryId },
       });
 
       if (!category) {
@@ -225,7 +234,7 @@ export async function PUT(
     // Atualizar o curso
     const updatedCourse = await prisma.course.update({
       where: { id: resolvedParams.id },
-      data: validatedData,
+      data: normalizedData,
       include: {
         category: true,
         instructor: {
@@ -263,7 +272,8 @@ export async function PUT(
       );
     }
     console.error('Erro ao atualizar curso:', error);
-    const message = (error as any)?.message || 'Erro ao atualizar curso';
+    const message =
+      error instanceof Error ? error.message : 'Erro ao atualizar curso';
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }

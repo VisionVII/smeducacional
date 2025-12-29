@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { useSession } from 'next-auth/react';
 import {
   Facebook,
   Instagram,
@@ -13,9 +12,10 @@ import {
   Phone,
   MapPin,
 } from 'lucide-react';
+import { useTranslations } from '@/hooks/use-translations';
 
 export function Footer() {
-  const { data: session } = useSession();
+  const { t, mounted } = useTranslations();
   const [currentYear, setCurrentYear] = useState<number | null>(null);
   const [accessAt, setAccessAt] = useState('');
 
@@ -33,19 +33,7 @@ export function Footer() {
     );
   }, []);
 
-  // Links que requerem autenticação
-  const requiresAuth = (path: string) => {
-    const protectedPaths = ['/student', '/teacher', '/admin'];
-    return protectedPaths.some((p) => path.startsWith(p));
-  };
-
-  // Retorna link apropriado
-  const getLink = (path: string) => {
-    if (requiresAuth(path) && !session) {
-      return '/login';
-    }
-    return path;
-  };
+  if (!mounted) return null;
 
   return (
     <footer className="bg-muted/50 border-t mt-auto">
@@ -55,11 +43,10 @@ export function Footer() {
           {/* Sobre */}
           <div className="text-center sm:text-left">
             <h3 className="font-bold text-base md:text-lg mb-3 md:mb-4">
-              SM Educacional
+              {t.footer.aboutTitle}
             </h3>
             <p className="text-xs md:text-sm text-muted-foreground mb-4 leading-relaxed">
-              Plataforma completa de ensino online com cursos de qualidade para
-              seu desenvolvimento profissional.
+              {t.footer.aboutText}
             </p>
             <div className="flex gap-3 justify-center sm:justify-start">
               <Link
@@ -118,7 +105,7 @@ export function Footer() {
           {/* Links Rápidos */}
           <div className="text-center sm:text-left">
             <h3 className="font-bold text-base md:text-lg mb-3 md:mb-4">
-              Links Rápidos
+              {t.footer.quickLinks}
             </h3>
             <ul className="space-y-2 text-xs md:text-sm">
               <li>
@@ -127,7 +114,7 @@ export function Footer() {
                   className="text-muted-foreground hover:text-primary transition-colors inline-block py-1"
                   suppressHydrationWarning
                 >
-                  Catálogo de Cursos
+                  {t.footer.courseCatalog}
                 </Link>
               </li>
               <li>
@@ -136,7 +123,7 @@ export function Footer() {
                   className="text-muted-foreground hover:text-primary transition-colors inline-block py-1"
                   suppressHydrationWarning
                 >
-                  Sobre Nós
+                  {t.footer.aboutUs}
                 </Link>
               </li>
               <li>
@@ -145,7 +132,7 @@ export function Footer() {
                   className="text-muted-foreground hover:text-primary transition-colors inline-block py-1"
                   suppressHydrationWarning
                 >
-                  Seja um Instrutor
+                  {t.footer.becomeInstructor}
                 </Link>
               </li>
               <li>
@@ -154,7 +141,7 @@ export function Footer() {
                   className="text-muted-foreground hover:text-primary transition-colors inline-block py-1"
                   suppressHydrationWarning
                 >
-                  FAQ
+                  {t.footer.faq}
                 </Link>
               </li>
             </ul>
@@ -163,7 +150,7 @@ export function Footer() {
           {/* Suporte */}
           <div className="text-center sm:text-left">
             <h3 className="font-bold text-base md:text-lg mb-3 md:mb-4">
-              Suporte
+              {t.footer.support}
             </h3>
             <ul className="space-y-2 text-xs md:text-sm">
               <li>
@@ -172,7 +159,7 @@ export function Footer() {
                   className="text-muted-foreground hover:text-primary transition-colors inline-block py-1"
                   suppressHydrationWarning
                 >
-                  Central de Ajuda
+                  {t.footer.helpCenter}
                 </Link>
               </li>
               <li>
@@ -181,7 +168,7 @@ export function Footer() {
                   className="text-muted-foreground hover:text-primary transition-colors inline-block py-1"
                   suppressHydrationWarning
                 >
-                  Contato
+                  {t.footer.contact}
                 </Link>
               </li>
               <li>
@@ -190,7 +177,7 @@ export function Footer() {
                   className="text-muted-foreground hover:text-primary transition-colors inline-block py-1"
                   suppressHydrationWarning
                 >
-                  Termos de Uso
+                  {t.footer.termsOfUse}
                 </Link>
               </li>
               <li>
@@ -199,7 +186,7 @@ export function Footer() {
                   className="text-muted-foreground hover:text-primary transition-colors inline-block py-1"
                   suppressHydrationWarning
                 >
-                  Política de Privacidade
+                  {t.footer.privacyPolicy}
                 </Link>
               </li>
               <li>
@@ -208,7 +195,7 @@ export function Footer() {
                   className="text-muted-foreground hover:text-primary transition-colors inline-block py-1"
                   suppressHydrationWarning
                 >
-                  Política de Cookies
+                  {t.footer.cookiePolicy}
                 </Link>
               </li>
             </ul>
@@ -217,7 +204,7 @@ export function Footer() {
           {/* Contato */}
           <div className="text-center sm:text-left">
             <h3 className="font-bold text-base md:text-lg mb-3 md:mb-4">
-              Contato
+              {t.footer.contactTitle}
             </h3>
             <ul className="space-y-3 text-xs md:text-sm">
               <li className="flex items-start gap-2 justify-center sm:justify-start">
@@ -258,17 +245,17 @@ export function Footer() {
             <div className="text-center md:text-left">
               <p>
                 <span suppressHydrationWarning>
-                  © {currentYear ?? ''} VisionVII. Todos os direitos reservados.
+                  {t.footer.rights.replace('{year}', String(currentYear ?? ''))}
                 </span>
                 <br />
                 <span suppressHydrationWarning>
-                  {accessAt ? `Acesso em: ${accessAt}` : ''}
+                  {accessAt
+                    ? t.footer.accessAt.replace('{datetime}', accessAt)
+                    : ''}
                 </span>
               </p>
               <p className="mt-1 text-[11px] text-red-600 font-semibold">
-                Atenção: Para sua segurança, filtros avançados de proteção,
-                autenticação e monitoramento estão ativos neste sistema.
-                Qualquer tentativa de acesso não autorizado será registrada.
+                {t.footer.securityWarning}
               </p>
             </div>
             <div className="flex flex-wrap justify-center gap-3 md:gap-4">
@@ -277,28 +264,28 @@ export function Footer() {
                 className="hover:text-primary transition-colors"
                 suppressHydrationWarning
               >
-                Termos
+                {t.footer.terms}
               </Link>
               <Link
                 href="/privacy"
                 className="hover:text-primary transition-colors"
                 suppressHydrationWarning
               >
-                Privacidade
+                {t.footer.privacy}
               </Link>
               <Link
                 href="/lgpd"
                 className="hover:text-primary transition-colors"
                 suppressHydrationWarning
               >
-                LGPD
+                {t.footer.lgpd}
               </Link>
               <Link
                 href="/cookies"
                 className="hover:text-primary transition-colors"
                 suppressHydrationWarning
               >
-                Cookies
+                {t.footer.cookies}
               </Link>
             </div>
           </div>
@@ -306,12 +293,9 @@ export function Footer() {
 
         {/* Developer Signature */}
         <div className="border-t mt-6 pt-4 text-center text-[10px] text-muted-foreground/60">
-          <p>
-            Desenvolvido com excelência pela <strong>VisionVII</strong> —
-            Transformando educação através da tecnologia.
-          </p>
+          <p>{t.footer.developedBy}</p>
           <p className="mt-1">
-            <strong>Desenvolvedor Principal:</strong> Victor Hugo |{' '}
+            <strong>{t.footer.developerPrincipal}:</strong> Victor Hugo |{' '}
             <a
               href="mailto:visionvidevgri@proton.me"
               className="hover:text-primary"

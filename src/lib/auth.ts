@@ -5,6 +5,22 @@ import GoogleProvider from 'next-auth/providers/google';
 import bcrypt from 'bcryptjs';
 import { prisma } from '@/lib/db';
 
+// TypeScript interfaces para session user
+interface GoogleProfile {
+  email?: string;
+  name?: string;
+  picture?: string;
+}
+
+interface ExtendedUser {
+  id: string;
+  email: string;
+  name?: string | null;
+  role: string;
+  avatar?: string | null;
+  twoFactorEnabled?: boolean;
+}
+
 export const authOptions: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
   session: {
@@ -144,7 +160,7 @@ export const authOptions: NextAuthOptions = {
           password: user.password,
           emailVerified: user.emailVerified,
           twoFactorEnabled: user.twoFactorEnabled,
-        } as any;
+        };
       },
     }),
     // Adicionar Google Provider apenas se credenciais estiverem configuradas
@@ -223,11 +239,12 @@ export const authOptions: NextAuthOptions = {
 
         if (!dbUser) {
           console.log('[auth][jwt] Criando novo usuário Google');
+          const googleProfile = profile as GoogleProfile;
           dbUser = await prisma.user.create({
             data: {
               email,
-              name: (profile as any)?.name || user?.name || email.split('@')[0],
-              avatar: (profile as any)?.picture || null,
+              name: googleProfile?.name || user?.name || email.split('@')[0],
+              avatar: googleProfile?.picture || null,
               emailVerified: new Date(),
               role: 'STUDENT',
             },
@@ -256,12 +273,13 @@ export const authOptions: NextAuthOptions = {
 
       // Credentials login
       if (account?.provider === 'credentials' && user) {
-        token.id = user.id;
-        token.email = user.email!;
-        token.name = user.name || '';
-        token.role = (user as any).role;
-        token.avatar = (user as any).avatar;
-        token.twoFactorEnabled = (user as any).twoFactorEnabled || false;
+        const extendedUser = user as ExtendedUser;
+        token.id = extendedUser.id;
+        token.email = extendedUser.email!;
+        token.name = extendedUser.name || '';
+        token.role = extendedUser.role as any;
+        token.avatar = extendedUser.avatar;
+        token.twoFactorEnabled = extendedUser.twoFactorEnabled || false;
         if (process.env.NODE_ENV === 'development') {
           console.log('[auth][jwt] ✅ Token Credentials populado');
         }
@@ -339,11 +357,12 @@ export const authOptions: NextAuthOptions = {
           role: token.role,
           twoFactorEnabled: token.twoFactorEnabled,
         });
-        (session.user as any).id = token.id;
-        (session.user as any).role = token.role;
-        (session.user as any).avatar = token.avatar;
-        (session.user as any).twoFactorEnabled =
-          token.twoFactorEnabled || false;
+        const sessionUser = session.user as ExtendedUser;
+        sessionUser.id = token.id as string;
+        sessionUser.role = token.role as string;
+        sessionUser.avatar = token.avatar as string | null;
+        sessionUser.twoFactorEnabled =
+          (token.twoFactorEnabled as boolean) || false;
       }
       return session;
     },

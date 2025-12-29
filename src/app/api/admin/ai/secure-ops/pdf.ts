@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { generateSecurityReportPdf, deliverPdfToUser } from '@/lib/secureOpsAI';
 
 // Endpoint: /api/admin/ai/secure-ops/pdf
-export async function POST(req: NextRequest) {
+export async function POST() {
   // Log auditável
   console.log('[SecureOpsAI][pdf] Solicitação de geração de PDF');
   try {

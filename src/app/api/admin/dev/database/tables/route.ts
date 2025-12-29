@@ -2,11 +2,17 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 
+interface DatabaseTable {
+  table_schema: string;
+  table_name: string;
+  column_count: bigint;
+}
+
 export async function GET(request: NextRequest) {
   try {
     const session = await auth();
 
-    if (!session?.user || (session.user as any).role !== 'ADMIN') {
+    if (!session?.user || session.user.role !== 'ADMIN') {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     }
 
@@ -33,7 +39,7 @@ export async function GET(request: NextRequest) {
 
     query += ` ORDER BY table_schema, table_name LIMIT 100;`;
 
-    const tables = await prisma.$queryRawUnsafe<any[]>(query);
+    const tables = await prisma.$queryRawUnsafe<DatabaseTable[]>(query);
 
     // Convert BigInt to string for JSON serialization
     const serializedTables = tables.map((table) => ({

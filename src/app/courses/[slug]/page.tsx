@@ -1,9 +1,9 @@
-import { notFound } from 'next/navigation';
-import Link from 'next/link';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/db';
+import { notFound } from 'next/navigation';
+import Link from 'next/link';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { LockedCourseCard } from '@/components/LockedCourseCard';
 import { CheckoutButton } from '@/components/checkout/CheckoutButton';
 import {
   Card,
@@ -22,8 +22,19 @@ import {
   FileText,
   Award,
 } from 'lucide-react';
+import { type Locale } from '@/lib/locales';
 
 type CourseParams = { slug: string };
+
+async function getPageTranslations() {
+  // i18n desativado: força locale pt-BR independentemente de cookies
+  const locale: Locale = 'pt-BR';
+  // Importar dinâmico da cache já construída em translations-provider
+  const { translationsMap } = await import(
+    '@/components/translations-provider'
+  );
+  return { locale, t: translationsMap[locale] };
+}
 
 async function getCourse(slug: string) {
   if (!slug) return null;
@@ -50,6 +61,8 @@ export default async function CourseDetailPage({
   const resolvedParams = await params;
   const session = await auth();
   const course = await getCourse(resolvedParams.slug);
+  const { locale, t } = await getPageTranslations();
+  const courseT = t.courseDetail;
 
   if (!course) {
     notFound();
@@ -79,6 +92,17 @@ export default async function CourseDetailPage({
     0
   );
 
+  const courseContentMeta = courseT.courseContent.meta
+    .replace('{modules}', course.modules.length.toString())
+    .replace('{lessons}', totalLessons.toString())
+    .replace('{hours}', Math.floor(totalDuration / 60).toString())
+    .replace('{minutes}', String(totalDuration % 60).padStart(2, '0'));
+
+  const currencyFormatter = new Intl.NumberFormat(locale, {
+    style: 'currency',
+    currency: 'BRL',
+  });
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
       {/* Breadcrumb */}
@@ -101,7 +125,7 @@ export default async function CourseDetailPage({
                 d="M15 19l-7-7 7-7"
               />
             </svg>
-            Voltar para cursos
+            {courseT.breadcrumb}
           </Link>
         </div>
       </div>
@@ -116,10 +140,12 @@ export default async function CourseDetailPage({
               {course.thumbnail && (
                 <div className="relative group overflow-hidden rounded-2xl border-2 border-border shadow-xl">
                   <div className="aspect-video w-full">
-                    <img
-                      src={course.thumbnail ?? undefined}
+                    <Image
+                      src={course.thumbnail}
                       alt={course.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                      fill
+                      className="object-cover group-hover:scale-105 transition-transform duration-700"
+                      sizes="(max-width: 1024px) 100vw, 1280px"
                     />
                   </div>
                   {/* Overlay Gradient */}
@@ -158,7 +184,7 @@ export default async function CourseDetailPage({
                     <div className="flex flex-col items-center justify-center p-3 sm:p-4 bg-muted/50 rounded-xl border transition-colors hover:bg-muted">
                       <Signal className="h-5 w-5 text-primary mb-1.5" />
                       <span className="text-xs text-muted-foreground mb-1">
-                        Nível
+                        {courseT.stats.level}
                       </span>
                       <span className="text-sm font-bold">{course.level}</span>
                     </div>
@@ -166,7 +192,7 @@ export default async function CourseDetailPage({
                   <div className="flex flex-col items-center justify-center p-3 sm:p-4 bg-muted/50 rounded-xl border transition-colors hover:bg-muted">
                     <Clock className="h-5 w-5 text-primary mb-1.5" />
                     <span className="text-xs text-muted-foreground mb-1">
-                      Duração
+                      {courseT.stats.duration}
                     </span>
                     <span className="text-sm font-bold">
                       {Math.floor(totalDuration / 60)}h {totalDuration % 60}m
@@ -175,7 +201,7 @@ export default async function CourseDetailPage({
                   <div className="flex flex-col items-center justify-center p-3 sm:p-4 bg-muted/50 rounded-xl border transition-colors hover:bg-muted">
                     <Users className="h-5 w-5 text-primary mb-1.5" />
                     <span className="text-xs text-muted-foreground mb-1">
-                      Alunos
+                      {courseT.stats.students}
                     </span>
                     <span className="text-sm font-bold">
                       {course._count.enrollments}
@@ -184,14 +210,14 @@ export default async function CourseDetailPage({
                   <div className="flex flex-col items-center justify-center p-3 sm:p-4 bg-muted/50 rounded-xl border transition-colors hover:bg-muted">
                     <PlayCircle className="h-5 w-5 text-primary mb-1.5" />
                     <span className="text-xs text-muted-foreground mb-1">
-                      Aulas
+                      {courseT.stats.lessons}
                     </span>
                     <span className="text-sm font-bold">{totalLessons}</span>
                   </div>
                   <div className="flex flex-col items-center justify-center p-3 sm:p-4 bg-muted/50 rounded-xl border transition-colors hover:bg-muted">
                     <BookOpen className="h-5 w-5 text-primary mb-1.5" />
                     <span className="text-xs text-muted-foreground mb-1">
-                      Módulos
+                      {courseT.stats.modules}
                     </span>
                     <span className="text-sm font-bold">
                       {course.modules.length}
@@ -209,7 +235,7 @@ export default async function CourseDetailPage({
                     <div className="p-2 bg-gradient-theme rounded-lg">
                       <CheckCircle className="h-5 w-5 text-white" />
                     </div>
-                    O que voce vai aprender
+                    {courseT.whatYouLearn}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -235,7 +261,7 @@ export default async function CourseDetailPage({
                 <CardHeader>
                   <CardTitle className="text-xl font-bold flex items-center gap-3">
                     <FileText className="h-5 w-5 text-primary" />
-                    Requisitos
+                    {courseT.requirements}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -252,11 +278,10 @@ export default async function CourseDetailPage({
                   <div className="p-2 bg-gradient-theme rounded-lg">
                     <BookOpen className="h-5 w-5 text-white" />
                   </div>
-                  Conteúdo do Curso
+                  {courseT.courseContent.title}
                 </CardTitle>
                 <CardDescription className="text-base font-medium mt-2">
-                  {course.modules.length} módulos • {totalLessons} aulas •{' '}
-                  {Math.floor(totalDuration / 60)}h {totalDuration % 60}min
+                  {courseContentMeta}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -290,7 +315,7 @@ export default async function CourseDetailPage({
                               </span>
                               {lesson.isFree && (
                                 <span className="text-xs px-2 py-1 rounded-md bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 font-semibold flex-shrink-0">
-                                  Grátis
+                                  {courseT.badges.free}
                                 </span>
                               )}
                             </div>
@@ -313,16 +338,18 @@ export default async function CourseDetailPage({
               <CardHeader>
                 <CardTitle className="text-xl font-bold flex items-center gap-3">
                   <Users className="h-5 w-5 text-primary" />
-                  Instrutor
+                  {courseT.instructor}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="flex items-start gap-5">
                   {course.instructor.avatar ? (
-                    <img
-                      src={course.instructor.avatar ?? undefined}
+                    <Image
+                      src={course.instructor.avatar}
                       alt={course.instructor.name}
-                      className="h-20 w-20 rounded-2xl object-cover border-2 border-primary border-opacity-20 shadow-lg"
+                      width={80}
+                      height={80}
+                      className="rounded-2xl object-cover border-2 border-primary border-opacity-20 shadow-lg"
                     />
                   ) : (
                     <div className="h-20 w-20 rounded-2xl bg-gradient-theme flex items-center justify-center text-white text-3xl font-bold shadow-lg flex-shrink-0">
@@ -357,15 +384,15 @@ export default async function CourseDetailPage({
                     {isPaidCourse ? (
                       <>
                         <div className="text-5xl font-black text-primary mb-1">
-                          R$ {(course.price || 0).toFixed(2)}
+                          {currencyFormatter.format(course.price || 0)}
                         </div>
                         <p className="text-sm font-medium text-muted-foreground">
-                          Pagamento único
+                          {courseT.price.oneTime}
                         </p>
                       </>
                     ) : (
                       <div className="text-5xl font-black text-green-600">
-                        GRÁTIS
+                        {courseT.price.freeLabel}
                       </div>
                     )}
                   </div>
@@ -381,7 +408,7 @@ export default async function CourseDetailPage({
                     >
                       <Link href={`/student/courses/${course.id}`}>
                         <PlayCircle className="h-5 w-5 mr-2" />
-                        Continuar Estudando
+                        {courseT.actions.continue}
                       </Link>
                     </Button>
                   ) : session?.user ? (
@@ -413,10 +440,10 @@ export default async function CourseDetailPage({
                             </div>
                             <div className="flex-1 min-w-0">
                               <h4 className="font-bold text-sm text-orange-900 dark:text-orange-100 mb-1">
-                                Curso Bloqueado
+                                {courseT.locked.title}
                               </h4>
                               <p className="text-xs text-orange-700 dark:text-orange-300">
-                                Adquira o acesso completo a este curso
+                                {courseT.locked.description}
                               </p>
                             </div>
                           </div>
@@ -433,7 +460,7 @@ export default async function CourseDetailPage({
                           size="lg"
                         >
                           <CheckCircle className="h-5 w-5 mr-2" />
-                          Matricular-se Agora
+                          {courseT.actions.enroll}
                         </Button>
                       </form>
                     )
@@ -443,20 +470,20 @@ export default async function CourseDetailPage({
                       className="w-full h-12 bg-primary hover:bg-primary/90 text-primary-foreground font-bold shadow-lg hover:shadow-xl transition-all"
                       size="lg"
                     >
-                      <Link href="/login">Fazer Login para Matricular</Link>
+                      <Link href="/login">{courseT.actions.login}</Link>
                     </Button>
                   )}
 
                   {/* Recursos Incluídos */}
                   <div className="pt-4 border-t space-y-3">
                     <h4 className="font-bold text-sm uppercase tracking-wider text-muted-foreground">
-                      Este curso inclui
+                      {courseT.includes.title}
                     </h4>
                     <div className="grid grid-cols-2 gap-2">
                       <div className="flex flex-col items-center p-3 bg-muted/50 rounded-lg border">
                         <BookOpen className="h-4 w-4 text-primary mb-1" />
                         <span className="text-xs text-muted-foreground">
-                          Módulos
+                          {courseT.includes.modules}
                         </span>
                         <span className="font-bold text-sm">
                           {course.modules.length}
@@ -465,7 +492,7 @@ export default async function CourseDetailPage({
                       <div className="flex flex-col items-center p-3 bg-muted/50 rounded-lg border">
                         <PlayCircle className="h-4 w-4 text-primary mb-1" />
                         <span className="text-xs text-muted-foreground">
-                          Aulas
+                          {courseT.includes.lessons}
                         </span>
                         <span className="font-bold text-sm">
                           {totalLessons}
@@ -474,7 +501,7 @@ export default async function CourseDetailPage({
                       <div className="flex flex-col items-center p-3 bg-muted/50 rounded-lg border">
                         <Clock className="h-4 w-4 text-primary mb-1" />
                         <span className="text-xs text-muted-foreground">
-                          Duração
+                          {courseT.includes.duration}
                         </span>
                         <span className="font-bold text-sm">
                           {Math.floor(totalDuration / 60)}h
@@ -483,10 +510,10 @@ export default async function CourseDetailPage({
                       <div className="flex flex-col items-center p-3 bg-muted/50 rounded-lg border">
                         <Signal className="h-4 w-4 text-primary mb-1" />
                         <span className="text-xs text-muted-foreground">
-                          Nível
+                          {courseT.includes.level}
                         </span>
                         <span className="font-bold text-sm">
-                          {course.level || 'Todos'}
+                          {course.level || courseT.includes.allLevels}
                         </span>
                       </div>
                     </div>
@@ -495,25 +522,25 @@ export default async function CourseDetailPage({
                   {/* Benefícios */}
                   <div className="pt-4 border-t space-y-3">
                     <h4 className="font-bold text-sm uppercase tracking-wider text-muted-foreground">
-                      Benefícios
+                      {courseT.benefits.title}
                     </h4>
                     <div className="space-y-2">
                       <div className="flex items-center gap-3 p-3 bg-green-50 dark:bg-green-950/20 rounded-lg border border-green-200 dark:border-green-900">
                         <Award className="h-4 w-4 text-green-600 dark:text-green-500 flex-shrink-0" />
                         <span className="text-xs font-medium">
-                          Certificado de conclusão
+                          {courseT.benefits.certificate}
                         </span>
                       </div>
                       <div className="flex items-center gap-3 p-3 bg-blue-50 dark:bg-blue-950/20 rounded-lg border border-blue-200 dark:border-blue-900">
                         <FileText className="h-4 w-4 text-blue-600 dark:text-blue-500 flex-shrink-0" />
                         <span className="text-xs font-medium">
-                          Materiais de apoio
+                          {courseT.benefits.materials}
                         </span>
                       </div>
                       <div className="flex items-center gap-3 p-3 bg-purple-50 dark:bg-purple-950/20 rounded-lg border border-purple-200 dark:border-purple-900">
                         <Clock className="h-4 w-4 text-purple-600 dark:text-purple-500 flex-shrink-0" />
                         <span className="text-xs font-medium">
-                          Acesso vitalício
+                          {courseT.benefits.lifetime}
                         </span>
                       </div>
                     </div>

@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
-import type { PublicPageLog, PublicPage } from '@prisma/client';
 import { auth } from '@/lib/auth';
 import { z } from 'zod';
 
@@ -27,7 +26,7 @@ export async function POST(
   }
   const { version } = result.data;
 
-  const logs: PublicPageLog[] = await prisma.publicPageLog.findMany({
+  const logs = await prisma.publicPageLog.findMany({
     where: { pageId: params.id },
     orderBy: { createdAt: 'desc' },
   });
@@ -38,7 +37,7 @@ export async function POST(
       { status: 404 }
     );
   }
-  const changes = log.changes as Partial<PublicPage>;
+  const changes = log.changes as any;
 
   const page = await prisma.publicPage.update({
     where: { id: params.id },

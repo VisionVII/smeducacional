@@ -7,16 +7,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import {
-  BookOpen,
-  Users,
-  GraduationCap,
-  TrendingUp,
-  DollarSign,
-  Award,
-  Activity,
-  Clock,
-} from 'lucide-react';
+import { BookOpen, Users, GraduationCap, DollarSign } from 'lucide-react';
 import { format, subDays } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import {
@@ -24,8 +15,6 @@ import {
   BarChartComponent,
   LineChartComponent,
   PieChartComponent,
-  MultiBarChartComponent,
-  MultiLineChartComponent,
 } from '@/components/admin/chart-components';
 
 export default async function AdminDashboardNew() {

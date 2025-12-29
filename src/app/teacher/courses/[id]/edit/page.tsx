@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -127,7 +126,20 @@ export default function EditCoursePage({
       const price = formData.price?.trim();
       const compareAtPrice = formData.compareAtPrice?.trim();
 
-      const payload: any = {
+      const payload: {
+        title: string;
+        slug: string;
+        description: string;
+        level: string;
+        isPublished: boolean;
+        categoryId: string;
+        duration?: number;
+        price?: number;
+        compareAtPrice?: number | null;
+        thumbnail?: string;
+        requirements?: string;
+        whatYouLearn?: string;
+      } = {
         title: formData.title,
         slug: formData.slug,
         description: formData.description,
@@ -179,7 +191,7 @@ export default function EditCoursePage({
         body: JSON.stringify(payload),
       });
 
-      const data = await response.json();
+      await response.json();
 
       if (response.ok) {
         toast({
@@ -206,6 +218,7 @@ export default function EditCoursePage({
         });
       }
     } catch (error) {
+      console.error('[course edit] Update error:', error);
       toast({
         title: 'Erro ao atualizar curso',
         description: 'Ocorreu um erro inesperado.',
@@ -248,6 +261,7 @@ export default function EditCoursePage({
         });
       }
     } catch (error) {
+      console.error('[course edit] Delete error:', error);
       toast({
         title: 'Erro ao deletar curso',
         description: 'Ocorreu um erro inesperado.',
@@ -489,7 +503,7 @@ export default function EditCoursePage({
                     className="h-11"
                   />
                   <p className="text-xs text-muted-foreground">
-                    Aparece como "De R$ X"
+                    Aparece como &quot;De R$ X&quot;
                   </p>
                 </div>
 

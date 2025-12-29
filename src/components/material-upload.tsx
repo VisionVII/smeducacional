@@ -2,11 +2,10 @@
 
 import { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/components/ui/use-toast';
-import { supabase } from '@/lib/supabase';
+import { uploadFile } from '@/lib/supabase';
 import { X, FileText, File, Loader2, Download } from 'lucide-react';
 
 interface Material {
@@ -52,7 +51,7 @@ export function MaterialUpload({
         continue;
       }
 
-      await uploadFile(file);
+      await uploadSingle(file);
     }
 
     if (fileInputRef.current) {
@@ -60,37 +59,29 @@ export function MaterialUpload({
     }
   };
 
-  const uploadFile = async (file: File) => {
+  const uploadSingle = async (file: File) => {
     setIsUploading(true);
     setUploadProgress(0);
 
     try {
       // Gerar nome único para o arquivo
-      const fileExt = file.name.split('.').pop();
       const fileName = `${lessonId}-${Date.now()}-${file.name}`;
       const filePath = `materials/${fileName}`;
 
-      // Upload para Supabase Storage
-      const { data, error } = await supabase.storage
-        .from('course-materials')
-        .upload(filePath, file, {
-          cacheControl: '3600',
-          upsert: false,
-        });
-
-      if (error) {
-        throw error;
+      // Upload para Supabase Storage via helper
+      const { url, error } = await uploadFile(
+        file,
+        'course-materials',
+        filePath
+      );
+      if (error || !url) {
+        throw new Error(error || 'Falha no upload');
       }
-
-      // Obter URL pública
-      const {
-        data: { publicUrl },
-      } = supabase.storage.from('course-materials').getPublicUrl(filePath);
 
       // Adicionar à lista de materiais
       const newMaterial: Material = {
         title: file.name,
-        url: publicUrl,
+        url,
         fileType: file.type || 'application/octet-stream',
         fileSize: file.size,
       };
@@ -101,11 +92,14 @@ export function MaterialUpload({
         title: 'Upload concluído!',
         description: `${file.name} enviado com sucesso.`,
       });
-    } catch (error: any) {
+    } catch (error) {
       console.error('Erro no upload:', error);
       toast({
         title: 'Erro no upload',
-        description: error.message || `Não foi possível enviar ${file.name}.`,
+        description:
+          error instanceof Error
+            ? error.message
+            : `Não foi possível enviar ${file.name}.`,
         variant: 'destructive',
       });
     } finally {

@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useRef, ChangeEvent } from 'react';
-import { Upload, X, Loader2, Image as ImageIcon, Link as LinkIcon } from 'lucide-react';
+import { X, Loader2, Image as ImageIcon, Link as LinkIcon } from 'lucide-react';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { uploadFile } from '@/lib/supabase';
@@ -97,7 +98,7 @@ export function ImageUpload({
       setError('Digite uma URL válida');
       return;
     }
-    
+
     setError('');
     setPreview(urlInput);
     onChange(urlInput);
@@ -123,11 +124,7 @@ export function ImageUpload({
             onChange={(e) => setUrlInput(e.target.value)}
             disabled={disabled}
           />
-          <Button 
-            type="button" 
-            onClick={handleUrlSubmit}
-            disabled={disabled}
-          >
+          <Button type="button" onClick={handleUrlSubmit} disabled={disabled}>
             OK
           </Button>
           <Button
@@ -158,10 +155,13 @@ export function ImageUpload({
       {preview ? (
         <div className="relative group">
           <div className="relative w-full h-64 rounded-lg overflow-hidden border-2 border-gray-200 dark:border-gray-700">
-            <img
+            <Image
               src={preview}
               alt="Preview"
-              className="w-full h-full object-cover"
+              fill
+              unoptimized
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, 50vw"
             />
             {isUploading && (
               <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
@@ -225,7 +225,9 @@ export function ImageUpload({
                 <>
                   <ImageIcon className="h-12 w-12 text-gray-400 mb-3" />
                   <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
-                    <span className="font-semibold">Clique para fazer upload</span>{' '}
+                    <span className="font-semibold">
+                      Clique para fazer upload
+                    </span>{' '}
                     ou arraste a imagem
                   </p>
                   <p className="text-xs text-gray-500 dark:text-gray-400">
@@ -235,7 +237,7 @@ export function ImageUpload({
               )}
             </div>
           </label>
-          
+
           {allowUrl && (
             <div className="text-center">
               <Button

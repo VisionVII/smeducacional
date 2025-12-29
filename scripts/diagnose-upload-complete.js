@@ -182,6 +182,7 @@ async function runFullDiagnostic() {
     const payload = JSON.parse(Buffer.from(parts[1], 'base64').toString());
     log('info', `   Algoritmo: ${header.alg}, Role: ${payload.role}`);
   } catch (e) {
+    console.error('[diagnose-upload-complete] JWT decode error:', e);
     log('warning', 'Não foi possível decodificar JWT');
   }
 

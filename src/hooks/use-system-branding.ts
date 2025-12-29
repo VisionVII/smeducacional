@@ -71,8 +71,8 @@ export function useSystemBranding() {
             setBranding(parsedCache);
             setLoading(false);
             return;
-          } catch (e) {
-            // Ignora erro e continua para fetch
+          } catch (err) {
+            console.debug('[use-system-branding] Parse cache error:', err);
           }
         }
 

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Card,
@@ -523,10 +524,13 @@ export default function AdminCoursesPage() {
                     >
                       {course.thumbnail && (
                         <div className="relative h-36 sm:h-40 overflow-hidden rounded-t-lg">
-                          <img
+                          <Image
                             src={course.thumbnail}
                             alt={course.title}
-                            className="w-full h-full object-cover"
+                            fill
+                            sizes="(max-width: 1024px) 100vw, (max-width: 1280px) 50vw, 33vw"
+                            className="object-cover"
+                            unoptimized
                           />
                           <div className="absolute top-2 right-2">
                             {getStatusBadge(course.status)}

@@ -2,11 +2,19 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 
+interface DatabaseFunction {
+  oid: number;
+  schema: string;
+  name: string;
+  return_type: string;
+  arguments: string;
+}
+
 export async function GET(request: NextRequest) {
   try {
     const session = await auth();
 
-    if (!session?.user || (session.user as any).role !== 'ADMIN') {
+    if (!session?.user || session.user.role !== 'ADMIN') {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     }
 
@@ -36,7 +44,7 @@ export async function GET(request: NextRequest) {
 
     query += ` ORDER BY n.nspname, p.proname LIMIT 100;`;
 
-    const functions = await prisma.$queryRawUnsafe<any[]>(query);
+    const functions = await prisma.$queryRawUnsafe<DatabaseFunction[]>(query);
 
     // Get schemas
     const schemas = await prisma.$queryRawUnsafe<{ schema_name: string }[]>(`

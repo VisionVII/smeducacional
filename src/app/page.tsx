@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Footer } from '@/components/footer';
 import { AdaptiveNavbar } from '@/components/adaptive-navbar';
+import { useTranslations } from '@/hooks/use-translations';
 import {
   BookOpen,
   GraduationCap,
@@ -66,12 +67,54 @@ function AnimatedCounter({
 }
 
 export default function HomePage() {
-  const [heroInView, setHeroInView] = useState(false);
-  const [testimonialInView, setTestimonialInView] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const { t, mounted: translationsLoaded } = useTranslations();
 
   useEffect(() => {
-    setHeroInView(true);
+    setMounted(true);
   }, []);
+
+  const testimonials = translationsLoaded
+    ? [
+        {
+          name: t.home.testimonials.author1,
+          role: t.home.testimonials.role1,
+          text: t.home.testimonials.quote1,
+          stars: 5,
+        },
+        {
+          name: t.home.testimonials.author2,
+          role: t.home.testimonials.role2,
+          text: t.home.testimonials.quote2,
+          stars: 5,
+        },
+        {
+          name: t.home.testimonials.author3,
+          role: t.home.testimonials.role3,
+          text: t.home.testimonials.quote3,
+          stars: 5,
+        },
+      ]
+    : [
+        {
+          name: 'Maria Silva',
+          role: 'Desenvolvedora Web',
+          text: 'Excelente plataforma! Os cursos são muito bem estruturados e os professores são atenciosos.',
+          stars: 5,
+        },
+        {
+          name: 'João Santos',
+          role: 'Analista de Dados',
+          text: 'Consegui mudar de carreira graças aos cursos da plataforma. Recomendo muito!',
+          stars: 5,
+        },
+        {
+          name: 'Ana Costa',
+          role: 'Designer UX/UI',
+          text: 'Material de qualidade e certificados que realmente agregam valor ao currículo.',
+          stars: 5,
+        },
+      ];
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-800">
@@ -94,9 +137,7 @@ export default function HomePage() {
           {/* Badge com efeito */}
           <div
             className={`inline-flex items-center gap-2 mb-6 px-4 py-2 rounded-full bg-primary/10 dark:bg-primary/20 border border-primary/20 transition-all duration-700 ${
-              heroInView
-                ? 'opacity-100 translate-y-0'
-                : 'opacity-0 translate-y-4'
+              mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
             }`}
           >
             <Sparkles
@@ -104,22 +145,24 @@ export default function HomePage() {
               style={{ animationDuration: '3s' }}
             />
             <span className="text-sm font-semibold text-primary">
-              Transforme sua carreira agora
+              {translationsLoaded
+                ? t.home.hero.badge
+                : 'Transforme sua carreira agora'}
             </span>
           </div>
 
           {/* Heading com animação */}
           <h1
             className={`text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-4 md:mb-6 leading-tight px-2 bg-gradient-to-r from-gray-900 via-primary to-purple-600 dark:from-white dark:via-primary dark:to-purple-400 bg-clip-text text-transparent transition-all duration-700 ${
-              heroInView
-                ? 'opacity-100 translate-y-0'
-                : 'opacity-0 translate-y-8'
+              mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
             }`}
           >
-            Aprenda no seu ritmo,
+            {translationsLoaded ? t.home.hero.title : 'Aprenda no seu ritmo,'}
             <br />
             <span className="relative">
-              conquiste seus objetivos
+              {translationsLoaded
+                ? t.home.hero.titleHighlight
+                : 'conquiste seus objetivos'}
               <span className="absolute bottom-2 left-0 w-full h-1 bg-gradient-to-r from-primary via-purple-500 to-transparent opacity-50" />
             </span>
           </h1>
@@ -127,24 +170,18 @@ export default function HomePage() {
           {/* Subtítulo com delay */}
           <p
             className={`text-base sm:text-lg md:text-xl text-muted-foreground mb-10 md:mb-12 max-w-2xl mx-auto leading-relaxed px-4 transition-all duration-700 delay-100 ${
-              heroInView
-                ? 'opacity-100 translate-y-0'
-                : 'opacity-0 translate-y-8'
+              mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
             }`}
           >
-            Plataforma completa de ensino com{' '}
-            <strong>cursos estruturados</strong>,{' '}
-            <strong>certificados reconhecidos</strong> e{' '}
-            <strong>acompanhamento personalizado</strong>. Junte-se a mais de
-            5.000 alunos em busca de transformação.
+            {translationsLoaded
+              ? t.home.hero.subtitle
+              : 'Plataforma completa de ensino com cursos estruturados, certificados reconhecidos e acompanhamento personalizado. Junte-se a mais de 5.000 alunos em busca de transformação.'}
           </p>
 
           {/* CTAs com efeito stagger */}
           <div
             className={`flex flex-col sm:flex-row gap-4 md:gap-6 justify-center items-stretch sm:items-center px-4 max-w-2xl mx-auto transition-all duration-700 delay-200 ${
-              heroInView
-                ? 'opacity-100 translate-y-0'
-                : 'opacity-0 translate-y-8'
+              mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
             }`}
           >
             <Button
@@ -152,8 +189,14 @@ export default function HomePage() {
               size="lg"
               className="w-full sm:w-auto min-w-[200px] h-14 text-base font-semibold shadow-lg hover:shadow-2xl hover:scale-105 transition-all duration-300 relative group overflow-hidden"
             >
-              <Link href="/courses" className="flex items-center gap-2">
-                <span>Explorar Cursos</span>
+              <Link
+                href="/courses"
+                className="flex items-center gap-2"
+                suppressHydrationWarning
+              >
+                <span>
+                  {translationsLoaded ? t.home.hero.cta : 'Explorar Cursos'}
+                </span>
                 <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
               </Link>
             </Button>
@@ -163,8 +206,12 @@ export default function HomePage() {
               variant="outline"
               className="w-full sm:w-auto min-w-[200px] h-14 text-base font-semibold hover:scale-105 transition-all duration-300"
             >
-              <Link href="/about" className="flex items-center gap-2">
-                Saiba Mais
+              <Link
+                href="/about"
+                className="flex items-center gap-2"
+                suppressHydrationWarning
+              >
+                {translationsLoaded ? t.home.hero.ctaSecondary : 'Saiba Mais'}
                 <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
               </Link>
             </Button>
@@ -177,18 +224,15 @@ export default function HomePage() {
             {[
               {
                 icon: BookOpen,
-                title: 'Cursos Completos',
-                desc: 'Aulas em vídeo, materiais extras e exercícios práticos',
+                key: 'courses',
               },
               {
                 icon: Award,
-                title: 'Certificados',
-                desc: 'Certificado digital ao concluir cada curso',
+                key: 'certificates',
               },
               {
                 icon: Users,
-                title: 'Suporte Dedicado',
-                desc: 'Professores disponíveis para tirar suas dúvidas',
+                key: 'support',
               },
             ].map((feature, idx) => (
               <div
@@ -202,10 +246,22 @@ export default function HomePage() {
                   <feature.icon className="h-10 w-10 md:h-12 md:w-12 text-primary group-hover:rotate-12 transition-transform" />
                 </div>
                 <h3 className="text-lg md:text-xl font-bold mb-2">
-                  {feature.title}
+                  {translationsLoaded
+                    ? t.home.features[feature.key].title
+                    : feature.key === 'courses'
+                    ? 'Cursos Completos'
+                    : feature.key === 'certificates'
+                    ? 'Certificados'
+                    : 'Suporte Dedicado'}
                 </h3>
                 <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
-                  {feature.desc}
+                  {translationsLoaded
+                    ? t.home.features[feature.key].description
+                    : feature.key === 'courses'
+                    ? 'Aulas em vídeo, materiais extras e exercícios práticos'
+                    : feature.key === 'certificates'
+                    ? 'Certificado digital ao concluir cada curso'
+                    : 'Professores disponíveis para tirar suas dúvidas'}
                 </p>
               </div>
             ))}
@@ -242,17 +298,17 @@ export default function HomePage() {
               {
                 icon: BookOpen,
                 value: 100,
-                label: 'Cursos Disponíveis',
+                key: 'courses',
                 suffix: '+',
               },
-              { icon: Users, value: 5000, label: 'Alunos Ativos', suffix: '+' },
+              { icon: Users, value: 5000, key: 'students', suffix: '+' },
               {
                 icon: GraduationCap,
                 value: 50,
-                label: 'Professores',
+                key: 'hours',
                 suffix: '+',
               },
-              { icon: Star, value: 98, label: 'Satisfação', suffix: '%' },
+              { icon: Star, value: 98, key: 'satisfaction', suffix: '%' },
             ].map((stat, idx) => (
               <div
                 key={idx}
@@ -272,7 +328,15 @@ export default function HomePage() {
                   <span className="text-2xl ml-1">{stat.suffix}</span>
                 </div>
                 <p className="text-sm md:text-base text-muted-foreground font-medium">
-                  {stat.label}
+                  {translationsLoaded
+                    ? t.home.stats[stat.key]
+                    : stat.key === 'courses'
+                    ? 'Cursos Disponíveis'
+                    : stat.key === 'students'
+                    ? 'Alunos Ativos'
+                    : stat.key === 'hours'
+                    ? 'Professores'
+                    : 'Satisfação'}
                 </p>
               </div>
             ))}
@@ -297,28 +361,42 @@ export default function HomePage() {
       <section className="container mx-auto px-4 py-16 md:py-24">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-center mb-4 px-2">
-            Benefícios para você
+            {mounted ? t.home.benefits.title : 'Benefícios para você'}
           </h2>
           <p className="text-center text-muted-foreground mb-12 md:mb-16 text-base md:text-lg max-w-2xl mx-auto">
-            Tudo que você precisa para aprender, crescer e alcançar sucesso
+            {mounted
+              ? t.home.benefits.subtitle
+              : 'Tudo que você precisa para aprender, crescer e alcançar sucesso'}
           </p>
 
           <div className="space-y-6 md:space-y-8">
             {[
               {
                 icon: Clock,
-                title: 'Aprenda no seu tempo',
-                desc: 'Acesse os cursos quando quiser, de onde estiver. Aprenda no seu ritmo, sem pressão ou prazos apertados.',
+                title: mounted
+                  ? t.home.benefits.learn.title
+                  : 'Aprenda no seu tempo',
+                desc: mounted
+                  ? t.home.benefits.learn.description
+                  : 'Acesse os cursos quando quiser, de onde estiver. Aprenda no seu ritmo, sem pressão ou prazos apertados.',
               },
               {
                 icon: TrendingUp,
-                title: 'Acompanhe seu progresso',
-                desc: 'Sistema completo de acompanhamento com estatísticas detalhadas e relatórios personalizados.',
+                title: mounted
+                  ? t.home.benefits.progress.title
+                  : 'Acompanhe seu progresso',
+                desc: mounted
+                  ? t.home.benefits.progress.description
+                  : 'Sistema completo de acompanhamento com estatísticas detalhadas e relatórios personalizados.',
               },
               {
                 icon: CheckCircle,
-                title: 'Certificação reconhecida',
-                desc: 'Certificados digitais válidos que comprovam seu conhecimento e habilidades no mercado.',
+                title: mounted
+                  ? t.home.benefits.certification.title
+                  : 'Certificação reconhecida',
+                desc: mounted
+                  ? t.home.benefits.certification.description
+                  : 'Certificados digitais válidos que comprovam seu conhecimento e habilidades no mercado.',
               },
             ].map((benefit, idx) => (
               <div
@@ -374,35 +452,19 @@ export default function HomePage() {
         <div className="relative container mx-auto px-4">
           <div className="text-center mb-12 md:mb-16">
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 px-2">
-              O que nossos alunos dizem
+              {translationsLoaded
+                ? t.home.testimonials.title
+                : 'O que nossos alunos dizem'}
             </h2>
             <p className="text-center text-muted-foreground text-base md:text-lg max-w-2xl mx-auto">
-              Veja como estamos transformando vidas de pessoas que acreditam na
-              educação contínua
+              {translationsLoaded
+                ? t.home.testimonials.subtitle
+                : 'Veja como estamos transformando vidas de pessoas que acreditam na educação contínua'}
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 max-w-6xl mx-auto">
-            {[
-              {
-                name: 'Maria Silva',
-                role: 'Desenvolvedora Web',
-                text: 'Excelente plataforma! Os cursos são muito bem estruturados e os professores são atenciosos.',
-                stars: 5,
-              },
-              {
-                name: 'João Santos',
-                role: 'Analista de Dados',
-                text: 'Consegui mudar de carreira graças aos cursos da plataforma. Recomendo muito!',
-                stars: 5,
-              },
-              {
-                name: 'Ana Costa',
-                role: 'Designer UX/UI',
-                text: 'Material de qualidade e certificados que realmente agregam valor ao currículo.',
-                stars: 5,
-              },
-            ].map((testimonial, idx) => (
+            {testimonials.map((testimonial, idx) => (
               <div
                 key={idx}
                 className="group bg-gradient-to-br from-card/90 to-card/70 dark:from-card/80 dark:to-card/60 backdrop-blur-md p-6 md:p-8 rounded-2xl border-2 border-primary/20 hover:border-primary/60 hover:shadow-2xl hover:scale-105 transition-all duration-300 relative overflow-hidden"
@@ -470,71 +532,88 @@ export default function HomePage() {
       <section className="container mx-auto px-4 py-16 md:py-20">
         <div className="max-w-4xl mx-auto text-center mb-10">
           <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-semibold">
-            Para professores
+            {mounted ? t.home.instructorPlans.title : 'Para professores'}
           </span>
           <h2 className="text-3xl md:text-4xl font-bold mt-4 mb-3">
-            Planos claros e receita transparente
+            {mounted
+              ? t.home.instructorPlans.subtitle
+              : 'Planos claros e receita transparente'}
           </h2>
           <p className="text-muted-foreground max-w-3xl mx-auto">
-            Aluno paga diretamente o valor do curso ao professor. No plano Free
-            aplicamos 15% de taxa por venda. Em planos pagos cobramos uma
-            mensalidade do professor e repassamos 100% das vendas.
+            {mounted
+              ? t.home.instructorPlans.description
+              : 'Aluno paga diretamente o valor do curso ao professor. No plano Free aplicamos 15% de taxa por venda. Em planos pagos cobramos uma mensalidade do professor e repassamos 100% das vendas.'}
           </p>
         </div>
 
         <div className="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto">
           <div className="p-6 rounded-2xl border bg-white shadow-sm">
             <div className="flex items-center justify-between mb-3">
-              <h3 className="text-xl font-semibold">Plano Free</h3>
+              <h3 className="text-xl font-semibold">
+                {mounted ? t.home.instructorPlans.freePlan.badge : 'Plano Free'}
+              </h3>
               <span className="text-sm font-semibold text-primary">
-                15% por venda
+                {mounted ? '15% por venda' : '15% por venda'}
               </span>
             </div>
-            <p className="text-3xl font-bold mb-3">R$ 0/mês</p>
+            <p className="text-3xl font-bold mb-3">
+              {mounted ? t.home.instructorPlans.freePlan.title : 'R$ 0/mês'}
+            </p>
             <p className="text-sm text-muted-foreground mb-4">
-              Comece sem mensalidade. Repasse líquido de 85% por venda.
+              {mounted
+                ? t.home.instructorPlans.freePlan.description
+                : 'Comece sem mensalidade. Repasse líquido de 85% por venda.'}
             </p>
             <ul className="space-y-2 text-sm text-muted-foreground">
-              <li className="flex items-start gap-2">
-                <CheckCircle className="h-4 w-4 text-green-600 mt-0.5" />
-                Publicação de cursos sem limite
-              </li>
-              <li className="flex items-start gap-2">
-                <CheckCircle className="h-4 w-4 text-green-600 mt-0.5" />
-                Certificados e suporte incluídos
-              </li>
-              <li className="flex items-start gap-2">
-                <CheckCircle className="h-4 w-4 text-green-600 mt-0.5" />
-                Painel financeiro em tempo real
-              </li>
+              {(mounted
+                ? t.home.instructorPlans.freePlan.perks
+                : [
+                    'Publicação de cursos sem limite',
+                    'Certificados e suporte incluídos',
+                    'Painel financeiro em tempo real',
+                  ]
+              ).map((perk, idx) => (
+                <li key={idx} className="flex items-start gap-2">
+                  <CheckCircle className="h-4 w-4 text-green-600 mt-0.5" />
+                  {perk}
+                </li>
+              ))}
             </ul>
           </div>
 
           <div className="p-6 rounded-2xl border bg-gradient-to-br from-primary/10 via-white to-white shadow-sm">
             <div className="flex items-center justify-between mb-3">
-              <h3 className="text-xl font-semibold">Plano Pago</h3>
+              <h3 className="text-xl font-semibold">
+                {mounted ? t.home.instructorPlans.paidPlan.badge : 'Plano Pago'}
+              </h3>
               <span className="text-sm font-semibold text-primary">
-                0% por venda
+                {mounted ? '0% por venda' : '0% por venda'}
               </span>
             </div>
-            <p className="text-3xl font-bold mb-3">Mensalidade ao admin</p>
+            <p className="text-3xl font-bold mb-3">
+              {mounted
+                ? t.home.instructorPlans.paidPlan.title
+                : 'Mensalidade ao admin'}
+            </p>
             <p className="text-sm text-muted-foreground mb-4">
-              Mensalidade fixa para remover taxas por venda e destravar
-              benefícios extras.
+              {mounted
+                ? t.home.instructorPlans.paidPlan.description
+                : 'Mensalidade fixa para remover taxas por venda e destravar benefícios extras.'}
             </p>
             <ul className="space-y-2 text-sm text-muted-foreground">
-              <li className="flex items-start gap-2">
-                <CheckCircle className="h-4 w-4 text-green-600 mt-0.5" />
-                Repasse integral das vendas
-              </li>
-              <li className="flex items-start gap-2">
-                <CheckCircle className="h-4 w-4 text-green-600 mt-0.5" />
-                Destaque no catálogo e slots de anúncios opcionais
-              </li>
-              <li className="flex items-start gap-2">
-                <CheckCircle className="h-4 w-4 text-green-600 mt-0.5" />
-                Analytics avançado e suporte prioritário
-              </li>
+              {(mounted
+                ? t.home.instructorPlans.paidPlan.perks
+                : [
+                    'Repasse integral das vendas',
+                    'Destaque no catálogo e slots de anúncios opcionais',
+                    'Analytics avançado e suporte prioritário',
+                  ]
+              ).map((perk, idx) => (
+                <li key={idx} className="flex items-start gap-2">
+                  <CheckCircle className="h-4 w-4 text-green-600 mt-0.5" />
+                  {perk}
+                </li>
+              ))}
             </ul>
           </div>
         </div>
@@ -558,12 +637,15 @@ export default function HomePage() {
             </div>
 
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 leading-tight bg-gradient-to-r from-gray-900 to-primary dark:from-white dark:to-purple-400 bg-clip-text text-transparent">
-              Comece sua jornada hoje
+              {translationsLoaded
+                ? t.home.cta.title
+                : 'Comece sua jornada hoje'}
             </h2>
 
             <p className="text-muted-foreground mb-8 md:mb-10 text-base md:text-lg leading-relaxed max-w-xl">
-              Cadastre-se <strong>gratuitamente</strong> e tenha acesso imediato
-              a cursos de qualidade. Sem cartão de crédito. Sem compromisso.
+              {translationsLoaded
+                ? t.home.cta.subtitle
+                : 'Cadastre-se gratuitamente e tenha acesso imediato a cursos de qualidade. Sem cartão de crédito. Sem compromisso.'}
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 sm:items-center">
@@ -575,14 +657,22 @@ export default function HomePage() {
                 <Link
                   href="/register"
                   className="flex items-center justify-center gap-2"
+                  suppressHydrationWarning
                 >
-                  <span>Criar conta gratuita</span>
+                  <span>
+                    {translationsLoaded
+                      ? t.home.cta.button
+                      : 'Criar conta gratuita'}
+                  </span>
                   <ArrowRight className="h-5 w-5 group-hover/btn:translate-x-1 transition-transform" />
                 </Link>
               </Button>
 
               <p className="text-sm text-muted-foreground flex items-center gap-1">
-                ✓ Sem cartão de crédito
+                ✓{' '}
+                {translationsLoaded
+                  ? t.home.cta.noCreditCard
+                  : 'Sem cartão de crédito'}
               </p>
             </div>
 

@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { Navbar } from '@/components/navbar';
 import { PublicNavbar } from '@/components/public-navbar';
-import { useSystemBranding } from '@/hooks/use-system-branding';
 import {
   LayoutDashboard,
   BookOpen,
@@ -20,6 +19,14 @@ import {
   Palette,
 } from 'lucide-react';
 
+type UserRole = 'STUDENT' | 'TEACHER' | 'ADMIN';
+
+interface NavLink {
+  href: string;
+  label: string;
+  icon: JSX.Element;
+}
+
 /**
  * Componente de navegação adaptativa que mostra:
  * - Menu completo (Navbar) para usuários logados (STUDENT, TEACHER, ADMIN)
@@ -30,7 +37,6 @@ import {
 export function AdaptiveNavbar() {
   const { data: session, status } = useSession();
   const [mounted, setMounted] = useState(false);
-  const { branding } = useSystemBranding();
 
   useEffect(() => {
     setMounted(true);
@@ -43,12 +49,17 @@ export function AdaptiveNavbar() {
 
   // Se usuário está logado, mostra menu completo baseado no role
   if (session?.user) {
-    const userRole = (session.user as any).role;
-    let links: any[] = [];
+    const userRole = (session.user as { role?: UserRole })?.role;
+
+    if (!userRole) {
+      return <PublicNavbar />;
+    }
+
+    const links: NavLink[] = [];
 
     switch (userRole) {
       case 'STUDENT':
-        links = [
+        links.push(
           {
             href: '/student/dashboard',
             label: 'Início',
@@ -88,12 +99,12 @@ export function AdaptiveNavbar() {
             href: '/courses',
             label: 'Catálogo',
             icon: <GraduationCap className="h-4 w-4" />,
-          },
-        ];
+          }
+        );
         break;
 
       case 'TEACHER':
-        links = [
+        links.push(
           {
             href: '/teacher/dashboard',
             label: 'Dashboard',
@@ -123,12 +134,12 @@ export function AdaptiveNavbar() {
             href: '/teacher/profile',
             label: 'Perfil',
             icon: <User className="h-4 w-4" />,
-          },
-        ];
+          }
+        );
         break;
 
       case 'ADMIN':
-        links = [
+        links.push(
           {
             href: '/admin',
             label: 'Dashboard',
@@ -153,9 +164,12 @@ export function AdaptiveNavbar() {
             href: '/admin/profile',
             label: 'Perfil',
             icon: <User className="h-4 w-4" />,
-          },
-        ];
+          }
+        );
         break;
+
+      default:
+        return <PublicNavbar />;
     }
 
     return (
@@ -164,7 +178,7 @@ export function AdaptiveNavbar() {
           name: session.user.name || 'Usuário',
           email: session.user.email || '',
           role: userRole,
-          avatar: (session.user as any).avatar || null,
+          avatar: (session.user as { avatar?: string | null })?.avatar ?? null,
         }}
         links={links}
       />

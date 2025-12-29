@@ -11,10 +11,14 @@ import { BookOpen, Award, Clock, TrendingUp, Activity } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { ClientText } from './client-text';
 
 export default async function StudentDashboard() {
   const session = await auth();
   const user = session!.user;
+
+  // i18n (client bridge)
+  // Nota: labels de UI serão renderizadas via client wrapper leve abaixo
 
   // Buscar dados do aluno
   const enrollments = await prisma.enrollment.findMany({
@@ -54,14 +58,17 @@ export default async function StudentDashboard() {
             <div className="flex items-center gap-4">
               <Badge className="bg-gradient-to-r from-green-500 to-emerald-500 text-white border-0 shadow-lg animate-pulse">
                 <Activity className="h-3 w-3 mr-1" />
-                Online
+                <ClientText path="dashboard.systemOnline" />
               </Badge>
             </div>
             <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-2 text-gradient-theme-triple mt-4">
-              Olá, {user.name}! 👋
+              <ClientText
+                path="dashboard.student.greeting"
+                variables={{ name: user.name || '' }}
+              />
             </h1>
             <p className="text-sm sm:text-base text-muted-foreground">
-              Continue seu aprendizado onde você parou
+              <ClientText path="dashboard.student.subtitle" />
             </p>
           </CardContent>
         </Card>
@@ -72,7 +79,7 @@ export default async function StudentDashboard() {
             <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-primary/5 to-transparent rounded-bl-full"></div>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
               <CardTitle className="text-sm font-medium">
-                Cursos Ativos
+                <ClientText path="dashboard.student.stats.activeCourses" />
               </CardTitle>
               <div className="p-3 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-lg group-hover:scale-110 transition-transform duration-300">
                 <BookOpen className="h-4 w-4 text-white" />
@@ -83,7 +90,7 @@ export default async function StudentDashboard() {
                 {stats.activeCourses}
               </div>
               <p className="text-[10px] sm:text-xs text-muted-foreground">
-                em andamento
+                <ClientText path="dashboard.student.stats.inProgress" />
               </p>
             </CardContent>
           </Card>
@@ -91,14 +98,18 @@ export default async function StudentDashboard() {
           <Card className="relative overflow-hidden border-2 hover:border-primary/50 transition-all duration-500 hover:shadow-2xl hover:-translate-y-1 group">
             <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-primary/5 to-transparent rounded-bl-full"></div>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
-              <CardTitle className="text-sm font-medium">Concluídos</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                <ClientText path="dashboard.student.stats.completedCourses" />
+              </CardTitle>
               <div className="p-3 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl shadow-lg group-hover:scale-110 transition-transform duration-300">
                 <TrendingUp className="h-4 w-4 text-white" />
               </div>
             </CardHeader>
             <CardContent className="relative z-10">
               <div className="text-2xl font-bold">{stats.completedCourses}</div>
-              <p className="text-xs text-muted-foreground">cursos completos</p>
+              <p className="text-xs text-muted-foreground">
+                <ClientText path="dashboard.student.stats.completeCourses" />
+              </p>
             </CardContent>
           </Card>
 
@@ -106,7 +117,7 @@ export default async function StudentDashboard() {
             <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-primary/5 to-transparent rounded-bl-full"></div>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
               <CardTitle className="text-sm font-medium">
-                Certificados
+                <ClientText path="dashboard.student.stats.certificates" />
               </CardTitle>
               <div className="p-3 bg-gradient-to-br from-amber-500 to-yellow-600 rounded-xl shadow-lg group-hover:scale-110 transition-transform duration-300">
                 <Award className="h-4 w-4 text-white" />
@@ -114,7 +125,9 @@ export default async function StudentDashboard() {
             </CardHeader>
             <CardContent className="relative z-10">
               <div className="text-2xl font-bold">{stats.certificates}</div>
-              <p className="text-xs text-muted-foreground">conquistados</p>
+              <p className="text-xs text-muted-foreground">
+                <ClientText path="dashboard.student.stats.earned" />
+              </p>
             </CardContent>
           </Card>
 
@@ -122,7 +135,7 @@ export default async function StudentDashboard() {
             <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-primary/5 to-transparent rounded-bl-full"></div>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
               <CardTitle className="text-sm font-medium">
-                Horas de Estudo
+                <ClientText path="dashboard.student.stats.studyHours" />
               </CardTitle>
               <div className="p-3 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl shadow-lg group-hover:scale-110 transition-transform duration-300">
                 <Clock className="h-4 w-4 text-white" />
@@ -130,7 +143,9 @@ export default async function StudentDashboard() {
             </CardHeader>
             <CardContent className="relative z-10">
               <div className="text-2xl font-bold">{stats.totalHours}h</div>
-              <p className="text-xs text-muted-foreground">tempo total</p>
+              <p className="text-xs text-muted-foreground">
+                <ClientText path="dashboard.student.stats.totalTime" />
+              </p>
             </CardContent>
           </Card>
         </div>
@@ -139,10 +154,10 @@ export default async function StudentDashboard() {
         <Card className="mb-6 sm:mb-8 border-2 hover:border-primary/30 transition-all">
           <CardHeader className="px-4 sm:px-6 py-4 sm:py-5">
             <CardTitle className="text-base sm:text-lg text-gradient-theme">
-              Continuar Aprendendo
+              <ClientText path="dashboard.student.continueLearning" />
             </CardTitle>
             <CardDescription className="text-xs sm:text-sm">
-              Seus cursos em andamento
+              <ClientText path="dashboard.student.coursesInProgress" />
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -152,16 +167,18 @@ export default async function StudentDashboard() {
                   <BookOpen className="h-10 w-10 text-primary" />
                 </div>
                 <h3 className="text-lg font-semibold mb-2">
-                  Você ainda não está matriculado em nenhum curso
+                  <ClientText path="dashboard.student.empty.noCourses" />
                 </h3>
                 <p className="text-muted-foreground mb-4">
-                  Explore nosso catálogo e comece a aprender hoje!
+                  <ClientText path="dashboard.student.empty.exploreText" />
                 </p>
                 <Button
                   asChild
                   className="bg-gradient-theme hover:bg-gradient-theme-soft transition-opacity"
                 >
-                  <Link href="/courses">Explorar Cursos</Link>
+                  <Link href="/courses">
+                    <ClientText path="dashboard.student.empty.exploreCourses" />
+                  </Link>
                 </Button>
               </div>
             ) : (
@@ -184,7 +201,7 @@ export default async function StudentDashboard() {
                       <div className="mb-2">
                         <div className="flex justify-between text-sm mb-1">
                           <span className="text-muted-foreground">
-                            Progresso
+                            <ClientText path="dashboard.student.progress" />
                           </span>
                           <span className="font-medium">
                             {Math.round(enrollment.progress)}%
@@ -203,7 +220,7 @@ export default async function StudentDashboard() {
                         size="sm"
                       >
                         <Link href={`/student/courses/${enrollment.course.id}`}>
-                          Continuar
+                          <ClientText path="dashboard.student.continueCourse" />
                         </Link>
                       </Button>
                     </CardContent>

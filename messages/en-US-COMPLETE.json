@@ -1,0 +1,628 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "close": "Close",
+    "search": "Search",
+    "filter": "Filter",
+    "actions": "Actions",
+    "yes": "Yes",
+    "no": "No",
+    "ok": "OK",
+    "error": "Error",
+    "success": "Success",
+    "warning": "Warning",
+    "info": "Information",
+    "viewAll": "View All",
+    "manage": "Manage",
+    "configure": "Configure",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "continue": "Continue",
+    "selectAll": "Select All",
+    "deselectAll": "Deselect All",
+    "noData": "No data available",
+    "nothingFound": "Nothing found",
+    "refresh": "Refresh",
+    "export": "Export",
+    "import": "Import",
+    "download": "Download",
+    "upload": "Upload",
+    "preview": "Preview",
+    "publish": "Publish",
+    "draft": "Draft",
+    "active": "Active",
+    "inactive": "Inactive",
+    "all": "All",
+    "none": "None",
+    "other": "Other",
+    "more": "More",
+    "less": "Less",
+    "show": "Show",
+    "hide": "Hide"
+  },
+  "roles": {
+    "admin": "Administrator",
+    "teacher": "Teacher",
+    "student": "Student",
+    "user": "User"
+  },
+  "nav": {
+    "home": "Home",
+    "courses": "Courses",
+    "about": "About Us",
+    "contact": "Contact",
+    "login": "Login",
+    "register": "Sign Up",
+    "dashboard": "Dashboard",
+    "profile": "Profile",
+    "logout": "Logout",
+    "settings": "Settings",
+    "messages": "Messages",
+    "notifications": "Notifications",
+    "becomeInstructor": "Become an Instructor",
+    "help": "Help",
+    "support": "Support"
+  },
+  "footer": {
+    "aboutTitle": "SM Educational",
+    "aboutText": "Complete online teaching platform with quality courses for your professional development.",
+    "quickLinks": "Quick Links",
+    "courseCatalog": "Course Catalog",
+    "aboutUs": "About Us",
+    "becomeInstructor": "Become an Instructor",
+    "faq": "FAQ",
+    "support": "Support",
+    "helpCenter": "Help Center",
+    "contact": "Contact",
+    "termsOfUse": "Terms of Use",
+    "privacyPolicy": "Privacy Policy",
+    "cookiePolicy": "Cookie Policy",
+    "contactTitle": "Contact",
+    "rights": "© {year} VisionVII. All rights reserved.",
+    "accessAt": "Access at: {datetime}",
+    "securityWarning": "Attention: For your security, advanced filters for protection, authentication and monitoring are active in this system. Any unauthorized access attempts will be logged.",
+    "terms": "Terms",
+    "privacy": "Privacy",
+    "lgpd": "GDPR",
+    "cookies": "Cookies",
+    "developedBy": "Developed with excellence by VisionVII — Transforming education through technology.",
+    "developerPrincipal": "Lead Developer"
+  },
+  "auth": {
+    "login": {
+      "title": "Login",
+      "subtitle": "Access your account",
+      "welcomeBack": "Welcome back!",
+      "enterAccount": "Enter your account",
+      "email": "Email",
+      "emailPlaceholder": "your@email.com",
+      "password": "Password",
+      "passwordPlaceholder": "Enter your password",
+      "rememberMe": "Remember me",
+      "forgotPassword": "Forgot password?",
+      "submit": "Login",
+      "noAccount": "Don't have an account?",
+      "signUp": "Sign up",
+      "twoFactorRequired": "Two-Factor Authentication",
+      "twoFactorCode": "Verification Code",
+      "twoFactorPlaceholder": "Enter 6-digit code",
+      "verify": "Verify",
+      "errors": {
+        "invalidCredentials": "Invalid email or password",
+        "userNotFound": "User not found",
+        "twoFactorInvalid": "Invalid verification code",
+        "accountLocked": "Account locked. Contact support.",
+        "networkError": "Connection error. Try again."
+      }
+    },
+    "register": {
+      "title": "Sign Up",
+      "subtitle": "Create your account",
+      "createAccount": "Create your account",
+      "joinUs": "Join us",
+      "name": "Full name",
+      "namePlaceholder": "Your full name",
+      "email": "Email",
+      "emailPlaceholder": "your@email.com",
+      "password": "Password",
+      "passwordPlaceholder": "Create a strong password",
+      "confirmPassword": "Confirm password",
+      "confirmPasswordPlaceholder": "Enter password again",
+      "agreeToTerms": "I agree to the",
+      "termsAndConditions": "Terms and Conditions",
+      "and": "and",
+      "privacyPolicy": "Privacy Policy",
+      "submit": "Create account",
+      "hasAccount": "Already have an account?",
+      "signIn": "Sign in",
+      "errors": {
+        "passwordMismatch": "Passwords don't match",
+        "emailExists": "Email already in use",
+        "weakPassword": "Password too weak. Use at least 8 characters.",
+        "invalidEmail": "Invalid email",
+        "nameRequired": "Name is required",
+        "termsRequired": "You must agree to the terms"
+      }
+    },
+    "forgotPassword": {
+      "title": "Forgot password?",
+      "subtitle": "Recover your password",
+      "instruction": "Enter your email and we'll send instructions to reset your password",
+      "email": "Email",
+      "emailPlaceholder": "your@email.com",
+      "submit": "Send instructions",
+      "emailSent": "Email sent! Check your inbox.",
+      "backToLogin": "Back to login",
+      "errors": {
+        "emailNotFound": "Email not found",
+        "tooManyAttempts": "Too many attempts. Try again later."
+      }
+    },
+    "resetPassword": {
+      "title": "Reset password",
+      "subtitle": "Create a new password",
+      "newPassword": "New password",
+      "newPasswordPlaceholder": "Enter your new password",
+      "confirmPassword": "Confirm new password",
+      "confirmPasswordPlaceholder": "Enter password again",
+      "submit": "Reset password",
+      "success": "Password reset successfully!",
+      "errors": {
+        "invalidToken": "Invalid or expired link",
+        "passwordMismatch": "Passwords don't match"
+      }
+    }
+  },
+  "dashboard": {
+    "student": {
+      "title": "Student Dashboard",
+      "welcome": "Hello, {name}! 👋",
+      "subtitle": "Continue your learning where you left off",
+      "stats": {
+        "activeCourses": "Active Courses",
+        "completedCourses": "Completed Courses",
+        "certificates": "Certificates",
+        "studyHours": "Study Hours"
+      },
+      "sections": {
+        "continueLearning": "Continue Learning",
+        "myCourses": "My Courses",
+        "progress": "Your progress",
+        "recentActivity": "Recent Activity",
+        "recommendedCourses": "Recommended Courses"
+      },
+      "empty": {
+        "noCourses": "You're not enrolled in any courses yet",
+        "noProgress": "No progress recorded yet",
+        "browseConrses": "Browse Courses"
+      }
+    },
+    "teacher": {
+      "title": "Teacher Dashboard",
+      "welcome": "Welcome, {name}!",
+      "stats": {
+        "totalCourses": "Total Courses",
+        "totalStudents": "Total Students",
+        "revenue": "Revenue",
+        "messages": "Messages",
+        "publishedCourses": "Published Courses",
+        "draftCourses": "Draft Courses",
+        "activeSubscriptions": "Active Subscriptions"
+      },
+      "sections": {
+        "myCourses": "My Courses",
+        "students": "Students",
+        "earnings": "Earnings",
+        "popularCourse": "Most Popular Course",
+        "recentPayments": "Recent Payments",
+        "analytics": "Analytics"
+      },
+      "empty": {
+        "noCourses": "You haven't created any courses yet",
+        "noStudents": "No students enrolled yet",
+        "noEarnings": "No earnings recorded",
+        "createCourse": "Create Course"
+      }
+    },
+    "admin": {
+      "title": "Admin Dashboard",
+      "welcome": "Admin Panel",
+      "stats": {
+        "totalUsers": "Total Users",
+        "totalCourses": "Active Courses",
+        "totalEnrollments": "Enrollments",
+        "totalRevenue": "Total Revenue",
+        "newUsersMonth": "New users (30 days)",
+        "newEnrollmentsWeek": "New enrollments (7 days)",
+        "activeUsers": "Active Users",
+        "pendingApprovals": "Pending Approvals"
+      },
+      "sections": {
+        "recentActivity": "Recent Activity",
+        "recentPayments": "Recent Payments",
+        "analytics": "Statistics",
+        "quickActions": "Quick Actions",
+        "systemHealth": "System Health",
+        "userGrowth": "User Growth"
+      },
+      "actions": {
+        "manageUsers": "Manage Users",
+        "manageCourses": "Manage Courses",
+        "viewReports": "View Reports",
+        "systemSettings": "System Settings"
+      }
+    }
+  },
+  "admin": {
+    "title": "Administration",
+    "sidebar": {
+      "dashboard": "Dashboard",
+      "users": "Users",
+      "allUsers": "All Users",
+      "students": "Students",
+      "teachers": "Teachers",
+      "administrators": "Administrators",
+      "courses": "Courses",
+      "allCourses": "All Courses",
+      "categories": "Categories",
+      "enrollments": "Enrollments",
+      "financial": "Financial",
+      "payments": "Payments",
+      "invoices": "Invoices",
+      "subscriptions": "Subscriptions",
+      "analytics": "Analytics",
+      "reports": "Reports",
+      "messages": "Messages",
+      "notifications": "Notifications",
+      "settings": "Settings",
+      "systemSettings": "System Settings",
+      "plans": "Plans",
+      "advertisements": "Advertisements",
+      "publicPages": "Public Pages",
+      "theme": "Theme",
+      "integrations": "Integrations"
+    },
+    "users": {
+      "title": "Manage Users",
+      "addNew": "Add User",
+      "allUsers": "All Users",
+      "students": "Students",
+      "teachers": "Teachers",
+      "administrators": "Administrators",
+      "filters": {
+        "search": "Search users...",
+        "role": "Filter by role",
+        "status": "Filter by status",
+        "dateCreated": "Creation date"
+      },
+      "table": {
+        "name": "Name",
+        "email": "Email",
+        "role": "Role",
+        "status": "Status",
+        "createdAt": "Created at",
+        "actions": "Actions"
+      },
+      "actions": {
+        "edit": "Edit",
+        "delete": "Delete",
+        "activate": "Activate",
+        "deactivate": "Deactivate",
+        "resetPassword": "Reset Password",
+        "viewProfile": "View Profile"
+      }
+    },
+    "courses": {
+      "title": "Manage Courses",
+      "addNew": "Add Course",
+      "published": "Published",
+      "draft": "Drafts",
+      "filters": {
+        "search": "Search courses...",
+        "category": "Filter by category",
+        "instructor": "Filter by instructor",
+        "status": "Filter by status"
+      },
+      "table": {
+        "title": "Title",
+        "instructor": "Instructor",
+        "category": "Category",
+        "students": "Students",
+        "status": "Status",
+        "createdAt": "Created at",
+        "actions": "Actions"
+      }
+    }
+  },
+  "teacher": {
+    "title": "Teacher",
+    "courses": {
+      "title": "My Courses",
+      "createNew": "Create New Course",
+      "myCourses": "My Courses",
+      "published": "Published",
+      "draft": "Drafts",
+      "students": "Students",
+      "content": "Content",
+      "settings": "Settings",
+      "noCoursesYet": "You haven't created any courses yet",
+      "createFirst": "Create your first course"
+    },
+    "earnings": {
+      "title": "Earnings",
+      "totalRevenue": "Total Revenue",
+      "thisMonth": "This Month",
+      "lastMonth": "Last Month",
+      "pending": "Pending",
+      "available": "Available",
+      "withdrawn": "Withdrawn",
+      "requestPayout": "Request Payout",
+      "paymentHistory": "Payment History"
+    },
+    "messages": {
+      "title": "Messages",
+      "inbox": "Inbox",
+      "sent": "Sent",
+      "compose": "Compose",
+      "noMessages": "No messages",
+      "sendMessage": "Send Message"
+    },
+    "profile": {
+      "title": "Teacher Profile",
+      "bio": "Biography",
+      "experience": "Experience",
+      "qualifications": "Qualifications",
+      "socialLinks": "Social Links"
+    }
+  },
+  "student": {
+    "title": "Student",
+    "courses": {
+      "title": "My Courses",
+      "myCourses": "My Courses",
+      "active": "Active",
+      "completed": "Completed",
+      "browseAll": "Browse All Courses",
+      "noCourses": "You're not enrolled in any courses yet",
+      "browseCatalog": "Browse Catalog"
+    },
+    "certificates": {
+      "title": "Certificates",
+      "earned": "Earned Certificates",
+      "download": "Download",
+      "share": "Share",
+      "noCertificates": "You haven't earned any certificates yet",
+      "completeCourses": "Complete courses to earn certificates"
+    },
+    "activities": {
+      "title": "Activities",
+      "pending": "Pending",
+      "completed": "Completed",
+      "noActivities": "No pending activities",
+      "viewAll": "View All"
+    },
+    "progress": {
+      "title": "My Progress",
+      "overallProgress": "Overall Progress",
+      "completionRate": "Completion Rate",
+      "timeSpent": "Time Spent"
+    }
+  },
+  "courses": {
+    "title": "Course Catalog",
+    "subtitle": "Explore our complete course collection",
+    "searchPlaceholder": "Search courses...",
+    "filterByCategory": "Filter by category",
+    "filterByLevel": "Filter by level",
+    "sortBy": {
+      "label": "Sort by",
+      "recent": "Most Recent",
+      "popular": "Most Popular",
+      "priceAsc": "Price (Low)",
+      "priceDesc": "Price (High)",
+      "rating": "Top Rated"
+    },
+    "levels": {
+      "all": "All Levels",
+      "beginner": "Beginner",
+      "intermediate": "Intermediate",
+      "advanced": "Advanced"
+    },
+    "card": {
+      "free": "Free",
+      "enrollNow": "Enroll Now",
+      "learnMore": "Learn More",
+      "duration": "{hours}h",
+      "students": "{count} students",
+      "lessons": "{count} lessons",
+      "instructor": "Instructor",
+      "rating": "Rating",
+      "bestseller": "Bestseller",
+      "new": "New"
+    },
+    "empty": {
+      "noCoursesFound": "No courses found",
+      "tryAnotherSearch": "Try another search or filter",
+      "clearFilters": "Clear Filters"
+    },
+    "details": {
+      "overview": "Overview",
+      "curriculum": "Curriculum",
+      "instructor": "Instructor",
+      "reviews": "Reviews",
+      "requirements": "Requirements",
+      "whatYouWillLearn": "What you will learn",
+      "courseIncludes": "This course includes",
+      "videoLectures": "Video lectures",
+      "downloadableResources": "Downloadable resources",
+      "certificate": "Certificate of completion",
+      "lifetimeAccess": "Lifetime access"
+    }
+  },
+  "home": {
+    "hero": {
+      "badge": "Transform your career now",
+      "title": "Learn at your pace,",
+      "titleHighlight": "achieve your goals",
+      "subtitle": "Complete teaching platform with structured courses, recognized certificates and personalized support. Join over 5,000 students seeking transformation.",
+      "cta": "Explore Courses",
+      "ctaSecondary": "Learn More"
+    },
+    "features": {
+      "courses": {
+        "title": "Complete Courses",
+        "description": "Video lessons, extra materials and practical exercises"
+      },
+      "certificates": {
+        "title": "Certificates",
+        "description": "Digital certificate upon completing each course"
+      },
+      "support": {
+        "title": "24/7 Support",
+        "description": "Get your questions answered anytime"
+      },
+      "quality": {
+        "title": "Qualified Instructors",
+        "description": "Learn from the best professionals"
+      },
+      "flexible": {
+        "title": "Flexible Schedule",
+        "description": "Study whenever and wherever you want"
+      },
+      "progress": {
+        "title": "Tracking",
+        "description": "Monitor your progress in real time"
+      }
+    },
+    "stats": {
+      "students": "Active Students",
+      "courses": "Available Courses",
+      "hours": "Content Hours",
+      "satisfaction": "Satisfaction Rate"
+    },
+    "testimonials": {
+      "title": "What our students say",
+      "subtitle": "See how we're transforming lives of people who believe in continuous education"
+    },
+    "cta": {
+      "title": "Start your learning journey today",
+      "subtitle": "Join thousands of students and transform your career. Try free for 7 days with access to quality courses. No credit card. No commitment.",
+      "button": "Create free account",
+      "noCreditCard": "No credit card"
+    }
+  },
+  "toasts": {
+    "success": {
+      "saved": "Saved successfully!",
+      "created": "Created successfully!",
+      "updated": "Updated successfully!",
+      "deleted": "Deleted successfully!",
+      "uploaded": "Upload complete!",
+      "published": "Published successfully!",
+      "generic": "Operation completed successfully!"
+    },
+    "error": {
+      "generic": "An error occurred. Try again.",
+      "network": "Connection error. Check your internet.",
+      "validation": "Check the fields and try again.",
+      "unauthorized": "You don't have permission for this action.",
+      "notFound": "Resource not found.",
+      "serverError": "Server error. Try later."
+    },
+    "upload": {
+      "uploading": "Uploading...",
+      "success": "Upload completed successfully!",
+      "error": "Upload error. Try again.",
+      "sizeLimit": "File too large. Max size: {size}MB",
+      "typeNotAllowed": "File type not allowed."
+    }
+  },
+  "modals": {
+    "confirmDelete": {
+      "title": "Confirm Delete",
+      "message": "Are you sure you want to delete? This action cannot be undone.",
+      "confirm": "Yes, delete",
+      "cancel": "Cancel"
+    },
+    "confirmAction": {
+      "title": "Confirm Action",
+      "message": "Are you sure you want to continue?",
+      "confirm": "Confirm",
+      "cancel": "Cancel"
+    },
+    "unsavedChanges": {
+      "title": "Unsaved changes",
+      "message": "You have unsaved changes. Do you want to leave anyway?",
+      "save": "Save",
+      "discard": "Discard",
+      "cancel": "Cancel"
+    }
+  },
+  "forms": {
+    "validation": {
+      "required": "This field is required",
+      "invalidEmail": "Invalid email",
+      "minLength": "Minimum {min} characters",
+      "maxLength": "Maximum {max} characters",
+      "passwordStrength": "Password must have at least 8 characters",
+      "urlInvalid": "Invalid URL",
+      "numberOnly": "Only numbers are allowed",
+      "phoneInvalid": "Invalid phone"
+    },
+    "profile": {
+      "updateSuccess": "Profile updated successfully!",
+      "updateError": "Error updating profile",
+      "avatarUpdated": "Avatar updated!",
+      "passwordChanged": "Password changed successfully!",
+      "emailSent": "Confirmation email sent!"
+    },
+    "course": {
+      "createSuccess": "Course created successfully!",
+      "updateSuccess": "Course updated!",
+      "deleteSuccess": "Course deleted!",
+      "publishSuccess": "Course published!",
+      "unpublishSuccess": "Course unpublished!"
+    }
+  },
+  "pricing": {
+    "currency": "$",
+    "perMonth": "/month",
+    "perYear": "/year",
+    "billed": "billed {period}",
+    "monthly": "monthly",
+    "yearly": "yearly",
+    "selectPlan": "Select Plan",
+    "currentPlan": "Current Plan",
+    "changePlan": "Change Plan",
+    "upgrade": "Upgrade",
+    "downgrade": "Downgrade",
+    "freePlan": "Free Plan",
+    "basicPlan": "Basic Plan",
+    "proPlan": "Pro Plan",
+    "premiumPlan": "Premium Plan"
+  },
+  "about": {
+    "title": "About Us",
+    "subtitle": "Know our story and mission",
+    "ourMission": "Our Mission",
+    "ourVision": "Our Vision",
+    "ourTeam": "Our Team",
+    "ourValues": "Our Values"
+  },
+  "contact": {
+    "title": "Get in Touch",
+    "subtitle": "We're here to help",
+    "name": "Name",
+    "email": "Email",
+    "subject": "Subject",
+    "message": "Message",
+    "send": "Send Message",
+    "sendSuccess": "Message sent successfully!",
+    "sendError": "Error sending message. Try again."
+  }
+}
