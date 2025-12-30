@@ -208,7 +208,8 @@ export default function ForgotPasswordPage() {
                 )}
               </div>
               <div className="space-y-4 flex-1 flex flex-col justify-center">
-                {branding.advertisements && branding.advertisements.length > 0 ? (
+                {branding.advertisements &&
+                branding.advertisements.length > 0 ? (
                   <div className="w-full max-w-5xl mx-auto">
                     <PromotedCoursesCarousel />
                   </div>
@@ -232,21 +233,10 @@ export default function ForgotPasswordPage() {
                         (mounted
                           ? t.auth.forgotPassword.codeSubtitle
                           : 'Digite o código enviado para seu email')}
-                      {step === 'password' &&
-                        (mounted
-                          ? t.auth.forgotPassword.newPasswordSubtitle
-                          : 'Crie uma nova senha segura')}
-                    </p>
-                  </>
-                )}
-              </div>
-            </div>
-                          ? t.auth.forgotPassword.codeSubtitle
-                          : 'Verifique o código de 6 dígitos que enviamos ao seu e-mail.')}
                       {step === 'newPassword' &&
                         (mounted
                           ? t.auth.forgotPassword.newPasswordSubtitle
-                          : 'Crie uma nova senha forte para proteger sua conta.')}
+                          : 'Crie uma nova senha segura')}
                     </p>
                   </>
                 )}
