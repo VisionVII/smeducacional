@@ -938,3 +938,20 @@ model NotificationLog {
   @@index([userId])
   @@map("notification_logs")
 }
+
+// System Status: Modo de manutenção e saúde do sistema
+// VisionVII 3.0 Maintenance Mode - Enterprise Pattern
+// Singleton table (sempre apenas 1 registro com id='singleton')
+model SystemStatus {
+  id                    String    @id @default("singleton")
+  maintenanceMode       Boolean   @default(false)
+  estimatedReturnTime   DateTime?
+  maintenanceMessage    String    @default("")
+  activatedBy           String    @default("system")
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([maintenanceMode])
+  @@index([updatedAt])
+  @@map("system_status")
+}

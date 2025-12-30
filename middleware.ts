@@ -2,6 +2,9 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { getToken } from 'next-auth/jwt';
 
+// Cache para modo de manutenção (5 segundos)
+let maintenanceCache = { data: null as any, expires: 0 };
+
 const PUBLIC_ROUTES = new Set([
   '/',
   '/login',
@@ -20,6 +23,16 @@ const PUBLIC_ROUTES = new Set([
   '/become-instructor',
   '/help',
   '/cookies',
+  '/maintenance', // ✅ Manutenção sempre acessível
+]);
+
+// Rotas que SEMPRE funcionam mesmo durante manutenção (whitelist)
+const MAINTENANCE_WHITELIST = new Set([
+  '/api/stripe/webhook', // ✅ Webhooks de pagamento
+  '/api/supabase/webhook', // ✅ Webhooks de banco
+  '/api/health', // ✅ Health checks
+  '/api/admin/system-maintenance', // ✅ Controle de manutenção
+  '/api/system/maintenance-stream', // ✅ SSE de notificações
 ]);
 
 // Rotas premium que requerem plano ativo (validação no cliente via layout wrapper)
@@ -73,6 +86,48 @@ function addSecurityHeaders(response: NextResponse): NextResponse {
   return response;
 }
 
+/**
+ * Verifica se sistema está em modo de manutenção
+ * Usa cache para performance (5 segundos TTL)
+ */
+async function checkMaintenanceMode(): Promise<boolean> {
+  const now = Date.now();
+
+  // Se cache válido, usa cache
+  if (maintenanceCache.expires > now && maintenanceCache.data !== null) {
+    return maintenanceCache.data.maintenanceMode;
+  }
+
+  try {
+    // Consulta banco de dados
+    const result = await fetch(
+      `${
+        process.env.NEXTAUTH_URL || 'http://localhost:3000'
+      }/api/admin/system-maintenance`,
+      {
+        cache: 'no-store',
+        headers: {
+          Authorization: `Bearer ${process.env.INTERNAL_API_KEY || ''}`,
+        },
+      }
+    );
+
+    if (result.ok) {
+      const data = await result.json();
+      maintenanceCache = {
+        data: data,
+        expires: now + 5000, // Cache por 5 segundos
+      };
+      return data.maintenanceMode;
+    }
+  } catch (error) {
+    console.error('Failed to check maintenance mode:', error);
+  }
+
+  // Se falhar, assume que NÃO está em manutenção
+  return false;
+}
+
 export default async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
@@ -97,6 +152,44 @@ export default async function proxy(request: NextRequest) {
 
   const isAuthRoute = pathname.startsWith('/api/auth');
   const isPublicRoute = PUBLIC_ROUTES.has(pathname) || isAuthRoute;
+
+  // ✅ MAINTENANCE MODE CHECK (antes de qualquer redirecionamento)
+  const maintenanceActive = await checkMaintenanceMode();
+  const isWhitelisted = MAINTENANCE_WHITELIST.has(pathname);
+  const isAdminPanel = pathname.startsWith('/admin') && token?.role === 'ADMIN';
+
+  if (
+    maintenanceActive &&
+    !isWhitelisted &&
+    !isAdminPanel &&
+    pathname !== '/maintenance'
+  ) {
+    // Se é API, retorna 503
+    if (pathname.startsWith('/api/')) {
+      const response = NextResponse.json(
+        {
+          error: 'Sistema em manutenção',
+          retryAfter: 300,
+        },
+        {
+          status: 503,
+          headers: {
+            'Retry-After': '300',
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+      return addSecurityHeaders(response);
+    }
+
+    // Se é UI, redireciona para /maintenance
+    if (!isPublicRoute) {
+      const response = NextResponse.redirect(
+        new URL('/maintenance', request.url)
+      );
+      return addSecurityHeaders(response);
+    }
+  }
 
   // Redirect root path baseado em role
   if (pathname === '/' && token) {
