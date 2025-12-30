@@ -88,7 +88,7 @@ export async function getUserPlanInfo(
     tier: (subscription.plan as PlanTier) || 'free',
     features: tierFeatureMap[subscription.plan] || [],
     isActive: subscription.status === 'active',
-    renewalDate: subscription.renewDate ?? undefined,
+    renewalDate: subscription.currentPeriodEnd ?? undefined,
   };
 }
 
