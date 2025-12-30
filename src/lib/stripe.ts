@@ -138,7 +138,7 @@ export async function createStudentSubscriptionCheckoutSession({
   }
 
   const stripe = getStripeClient();
-  
+
   const sessionParams: any = {
     mode: 'subscription',
     payment_method_types: ['card'],
@@ -200,7 +200,7 @@ export async function createTeacherSubscriptionCheckoutSession({
   }
 
   const stripe = getStripeClient();
-  
+
   const sessionParams: any = {
     mode: 'subscription',
     payment_method_types: ['card'],
