@@ -82,7 +82,7 @@ export async function createCourseCheckoutSession(
 
     const stripe = getStripeClient();
     const session = await stripe.checkout.sessions.create({
-      customer_email: input.userEmail,
+      customer_email: input.userEmail || null,
       mode: 'payment',
       payment_method_types: ['card'],
       line_items: [
@@ -134,7 +134,7 @@ export async function createSubscriptionSession(
   try {
     const stripe = getStripeClient();
     const session = await stripe.checkout.sessions.create({
-      customer_email: input.userEmail,
+      customer_email: input.userEmail || null,
       mode: 'subscription',
       payment_method_types: ['card'],
       line_items: [
