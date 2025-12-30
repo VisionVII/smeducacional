@@ -213,6 +213,9 @@ export async function listTeacherCoursesWithCounts(params: {
         price: true,
         compareAtPrice: true,
         level: true,
+        category: {
+          select: { name: true },
+        },
         modules: {
           where: { deletedAt: null },
           select: { _count: { select: { lessons: true } } },
@@ -235,6 +238,7 @@ export async function listTeacherCoursesWithCounts(params: {
     price: course.price,
     compareAtPrice: course.compareAtPrice,
     level: course.level,
+    category: course.category,
     _count: {
       modules: course._count.modules,
       enrollments: course._count.enrollments,
@@ -276,16 +280,16 @@ async function generateUniqueSlug(title: string): Promise<string> {
     .trim()
     .replace(/\s+/g, '-')
     .replace(/-+/g, '-');
-  
+
   let slug = baseSlug || `curso-${Date.now()}`;
   let counter = 1;
-  
+
   while (true) {
     const exists = await prisma.course.findUnique({ where: { slug } });
     if (!exists) break;
     slug = `${baseSlug}-${counter++}`;
   }
-  
+
   return slug;
 }
 
@@ -298,7 +302,7 @@ export async function createTeacherCourse(input: {
   instructorId: string;
 }) {
   const slug = await generateUniqueSlug(input.title);
-  
+
   return prisma.course.create({
     data: {
       title: input.title,
