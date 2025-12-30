@@ -218,13 +218,7 @@ export function CoursesClientWrapper({
               disabled={isLoading}
               className="min-w-[220px] font-semibold"
             >
-              {isLoading
-                ? mounted
-                  ? t.dashboard.teacher.loadingMore || 'Carregando...'
-                  : 'Carregando...'
-                : mounted
-                ? t.dashboard.teacher.showMore || 'Ver mais cursos'
-                : 'Ver mais cursos'}
+              {isLoading ? 'Carregando...' : 'Ver mais cursos'}
             </Button>
           </div>
         )}
