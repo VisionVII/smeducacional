@@ -8,6 +8,7 @@ import { StatsCard } from '@/components/teacher/stats-card';
 import { CourseCard } from '@/components/teacher/course-card';
 import { EmptyState } from '@/components/teacher/empty-state';
 import { useTranslations } from '@/hooks/use-translations';
+import { useState } from 'react';
 
 interface Course {
   id: string;
@@ -19,12 +20,13 @@ interface Course {
   price: number | null;
   compareAtPrice: number | null;
   level: string | null;
+  lessonCount?: number;
   category: { name: string } | null;
   _count: {
     enrollments: number;
     modules: number;
   };
-  modules: Array<{
+  modules?: Array<{
     _count: {
       lessons: number;
     };
@@ -39,15 +41,53 @@ interface CoursesClientWrapperProps {
     draftCourses: number;
     totalStudents: number;
   };
+  pageSize: number;
+  totalCoursesCount: number;
 }
 
 export function CoursesClientWrapper({
   courses,
   stats,
+  pageSize,
+  totalCoursesCount,
 }: CoursesClientWrapperProps) {
   const { t, mounted } = useTranslations();
 
-  const { totalCourses, publishedCourses, draftCourses, totalStudents } = stats;
+  const [currentPage, setCurrentPage] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
+  const [courseList, setCourseList] = useState<Course[]>(courses);
+  const hasMore = courseList.length < totalCoursesCount;
+
+  const handleLoadMore = async () => {
+    if (!hasMore || isLoading) return;
+    setIsLoading(true);
+    const nextPage = currentPage + 1;
+
+    try {
+      const response = await fetch(
+        `/api/teacher/courses?page=${nextPage}&pageSize=${pageSize}`
+      );
+
+      if (!response.ok) {
+        throw new Error('Failed to load more courses');
+      }
+
+      const result = (await response.json()) as { data: Course[] };
+      setCourseList((prev) => [...prev, ...(result.data || [])]);
+      setCurrentPage(nextPage);
+    } catch (error) {
+      console.error('Error fetching more courses', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const {
+    totalCourses: totalCoursesStat,
+    publishedCourses,
+    draftCourses,
+    totalStudents,
+  } = stats;
 
   return (
     <>
@@ -91,7 +131,7 @@ export function CoursesClientWrapper({
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-7 lg:gap-8">
         <StatsCard
           title={mounted ? t.dashboard.teacher.totalCourses : 'Total de Cursos'}
-          value={totalCourses}
+          value={totalCoursesStat}
           description={
             mounted
               ? `${publishedCourses} ${t.dashboard.teacher.publishedCount}, ${draftCourses} ${t.dashboard.teacher.draftCoursesCount}`
@@ -136,7 +176,7 @@ export function CoursesClientWrapper({
 
       {/* Lista de Cursos */}
       <div className="space-y-6">
-        {courses.length === 0 ? (
+        {courseList.length === 0 ? (
           <EmptyState
             icon={BookOpen}
             title={
@@ -157,8 +197,8 @@ export function CoursesClientWrapper({
             }}
           />
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-            {courses.map((course) => (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 lg:gap-6">
+            {courseList.map((course) => (
               <CourseCard
                 key={course.id}
                 course={course}
@@ -166,6 +206,26 @@ export function CoursesClientWrapper({
                 mounted={mounted}
               />
             ))}
+          </div>
+        )}
+
+        {hasMore && (
+          <div className="flex justify-center pt-4">
+            <Button
+              variant="outline"
+              size="lg"
+              onClick={handleLoadMore}
+              disabled={isLoading}
+              className="min-w-[220px] font-semibold"
+            >
+              {isLoading
+                ? mounted
+                  ? t.dashboard.teacher.loadingMore || 'Carregando...'
+                  : 'Carregando...'
+                : mounted
+                ? t.dashboard.teacher.showMore || 'Ver mais cursos'
+                : 'Ver mais cursos'}
+            </Button>
           </div>
         )}
       </div>

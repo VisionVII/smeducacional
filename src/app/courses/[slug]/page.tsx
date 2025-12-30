@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { CheckoutButton } from '@/components/checkout/CheckoutButton';
+import { BreadcrumbLink } from '@/components/course/breadcrumb-link';
 import {
   Card,
   CardContent,
@@ -99,25 +100,7 @@ export default async function CourseDetailPage({
       {/* Breadcrumb */}
       <div className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 py-3 sm:py-4">
-          <Link
-            href="/courses"
-            className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary font-medium transition-colors group"
-          >
-            <svg
-              className="w-4 h-4 group-hover:-translate-x-1 transition-transform"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M15 19l-7-7 7-7"
-              />
-            </svg>
-            {courseT.breadcrumb}
-          </Link>
+          <BreadcrumbLink href="/courses" label={courseT.breadcrumb} />
         </div>
       </div>
 

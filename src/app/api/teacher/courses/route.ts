@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
-import { prisma } from '@/lib/db';
+import {
+  listTeacherCoursesWithCounts,
+  createTeacherCourse,
+} from '@/lib/services/course.service';
 import { z } from 'zod';
 
 // Schema para criação de curso pelo professor
@@ -25,62 +28,18 @@ export async function GET(request: NextRequest) {
 
     const { searchParams } = new URL(request.url);
     const search = searchParams.get('search') || undefined;
-    const status = searchParams.get('status'); // DRAFT | PUBLISHED
+    const status = searchParams.get('status');
     const category = searchParams.get('category') || undefined;
     const page = Number(searchParams.get('page') || '1');
     const pageSize = Math.min(Number(searchParams.get('pageSize') || '20'), 50);
-
-    const where: any = { instructorId: session.user.id };
-
-    if (search) {
-      where.OR = [
-        { title: { contains: search, mode: 'insensitive' } },
-        { description: { contains: search, mode: 'insensitive' } },
-      ];
-    }
-
-    if (status === 'PUBLISHED') where.isPublished = true;
-    if (status === 'DRAFT') where.isPublished = false;
-
-    if (category) {
-      where.categoryId = category;
-    }
-
-    const [total, courses] = await Promise.all([
-      prisma.course.count({ where }),
-      prisma.course.findMany({
-        where,
-        select: {
-          id: true,
-          title: true,
-          description: true,
-          thumbnail: true,
-          categoryId: true,
-          level: true,
-          isPublished: true,
-          createdAt: true,
-          updatedAt: true,
-          _count: { select: { modules: true, enrollments: true } },
-        },
-        orderBy: { createdAt: 'desc' },
-        skip: (page - 1) * pageSize,
-        take: pageSize,
-      }),
-    ]);
-
-    const data = courses.map((c) => ({
-      id: c.id,
-      title: c.title,
-      description: c.description || '',
-      thumbnail: c.thumbnail,
-      categoryId: c.categoryId || null,
-      level: c.level || 'BEGINNER',
-      status: c.isPublished ? 'PUBLISHED' : 'DRAFT',
-      moduleCount: c._count.modules,
-      enrollmentCount: c._count.enrollments,
-      createdAt: c.createdAt,
-      updatedAt: c.updatedAt,
-    }));
+    const { data, total } = await listTeacherCoursesWithCounts({
+      instructorId: session.user.id,
+      search,
+      status: (status as 'PUBLISHED' | 'DRAFT' | null) || null,
+      category: category || null,
+      page,
+      pageSize,
+    });
 
     return NextResponse.json({ data, page, pageSize, total });
   } catch (error) {
@@ -132,25 +91,14 @@ export async function POST(request: NextRequest) {
       slug = `${baseSlug}-${counter++}`;
     }
 
-    const course = await prisma.course.create({
-      data: {
-        title,
-        slug,
-        description,
-        categoryId,
-        level: level ?? undefined,
-        thumbnail: thumbnail ?? undefined,
-        isPublished: false,
-        instructorId: session.user.id,
-      },
-      select: {
-        id: true,
-        title: true,
-        description: true,
-        categoryId: true,
-        level: true,
-        isPublished: true,
-      },
+    const course = await createTeacherCourse({
+      title,
+      description,
+      categoryId,
+      level,
+      thumbnail,
+      instructorId: session.user.id,
+      slug,
     });
 
     return NextResponse.json(

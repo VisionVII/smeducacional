@@ -172,6 +172,101 @@ export async function listTeacherCourses(params: {
   return { data, total };
 }
 
+export async function listTeacherCoursesWithCounts(params: {
+  instructorId: string;
+  page: number;
+  pageSize: number;
+  search?: string;
+  status?: 'PUBLISHED' | 'DRAFT' | null;
+  category?: string | null;
+}) {
+  const where: Prisma.CourseWhereInput = {
+    instructorId: params.instructorId,
+    deletedAt: null,
+  };
+
+  if (params.search) {
+    where.OR = [
+      { title: { contains: params.search, mode: 'insensitive' } },
+      { description: { contains: params.search, mode: 'insensitive' } },
+    ];
+  }
+
+  if (params.status === 'PUBLISHED') where.isPublished = true;
+  if (params.status === 'DRAFT') where.isPublished = false;
+
+  if (params.category) {
+    where.categoryId = params.category;
+  }
+
+  const [total, courses] = await Promise.all([
+    prisma.course.count({ where }),
+    prisma.course.findMany({
+      where,
+      select: {
+        id: true,
+        title: true,
+        slug: true,
+        description: true,
+        thumbnail: true,
+        isPublished: true,
+        price: true,
+        compareAtPrice: true,
+        level: true,
+        modules: {
+          where: { deletedAt: null },
+          select: { _count: { select: { lessons: true } } },
+        },
+        _count: { select: { modules: true, enrollments: true } },
+      },
+      orderBy: { createdAt: 'desc' },
+      skip: (params.page - 1) * params.pageSize,
+      take: params.pageSize,
+    }),
+  ]);
+
+  const data = courses.map((course) => ({
+    id: course.id,
+    title: course.title,
+    slug: course.slug,
+    description: course.description,
+    thumbnail: course.thumbnail,
+    isPublished: course.isPublished,
+    price: course.price,
+    compareAtPrice: course.compareAtPrice,
+    level: course.level,
+    _count: {
+      modules: course._count.modules,
+      enrollments: course._count.enrollments,
+    },
+    lessonCount: course.modules.reduce(
+      (acc, module) => acc + module._count.lessons,
+      0
+    ),
+  }));
+
+  return { data, total };
+}
+
+export async function getTeacherCourseStats(instructorId: string) {
+  const where: Prisma.CourseWhereInput = {
+    instructorId,
+    deletedAt: null,
+  };
+
+  const [totalCourses, publishedCourses, draftCourses, totalStudents] =
+    await Promise.all([
+      prisma.course.count({ where }),
+      prisma.course.count({ where: { ...where, isPublished: true } }),
+      prisma.course.count({ where: { ...where, isPublished: false } }),
+      prisma.enrollment.count({
+        where: { course: { instructorId, deletedAt: null } },
+      }),
+    ]);
+
+  return { totalCourses, publishedCourses, draftCourses, totalStudents };
+}
+
 export async function createTeacherCourse(input: {
   title: string;
   description: string;
