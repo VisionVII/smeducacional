@@ -141,7 +141,7 @@ export default function LoginPage() {
 
         // Se chegou aqui, deu timeout
         console.error('[LOGIN] ❌ Timeout aguardando session');
-        toast.error('sessionTimeout');
+        toast.error('generic');
         setIsLoading(false);
         return;
       }
