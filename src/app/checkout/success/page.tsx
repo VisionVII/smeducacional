@@ -78,6 +78,15 @@ function CheckoutSuccessContent() {
       router.push('/student/courses');
       return;
     }
+    if (type === 'feature_purchase') {
+      const featureId = searchParams.get('featureId');
+      if (featureId === 'ai-assistant') {
+        router.push('/student/ai-chat');
+      } else {
+        router.push('/student/dashboard');
+      }
+      return;
+    }
     if (type === 'student_subscription') {
       router.push('/student/dashboard');
       return;
@@ -87,7 +96,7 @@ function CheckoutSuccessContent() {
       return;
     }
     router.push('/');
-  }, [type, router]);
+  }, [type, router, searchParams]);
 
   useEffect(() => {
     if (!loading && !error) {

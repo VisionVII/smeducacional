@@ -498,6 +498,118 @@ async function handleCheckoutSessionCompleted(
 ) {
   const metadata = safeCheckoutMetadata(session);
 
+  if (!metadata.userId) {
+    console.error('[PaymentService] Missing userId in metadata');
+    return;
+  }
+
+  // Detectar tipo de compra: feature_purchase ou course_purchase
+  if (metadata.type === 'feature_purchase' && metadata.courseId === undefined) {
+    // Processando compra de feature standalone
+    const featureId = session.metadata?.featureId;
+
+    if (!featureId) {
+      console.error('[PaymentService] Missing featureId in feature purchase');
+      return;
+    }
+
+    const paymentIntentId =
+      typeof session.payment_intent === 'string'
+        ? session.payment_intent
+        : session.id;
+
+    const featurePrices: Record<string, number> = {
+      'ai-assistant': 29.9,
+      mentorships: 49.9,
+      'pro-tools': 39.9,
+    };
+
+    const amount = featurePrices[featureId] || 0;
+    const currency = session.currency || 'BRL';
+    const isTest = session.livemode === false;
+
+    await prisma.$transaction(async (tx) => {
+      // Criar ou atualizar FeaturePurchase
+      await tx.featurePurchase.upsert({
+        where: {
+          userId_featureId: {
+            userId: metadata.userId as string,
+            featureId,
+          },
+        },
+        update: {
+          status: 'active',
+          purchaseDate: new Date(),
+          stripePaymentId: paymentIntentId,
+        },
+        create: {
+          userId: metadata.userId as string,
+          featureId,
+          status: 'active',
+          stripePaymentId: paymentIntentId,
+          amount,
+          currency,
+          metadata: {
+            stripeEventId: eventId,
+            sessionId: session.id,
+            livemode: session.livemode,
+          },
+        },
+      });
+
+      // Registrar pagamento
+      await tx.payment.create({
+        data: {
+          userId: metadata.userId as string,
+          stripePaymentId: paymentIntentId,
+          stripeIntentId: paymentIntentId,
+          checkoutSessionId: session.id,
+          amount,
+          currency,
+          paymentMethod: 'stripe',
+          type: 'feature',
+          status: 'completed',
+          isTest,
+          metadata: {
+            stripeEventId: eventId,
+            sessionId: session.id,
+            livemode: session.livemode,
+            featureId,
+          },
+        },
+      });
+
+      // Atualizar sessão de checkout
+      await tx.checkoutSession.updateMany({
+        where: { stripeSessionId: session.id },
+        data: {
+          status: 'completed',
+          paymentIntentId,
+          stripeCustomerId: session.customer ? String(session.customer) : null,
+        },
+      });
+
+      // Registrar auditoria
+      await tx.auditLog.create({
+        data: {
+          userId: metadata.userId as string,
+          action: AuditAction.PAYMENT_CREATED,
+          targetId: featureId,
+          targetType: 'Feature',
+          metadata: {
+            stripeEventId: eventId,
+            stripePaymentIntentId: paymentIntentId,
+            featureId,
+          },
+        },
+      });
+    });
+
+    console.log('[PaymentService] Feature purchase completed:', featureId);
+    return;
+  }
+
+  // Processando compra de curso (lógica existente)
   if (!metadata.userId || !metadata.courseId) {
     console.error('[PaymentService] Missing userId or courseId in metadata');
     return;
