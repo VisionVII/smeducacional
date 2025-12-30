@@ -1,10 +1,16 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/db';
+import {
+  logAuditTrail,
+  AuditAction,
+  getClientIpFromRequest,
+} from '@/lib/audit.service';
 
 /**
  * DELETE /api/admin/courses/[id]
- * Remove um curso do sistema (apenas ADMIN)
+ * Soft delete de um curso (apenas ADMIN)
+ * Nota: TODO - Cleanup bucket assets. Após 30 dias de soft delete, remover arquivos de vídeo/material do Supabase Storage
  */
 export async function DELETE(
   request: Request,
@@ -13,6 +19,7 @@ export async function DELETE(
   try {
     const session = await auth();
 
+    // RBAC: Apenas ADMIN pode deletar cursos
     if (!session?.user || session.user.role !== 'ADMIN') {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     }
@@ -25,6 +32,8 @@ export async function DELETE(
       select: {
         id: true,
         title: true,
+        instructorId: true,
+        deletedAt: true,
         _count: {
           select: {
             enrollments: true,
@@ -40,6 +49,14 @@ export async function DELETE(
       );
     }
 
+    // Verificar se já foi deletado
+    if (course.deletedAt) {
+      return NextResponse.json(
+        { error: 'Este curso já foi deletado' },
+        { status: 400 }
+      );
+    }
+
     // Verificar se há matrículas ativas
     if (course._count.enrollments > 0) {
       return NextResponse.json(
@@ -50,14 +67,39 @@ export async function DELETE(
       );
     }
 
-    // Deletar curso (Prisma cascade deleta módulos, lições, materiais, etc)
-    await prisma.course.delete({
+    // Soft delete: marcar como deletado ao invés de remover
+    const deletedCourse = await prisma.course.update({
       where: { id },
+      data: { deletedAt: new Date() },
+      select: { id: true, title: true },
     });
 
+    // Registrar auditoria de deleção
+    const ipAddress = getClientIpFromRequest(request);
+    await logAuditTrail({
+      userId: session.user.id,
+      action: AuditAction.COURSE_DELETED,
+      targetId: id,
+      targetType: 'Course',
+      metadata: {
+        deletedTitle: course.title,
+        instructorId: course.instructorId,
+      },
+      ipAddress,
+    });
+
+    console.log(
+      `[admin][courses][delete] Soft delete do curso "${course.title}" por ${session.user.email}`
+    );
+
+    // TODO: Cleanup bucket assets
+    // Remover arquivos do Supabase Storage (courses/{courseId}/*) após período de retenção
+
     return NextResponse.json({
-      success: true,
-      message: 'Curso excluído com sucesso',
+      data: {
+        success: true,
+        message: `Curso "${course.title}" deletado com sucesso`,
+      },
     });
   } catch (error) {
     console.error('[admin][courses][delete] Erro ao excluir curso:', error);

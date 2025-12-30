@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
 import { signIn } from 'next-auth/react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -29,6 +29,8 @@ import { PasswordInput } from '@/components/password-input';
 import { useSystemBranding } from '@/hooks/use-system-branding';
 import { useTranslations } from '@/hooks/use-translations';
 import { useTranslatedToast } from '@/lib/translation-helpers';
+import { PromotedCourseCard } from '@/components/promoted-course-card';
+import { PromotedCoursesCarousel } from '@/components/promoted-courses-carousel';
 
 const keyframes = `
   @keyframes slideInUp {
@@ -44,7 +46,6 @@ const keyframes = `
 `;
 
 export default function LoginPage() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const { branding } = useSystemBranding();
   const { t, mounted } = useTranslations();
@@ -78,7 +79,7 @@ export default function LoginPage() {
         email: formData.email,
         password: formData.password,
         redirect: false,
-        code: require2FA ? twofaCode : undefined,
+        twoFactorCode: require2FA ? twofaCode : undefined,
       });
 
       if (result?.error) {
@@ -94,8 +95,55 @@ export default function LoginPage() {
 
       if (result?.ok) {
         toast.success('loginSuccess');
-        router.push('/student/dashboard');
-        router.refresh();
+
+        // Polling: Aguardar session estar disponível antes de redirecionar
+        let attempts = 0;
+        const maxAttempts = 10;
+
+        while (attempts < maxAttempts) {
+          try {
+            const sessionRes = await fetch('/api/auth/session', {
+              cache: 'no-store',
+            });
+            const session = await sessionRes.json();
+
+            if (session?.user) {
+              console.log(
+                '[LOGIN] ✅ Session disponível, redirecionando...',
+                session.user.role
+              );
+
+              // Redirecionar baseado em role
+              const dashboardUrl =
+                session.user.role === 'ADMIN'
+                  ? '/admin'
+                  : session.user.role === 'TEACHER'
+                  ? '/teacher/dashboard'
+                  : '/student/dashboard';
+
+              window.location.href = dashboardUrl;
+              return;
+            }
+
+            console.log(
+              '[LOGIN] ⏳ Aguardando session...',
+              attempts + 1,
+              '/',
+              maxAttempts
+            );
+          } catch (error) {
+            console.error('[LOGIN] Erro ao buscar session:', error);
+          }
+
+          await new Promise((resolve) => setTimeout(resolve, 300));
+          attempts++;
+        }
+
+        // Se chegou aqui, deu timeout
+        console.error('[LOGIN] ❌ Timeout aguardando session');
+        toast.error('sessionTimeout');
+        setIsLoading(false);
+        return;
       }
     } catch (error) {
       console.error('[Login] error', error);
@@ -125,11 +173,25 @@ export default function LoginPage() {
 
       {/* Lado Esquerdo - Branding e Visual */}
       <div className="hidden lg:flex lg:w-1/2 relative bg-muted text-primary-foreground flex-col justify-between p-12 overflow-hidden">
-        <div className="absolute inset-0 bg-primary/90 z-10" />
+        <div
+          className={`absolute inset-0 z-10 ${
+            branding.promotedCourse
+              ? 'bg-gradient-to-t from-black/90 via-black/50 to-black/30'
+              : 'bg-primary/90'
+          }`}
+        />
         <div className="absolute inset-0 z-0">
-          {branding.loginImage ? (
+          {branding.promotedCourse?.thumbnail ? (
             <Image
-              src={branding.loginImage}
+              src={branding.promotedCourse.thumbnail}
+              alt={branding.promotedCourse.title}
+              fill
+              className="object-cover"
+              priority
+            />
+          ) : branding.loginBgUrl ? (
+            <Image
+              src={branding.loginBgUrl}
               alt="Background"
               fill
               className="object-cover opacity-50"
@@ -163,27 +225,39 @@ export default function LoginPage() {
         </div>
 
         {/* Hero Content */}
-        <div className="relative z-20 space-y-6 max-w-lg">
-          <h1 className="text-4xl font-bold tracking-tight text-white leading-tight">
-            {t.auth.login.heroTitle ||
-              'Transforme seu futuro com educação de qualidade.'}
-          </h1>
-          <p className="text-lg text-white/80 leading-relaxed">
-            {t.auth.login.heroSubtitle ||
-              'Acesse nossa plataforma e descubra um mundo de conhecimento preparado especialmente para você.'}
-          </p>
+        <div className="relative z-20 space-y-6 max-w-lg w-full flex flex-col justify-center flex-1">
+          {branding.advertisements && branding.advertisements.length > 0 ? (
+            <div className="w-full max-w-5xl mx-auto">
+              <PromotedCoursesCarousel />
+            </div>
+          ) : branding.promotedCourse ? (
+            <div className="flex justify-center w-full">
+              <PromotedCourseCard course={branding.promotedCourse} />
+            </div>
+          ) : (
+            <>
+              <h1 className="text-4xl font-bold tracking-tight text-white leading-tight">
+                {t.auth.login.heroTitle ||
+                  'Transforme seu futuro com educação de qualidade.'}
+              </h1>
+              <p className="text-lg text-white/80 leading-relaxed">
+                {t.auth.login.heroSubtitle ||
+                  'Acesse nossa plataforma e descubra um mundo de conhecimento preparado especialmente para você.'}
+              </p>
 
-          {/* Stats/Features */}
-          <div className="grid grid-cols-2 gap-6 pt-8">
-            <div className="space-y-1">
-              <h3 className="text-2xl font-bold text-white">+1000</h3>
-              <p className="text-sm text-white/70">Alunos ativos</p>
-            </div>
-            <div className="space-y-1">
-              <h3 className="text-2xl font-bold text-white">4.9/5</h3>
-              <p className="text-sm text-white/70">Avaliação média</p>
-            </div>
-          </div>
+              {/* Stats/Features */}
+              <div className="grid grid-cols-2 gap-6 pt-8">
+                <div className="space-y-1">
+                  <h3 className="text-2xl font-bold text-white">+1000</h3>
+                  <p className="text-sm text-white/70">Alunos ativos</p>
+                </div>
+                <div className="space-y-1">
+                  <h3 className="text-2xl font-bold text-white">4.9/5</h3>
+                  <p className="text-sm text-white/70">Avaliação média</p>
+                </div>
+              </div>
+            </>
+          )}
         </div>
 
         {/* Footer */}

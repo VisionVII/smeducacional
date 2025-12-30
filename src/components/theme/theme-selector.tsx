@@ -48,7 +48,7 @@ export function ThemeSelector({
 
     setIsSaving(true);
     try {
-      const response = await fetch('/api/user/theme', {
+      const response = await fetch('/api/system/theme', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -89,7 +89,7 @@ export function ThemeSelector({
   const handleReset = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch('/api/user/theme', {
+      const response = await fetch('/api/system/theme', {
         method: 'DELETE',
       });
 

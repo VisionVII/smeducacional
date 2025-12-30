@@ -70,6 +70,7 @@ const systemConfigSchema = z.object({
     .optional(),
   maintenanceMode: z.boolean().optional(),
   registrationEnabled: z.boolean().optional(),
+  promotedCourseId: z.string().nullable().optional(),
 });
 
 // GET - Obter configurações do sistema
@@ -78,6 +79,7 @@ export async function GET() {
     // Buscar configuração (sempre key="system")
     let config = await prisma.systemConfig.findUnique({
       where: { key: 'system' },
+      include: { promotedCourse: true },
     });
 
     // Se não existir, criar com valores padrão
@@ -88,6 +90,7 @@ export async function GET() {
           companyName: 'SM Educacional',
           systemName: 'SM Educacional',
         },
+        include: { promotedCourse: true },
       });
     }
 

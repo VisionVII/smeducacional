@@ -20,6 +20,8 @@ import { PasswordInput } from '@/components/password-input';
 import { useSystemBranding } from '@/hooks/use-system-branding';
 import { useTranslations } from '@/hooks/use-translations';
 import { useTranslatedToast } from '@/lib/translation-helpers';
+import { PromotedCourseCard } from '@/components/promoted-course-card';
+import { PromotedCoursesCarousel } from '@/components/promoted-courses-carousel';
 
 const keyframes = `
   @keyframes slideInUp {
@@ -128,60 +130,87 @@ export default function RegisterPage() {
       <div className="relative z-10 h-screen w-full flex items-center justify-center px-4 sm:px-6 lg:px-10 py-8 sm:py-12">
         <div className="w-full max-w-5xl grid gap-8 lg:grid-cols-2 items-center">
           {/* Brand / Hero Side */}
-          <div className="relative hidden lg:block overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-primary/25 via-primary/10 to-transparent shadow-2xl backdrop-blur-xl p-10">
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.08),transparent_25%)]" />
-            <div className="relative space-y-6">
-              <div className="flex items-center gap-3">
+          <div className="relative lg:block overflow-hidden rounded-2xl border border-white/10 bg-slate-950 shadow-2xl p-10 min-h-[600px] flex flex-col justify-center">
+            {/* Background Image or Gradient */}
+            <div className="absolute inset-0 z-0">
+              {branding.promotedCourse?.thumbnail ? (
+                <Image
+                  src={branding.promotedCourse.thumbnail}
+                  alt={branding.promotedCourse.title}
+                  fill
+                  className="object-cover"
+                  priority
+                />
+              ) : (
+                <div className="w-full h-full bg-gradient-to-br from-primary/25 via-primary/10 to-transparent backdrop-blur-xl" />
+              )}
+            </div>
+
+            {/* Overlay */}
+            <div
+              className={`absolute inset-0 z-10 ${
+                branding.promotedCourse
+                  ? 'bg-gradient-to-t from-black/90 via-black/60 to-black/40'
+                  : 'bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.08),transparent_25%)]'
+              }`}
+            />
+
+            <div className="relative z-20 space-y-6 h-full flex flex-col justify-center">
+              <div className="flex items-center justify-center mb-4">
                 {branding.logoUrl ? (
-                  <div className="relative h-12 w-12 overflow-hidden rounded-xl border border-white/10 bg-white/5">
+                  <div className="relative h-16 w-auto min-w-[120px] overflow-hidden rounded-xl border border-white/10 bg-white/5 p-2 backdrop-blur-sm">
                     <Image
                       src={branding.logoUrl}
                       alt={branding.companyName || 'Logo do sistema'}
-                      fill
-                      className="object-contain"
+                      width={160}
+                      height={60}
+                      className="h-12 w-auto object-contain"
                       priority
-                      sizes="48px"
                     />
                   </div>
                 ) : (
-                  <div className="h-12 w-12 rounded-xl bg-white/10 flex items-center justify-center">
-                    <GraduationCap className="h-6 w-6 text-white" />
+                  <div className="h-16 w-16 rounded-xl bg-white/10 flex items-center justify-center">
+                    <GraduationCap className="h-8 w-8 text-white" />
                   </div>
                 )}
-                <div>
-                  <p className="text-sm uppercase tracking-[0.2em] text-white/70">
-                    {mounted ? t.auth.register.title : 'Registre-se'}
-                  </p>
-                  <p className="text-lg font-semibold text-white">
-                    {branding.companyName || 'Sistema Escolar Enterprise'}
-                  </p>
-                </div>
               </div>
-              <h2 className="text-3xl font-bold text-white leading-tight">
-                Matrículas rápidas, seguras e com verificação instantânea
-              </h2>
-              <p className="text-white/80 leading-relaxed">
-                Fluxo de criação de conta com validação em camadas, uso
-                obrigatório de senhas fortes e onboarding direto para o
-                catálogo.
-              </p>
-              <div className="grid grid-cols-3 gap-4 text-white/80">
-                <div className="rounded-xl border border-white/10 bg-white/5 p-4">
-                  <p className="text-sm text-white/60">Tempo médio</p>
-                  <p className="text-2xl font-semibold">50s</p>
-                  <p className="text-xs text-white/50">para iniciar</p>
+              {branding.advertisements && branding.advertisements.length > 0 ? (
+                <div className="w-full max-w-5xl mx-auto">
+                  <PromotedCoursesCarousel />
                 </div>
-                <div className="rounded-xl border border-white/10 bg-white/5 p-4">
-                  <p className="text-sm text-white/60">Senha forte</p>
-                  <p className="text-2xl font-semibold">Obrigatória</p>
-                  <p className="text-xs text-white/50">detector ativo</p>
+              ) : branding.promotedCourse ? (
+                <div className="flex justify-center w-full">
+                  <PromotedCourseCard course={branding.promotedCourse} />
                 </div>
-                <div className="rounded-xl border border-white/10 bg-white/5 p-4">
-                  <p className="text-sm text-white/60">Aprovação</p>
-                  <p className="text-2xl font-semibold">Instantânea</p>
-                  <p className="text-xs text-white/50">sem filas</p>
-                </div>
-              </div>
+              ) : (
+                <>
+                  <h2 className="text-3xl font-bold text-white leading-tight text-center">
+                    Matrículas rápidas, seguras e com verificação instantânea
+                  </h2>
+                  <p className="text-white/80 leading-relaxed text-center">
+                    Fluxo de criação de conta com validação em camadas, uso
+                    obrigatório de senhas fortes e onboarding direto para o
+                    catálogo.
+                  </p>
+                  <div className="grid grid-cols-3 gap-4 text-white/80">
+                    <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+                      <p className="text-sm text-white/60">Tempo médio</p>
+                      <p className="text-2xl font-semibold">50s</p>
+                      <p className="text-xs text-white/50">para iniciar</p>
+                    </div>
+                    <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+                      <p className="text-sm text-white/60">Senha forte</p>
+                      <p className="text-2xl font-semibold">Obrigatória</p>
+                      <p className="text-xs text-white/50">detector ativo</p>
+                    </div>
+                    <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+                      <p className="text-sm text-white/60">Aprovação</p>
+                      <p className="text-2xl font-semibold">Instantânea</p>
+                      <p className="text-xs text-white/50">sem filas</p>
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
           </div>
 

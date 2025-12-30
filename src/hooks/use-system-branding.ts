@@ -20,6 +20,51 @@ interface SystemBranding {
   registerDescription: string;
   coursesTitle: string;
   coursesDescription: string;
+  promotedCourse?: {
+    id: string;
+    title: string;
+    description: string;
+    thumbnail: string | null;
+    slug: string;
+    price: number;
+    level: string | null;
+    duration: number | null;
+    category: {
+      name: string;
+    };
+    instructor: {
+      name: string;
+      avatar: string | null;
+      bio: string | null;
+    };
+    _count: {
+      modules: number;
+      enrollments: number;
+    };
+  } | null;
+  advertisements?: Array<{
+    id: string;
+    title: string;
+    description: string;
+    thumbnail: string | null;
+    slug: string;
+    price: number;
+    level: string | null;
+    duration: number | null;
+    category: {
+      name: string;
+    };
+    instructor: {
+      name: string;
+      avatar: string | null;
+      bio: string | null;
+    };
+    _count: {
+      modules: number;
+      enrollments: number;
+    };
+    adId: string;
+  }>;
 }
 
 // Cache global para evitar re-fetches desnecessários
@@ -57,6 +102,7 @@ export function useSystemBranding() {
     registerDescription: 'Comece sua jornada de aprendizado hoje',
     coursesTitle: 'Nossos Cursos',
     coursesDescription: 'Descubra cursos incríveis para alavancar sua carreira',
+    promotedCourse: null,
   });
   const [loading, setLoading] = useState(true);
 

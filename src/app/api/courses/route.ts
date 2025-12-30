@@ -1,7 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
-import { prisma } from '@/lib/db';
 import { z } from 'zod';
+import {
+  listCourses,
+  findCourseBySlug,
+  findCategoryById,
+  createCourse,
+} from '@/lib/services/course.service';
+import { prisma } from '@/lib/db';
 
 // Schema de validação para criação de curso
 const createCourseSchema = z.object({
@@ -28,62 +34,12 @@ export async function GET(req: NextRequest) {
     const isPublished = searchParams.get('isPublished');
     const search = searchParams.get('search');
 
-    type WhereClause = {
-      categoryId?: string;
-      instructorId?: string;
-      isPublished?: boolean;
-      OR?: Array<{
-        title?: { contains: string; mode: 'insensitive' };
-        description?: { contains: string; mode: 'insensitive' };
-      }>;
-    };
-
-    const where: WhereClause = {};
-
-    if (categoryId) where.categoryId = categoryId;
-    if (instructorId) where.instructorId = instructorId;
-    if (isPublished !== null) where.isPublished = isPublished === 'true';
-    if (search) {
-      where.OR = [
-        { title: { contains: search, mode: 'insensitive' } },
-        { description: { contains: search, mode: 'insensitive' } },
-      ];
-    }
-
-    const courses = await prisma.course.findMany({
-      where,
-      include: {
-        category: true,
-        instructor: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            avatar: true,
-            bio: true,
-          },
-        },
-        modules: {
-          include: {
-            lessons: true,
-          },
-        },
-        _count: {
-          select: {
-            enrollments: true,
-          },
-        },
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
+    const normalized = await listCourses({
+      categoryId,
+      instructorId,
+      isPublished: isPublished !== null ? isPublished === 'true' : null,
+      search,
     });
-
-    // Normalizar isPaid em tempo de resposta (compatibilidade com registros antigos)
-    const normalized = courses.map((c) => ({
-      ...c,
-      isPaid: typeof c.price === 'number' ? c.price > 0 : Boolean(c.isPaid),
-    }));
 
     return NextResponse.json(normalized, {
       headers: {
@@ -120,9 +76,7 @@ export async function POST(req: NextRequest) {
     const validatedData = createCourseSchema.parse(body);
 
     // Verificar se o slug já existe
-    const existingCourse = await prisma.course.findUnique({
-      where: { slug: validatedData.slug },
-    });
+    const existingCourse = await findCourseBySlug(validatedData.slug);
 
     if (existingCourse) {
       return NextResponse.json(
@@ -132,9 +86,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Verificar se a categoria existe
-    const category = await prisma.category.findUnique({
-      where: { id: validatedData.categoryId },
-    });
+    const category = await findCategoryById(validatedData.categoryId);
 
     if (!category) {
       return NextResponse.json(
@@ -144,24 +96,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Criar o curso
-    const course = await prisma.course.create({
-      data: {
-        ...validatedData,
-        instructorId: session.user.id,
-      },
-      include: {
-        category: true,
-        instructor: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            avatar: true,
-            bio: true,
-          },
-        },
-      },
-    });
+    const course = await createCourse(validatedData, session.user.id);
 
     // Registrar log de atividade
     await prisma.activityLog.create({

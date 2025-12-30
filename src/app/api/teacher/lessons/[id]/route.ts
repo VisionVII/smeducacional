@@ -2,6 +2,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 import { z } from 'zod';
+import {
+  logAuditTrail,
+  AuditAction,
+  getClientIpFromRequest,
+} from '@/lib/audit.service';
 
 const updateLessonSchema = z.object({
   title: z.string().min(2).max(200).optional(),
@@ -79,7 +84,7 @@ export async function PUT(
 }
 
 export async function DELETE(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
@@ -96,8 +101,53 @@ export async function DELETE(
     if ('error' in own)
       return NextResponse.json({ error: own.error }, { status: own.status });
 
-    await prisma.lesson.delete({ where: { id } });
-    return NextResponse.json({ message: 'Lição excluída com sucesso' });
+    // Buscar lição antes de deletar
+    const lesson = await prisma.lesson.findUnique({
+      where: { id },
+      select: { id: true, title: true, moduleId: true, deletedAt: true },
+    });
+
+    if (!lesson) {
+      return NextResponse.json(
+        { error: 'Lição não encontrada' },
+        { status: 404 }
+      );
+    }
+
+    // Verificar se já foi deletada
+    if (lesson.deletedAt) {
+      return NextResponse.json(
+        { error: 'Esta lição já foi deletada' },
+        { status: 400 }
+      );
+    }
+
+    // Soft delete ao invés de hard delete
+    await prisma.lesson.update({
+      where: { id },
+      data: { deletedAt: new Date() },
+    });
+
+    // Registrar auditoria
+    const ipAddress = getClientIpFromRequest(request);
+    await logAuditTrail({
+      userId: session.user.id,
+      action: AuditAction.LESSON_DELETED,
+      targetId: id,
+      targetType: 'Lesson',
+      metadata: { deletedTitle: lesson.title, moduleId: lesson.moduleId },
+      ipAddress,
+    });
+
+    console.log(
+      `[teacher][lessons][delete] Soft delete da lição "${lesson.title}" por ${session.user.email}`
+    );
+
+    // TODO: Cleanup bucket assets. Após 30 dias de soft delete, remover arquivos de vídeo/material do Supabase Storage
+
+    return NextResponse.json({
+      data: { success: true, message: 'Lição excluída com sucesso' },
+    });
   } catch (error) {
     console.error('[teacher][lessons][id] DELETE error:', error);
     return NextResponse.json(

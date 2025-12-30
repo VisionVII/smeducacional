@@ -332,20 +332,25 @@ export const authOptions: NextAuthOptions = {
 
       // NUNCA redirecionar rotas da API (causa erro CLIENT_FETCH_ERROR)
       if (url.includes('/api/')) {
+        console.log('[auth][redirect] Bloqueando redirect de API');
         return url;
       }
 
-      // Se URL é relativa e começa com /, usar direto com baseUrl
+      // Se URL é relativa e começa com /, combinar com baseUrl
       if (url.startsWith('/')) {
-        return `${baseUrl}${url}`;
+        const redirectUrl = `${baseUrl}${url}`;
+        console.log('[auth][redirect] URL relativa:', redirectUrl);
+        return redirectUrl;
       }
 
-      // Se URL já tem baseUrl, usar direto
-      if (new URL(url).origin === baseUrl) {
+      // Permitir redirect se URL já contém baseUrl
+      if (url.startsWith(baseUrl)) {
+        console.log('[auth][redirect] URL com baseUrl:', url);
         return url;
       }
 
       // Fallback: voltar para baseUrl
+      console.log('[auth][redirect] Fallback para baseUrl:', baseUrl);
       return baseUrl;
     },
     async session({ session, token }) {

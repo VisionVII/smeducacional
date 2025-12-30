@@ -62,6 +62,7 @@ model User {
   emailVerified             DateTime?
   resetCode                 String?
   resetCodeExpires          DateTime?
+  deletedAt                 DateTime?
   createdAt                 DateTime                   @default(now())
   updatedAt                 DateTime                   @updatedAt
   landingConfig             Json?
@@ -70,6 +71,8 @@ model User {
   publicPageLogs            PublicPageLog[]
   activities                Activity[]                 @relation("ActivityCreator")
   activityLogs              ActivityLog[]
+  auditLogs                 AuditLog[]
+  notificationLogs          NotificationLog[]
   certificates              Certificate[]
   checkoutSessions          CheckoutSession[]
   createdCourses            Course[]                   @relation("CourseCreator")
@@ -138,6 +141,7 @@ model Course {
   whatYouLearn              String?
   categoryId                String
   instructorId              String
+  deletedAt                 DateTime?
   createdAt                 DateTime                   @default(now())
   updatedAt                 DateTime                   @updatedAt
   compareAtPrice            Float?
@@ -151,6 +155,7 @@ model Course {
   payments                  Payment[]
   studentEnrollmentPayments StudentEnrollmentPayment[]
   advertisements            Advertisement[]
+  promotedInConfig          SystemConfig[]             @relation("PromotedCourse")
 
   @@index([categoryId])
   @@index([instructorId])
@@ -164,10 +169,11 @@ model Module {
   description String?
   order       Int
   courseId    String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  deletedAt   DateTime?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
   lessons     Lesson[]
-  course      Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  course      Course     @relation(fields: [courseId], references: [id], onDelete: Cascade)
 
   @@index([courseId])
   @@map("modules")
@@ -183,6 +189,7 @@ model Lesson {
   order       Int
   isFree      Boolean    @default(false)
   moduleId    String
+  deletedAt   DateTime?
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
   module      Module     @relation(fields: [moduleId], references: [id], onDelete: Cascade)
@@ -728,6 +735,8 @@ model SystemConfig {
   loginDescription    String?  @default("Entre com suas credenciais para acessar sua conta")
   loginTitle          String?  @default("Bem-vindo de volta")
   navbarBgUrl         String?
+  promotedCourseId    String?
+  promotedCourse      Course?  @relation("PromotedCourse", fields: [promotedCourseId], references: [id])
   registerDescription String?  @default("Comece sua jornada de aprendizado hoje")
   registerTitle       String?  @default("Crie sua conta")
   themePresetId       String?  @default("academic-blue")
@@ -886,4 +895,46 @@ model AdAnalytics {
 
   @@index([adId, date])
   @@map("ad_analytics")
+}
+
+// Audit Log: Registra todas as operações sensíveis (financeiras, acesso, deletions)
+// Implementa system-blueprint.md seção 7 "Módulo Administrativo & Governança"
+model AuditLog {
+  id          String    @id @default(cuid())
+  userId      String
+  action      String
+  targetId    String?
+  targetType  String?
+  changes     Json?
+  metadata    Json?
+  ipAddress   String?
+  createdAt   DateTime  @default(now())
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([action])
+  @@index([targetId])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
+
+// Notification Log: Registra envio de e-mails críticos
+// Implementa system-blueprint.md seção 6 "Módulo de Comunicação (Resend)"
+model NotificationLog {
+  id                String    @id @default(cuid())
+  emailAddress      String
+  emailType         String
+  status            String    @default("SENT")
+  resendMessageId   String?
+  error             String?
+  userId            String?
+  sentAt            DateTime  @default(now())
+  user              User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([emailAddress])
+  @@index([emailType])
+  @@index([status])
+  @@index([sentAt])
+  @@index([userId])
+  @@map("notification_logs")
 }

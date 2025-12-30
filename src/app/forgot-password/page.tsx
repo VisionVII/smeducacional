@@ -18,6 +18,8 @@ import { GraduationCap, ArrowLeft, Mail } from 'lucide-react';
 import { useTranslations } from '@/hooks/use-translations';
 import { useTranslatedToast } from '@/lib/translation-helpers';
 import { useSystemBranding } from '@/hooks/use-system-branding';
+import { PromotedCourseCard } from '@/components/promoted-course-card';
+import { PromotedCoursesCarousel } from '@/components/promoted-courses-carousel';
 
 const keyframes = `
   @keyframes slideInUp {
@@ -161,58 +163,93 @@ export default function ForgotPasswordPage() {
       <div className="relative z-10 min-h-screen flex items-center justify-center px-4 py-10 sm:px-6 lg:px-10">
         <div className="w-full max-w-5xl grid gap-8 lg:grid-cols-2 items-center">
           {/* Brand / Hero Side */}
-          <div className="relative hidden lg:block overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-primary/20 via-primary/10 to-transparent shadow-2xl backdrop-blur-xl">
-            <div className="absolute inset-0">
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/40 via-primary/20 to-transparent" />
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.08),transparent_25%)]" />
+          <div className="relative hidden lg:block overflow-hidden rounded-2xl border border-white/10 bg-slate-950 shadow-2xl min-h-[600px]">
+            {/* Background Image or Gradient */}
+            <div className="absolute inset-0 z-0">
+              {branding.promotedCourse?.thumbnail ? (
+                <Image
+                  src={branding.promotedCourse.thumbnail}
+                  alt={branding.promotedCourse.title}
+                  fill
+                  className="object-cover"
+                  priority
+                />
+              ) : (
+                <div className="w-full h-full bg-gradient-to-br from-primary/20 via-primary/10 to-transparent" />
+              )}
             </div>
-            <div className="relative h-full flex flex-col justify-between p-10 gap-10">
-              <div className="flex items-center gap-3">
+
+            {/* Overlay */}
+            <div
+              className={`absolute inset-0 z-10 ${
+                branding.promotedCourse
+                  ? 'bg-gradient-to-t from-black/90 via-black/60 to-black/40'
+                  : 'bg-gradient-to-br from-primary/40 via-primary/20 to-transparent'
+              }`}
+            />
+
+            <div className="relative z-20 h-full flex flex-col justify-center p-10 gap-10">
+              <div className="flex items-center justify-center">
                 {branding.logoUrl ? (
-                  <div className="relative h-12 w-12 overflow-hidden rounded-xl border border-white/10 bg-white/5">
+                  <div className="relative h-16 w-auto min-w-[120px] overflow-hidden rounded-xl border border-white/10 bg-white/5 p-2 backdrop-blur-sm">
                     <Image
                       src={branding.logoUrl}
                       alt={branding.companyName || 'Logo do sistema'}
-                      fill
-                      className="object-contain"
+                      width={160}
+                      height={60}
+                      className="h-12 w-auto object-contain"
                       priority
-                      sizes="48px"
                     />
                   </div>
                 ) : (
-                  <div className="h-12 w-12 rounded-xl bg-white/10 flex items-center justify-center">
-                    <GraduationCap className="h-6 w-6 text-white" />
+                  <div className="h-16 w-16 rounded-xl bg-white/10 flex items-center justify-center">
+                    <GraduationCap className="h-8 w-8 text-white" />
                   </div>
                 )}
-                <div>
-                  <p className="text-sm uppercase tracking-[0.2em] text-white/70">
-                    {mounted ? t.common.platform : 'VisionVII Suite'}
-                  </p>
-                  <p className="text-lg font-semibold text-white">
-                    {branding.companyName || 'Sistema Escolar Enterprise'}
-                  </p>
-                </div>
               </div>
-              <div className="space-y-4">
-                <h2 className="text-3xl font-bold text-white leading-tight">
-                  {mounted
-                    ? t.auth.forgotPassword.title
-                    : 'Recupere o acesso com segurança'}
-                </h2>
-                <p className="text-white/80 leading-relaxed">
-                  {step === 'email' &&
-                    (mounted
-                      ? t.auth.forgotPassword.subtitle
-                      : 'Envie seu e-mail para receber o código de validação instantaneamente.')}
-                  {step === 'code' &&
-                    (mounted
-                      ? t.auth.forgotPassword.codeSubtitle
-                      : 'Verifique o código de 6 dígitos que enviamos ao seu e-mail.')}
-                  {step === 'newPassword' &&
-                    (mounted
-                      ? t.auth.forgotPassword.newPasswordSubtitle
-                      : 'Crie uma nova senha forte para proteger sua conta.')}
-                </p>
+              <div className="space-y-4 flex-1 flex flex-col justify-center">
+                {branding.advertisements && branding.advertisements.length > 0 ? (
+                  <div className="w-full max-w-5xl mx-auto">
+                    <PromotedCoursesCarousel />
+                  </div>
+                ) : branding.promotedCourse ? (
+                  <div className="flex justify-center w-full">
+                    <PromotedCourseCard course={branding.promotedCourse} />
+                  </div>
+                ) : (
+                  <>
+                    <h2 className="text-3xl font-bold text-white leading-tight text-center">
+                      {mounted
+                        ? t.auth.forgotPassword.title
+                        : 'Recupere o acesso com segurança'}
+                    </h2>
+                    <p className="text-white/80 leading-relaxed text-center">
+                      {step === 'email' &&
+                        (mounted
+                          ? t.auth.forgotPassword.subtitle
+                          : 'Envie seu e-mail para receber o código de validação instantaneamente.')}
+                      {step === 'code' &&
+                        (mounted
+                          ? t.auth.forgotPassword.codeSubtitle
+                          : 'Digite o código enviado para seu email')}
+                      {step === 'password' &&
+                        (mounted
+                          ? t.auth.forgotPassword.newPasswordSubtitle
+                          : 'Crie uma nova senha segura')}
+                    </p>
+                  </>
+                )}
+              </div>
+            </div>
+                          ? t.auth.forgotPassword.codeSubtitle
+                          : 'Verifique o código de 6 dígitos que enviamos ao seu e-mail.')}
+                      {step === 'newPassword' &&
+                        (mounted
+                          ? t.auth.forgotPassword.newPasswordSubtitle
+                          : 'Crie uma nova senha forte para proteger sua conta.')}
+                    </p>
+                  </>
+                )}
               </div>
               <div className="grid grid-cols-3 gap-4 text-white/80">
                 <div className="rounded-xl border border-white/10 bg-white/5 p-4">

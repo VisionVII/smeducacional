@@ -1,6 +1,11 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/db';
+import {
+  logAuditTrail,
+  AuditAction,
+  getClientIpFromRequest,
+} from '@/lib/audit.service';
 import bcrypt from 'bcryptjs';
 
 export async function GET(
@@ -105,12 +110,14 @@ export async function DELETE(
   try {
     const session = await auth();
 
+    // RBAC: Apenas ADMIN pode deletar usuários
     if (!session || session.user.role !== 'ADMIN') {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     }
 
-    // Não permitir deletar o próprio usuário
     const { id } = await params;
+
+    // Validação de integridade: não permitir auto-delete
     if (id === session.user.id) {
       return NextResponse.json(
         { error: 'Você não pode deletar sua própria conta' },
@@ -118,13 +125,52 @@ export async function DELETE(
       );
     }
 
-    await prisma.user.delete({
+    // Verificar se usuário existe
+    const user = await prisma.user.findUnique({
       where: { id },
+      select: { id: true, name: true, email: true, deletedAt: true },
     });
 
-    return NextResponse.json({ success: true });
+    if (!user) {
+      return NextResponse.json(
+        { error: 'Usuário não encontrado' },
+        { status: 404 }
+      );
+    }
+
+    // Soft delete: marcar como deletado ao invés de remover
+    const deletedUser = await prisma.user.update({
+      where: { id },
+      data: { deletedAt: new Date() },
+      select: { id: true, name: true, email: true },
+    });
+
+    // Registrar auditoria de deleção
+    const ipAddress = getClientIpFromRequest(request);
+    await logAuditTrail({
+      userId: session.user.id,
+      action: AuditAction.USER_DELETED,
+      targetId: id,
+      targetType: 'User',
+      metadata: {
+        deletedName: user.name,
+        deletedEmail: user.email,
+      },
+      ipAddress,
+    });
+
+    console.log(
+      `[admin][users][delete] Soft delete do usuário ${user.email} por ${session.user.email}`
+    );
+
+    return NextResponse.json({
+      data: {
+        success: true,
+        message: `Usuário "${user.name}" deletado com sucesso`,
+      },
+    });
   } catch (error) {
-    console.error('Erro ao deletar usuário:', error);
+    console.error('[admin][users][delete] Erro ao deletar usuário:', error);
     return NextResponse.json(
       { error: 'Erro ao deletar usuário' },
       { status: 500 }

@@ -69,6 +69,25 @@ export function useTranslatedToast() {
         description: message,
       });
     },
+    info: (
+      key: keyof typeof t.toasts.info,
+      variables?: Record<string, string>
+    ) => {
+      if (!mounted) return;
+      let message = t.toasts.info[key] || 'Info';
+
+      if (variables) {
+        Object.entries(variables).forEach(([k, v]) => {
+          message = message.replace(`{${k}}`, v);
+        });
+      }
+
+      toast({
+        title: t.common.info,
+        description: message,
+        className: 'bg-blue-500 text-white border-none',
+      });
+    },
   };
 }
 

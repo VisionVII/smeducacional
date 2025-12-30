@@ -14,11 +14,20 @@ const PUBLIC_ROUTES = new Set([
   '/privacy',
   '/terms',
   '/teacher',
+  '/teacher/login',
   '/admin',
+  '/admin/login',
   '/become-instructor',
   '/help',
   '/cookies',
 ]);
+
+// Rotas premium que requerem plano ativo (validação no cliente via layout wrapper)
+const PREMIUM_ROUTES = {
+  TEACHER: ['/teacher/ai-assistant', '/teacher/mentorships', '/teacher/tools'],
+  STUDENT: ['/student/ai-chat', '/student/mentorships', '/student/tools'],
+  ADMIN: [], // Admins sempre têm acesso
+};
 
 // Security headers para todas as respostas
 function addSecurityHeaders(response: NextResponse): NextResponse {
@@ -76,8 +85,33 @@ export default async function proxy(request: NextRequest) {
         : 'next-auth.session-token',
   });
 
+  // Debug logging
+  if (process.env.NODE_ENV === 'development') {
+    console.log('[MIDDLEWARE]', {
+      pathname,
+      hasToken: !!token,
+      role: token?.role,
+      email: token?.email,
+    });
+  }
+
   const isAuthRoute = pathname.startsWith('/api/auth');
   const isPublicRoute = PUBLIC_ROUTES.has(pathname) || isAuthRoute;
+
+  // Redirect root path baseado em role
+  if (pathname === '/' && token) {
+    const userRole = token.role as string;
+    let dashboardUrl = '/student/dashboard';
+
+    if (userRole === 'ADMIN') {
+      dashboardUrl = '/admin';
+    } else if (userRole === 'TEACHER') {
+      dashboardUrl = '/teacher/dashboard';
+    }
+
+    const response = NextResponse.redirect(new URL(dashboardUrl, request.url));
+    return addSecurityHeaders(response);
+  }
 
   // Se não tem token e não é rota pública, redirecionar para login
   if (!token && !isPublicRoute) {
@@ -105,11 +139,15 @@ export default async function proxy(request: NextRequest) {
       return addSecurityHeaders(response);
     }
 
+    // NOTE: Feature gating para rotas premium (ai-assistant, mentorships, etc.)
+    // é feito no layout wrapper via checkFeatureAccessAction e PlanService.
+    // O middleware apenas valida role, não plano/tier.
+
     // Se já está logado e tenta acessar /login ou /register, redirecionar para dashboard
     if (pathname === '/login' || pathname === '/register') {
       let dashboardUrl = '/';
       if (userRole === 'ADMIN') {
-        dashboardUrl = '/admin/dashboard';
+        dashboardUrl = '/admin';
       } else if (userRole === 'TEACHER') {
         dashboardUrl = '/teacher/dashboard';
       } else if (userRole === 'STUDENT') {

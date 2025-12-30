@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
+import { useMounted } from '@/hooks/use-mounted';
 import { Button } from '@/components/ui/button';
 import {
   GraduationCap,
@@ -40,16 +41,12 @@ interface NavbarProps {
 
 export function Navbar({ user, links }: NavbarProps) {
   const pathname = usePathname();
+  const mounted = useMounted();
   const { theme, setTheme } = useTheme();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
-  const [mounted, setMounted] = useState(false);
   const { branding } = useSystemBranding();
   const { t, mounted: translationsLoaded } = useTranslations();
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   const handleLogout = async () => {
     // Limpa cache de tema do usuário antes de fazer logout

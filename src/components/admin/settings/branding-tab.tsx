@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Card,
   CardContent,
@@ -10,11 +10,20 @@ import {
 } from '@/components/ui/card';
 import { FileUpload } from '@/components/ui/file-upload';
 import { toast } from '@/components/ui/use-toast';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Label } from '@/components/ui/label';
 
 interface BrandingAssets {
   logoUrl?: string | null;
   faviconUrl?: string | null;
   loginBgUrl?: string | null;
+  promotedCourseId?: string | null;
 }
 
 interface BrandingTabProps {
@@ -22,10 +31,31 @@ interface BrandingTabProps {
   onUpdate: (field: keyof BrandingAssets, value: string | null) => void;
 }
 
+interface Course {
+  id: string;
+  title: string;
+}
+
 export function BrandingTab({ assets, onUpdate }: BrandingTabProps) {
   const [uploadingLogo, setUploadingLogo] = useState(false);
   const [uploadingFavicon, setUploadingFavicon] = useState(false);
   const [uploadingLoginBg, setUploadingLoginBg] = useState(false);
+  const [courses, setCourses] = useState<Course[]>([]);
+
+  useEffect(() => {
+    async function fetchCourses() {
+      try {
+        const res = await fetch('/api/admin/courses?status=PUBLISHED');
+        if (res.ok) {
+          const data = await res.json();
+          setCourses(Array.isArray(data) ? data : []);
+        }
+      } catch (error) {
+        console.error('Erro ao buscar cursos:', error);
+      }
+    }
+    fetchCourses();
+  }, []);
 
   const handleUpload = async (
     file: File,
@@ -150,6 +180,32 @@ export function BrandingTab({ assets, onUpdate }: BrandingTabProps) {
           isUploading={uploadingLoginBg}
           maxSizeMB={10}
         />
+
+        {/* Promoted Course Selector */}
+        <div className="space-y-3">
+          <Label>Curso Promovido (Login/Registro)</Label>
+          <Select
+            value={assets.promotedCourseId || 'none'}
+            onValueChange={(value) =>
+              onUpdate('promotedCourseId', value === 'none' ? null : value)
+            }
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Selecione um curso para promover" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="none">Nenhum</SelectItem>
+              {courses.map((course) => (
+                <SelectItem key={course.id} value={course.id}>
+                  {course.title}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <p className="text-sm text-muted-foreground">
+            Este curso aparecerá em destaque nas páginas de autenticação.
+          </p>
+        </div>
       </CardContent>
     </Card>
   );

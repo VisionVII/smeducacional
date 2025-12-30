@@ -131,7 +131,7 @@ export default function NewCoursePage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/20 dark:from-slate-900 dark:via-slate-900 dark:to-slate-950">
-      <div className="container mx-auto px-4 py-8 max-w-5xl space-y-8">
+      <div className="space-y-8">
         <BackButton href="/teacher/courses" label="Voltar para meus cursos" />
 
         <Card className="relative overflow-hidden border-2 shadow-2xl">

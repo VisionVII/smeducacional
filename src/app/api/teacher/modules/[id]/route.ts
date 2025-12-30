@@ -2,6 +2,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 import { z } from 'zod';
+import {
+  logAuditTrail,
+  AuditAction,
+  getClientIpFromRequest,
+} from '@/lib/audit.service';
 
 const updateModuleSchema = z.object({
   title: z.string().min(2).max(200).optional(),
@@ -74,7 +79,7 @@ export async function PUT(
 }
 
 export async function DELETE(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
@@ -91,8 +96,53 @@ export async function DELETE(
     if ('error' in own)
       return NextResponse.json({ error: own.error }, { status: own.status });
 
-    await prisma.module.delete({ where: { id } });
-    return NextResponse.json({ message: 'Módulo excluído com sucesso' });
+    // Buscar módulo antes de deletar
+    const module = await prisma.module.findUnique({
+      where: { id },
+      select: { id: true, title: true, courseId: true, deletedAt: true },
+    });
+
+    if (!module) {
+      return NextResponse.json(
+        { error: 'Módulo não encontrado' },
+        { status: 404 }
+      );
+    }
+
+    // Verificar se já foi deletado
+    if (module.deletedAt) {
+      return NextResponse.json(
+        { error: 'Este módulo já foi deletado' },
+        { status: 400 }
+      );
+    }
+
+    // Soft delete ao invés de hard delete
+    await prisma.module.update({
+      where: { id },
+      data: { deletedAt: new Date() },
+    });
+
+    // Registrar auditoria
+    const ipAddress = getClientIpFromRequest(request);
+    await logAuditTrail({
+      userId: session.user.id,
+      action: AuditAction.MODULE_DELETED,
+      targetId: id,
+      targetType: 'Module',
+      metadata: { deletedTitle: module.title, courseId: module.courseId },
+      ipAddress,
+    });
+
+    console.log(
+      `[teacher][modules][delete] Soft delete do módulo "${module.title}" por ${session.user.email}`
+    );
+
+    // TODO: Cleanup bucket assets. Após 30 dias de soft delete, remover arquivos de vídeo/material do Supabase Storage
+
+    return NextResponse.json({
+      data: { success: true, message: 'Módulo excluído com sucesso' },
+    });
   } catch (error) {
     console.error('[teacher][modules][id] DELETE error:', error);
     return NextResponse.json(

@@ -16,6 +16,7 @@ import { Input } from '@/components/ui/input';
 import { AdaptiveNavbar } from '@/components/adaptive-navbar';
 import { Footer } from '@/components/footer';
 import { CoursesCarousel } from '@/components/courses-carousel';
+import { CatalogAdsBanner } from '@/components/catalog-ads-banner';
 import {
   BookOpen,
   Clock,
@@ -215,7 +216,10 @@ function CoursesClient() {
       {/* Menu adaptativo */}
       <AdaptiveNavbar />
 
-      {/* Featured Carousel - Primeira Camada */}
+      {/* Banner de Anúncios com Cards */}
+      <CatalogAdsBanner />
+
+      {/* Featured Carousel - Destaque horizontal (video deitado + shorts) */}
       <section className="relative w-full">
         {isFeaturedLoading ? (
           <div className="container mx-auto px-4 py-8 grid grid-cols-1 md:grid-cols-3 gap-4">

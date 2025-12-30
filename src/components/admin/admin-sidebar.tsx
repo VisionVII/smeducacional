@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useMounted } from '@/hooks/use-mounted';
 import { cn } from '@/lib/utils';
 import {
   LayoutDashboard,
@@ -121,6 +122,7 @@ const navItems: NavItem[] = [
 
 export function AdminSidebar() {
   const pathname = usePathname();
+  const mounted = useMounted();
   const [openItems, setOpenItems] = useState<string[]>([]);
 
   const toggleItem = (title: string) => {
@@ -137,7 +139,8 @@ export function AdminSidebar() {
         {navItems?.map((item) => {
           const Icon = item.icon;
           const isActive =
-            pathname === item.href || pathname?.startsWith(item.href + '/');
+            mounted &&
+            (pathname === item.href || pathname?.startsWith(item.href + '/'));
           const hasChildren = item.children && item.children.length > 0;
           const isOpen = openItems.includes(item.title);
 
@@ -149,6 +152,7 @@ export function AdminSidebar() {
                 onOpenChange={() => toggleItem(item.title)}
               >
                 <CollapsibleTrigger
+                  suppressHydrationWarning
                   className={cn(
                     'flex items-center justify-between w-full gap-3 px-3 py-2 text-sm font-medium rounded-lg transition-all hover:bg-accent hover:text-accent-foreground',
                     isActive && 'bg-accent text-accent-foreground'
@@ -173,19 +177,23 @@ export function AdminSidebar() {
                   </div>
                 </CollapsibleTrigger>
                 <CollapsibleContent className="pl-11 pr-3 pt-2 space-y-1">
-                  {item.children?.map((child) => (
-                    <Link
-                      key={child.href}
-                      href={child.href}
-                      className={cn(
-                        'block px-3 py-1.5 text-sm rounded-md transition-colors hover:bg-accent hover:text-accent-foreground',
-                        pathname === child.href &&
-                          'bg-accent text-accent-foreground font-medium'
-                      )}
-                    >
-                      {child.title}
-                    </Link>
-                  ))}
+                  {item.children?.map((child) => {
+                    const isChildActive = mounted && pathname === child.href;
+                    return (
+                      <Link
+                        key={child.href}
+                        href={child.href}
+                        suppressHydrationWarning
+                        className={cn(
+                          'block px-3 py-1.5 text-sm rounded-md transition-colors hover:bg-accent hover:text-accent-foreground',
+                          isChildActive &&
+                            'bg-accent text-accent-foreground font-medium'
+                        )}
+                      >
+                        {child.title}
+                      </Link>
+                    );
+                  })}
                 </CollapsibleContent>
               </Collapsible>
             );
@@ -195,6 +203,7 @@ export function AdminSidebar() {
             <Link
               key={item.title}
               href={item.href}
+              suppressHydrationWarning
               className={cn(
                 'flex items-center justify-between gap-3 px-3 py-2 text-sm font-medium rounded-lg transition-all hover:bg-accent hover:text-accent-foreground',
                 isActive && 'bg-accent text-accent-foreground'

@@ -2,6 +2,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 import { z } from 'zod';
+import {
+  logAuditTrail,
+  AuditAction,
+  getClientIpFromRequest,
+} from '@/lib/audit.service';
 
 // Schema de validação para atualização de aula
 const updateLessonSchema = z.object({
@@ -90,9 +95,10 @@ export async function PUT(
   }
 }
 
-// DELETE /api/lessons/[id] - Deletar aula
+// DELETE /api/lessons/[id] - Soft delete de aula
+// Nota: TODO - Cleanup bucket assets. Após 30 dias de soft delete, remover arquivos de vídeo/material do Supabase Storage
 export async function DELETE(
-  req: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
@@ -108,7 +114,7 @@ export async function DELETE(
       include: {
         module: {
           include: {
-            course: true,
+            course: { select: { instructorId: true } },
           },
         },
       },
@@ -132,21 +138,54 @@ export async function DELETE(
       );
     }
 
-    // Deletar a aula
-    await prisma.lesson.delete({
+    // Verificar se já foi deletada (usando casting temporário até migração)
+    if (
+      'deletedAt' in lesson &&
+      (lesson as { deletedAt?: Date | null }).deletedAt
+    ) {
+      return NextResponse.json(
+        { error: 'Esta aula já foi deletada' },
+        { status: 400 }
+      );
+    }
+
+    // Soft delete ao invés de hard delete (usando casting temporário até migração)
+    await prisma.lesson.update({
       where: { id },
+      data: { deletedAt: new Date() } as never,
     });
 
-    // Registrar log
+    // Registrar auditoria
+    const ipAddress = getClientIpFromRequest(request);
+    await logAuditTrail({
+      userId: session.user.id,
+      action: AuditAction.LESSON_DELETED,
+      targetId: id,
+      targetType: 'Lesson',
+      metadata: {
+        deletedTitle: lesson.title,
+        moduleId: lesson.moduleId,
+        courseId: lesson.module.courseId,
+      },
+      ipAddress,
+    });
+
+    // Registrar log de atividade
     await prisma.activityLog.create({
       data: {
         userId: session.user.id,
         action: 'DELETE_LESSON',
-        details: `Deletou a aula "${lesson.title}"`,
+        details: `Soft-deletou a aula "${lesson.title}"`,
       },
     });
 
-    return NextResponse.json({ message: 'Aula deletada com sucesso' });
+    console.log(
+      `[lessons][delete] Soft delete da aula "${lesson.title}" por ${session.user.email}`
+    );
+
+    return NextResponse.json({
+      data: { success: true, message: 'Aula deletada com sucesso' },
+    });
   } catch (error) {
     console.error('Erro ao deletar aula:', error);
     return NextResponse.json(

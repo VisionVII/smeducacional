@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/db';
+import {
+  logAuditTrail,
+  AuditAction,
+  getClientIpFromRequest,
+} from '@/lib/audit.service';
 import { z } from 'zod';
 
 const updateCourseSchema = z.object({
@@ -141,11 +146,12 @@ export async function PUT(
 }
 
 export async function DELETE(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await auth();
+    // RBAC: Apenas TEACHER e ADMIN
     if (!session?.user) {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     }
@@ -154,13 +160,19 @@ export async function DELETE(
     }
 
     const { id } = await params;
+    // RBAC: Validar ownership (TEACHER só pode deletar seus cursos)
     const own = await ensureOwnership(id, session.user.id);
     if ('error' in own)
       return NextResponse.json({ error: own.error }, { status: own.status });
 
     const course = await prisma.course.findUnique({
       where: { id },
-      select: { id: true, _count: { select: { enrollments: true } } },
+      select: {
+        id: true,
+        title: true,
+        deletedAt: true,
+        _count: { select: { enrollments: true } },
+      },
     });
     if (!course) {
       return NextResponse.json(
@@ -168,6 +180,15 @@ export async function DELETE(
         { status: 404 }
       );
     }
+
+    // Verificar se já foi deletado
+    if (course.deletedAt) {
+      return NextResponse.json(
+        { error: 'Este curso já foi deletado' },
+        { status: 400 }
+      );
+    }
+
     if (course._count.enrollments > 0) {
       return NextResponse.json(
         { error: 'Não é possível excluir curso com alunos matriculados' },
@@ -175,8 +196,39 @@ export async function DELETE(
       );
     }
 
-    await prisma.course.delete({ where: { id } });
-    return NextResponse.json({ message: 'Curso excluído com sucesso' });
+    // Soft delete: marcar como deletado
+    const deletedCourse = await prisma.course.update({
+      where: { id },
+      data: { deletedAt: new Date() },
+      select: { id: true, title: true },
+    });
+
+    // Registrar auditoria
+    const ipAddress = getClientIpFromRequest(request);
+    await logAuditTrail({
+      userId: session.user.id,
+      action: AuditAction.COURSE_DELETED,
+      targetId: id,
+      targetType: 'Course',
+      metadata: {
+        deletedTitle: course.title,
+      },
+      ipAddress,
+    });
+
+    console.log(
+      `[teacher][courses][delete] Soft delete do curso "${course.title}" por ${session.user.email}`
+    );
+
+    // TODO: Cleanup bucket assets
+    // Remover arquivos do Supabase Storage (courses/{courseId}/*) após período de retenção
+
+    return NextResponse.json({
+      data: {
+        success: true,
+        message: `Curso "${course.title}" deletado com sucesso`,
+      },
+    });
   } catch (error) {
     console.error('[teacher][courses][id] DELETE error:', error);
     return NextResponse.json(

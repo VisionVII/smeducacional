@@ -23,8 +23,97 @@ export async function GET() {
         registerDescription: true,
         coursesTitle: true,
         coursesDescription: true,
+        promotedCourse: {
+          select: {
+            id: true,
+            title: true,
+            description: true,
+            thumbnail: true,
+            slug: true,
+            price: true,
+            level: true,
+            duration: true,
+            category: {
+              select: {
+                name: true,
+              },
+            },
+            instructor: {
+              select: {
+                name: true,
+                avatar: true,
+                bio: true,
+              },
+            },
+            _count: {
+              select: {
+                modules: true,
+                enrollments: true,
+              },
+            },
+          },
+        },
       },
     });
+
+    // Buscar anúncios ativos
+    const ads = await prisma.advertisement.findMany({
+      where: {
+        status: 'ACTIVE',
+        startDate: {
+          lte: new Date(),
+        },
+        endDate: {
+          gte: new Date(),
+        },
+      },
+      orderBy: {
+        priority: 'desc',
+      },
+      take: 5,
+      include: {
+        course: {
+          select: {
+            id: true,
+            title: true,
+            description: true,
+            thumbnail: true,
+            slug: true,
+            price: true,
+            level: true,
+            duration: true,
+            category: {
+              select: {
+                name: true,
+              },
+            },
+            instructor: {
+              select: {
+                name: true,
+                avatar: true,
+                bio: true,
+              },
+            },
+            _count: {
+              select: {
+                modules: true,
+                enrollments: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    const advertisements = ads.map((ad) => ({
+      ...ad.course,
+      adId: ad.id,
+    }));
+
+    console.log(
+      '[GET /api/system/branding] Anúncios encontrados:',
+      advertisements.length
+    );
 
     // Retornar valores padrão se não existir
     if (!config) {
@@ -46,10 +135,12 @@ export async function GET() {
         coursesTitle: 'Nossos Cursos',
         coursesDescription:
           'Descubra cursos incríveis para alavancar sua carreira',
+        promotedCourse: null,
+        advertisements,
       });
     }
 
-    return NextResponse.json(config);
+    return NextResponse.json({ ...config, advertisements });
   } catch (error) {
     console.error('[GET /api/system/branding] Erro:', error);
     return NextResponse.json(

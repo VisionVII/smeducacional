@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/db';
+import {
+  logAuditTrail,
+  AuditAction,
+  getClientIpFromRequest,
+} from '@/lib/audit.service';
 import { z } from 'zod';
 
 // Schema de validação para atualização de curso
@@ -278,7 +283,8 @@ export async function PUT(
   }
 }
 
-// DELETE /api/courses/[id] - Deletar curso
+// DELETE /api/courses/[id] - Soft delete de curso
+// Nota: TODO - Cleanup bucket assets. Após 30 dias de soft delete, remover arquivos de vídeo/material do Supabase Storage
 export async function DELETE(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -286,6 +292,7 @@ export async function DELETE(
   try {
     const session = await auth();
 
+    // RBAC: Apenas autenticado
     if (!session?.user) {
       return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
     }
@@ -293,8 +300,14 @@ export async function DELETE(
     const resolvedParams = await params;
     const course = await prisma.course.findUnique({
       where: { id: resolvedParams.id },
-      include: {
-        enrollments: true,
+      select: {
+        id: true,
+        title: true,
+        instructorId: true,
+        deletedAt: true,
+        enrollments: {
+          select: { id: true },
+        },
       },
     });
 
@@ -305,7 +318,7 @@ export async function DELETE(
       );
     }
 
-    // Verificar permissão: apenas o instrutor do curso ou admin pode deletar
+    // RBAC: Apenas o instrutor do curso ou admin podem deletar
     if (
       course.instructorId !== session.user.id &&
       session.user.role !== 'ADMIN'
@@ -313,6 +326,14 @@ export async function DELETE(
       return NextResponse.json(
         { error: 'Sem permissão para deletar este curso' },
         { status: 403 }
+      );
+    }
+
+    // Verificar se já foi deletado
+    if (course.deletedAt) {
+      return NextResponse.json(
+        { error: 'Este curso já foi deletado' },
+        { status: 400 }
       );
     }
 
@@ -327,23 +348,51 @@ export async function DELETE(
       );
     }
 
-    // Deletar o curso (o Prisma irá deletar módulos e aulas em cascata)
-    await prisma.course.delete({
+    // Soft delete: marcar como deletado ao invés de remover
+    const deletedCourse = await prisma.course.update({
       where: { id: resolvedParams.id },
+      data: { deletedAt: new Date() },
+      select: { id: true, title: true },
     });
 
-    // Registrar log de atividade
+    // Registrar auditoria de deleção
+    const ipAddress = getClientIpFromRequest(req);
+    await logAuditTrail({
+      userId: session.user.id,
+      action: AuditAction.COURSE_DELETED,
+      targetId: resolvedParams.id,
+      targetType: 'Course',
+      metadata: {
+        deletedTitle: course.title,
+        instructorId: course.instructorId,
+      },
+      ipAddress,
+    });
+
+    // Legacy: Manter activityLog para compatibilidade
     await prisma.activityLog.create({
       data: {
         userId: session.user.id,
         action: 'DELETE_COURSE',
-        details: `Deletou o curso "${course.title}"`,
+        details: `Soft-deletou o curso "${course.title}"`,
       },
     });
 
-    return NextResponse.json({ message: 'Curso deletado com sucesso' });
+    console.log(
+      `[courses][delete] Soft delete do curso "${course.title}" por ${session.user.email}`
+    );
+
+    // TODO: Cleanup bucket assets
+    // Remover arquivos do Supabase Storage (courses/{courseId}/*) após período de retenção
+
+    return NextResponse.json({
+      data: {
+        success: true,
+        message: `Curso "${course.title}" deletado com sucesso`,
+      },
+    });
   } catch (error) {
-    console.error('Erro ao deletar curso:', error);
+    console.error('[courses][delete] Erro ao deletar curso:', error);
     return NextResponse.json(
       { error: 'Erro ao deletar curso' },
       { status: 500 }

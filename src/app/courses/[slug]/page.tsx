@@ -23,18 +23,9 @@ import {
   Award,
 } from 'lucide-react';
 import { type Locale } from '@/lib/locales';
+import { getServerTranslations } from '@/lib/i18n-server';
 
 type CourseParams = { slug: string };
-
-async function getPageTranslations() {
-  // i18n desativado: força locale pt-BR independentemente de cookies
-  const locale: Locale = 'pt-BR';
-  // Importar dinâmico da cache já construída em translations-provider
-  const { translationsMap } = await import(
-    '@/components/translations-provider'
-  );
-  return { locale, t: translationsMap[locale] };
-}
 
 async function getCourse(slug: string) {
   if (!slug) return null;
@@ -61,7 +52,7 @@ export default async function CourseDetailPage({
   const resolvedParams = await params;
   const session = await auth();
   const course = await getCourse(resolvedParams.slug);
-  const { locale, t } = await getPageTranslations();
+  const { locale, t } = getServerTranslations('pt-BR');
   const courseT = t.courseDetail;
 
   if (!course) {

@@ -1,29 +1,23 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { useSession } from 'next-auth/react';
-import { redirect } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import {
-  Users,
-  BookOpen,
-  GraduationCap,
-  DollarSign,
-  TrendingUp,
-  Clock,
-  Award,
-  UserPlus,
-  ArrowRight,
-  BarChart3,
-  Settings,
-  Bell,
-  Calendar,
-  CheckCircle2,
   Activity as ActivityIcon,
+  Bell,
+  CheckCircle2,
+  DollarSign,
+  GraduationCap,
+  ShieldAlert,
+  TrendingUp,
+  Users,
 } from 'lucide-react';
-import { useTranslations } from '@/hooks/use-translations';
-import { RecentPayments } from '@/components/admin/recent-payments';
-import { PaymentStats } from '@/components/admin/payment-stats';
-import { Skeleton } from '@/components/ui/skeleton';
+import {
+  StatsCard,
+  StatsCardSkeleton,
+} from '@/components/dashboard/stats-card';
 import {
   Card,
   CardContent,
@@ -32,504 +26,370 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
+import { RecentPayments } from '@/components/admin/recent-payments';
+import { PaymentStats } from '@/components/admin/payment-stats';
 
-interface DashboardStats {
-  totalUsers: number;
-  totalCourses: number;
-  totalEnrollments: number;
-  totalRevenue: number;
-  newUsersLast30Days: number;
-  newEnrollmentsLast7Days: number;
-}
-
-interface Activity {
-  id: string;
-  user: {
-    name: string;
-    email: string;
-    avatar: string | null;
+type DashboardResponse = {
+  stats: {
+    totalUsers: number;
+    totalCourses: number;
+    totalEnrollments: number;
+    totalRevenue: number;
+    newUsersLast24Hours: number;
+    newUsersLast30Days: number;
+    newEnrollmentsLast7Days: number;
   };
-  action: string;
-  type: 'user' | 'enrollment' | 'course';
-  createdAt: Date;
-}
+  systemStatus: Array<{
+    name: string;
+    status: 'operational';
+    latencyMs: number;
+  }>;
+  suspiciousActivities: Array<{
+    id: string;
+    action: string;
+    createdAt: string;
+    user?: { id: string; name: string | null; email: string } | null;
+    targetId?: string | null;
+    targetType?: string | null;
+  }>;
+  pendingCourses: Array<{
+    id: string;
+    title: string;
+    createdAt: string;
+    instructor?: { id: string; name: string | null; email: string } | null;
+  }>;
+};
+
+const fetcher = async <T,>(url: string): Promise<T> => {
+  const res = await fetch(url, { cache: 'no-store' });
+  if (!res.ok) {
+    throw new Error('Falha ao carregar dados');
+  }
+  return res.json();
+};
 
 export default function AdminDashboard() {
+  const router = useRouter();
   const { data: session, status } = useSession();
-  const { t } = useTranslations();
-  const [stats, setStats] = useState<DashboardStats | null>(null);
-  const [activities, setActivities] = useState<Activity[]>([]);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (status === 'unauthenticated') {
-      redirect('/login');
+      router.replace('/login');
     }
-
     if (status === 'authenticated' && session?.user?.role !== 'ADMIN') {
-      redirect('/');
+      router.replace('/');
     }
-  }, [session, status]);
+  }, [router, session, status]);
 
-  useEffect(() => {
-    if (status === 'authenticated' && session?.user?.role === 'ADMIN') {
-      fetchDashboardData();
-    }
-  }, [status, session]);
+  const dashboardQuery = useQuery({
+    queryKey: ['admin-dashboard'],
+    queryFn: () => fetcher<DashboardResponse>('/api/dashboard/admin'),
+    enabled: status === 'authenticated' && session?.user?.role === 'ADMIN',
+    staleTime: 60_000,
+  });
 
-  const fetchDashboardData = async () => {
-    try {
-      const statsRes = await fetch('/api/admin/stats').catch(() => null);
-      const activitiesRes = await fetch('/api/admin/activities').catch(
-        () => null
-      );
-
-      if (statsRes?.ok) {
-        const statsData = await statsRes.json();
-        setStats(statsData);
-      } else {
-        setStats({
-          totalUsers: 156,
-          totalCourses: 24,
-          totalEnrollments: 342,
-          totalRevenue: 45890.5,
-          newUsersLast30Days: 28,
-          newEnrollmentsLast7Days: 15,
-        });
-      }
-
-      if (activitiesRes?.ok) {
-        const activitiesData = await activitiesRes.json();
-        setActivities(activitiesData);
-      } else {
-        setActivities([
-          {
-            id: '1',
-            user: { name: 'João Silva', email: 'joao@email.com', avatar: null },
-            action: 'Novo aluno cadastrado',
-            type: 'user',
-            createdAt: new Date(),
-          },
-          {
-            id: '2',
-            user: {
-              name: 'Maria Santos',
-              email: 'maria@email.com',
-              avatar: null,
-            },
-            action: 'Matriculou-se em "React Avançado"',
-            type: 'enrollment',
-            createdAt: new Date(Date.now() - 3600000),
-          },
-        ]);
-      }
-    } catch (error) {
-      console.error('Erro ao carregar dashboard:', error);
-      setStats({
-        totalUsers: 156,
-        totalCourses: 24,
-        totalEnrollments: 342,
-        totalRevenue: 45890.5,
-        newUsersLast30Days: 28,
-        newEnrollmentsLast7Days: 15,
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+  const activitiesQuery = useQuery({
+    queryKey: ['admin-activities'],
+    queryFn: () =>
+      fetcher<
+        Array<{
+          id: string;
+          action: string;
+          type: string;
+          user: { name: string; email: string; avatar: string | null };
+          createdAt: string;
+        }>
+      >('/api/admin/activities?limit=8'),
+    enabled: status === 'authenticated' && session?.user?.role === 'ADMIN',
+    staleTime: 60_000,
+  });
 
   if (status === 'loading') {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 p-6">
-        <div className="container mx-auto max-w-[1600px] space-y-6">
-          <Skeleton className="h-16 w-80" />
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {[1, 2, 3, 4].map((i) => (
-              <Skeleton key={i} className="h-40" />
-            ))}
-          </div>
-        </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {[1, 2, 3, 4].map((key) => (
+          <StatsCardSkeleton key={key} />
+        ))}
       </div>
     );
   }
 
-  if (status === 'unauthenticated' || session?.user?.role !== 'ADMIN') {
+  if (!session || session.user.role !== 'ADMIN') {
     return null;
   }
 
-  const userGrowth = stats?.newUsersLast30Days || 28;
-  const enrollmentGrowth = stats?.newEnrollmentsLast7Days || 15;
-  const avgRevenuePerMonth = (stats?.totalRevenue || 0) / 12;
-  const avgEnrollmentsPerCourse = Math.round(
-    (stats?.totalEnrollments || 0) / (stats?.totalCourses || 1)
-  );
+  const dashboard = dashboardQuery.data;
+
+  const adminJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareApplication',
+    name: `Painel Administrativo - ${session.user.name || 'SM Educa'}`,
+    applicationCategory: 'BusinessApplication',
+    operatingSystem: 'Web',
+    url: 'https://sm-educa.com/admin',
+    offers: {
+      '@type': 'Offer',
+      price: '0',
+      priceCurrency: 'BRL',
+      description: 'Dashboard administrativo unificado',
+    },
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
-      <div className="container mx-auto px-3 sm:px-4 lg:px-6 py-6 sm:py-10 max-w-[1600px]">
-        {/* Header Compacto */}
-        <div className="mb-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div className="flex items-center gap-2 flex-wrap">
-              <Badge
-                variant="outline"
-                className="border-primary/50 bg-primary/10 text-xs"
-              >
-                <ActivityIcon className="h-3 w-3 mr-1 animate-pulse" />
-                {t.dashboard.systemOnline}
-              </Badge>
-              <p className="text-xs text-muted-foreground">
-                {new Date().toLocaleDateString('pt-BR', {
-                  day: '2-digit',
-                  month: 'short',
-                  year: 'numeric',
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(adminJsonLd) }}
+      />
+      <div className="space-y-6">
+        <div className="flex flex-col gap-1">
+          <h1 className="text-2xl font-bold">
+            Painel Administrativo - {session.user.name || 'Administrador'}
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            Visão geral do ambiente e indicadores críticos.
+          </p>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+          {dashboardQuery.isLoading || !dashboard ? (
+            [1, 2, 3, 4].map((key) => <StatsCardSkeleton key={key} />)
+          ) : (
+            <>
+              <StatsCard
+                title="Total de Usuários"
+                value={dashboard.stats.totalUsers.toLocaleString('pt-BR')}
+                description="Contagem geral da base"
+                icon={Users}
+                trend={{
+                  direction: 'up',
+                  value: `+${dashboard.stats.newUsersLast30Days}`,
+                  label: 'últimos 30d',
+                }}
+              />
+              <StatsCard
+                title="Cursos Publicados"
+                value={dashboard.stats.totalCourses.toLocaleString('pt-BR')}
+                description="Cursos ativos e visíveis"
+                icon={CheckCircle2}
+                trend={{
+                  direction: 'up',
+                  value: `${dashboard.stats.totalCourses > 0 ? 'OK' : '—'}`,
+                  label: 'aprovados',
+                }}
+              />
+              <StatsCard
+                title="Matrículas"
+                value={dashboard.stats.totalEnrollments.toLocaleString('pt-BR')}
+                description="Total de matrículas"
+                icon={GraduationCap}
+                trend={{
+                  direction: 'up',
+                  value: `+${dashboard.stats.newEnrollmentsLast7Days}`,
+                  label: 'últimos 7d',
+                }}
+              />
+              <StatsCard
+                title="Faturamento"
+                value={dashboard.stats.totalRevenue.toLocaleString('pt-BR', {
+                  style: 'currency',
+                  currency: 'BRL',
+                  maximumFractionDigits: 0,
                 })}
-              </p>
-            </div>
+                description="Receita confirmada"
+                icon={DollarSign}
+                trend={{ direction: 'up', value: '+12%', label: 'mês' }}
+                miniChartData={[
+                  dashboard.stats.totalRevenue / 10,
+                  dashboard.stats.totalRevenue / 8,
+                  dashboard.stats.totalRevenue / 6,
+                  dashboard.stats.totalRevenue / 5,
+                  dashboard.stats.totalRevenue / 4,
+                ]}
+              />
+            </>
+          )}
+        </div>
 
-            <div className="flex gap-2">
-              <Button variant="outline" size="sm" className="gap-2">
-                <Bell className="h-4 w-4" />
-                <Badge
-                  variant="destructive"
-                  className="h-4 w-4 p-0 flex items-center justify-center rounded-full text-[10px]"
-                >
-                  3
-                </Badge>
-              </Button>
-              <Button variant="outline" size="sm" className="gap-2">
-                <Calendar className="h-4 w-4" />
-                <span className="hidden sm:inline">Agenda</span>
-              </Button>
-            </div>
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+          <div className="xl:col-span-2 space-y-6">
+            <PaymentStats />
+            <RecentPayments />
+          </div>
+
+          <div className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <ShieldAlert className="h-5 w-5 text-primary" />
+                  Status dos Serviços
+                </CardTitle>
+                <CardDescription>
+                  Saúde operacional do ecossistema
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {dashboardQuery.isLoading || !dashboard ? (
+                  <div className="space-y-3">
+                    {[1, 2, 3].map((i) => (
+                      <Skeleton key={i} className="h-12 w-full" />
+                    ))}
+                  </div>
+                ) : (
+                  dashboard.systemStatus.map((service) => (
+                    <div
+                      key={service.name}
+                      className="flex items-center justify-between rounded-lg border p-3"
+                    >
+                      <div>
+                        <p className="text-sm font-semibold">{service.name}</p>
+                        <p className="text-xs text-muted-foreground">
+                          Latência ~{service.latencyMs}ms
+                        </p>
+                      </div>
+                      <Badge
+                        variant="outline"
+                        className="border-green-500 text-green-600"
+                      >
+                        Operacional
+                      </Badge>
+                    </div>
+                  ))
+                )}
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <ActivityIcon className="h-5 w-5 text-primary" />
+                  Atividades Suspeitas
+                </CardTitle>
+                <CardDescription>Monitore ações sensíveis</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {dashboardQuery.isLoading || !dashboard ? (
+                  <div className="space-y-3">
+                    {[1, 2, 3].map((i) => (
+                      <Skeleton key={i} className="h-10 w-full" />
+                    ))}
+                  </div>
+                ) : dashboard.suspiciousActivities.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">
+                    Nenhum evento crítico.
+                  </p>
+                ) : (
+                  dashboard.suspiciousActivities.slice(0, 6).map((activity) => (
+                    <div
+                      key={activity.id}
+                      className="flex items-center justify-between rounded-lg border p-3"
+                    >
+                      <div>
+                        <p className="text-sm font-semibold">
+                          {activity.action}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {activity.user?.email || 'Usuário desconhecido'} •{' '}
+                          {new Date(activity.createdAt).toLocaleString('pt-BR')}
+                        </p>
+                      </div>
+                      <Badge variant="destructive">Revisar</Badge>
+                    </div>
+                  ))
+                )}
+              </CardContent>
+            </Card>
           </div>
         </div>
 
-        {loading ? (
-          <div className="space-y-4">
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-              {[1, 2, 3, 4].map((i) => (
-                <Skeleton key={i} className="h-32" />
-              ))}
-            </div>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              <Skeleton className="h-80" />
-              <Skeleton className="h-80" />
-            </div>
-          </div>
-        ) : (
-          <div className="space-y-6">
-            {/* KPIs Principais - Cards Compactos */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-              {/* Card Usuários */}
-              <Card className="relative overflow-hidden border-2 hover:border-primary/50 transition-all hover:shadow-2xl hover:-translate-y-1 group">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-primary/10 to-transparent rounded-bl-[100px]"></div>
-                <CardHeader className="pb-3">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="p-3 bg-gradient-to-br from-primary to-primary/80 rounded-xl">
-                      <Users className="h-6 w-6 text-white" />
-                    </div>
-                    <Badge
-                      variant="outline"
-                      className="bg-green-500/10 text-green-700 border-green-500/30 text-xs px-2 py-1"
-                    >
-                      <TrendingUp className="h-3 w-3 mr-1" />+{userGrowth}
-                    </Badge>
-                  </div>
-                  <CardTitle className="text-sm text-muted-foreground font-medium">
-                    {t.dashboard.admin.totalUsers}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div>
-                    <p className="text-4xl font-bold text-gradient-theme">
-                      {stats?.totalUsers || 0}
-                    </p>
-                    <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1">
-                      <Clock className="h-3 w-3" />+{userGrowth}
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Card Cursos */}
-              <Card className="relative overflow-hidden border-2 hover:border-green-500/50 transition-all hover:shadow-2xl hover:-translate-y-1 group">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-green-500/10 to-transparent rounded-bl-[100px]"></div>
-                <CardHeader className="pb-3">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="p-3 bg-gradient-to-br from-green-600 to-green-500 rounded-xl">
-                      <BookOpen className="h-6 w-6 text-white" />
-                    </div>
-                    <Badge
-                      variant="outline"
-                      className="bg-green-500/10 text-green-700 border-green-500/30 text-xs px-2 py-1"
-                    >
-                      <CheckCircle2 className="h-3 w-3 mr-1" />
-                      Ativos
-                    </Badge>
-                  </div>
-                  <CardTitle className="text-sm text-muted-foreground font-medium">
-                    {t.dashboard.admin.totalCourses}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div>
-                    <p className="text-4xl font-bold bg-gradient-to-r from-green-600 to-emerald-500 bg-clip-text text-transparent">
-                      {stats?.totalCourses || 0}
-                    </p>
-                    <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1">
-                      <Award className="h-3 w-3" />
-                      {avgEnrollmentsPerCourse}{' '}
-                      {t.dashboard.admin.stats.avgEnrollments}
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Card Matrículas */}
-              <Card className="relative overflow-hidden border-2 hover:border-orange-500/50 transition-all hover:shadow-2xl hover:-translate-y-1 group">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-orange-500/10 to-transparent rounded-bl-[100px]"></div>
-                <CardHeader className="pb-3">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="p-3 bg-gradient-to-br from-orange-600 to-orange-500 rounded-xl">
-                      <GraduationCap className="h-6 w-6 text-white" />
-                    </div>
-                    <Badge
-                      variant="outline"
-                      className="bg-orange-500/10 text-orange-700 border-orange-500/30 text-xs px-2 py-1"
-                    >
-                      <TrendingUp className="h-3 w-3 mr-1" />+{enrollmentGrowth}
-                    </Badge>
-                  </div>
-                  <CardTitle className="text-sm text-muted-foreground font-medium">
-                    {t.dashboard.admin.totalEnrollments}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div>
-                    <p className="text-4xl font-bold bg-gradient-to-r from-orange-600 to-amber-500 bg-clip-text text-transparent">
-                      {stats?.totalEnrollments || 0}
-                    </p>
-                    <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1">
-                      <TrendingUp className="h-3 w-3" />+{enrollmentGrowth} esta
-                      semana
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Card Receita */}
-              <Card className="relative overflow-hidden border-2 hover:border-red-500/50 transition-all hover:shadow-2xl hover:-translate-y-1 group">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-red-500/10 to-transparent rounded-bl-[100px]"></div>
-                <CardHeader className="pb-3">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="p-3 bg-gradient-to-br from-red-600 to-red-500 rounded-xl">
-                      <DollarSign className="h-6 w-6 text-white" />
-                    </div>
-                    <Badge
-                      variant="outline"
-                      className="bg-green-500/10 text-green-700 border-green-500/30 text-xs px-2 py-1"
-                    >
-                      <TrendingUp className="h-3 w-3 mr-1" />
-                      +12%
-                    </Badge>
-                  </div>
-                  <CardTitle className="text-sm text-muted-foreground font-medium">
-                    {t.dashboard.admin.totalRevenue}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="px-4 pb-4">
-                  <div>
-                    <p className="text-3xl font-bold bg-gradient-to-r from-red-600 to-rose-500 bg-clip-text text-transparent">
-                      {(stats?.totalRevenue || 0).toLocaleString('pt-BR', {
-                        style: 'currency',
-                        currency: 'BRL',
-                        maximumFractionDigits: 0,
-                      })}
-                    </p>
-                    <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1">
-                      <DollarSign className="h-3 w-3" />~
-                      {avgRevenuePerMonth.toLocaleString('pt-BR', {
-                        style: 'currency',
-                        currency: 'BRL',
-                        maximumFractionDigits: 0,
-                      })}
-                      /mês
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Stats de Pagamento */}
-            <PaymentStats />
-
-            {/* Grid 2 colunas - Pagamentos & Atividades */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Pagamentos Recentes */}
-              <RecentPayments />
-
-              {/* Ações Rápidas */}
-              <Card className="border-2 hover:border-primary/50 transition-all hover:shadow-xl">
-                <CardHeader className="bg-gradient-to-r from-primary/5 via-purple-500/5 to-pink-500/5 border-b">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2.5 bg-gradient-theme rounded-lg">
-                      <ActivityIcon className="h-5 w-5 text-white" />
-                    </div>
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <TrendingUp className="h-5 w-5 text-primary" />
+                Aprovação de Cursos Pendentes
+              </CardTitle>
+              <CardDescription>
+                Últimos cursos aguardando publicação
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {dashboardQuery.isLoading || !dashboard ? (
+                <div className="space-y-3">
+                  {[1, 2, 3].map((i) => (
+                    <Skeleton key={i} className="h-12 w-full" />
+                  ))}
+                </div>
+              ) : dashboard.pendingCourses.length === 0 ? (
+                <p className="text-sm text-muted-foreground">
+                  Nenhum curso pendente no momento.
+                </p>
+              ) : (
+                dashboard.pendingCourses.map((course) => (
+                  <div
+                    key={course.id}
+                    className="flex items-center justify-between rounded-lg border p-3"
+                  >
                     <div>
-                      <CardTitle className="text-xl">
-                        {t.dashboard.admin.cards.quickActions}
-                      </CardTitle>
-                      <CardDescription>
-                        Acesso direto às principais funcionalidades
-                      </CardDescription>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent className="pt-6">
-                  <div className="grid grid-cols-2 gap-3">
-                    {[
-                      {
-                        href: '/admin/users',
-                        icon: Users,
-                        label: t.dashboard.admin.users,
-                        color: 'primary',
-                      },
-                      {
-                        href: '/admin/courses',
-                        icon: BookOpen,
-                        label: t.dashboard.admin.courses,
-                        color: 'green',
-                      },
-                      {
-                        href: '/admin/settings',
-                        icon: Settings,
-                        label: t.dashboard.admin.settings,
-                        color: 'orange',
-                      },
-                      {
-                        href: '/admin/analytics',
-                        icon: BarChart3,
-                        label: 'Analytics',
-                        color: 'blue',
-                      },
-                    ].map((item, i) => (
-                      <a
-                        key={i}
-                        href={item.href}
-                        className="group relative overflow-hidden flex flex-col items-center justify-center p-5 rounded-xl border-2 border-dashed hover:border-solid hover:border-primary hover:bg-gradient-to-br hover:from-primary/5 hover:to-primary/10 transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
-                      >
-                        <div
-                          className={`absolute inset-0 bg-gradient-to-br from-${item.color}-500/0 to-${item.color}-500/0 group-hover:from-${item.color}-500/5 group-hover:to-${item.color}-500/10 transition-all duration-500`}
-                        ></div>
-                        <div
-                          className={`p-3 bg-${item.color}-500/10 group-hover:bg-${item.color}-500/20 rounded-full mb-3 transition-all duration-300 group-hover:scale-110 relative z-10`}
-                        >
-                          <item.icon
-                            className={`h-6 w-6 text-${item.color}-600`}
-                          />
-                        </div>
-                        <span className="text-sm font-semibold text-center group-hover:text-primary transition-colors relative z-10">
-                          {item.label}
-                        </span>
-                      </a>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Atividades Recentes */}
-              <Card className="border-2 hover:border-primary/50 transition-all duration-300 hover:shadow-xl">
-                <CardHeader className="bg-gradient-to-r from-purple-500/10 via-pink-500/10 to-primary/10 border-b">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="p-2.5 bg-gradient-to-br from-purple-600 to-pink-600 rounded-lg">
-                        <ActivityIcon className="h-5 w-5 text-white" />
-                      </div>
-                      <div>
-                        <CardTitle className="text-xl">
-                          {t.dashboard.recentActivity}
-                        </CardTitle>
-                        <CardDescription>
-                          Últimas ações no sistema
-                        </CardDescription>
-                      </div>
-                    </div>
-                    <Button variant="ghost" size="sm" className="gap-2">
-                      {t.dashboard.viewAll}
-                      <ArrowRight className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </CardHeader>
-                <CardContent className="pt-6">
-                  {activities.length > 0 ? (
-                    <div className="space-y-4">
-                      {activities.slice(0, 5).map((activity) => (
-                        <div
-                          key={activity.id}
-                          className="flex items-start gap-4 p-4 rounded-xl hover:bg-accent/50 hover:shadow-md transition-all duration-200 cursor-pointer group border border-transparent hover:border-primary/20"
-                        >
-                          <div className="flex-shrink-0">
-                            <div
-                              className={`w-12 h-12 rounded-xl flex items-center justify-center ${
-                                activity.type === 'user'
-                                  ? 'bg-primary/10'
-                                  : activity.type === 'enrollment'
-                                  ? 'bg-green-500/10'
-                                  : 'bg-blue-500/10'
-                              } group-hover:scale-110 transition-transform duration-300`}
-                            >
-                              {activity.type === 'user' && (
-                                <UserPlus className="h-5 w-5 text-primary" />
-                              )}
-                              {activity.type === 'enrollment' && (
-                                <GraduationCap className="h-5 w-5 text-green-600" />
-                              )}
-                              {activity.type === 'course' && (
-                                <BookOpen className="h-5 w-5 text-blue-600" />
-                              )}
-                            </div>
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-semibold group-hover:text-primary transition-colors">
-                              {activity.user.name}
-                            </p>
-                            <p className="text-sm text-muted-foreground mt-0.5">
-                              {activity.action}
-                            </p>
-                            <p className="text-xs text-muted-foreground mt-1.5 flex items-center gap-1">
-                              <Clock className="h-3 w-3" />
-                              {new Date(activity.createdAt).toLocaleString(
-                                'pt-BR',
-                                {
-                                  day: '2-digit',
-                                  month: 'short',
-                                  hour: '2-digit',
-                                  minute: '2-digit',
-                                }
-                              )}
-                            </p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="text-center py-12">
-                      <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-muted/50 flex items-center justify-center">
-                        <ActivityIcon className="h-8 w-8 text-muted-foreground/30" />
-                      </div>
-                      <p className="text-sm text-muted-foreground">
-                        {t.dashboard.admin.activities.noActivity}
+                      <p className="text-sm font-semibold">{course.title}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {course.instructor?.name || 'Instrutor não informado'} •{' '}
+                        {new Date(course.createdAt).toLocaleDateString('pt-BR')}
                       </p>
                     </div>
-                  )}
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-        )}
+                    <div className="flex items-center gap-2">
+                      <Button size="sm" variant="outline">
+                        Revisar
+                      </Button>
+                      <Badge variant="outline">Pendente</Badge>
+                    </div>
+                  </div>
+                ))
+              )}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Bell className="h-5 w-5 text-primary" />
+                Atividades Recentes
+              </CardTitle>
+              <CardDescription>Eventos em tempo real</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {activitiesQuery.isLoading || !activitiesQuery.data ? (
+                <div className="space-y-3">
+                  {[1, 2, 3, 4].map((i) => (
+                    <Skeleton key={i} className="h-10 w-full" />
+                  ))}
+                </div>
+              ) : activitiesQuery.data.length === 0 ? (
+                <p className="text-sm text-muted-foreground">
+                  Nenhuma atividade recente.
+                </p>
+              ) : (
+                activitiesQuery.data.map((activity) => (
+                  <div
+                    key={activity.id}
+                    className="flex items-center justify-between rounded-lg border p-3"
+                  >
+                    <div>
+                      <p className="text-sm font-semibold">{activity.action}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {activity.user?.email || 'Usuário'} •{' '}
+                        {new Date(activity.createdAt).toLocaleString('pt-BR')}
+                      </p>
+                    </div>
+                    <Badge variant="outline">Live</Badge>
+                  </div>
+                ))
+              )}
+            </CardContent>
+          </Card>
+        </div>
       </div>
-    </div>
+    </>
   );
 }

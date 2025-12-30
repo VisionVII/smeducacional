@@ -1,17 +1,6 @@
 import { redirect } from 'next/navigation';
 import { auth } from '@/lib/auth';
-import { Navbar } from '@/components/navbar';
-import { Footer } from '@/components/footer';
-import { Breadcrumbs } from '@/components/breadcrumbs';
-import {
-  BookOpen,
-  Plus,
-  LayoutDashboard,
-  MessageSquare,
-  User,
-  DollarSign,
-  Palette,
-} from 'lucide-react';
+import { TeacherLayoutWrapper } from '@/components/layouts/teacher-layout-wrapper';
 
 export default async function TeacherLayout({
   children,
@@ -24,54 +13,15 @@ export default async function TeacherLayout({
     redirect('/login');
   }
 
-  const teacherLinks = [
-    {
-      href: '/teacher/dashboard',
-      label: 'Início',
-      icon: <LayoutDashboard className="h-4 w-4" />,
-    },
-    {
-      href: '/teacher/courses',
-      label: 'Meus Cursos',
-      icon: <BookOpen className="h-4 w-4" />,
-    },
-    {
-      href: '/teacher/courses/new',
-      label: 'Novo Curso',
-      icon: <Plus className="h-4 w-4" />,
-    },
-    {
-      href: '/teacher/earnings',
-      label: 'Ganhos',
-      icon: <DollarSign className="h-4 w-4" />,
-    },
-    {
-      href: '/teacher/messages',
-      label: 'Mensagens',
-      icon: <MessageSquare className="h-4 w-4" />,
-    },
-    {
-      href: '/teacher/profile',
-      label: 'Perfil',
-      icon: <User className="h-4 w-4" />,
-    },
-    {
-      href: '/teacher/settings/theme',
-      label: 'Tema',
-      icon: <Palette className="h-4 w-4" />,
-    },
-  ];
-
   return (
-    <div className="min-h-screen flex flex-col">
-      <Navbar user={session.user} links={teacherLinks} />
-      <main className="flex-1">
-        <div className="container mx-auto px-4 py-6">
-          <Breadcrumbs />
-          {children}
-        </div>
-      </main>
-      <Footer />
-    </div>
+    <TeacherLayoutWrapper
+      user={{
+        name: session.user.name,
+        email: session.user.email || '',
+        avatar: (session.user as { image?: string }).image,
+      }}
+    >
+      {children}
+    </TeacherLayoutWrapper>
   );
 }

@@ -6,6 +6,7 @@
   },
   "common": {
     "loading": "Carregando...",
+    "platform": "Plataforma",
     "save": "Salvar",
     "cancel": "Cancelar",
     "delete": "Excluir",
@@ -899,6 +900,8 @@
     "login": {
       "title": "Entrar",
       "subtitle": "Acesse sua conta",
+      "heroTitle": "Transforme seu futuro com educação de qualidade.",
+      "heroSubtitle": "Acesse nossa plataforma e descubra um mundo de conhecimento preparado especialmente para você.",
       "email": "Email",
       "password": "Senha",
       "forgotPassword": "Esqueceu a senha?",
@@ -1371,7 +1374,12 @@
       "deleteFailed": "Falha ao deletar.",
       "createFailed": "Falha ao criar.",
       "updateFailed": "Falha ao atualizar.",
-      "loadFailed": "Falha ao carregar dados."
+      "loadFailed": "Falha ao carregar dados.",
+      "oauthAccountNotLinked": "Esta conta já está associada a outro método de login."
+    },
+    "info": {
+      "twofaRequired": "Autenticação de dois fatores necessária.",
+      "loginRequired": "Faça login para continuar."
     },
     "validation": {
       "required": "Este campo é obrigatório",
