@@ -267,6 +267,28 @@ export async function getTeacherCourseStats(instructorId: string) {
   return { totalCourses, publishedCourses, draftCourses, totalStudents };
 }
 
+async function generateUniqueSlug(title: string): Promise<string> {
+  const baseSlug = title
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9\s-]/g, '')
+    .trim()
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-');
+  
+  let slug = baseSlug || `curso-${Date.now()}`;
+  let counter = 1;
+  
+  while (true) {
+    const exists = await prisma.course.findUnique({ where: { slug } });
+    if (!exists) break;
+    slug = `${baseSlug}-${counter++}`;
+  }
+  
+  return slug;
+}
+
 export async function createTeacherCourse(input: {
   title: string;
   description: string;
@@ -274,12 +296,13 @@ export async function createTeacherCourse(input: {
   level?: string | null;
   thumbnail?: string | null;
   instructorId: string;
-  slug: string;
 }) {
+  const slug = await generateUniqueSlug(input.title);
+  
   return prisma.course.create({
     data: {
       title: input.title,
-      slug: input.slug,
+      slug,
       description: input.description,
       categoryId: input.categoryId,
       level: input.level || undefined,

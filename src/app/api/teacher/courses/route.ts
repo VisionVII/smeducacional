@@ -73,24 +73,6 @@ export async function POST(request: NextRequest) {
 
     const { title, description, categoryId, level, thumbnail } = result.data;
 
-    // Gerar slug único a partir do título
-    const baseSlug = title
-      .toLowerCase()
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .replace(/[^a-z0-9\s-]/g, '')
-      .trim()
-      .replace(/\s+/g, '-')
-      .replace(/-+/g, '-');
-    let slug = baseSlug || `curso-${Date.now()}`;
-    let counter = 1;
-    // Garantir unicidade do slug
-    while (true) {
-      const exists = await prisma.course.findUnique({ where: { slug } });
-      if (!exists) break;
-      slug = `${baseSlug}-${counter++}`;
-    }
-
     const course = await createTeacherCourse({
       title,
       description,
@@ -98,7 +80,6 @@ export async function POST(request: NextRequest) {
       level,
       thumbnail,
       instructorId: session.user.id,
-      slug,
     });
 
     return NextResponse.json(
