@@ -81,8 +81,9 @@ export async function createCourseCheckoutSession(
     }
 
     const stripe = getStripeClient();
-    const session = await stripe.checkout.sessions.create({
-      ...(input.userEmail && { customer_email: input.userEmail }),
+
+    // Build session params dynamically
+    const sessionParams: any = {
       mode: 'payment',
       payment_method_types: ['card'],
       line_items: [
@@ -106,7 +107,14 @@ export async function createCourseCheckoutSession(
         type: 'course_purchase',
         instructorId: instructorId || undefined,
       },
-    });
+    };
+
+    // Add customer_email only if present
+    if (input.userEmail) {
+      sessionParams.customer_email = input.userEmail;
+    }
+
+    const session = await stripe.checkout.sessions.create(sessionParams);
 
     console.log('[PaymentService] Sessão criada:', session.id);
     return session;
@@ -133,8 +141,9 @@ export async function createSubscriptionSession(
 
   try {
     const stripe = getStripeClient();
-    const session = await stripe.checkout.sessions.create({
-      ...(input.userEmail && { customer_email: input.userEmail }),
+
+    // Build session params dynamically
+    const sessionParams: any = {
       mode: 'subscription',
       payment_method_types: ['card'],
       line_items: [
@@ -149,7 +158,14 @@ export async function createSubscriptionSession(
         userId: input.userId,
         ...input.metadata,
       },
-    });
+    };
+
+    // Add customer_email only if present
+    if (input.userEmail) {
+      sessionParams.customer_email = input.userEmail;
+    }
+
+    const session = await stripe.checkout.sessions.create(sessionParams);
 
     console.log('[PaymentService] Assinatura criada:', session.id);
     return session;

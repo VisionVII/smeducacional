@@ -68,8 +68,8 @@ export async function createCourseCheckoutSession({
 
   try {
     const stripe = getStripeClient();
-    const session = await stripe.checkout.sessions.create({
-      ...(userEmail && { customer_email: userEmail }),
+
+    const sessionParams: any = {
       mode: 'payment',
       payment_method_types:
         paymentMethodTypes as Stripe.Checkout.SessionCreateParams.PaymentMethodType[],
@@ -93,7 +93,13 @@ export async function createCourseCheckoutSession({
         courseId,
         type: 'course_purchase',
       },
-    });
+    };
+
+    if (userEmail) {
+      sessionParams.customer_email = userEmail;
+    }
+
+    const session = await stripe.checkout.sessions.create(sessionParams);
 
     console.log('[Stripe] Sessão criada com sucesso:', session.id);
     return session;
@@ -132,8 +138,8 @@ export async function createStudentSubscriptionCheckoutSession({
   }
 
   const stripe = getStripeClient();
-  const session = await stripe.checkout.sessions.create({
-    ...(userEmail && { customer_email: userEmail }),
+  
+  const sessionParams: any = {
     mode: 'subscription',
     payment_method_types: ['card'],
     line_items: [
@@ -149,7 +155,13 @@ export async function createStudentSubscriptionCheckoutSession({
       plan,
       type: 'student_subscription',
     },
-  });
+  };
+
+  if (userEmail) {
+    sessionParams.customer_email = userEmail;
+  }
+
+  const session = await stripe.checkout.sessions.create(sessionParams);
 
   return session;
 }
@@ -188,8 +200,8 @@ export async function createTeacherSubscriptionCheckoutSession({
   }
 
   const stripe = getStripeClient();
-  const session = await stripe.checkout.sessions.create({
-    ...(userEmail && { customer_email: userEmail }),
+  
+  const sessionParams: any = {
     mode: 'subscription',
     payment_method_types: ['card'],
     line_items: [
@@ -205,7 +217,13 @@ export async function createTeacherSubscriptionCheckoutSession({
       plan,
       type: 'teacher_subscription',
     },
-  });
+  };
+
+  if (userEmail) {
+    sessionParams.customer_email = userEmail;
+  }
+
+  const session = await stripe.checkout.sessions.create(sessionParams);
 
   return session;
 }
