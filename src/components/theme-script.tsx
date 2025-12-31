@@ -26,12 +26,18 @@ export async function ThemeScript() {
   let session: Session | null = null;
 
   try {
-    // Busca sessão do usuário (pode falhar em rotas estáticas)
-    session = await auth().catch(() => null);
-  } catch {
+    // Busca sessão do usuário (pode falhar em rotas estáticas ou sem conexão BD)
+    // Timeout de 3 segundos para não bloquear a página
+    session = await Promise.race([
+      auth().catch(() => null),
+      new Promise<null>((resolve) => setTimeout(() => resolve(null), 3000)),
+    ]);
+  } catch (error) {
     console.debug(
-      '[ThemeScript] Não foi possível obter sessão, usando tema admin'
+      '[ThemeScript] Erro ao obter sessão (banco pode estar indisponível), usando tema admin:',
+      error instanceof Error ? error.message : 'Erro desconhecido'
     );
+    session = null;
   }
 
   try {
@@ -40,13 +46,31 @@ export async function ThemeScript() {
     // - TEACHER/STUDENT roles → usa tema próprio
     if (session?.user?.id && session.user.role !== 'ADMIN') {
       // Teacher ou Student: usa tema customizado (com fallback ao admin)
-      const userTheme = await getUserTheme(session.user.id);
-      lightVars = generateCssVariables(userTheme.preset.light);
-      darkVars = generateCssVariables(userTheme.preset.dark);
+      try {
+        const userTheme = await Promise.race([
+          getUserTheme(session.user.id),
+          new Promise((_, reject) =>
+            setTimeout(
+              () => reject(new Error('Timeout ao buscar tema do usuário')),
+              2000
+            )
+          ),
+        ]);
+        lightVars = generateCssVariables(userTheme.preset.light);
+        darkVars = generateCssVariables(userTheme.preset.dark);
 
-      console.log(
-        `[ThemeScript] Aplicando tema de ${session.user.role} (${userTheme.presetId})`
-      );
+        console.log(
+          `[ThemeScript] Aplicando tema de ${session.user.role} (${userTheme.presetId})`
+        );
+      } catch {
+        // Fallback para tema admin se falhar
+        const adminPreset = await getAdminThemePreset();
+        lightVars = generateCssVariables(adminPreset.light);
+        darkVars = generateCssVariables(adminPreset.dark);
+        console.log(
+          '[ThemeScript] Erro ao carregar tema do usuário, usando tema admin'
+        );
+      }
     } else {
       // Admin ou não autenticado: usa tema admin
       const adminPreset = await getAdminThemePreset();
@@ -60,7 +84,10 @@ export async function ThemeScript() {
       );
     }
   } catch (error) {
-    console.error('[ThemeScript] Erro ao gerar CSS variables:', error);
+    console.error(
+      '[ThemeScript] Erro ao gerar CSS variables:',
+      error instanceof Error ? error.message : 'Erro desconhecido'
+    );
 
     // Fallback: tema padrão hardcoded
     lightVars = `

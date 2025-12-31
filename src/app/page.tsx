@@ -3,9 +3,9 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { Footer } from '@/components/footer';
 import { AdaptiveNavbar } from '@/components/adaptive-navbar';
-import { useTranslations } from '@/hooks/use-translations';
 import {
   BookOpen,
   GraduationCap,
@@ -17,6 +17,7 @@ import {
   Star,
   Sparkles,
   ArrowRight,
+  DollarSign,
 } from 'lucide-react';
 
 // Componente de contador animado
@@ -68,53 +69,31 @@ function AnimatedCounter({
 
 export default function HomePage() {
   const [mounted, setMounted] = useState(false);
-  const { t, mounted: translationsLoaded } = useTranslations();
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  const testimonials = translationsLoaded
-    ? [
-        {
-          name: t.home.testimonials.author1,
-          role: t.home.testimonials.role1,
-          text: t.home.testimonials.quote1,
-          stars: 5,
-        },
-        {
-          name: t.home.testimonials.author2,
-          role: t.home.testimonials.role2,
-          text: t.home.testimonials.quote2,
-          stars: 5,
-        },
-        {
-          name: t.home.testimonials.author3,
-          role: t.home.testimonials.role3,
-          text: t.home.testimonials.quote3,
-          stars: 5,
-        },
-      ]
-    : [
-        {
-          name: 'Maria Silva',
-          role: 'Desenvolvedora Web',
-          text: 'Excelente plataforma! Os cursos são muito bem estruturados e os professores são atenciosos.',
-          stars: 5,
-        },
-        {
-          name: 'João Santos',
-          role: 'Analista de Dados',
-          text: 'Consegui mudar de carreira graças aos cursos da plataforma. Recomendo muito!',
-          stars: 5,
-        },
-        {
-          name: 'Ana Costa',
-          role: 'Designer UX/UI',
-          text: 'Material de qualidade e certificados que realmente agregam valor ao currículo.',
-          stars: 5,
-        },
-      ];
+  const testimonials = [
+    {
+      name: 'Maria Silva',
+      role: 'Desenvolvedora Web',
+      text: 'Excelente plataforma! Os cursos são muito bem estruturados e os professores são atenciosos.',
+      stars: 5,
+    },
+    {
+      name: 'João Santos',
+      role: 'Analista de Dados',
+      text: 'Consegui mudar de carreira graças aos cursos da plataforma. Recomendo muito!',
+      stars: 5,
+    },
+    {
+      name: 'Ana Costa',
+      role: 'Designer UX/UI',
+      text: 'Material de qualidade e certificados que realmente agregam valor ao currículo.',
+      stars: 5,
+    },
+  ];
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-800">
@@ -145,9 +124,7 @@ export default function HomePage() {
               style={{ animationDuration: '3s' }}
             />
             <span className="text-sm font-semibold text-primary">
-              {translationsLoaded
-                ? t.home.hero.badge
-                : 'Transforme sua carreira agora'}
+              Transforme sua carreira agora
             </span>
           </div>
 
@@ -157,25 +134,24 @@ export default function HomePage() {
               mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
             }`}
           >
-            {translationsLoaded ? t.home.hero.title : 'Aprenda no seu ritmo,'}
+            Transforme Conhecimento
             <br />
             <span className="relative">
-              {translationsLoaded
-                ? t.home.hero.titleHighlight
-                : 'conquiste seus objetivos'}
+              em Renda Recorrente
               <span className="absolute bottom-2 left-0 w-full h-1 bg-gradient-to-r from-primary via-purple-500 to-transparent opacity-50" />
             </span>
           </h1>
 
           {/* Subtítulo com delay */}
           <p
-            className={`text-base sm:text-lg md:text-xl text-muted-foreground mb-10 md:mb-12 max-w-2xl mx-auto leading-relaxed px-4 transition-all duration-700 delay-100 ${
+            className={`text-base sm:text-lg md:text-xl text-muted-foreground mb-10 md:mb-12 max-w-3xl mx-auto leading-relaxed px-4 transition-all duration-700 delay-100 ${
               mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
             }`}
           >
-            {translationsLoaded
-              ? t.home.hero.subtitle
-              : 'Plataforma completa de ensino com cursos estruturados, certificados reconhecidos e acompanhamento personalizado. Junte-se a mais de 5.000 alunos em busca de transformação.'}
+            Plataforma completa para professores criarem, venderem e escalarem
+            cursos online. Comece grátis com 0% de mensalidade e pague apenas
+            15% por venda. Ou escolha o Plano Pro por R$ 97/mês e fique com 92%
+            de cada venda.
           </p>
 
           {/* CTAs com efeito stagger */}
@@ -187,16 +163,14 @@ export default function HomePage() {
             <Button
               asChild
               size="lg"
-              className="w-full sm:w-auto min-w-[200px] h-14 text-base font-semibold shadow-lg hover:shadow-2xl hover:scale-105 transition-all duration-300 relative group overflow-hidden"
+              className="w-full sm:w-auto min-w-[220px] h-14 text-base font-semibold shadow-lg hover:shadow-2xl hover:scale-105 transition-all duration-300 relative group overflow-hidden"
             >
               <Link
-                href="/courses"
+                href="/register"
                 className="flex items-center gap-2"
                 suppressHydrationWarning
               >
-                <span>
-                  {translationsLoaded ? t.home.hero.cta : 'Explorar Cursos'}
-                </span>
+                <span>Começar Grátis</span>
                 <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
               </Link>
             </Button>
@@ -204,14 +178,14 @@ export default function HomePage() {
               asChild
               size="lg"
               variant="outline"
-              className="w-full sm:w-auto min-w-[200px] h-14 text-base font-semibold hover:scale-105 transition-all duration-300"
+              className="w-full sm:w-auto min-w-[220px] h-14 text-base font-semibold hover:scale-105 transition-all duration-300"
             >
               <Link
-                href="/about"
+                href="/pricing"
                 className="flex items-center gap-2"
                 suppressHydrationWarning
               >
-                {translationsLoaded ? t.home.hero.ctaSecondary : 'Saiba Mais'}
+                Ver Planos e Preços
                 <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
               </Link>
             </Button>
@@ -246,18 +220,14 @@ export default function HomePage() {
                   <feature.icon className="h-10 w-10 md:h-12 md:w-12 text-primary group-hover:rotate-12 transition-transform" />
                 </div>
                 <h3 className="text-lg md:text-xl font-bold mb-2">
-                  {translationsLoaded
-                    ? t.home.features[feature.key].title
-                    : feature.key === 'courses'
+                  {feature.key === 'courses'
                     ? 'Cursos Completos'
                     : feature.key === 'certificates'
                     ? 'Certificados'
                     : 'Suporte Dedicado'}
                 </h3>
                 <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
-                  {translationsLoaded
-                    ? t.home.features[feature.key].description
-                    : feature.key === 'courses'
+                  {feature.key === 'courses'
                     ? 'Aulas em vídeo, materiais extras e exercícios práticos'
                     : feature.key === 'certificates'
                     ? 'Certificado digital ao concluir cada curso'
@@ -328,9 +298,7 @@ export default function HomePage() {
                   <span className="text-2xl ml-1">{stat.suffix}</span>
                 </div>
                 <p className="text-sm md:text-base text-muted-foreground font-medium">
-                  {translationsLoaded
-                    ? t.home.stats[stat.key]
-                    : stat.key === 'courses'
+                  {stat.key === 'courses'
                     ? 'Cursos Disponíveis'
                     : stat.key === 'students'
                     ? 'Alunos Ativos'
@@ -361,42 +329,28 @@ export default function HomePage() {
       <section className="container mx-auto px-4 py-16 md:py-24">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-center mb-4 px-2">
-            {mounted ? t.home.benefits.title : 'Benefícios para você'}
+            Benefícios para você
           </h2>
           <p className="text-center text-muted-foreground mb-12 md:mb-16 text-base md:text-lg max-w-2xl mx-auto">
-            {mounted
-              ? t.home.benefits.subtitle
-              : 'Tudo que você precisa para aprender, crescer e alcançar sucesso'}
+            Tudo que você precisa para aprender, crescer e alcançar sucesso
           </p>
 
           <div className="space-y-6 md:space-y-8">
             {[
               {
                 icon: Clock,
-                title: mounted
-                  ? t.home.benefits.learn.title
-                  : 'Aprenda no seu tempo',
-                desc: mounted
-                  ? t.home.benefits.learn.description
-                  : 'Acesse os cursos quando quiser, de onde estiver. Aprenda no seu ritmo, sem pressão ou prazos apertados.',
+                title: 'Aprenda no seu tempo',
+                desc: 'Acesse os cursos quando quiser, de onde estiver. Aprenda no seu ritmo, sem pressão ou prazos apertados.',
               },
               {
                 icon: TrendingUp,
-                title: mounted
-                  ? t.home.benefits.progress.title
-                  : 'Acompanhe seu progresso',
-                desc: mounted
-                  ? t.home.benefits.progress.description
-                  : 'Sistema completo de acompanhamento com estatísticas detalhadas e relatórios personalizados.',
+                title: 'Acompanhe seu progresso',
+                desc: 'Sistema completo de acompanhamento com estatísticas detalhadas e relatórios personalizados.',
               },
               {
                 icon: CheckCircle,
-                title: mounted
-                  ? t.home.benefits.certification.title
-                  : 'Certificação reconhecida',
-                desc: mounted
-                  ? t.home.benefits.certification.description
-                  : 'Certificados digitais válidos que comprovam seu conhecimento e habilidades no mercado.',
+                title: 'Certificação reconhecida',
+                desc: 'Certificados digitais válidos que comprovam seu conhecimento e habilidades no mercado.',
               },
             ].map((benefit, idx) => (
               <div
@@ -452,14 +406,11 @@ export default function HomePage() {
         <div className="relative container mx-auto px-4">
           <div className="text-center mb-12 md:mb-16">
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 px-2">
-              {translationsLoaded
-                ? t.home.testimonials.title
-                : 'O que nossos alunos dizem'}
+              O que nossos alunos dizem
             </h2>
             <p className="text-center text-muted-foreground text-base md:text-lg max-w-2xl mx-auto">
-              {translationsLoaded
-                ? t.home.testimonials.subtitle
-                : 'Veja como estamos transformando vidas de pessoas que acreditam na educação contínua'}
+              Veja como estamos transformando vidas de pessoas que acreditam na
+              educação contínua
             </p>
           </div>
 
@@ -528,93 +479,214 @@ export default function HomePage() {
         `}</style>
       </section>
 
-      {/* Modelos de receita para professores */}
-      <section className="container mx-auto px-4 py-16 md:py-20">
-        <div className="max-w-4xl mx-auto text-center mb-10">
-          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-semibold">
-            {mounted ? t.home.instructorPlans.title : 'Para professores'}
-          </span>
-          <h2 className="text-3xl md:text-4xl font-bold mt-4 mb-3">
-            {mounted
-              ? t.home.instructorPlans.subtitle
-              : 'Planos claros e receita transparente'}
-          </h2>
-          <p className="text-muted-foreground max-w-3xl mx-auto">
-            {mounted
-              ? t.home.instructorPlans.description
-              : 'Aluno paga diretamente o valor do curso ao professor. No plano Free aplicamos 15% de taxa por venda. Em planos pagos cobramos uma mensalidade do professor e repassamos 100% das vendas.'}
-          </p>
-        </div>
-
-        <div className="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto">
-          <div className="p-6 rounded-2xl border bg-white shadow-sm">
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="text-xl font-semibold">
-                {mounted ? t.home.instructorPlans.freePlan.badge : 'Plano Free'}
-              </h3>
-              <span className="text-sm font-semibold text-primary">
-                {mounted ? '15% por venda' : '15% por venda'}
-              </span>
-            </div>
-            <p className="text-3xl font-bold mb-3">
-              {mounted ? t.home.instructorPlans.freePlan.title : 'R$ 0/mês'}
+      {/* Modelos de receita para professores - DESTAQUE */}
+      <section className="container mx-auto px-4 py-20 md:py-28">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-12">
+            <Badge className="mb-4" variant="secondary">
+              <DollarSign className="h-3 w-3 mr-1" />
+              Receita Transparente
+            </Badge>
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+              Planos para Professores
+            </h2>
+            <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+              Escolha o modelo de negócio que funciona para você. Seja começando
+              sem custo ou escalando com taxa reduzida.
             </p>
-            <p className="text-sm text-muted-foreground mb-4">
-              {mounted
-                ? t.home.instructorPlans.freePlan.description
-                : 'Comece sem mensalidade. Repasse líquido de 85% por venda.'}
-            </p>
-            <ul className="space-y-2 text-sm text-muted-foreground">
-              {(mounted
-                ? t.home.instructorPlans.freePlan.perks
-                : [
-                    'Publicação de cursos sem limite',
-                    'Certificados e suporte incluídos',
-                    'Painel financeiro em tempo real',
-                  ]
-              ).map((perk, idx) => (
-                <li key={idx} className="flex items-start gap-2">
-                  <CheckCircle className="h-4 w-4 text-green-600 mt-0.5" />
-                  {perk}
-                </li>
-              ))}
-            </ul>
           </div>
 
-          <div className="p-6 rounded-2xl border bg-gradient-to-br from-primary/10 via-white to-white shadow-sm">
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="text-xl font-semibold">
-                {mounted ? t.home.instructorPlans.paidPlan.badge : 'Plano Pago'}
-              </h3>
-              <span className="text-sm font-semibold text-primary">
-                {mounted ? '0% por venda' : '0% por venda'}
-              </span>
+          <div className="grid md:grid-cols-3 gap-8 mb-12">
+            {/* Plano Free */}
+            <div className="relative p-8 rounded-2xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 hover:shadow-xl transition-all hover:scale-105">
+              <div className="mb-6">
+                <h3 className="text-2xl font-bold mb-2">Plano Free</h3>
+                <div className="flex items-baseline gap-2 mb-4">
+                  <span className="text-5xl font-bold">R$ 0</span>
+                  <span className="text-muted-foreground">/mês</span>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  Comece sem investimento inicial
+                </p>
+              </div>
+
+              <div className="mb-6 p-4 bg-orange-50 dark:bg-orange-950/20 rounded-lg border border-orange-200 dark:border-orange-800">
+                <div className="text-3xl font-bold text-orange-600 mb-1">
+                  15%
+                </div>
+                <div className="text-sm text-muted-foreground">
+                  taxa por venda
+                </div>
+              </div>
+
+              <ul className="space-y-3 mb-8">
+                {[
+                  'Até 3 cursos publicados',
+                  'Certificados automáticos',
+                  'Dashboard de vendas',
+                  'Suporte por email (48h)',
+                ].map((perk, idx) => (
+                  <li key={idx} className="flex items-start gap-3">
+                    <CheckCircle className="h-5 w-5 text-green-600 shrink-0 mt-0.5" />
+                    <span className="text-sm">{perk}</span>
+                  </li>
+                ))}
+              </ul>
+
+              <Button asChild className="w-full" variant="outline">
+                <Link href="/register?plan=free" suppressHydrationWarning>
+                  Começar Grátis
+                </Link>
+              </Button>
             </div>
-            <p className="text-3xl font-bold mb-3">
-              {mounted
-                ? t.home.instructorPlans.paidPlan.title
-                : 'Mensalidade ao admin'}
-            </p>
-            <p className="text-sm text-muted-foreground mb-4">
-              {mounted
-                ? t.home.instructorPlans.paidPlan.description
-                : 'Mensalidade fixa para remover taxas por venda e destravar benefícios extras.'}
-            </p>
-            <ul className="space-y-2 text-sm text-muted-foreground">
-              {(mounted
-                ? t.home.instructorPlans.paidPlan.perks
-                : [
-                    'Repasse integral das vendas',
-                    'Destaque no catálogo e slots de anúncios opcionais',
-                    'Analytics avançado e suporte prioritário',
-                  ]
-              ).map((perk, idx) => (
-                <li key={idx} className="flex items-start gap-2">
-                  <CheckCircle className="h-4 w-4 text-green-600 mt-0.5" />
-                  {perk}
+
+            {/* Plano Pro - POPULAR */}
+            <div className="relative p-8 rounded-2xl border-2 border-purple-500 bg-gradient-to-br from-purple-50 to-blue-50 dark:from-purple-950/20 dark:to-blue-950/20 hover:shadow-2xl transition-all scale-105">
+              <div className="absolute -top-4 left-1/2 -translate-x-1/2">
+                <Badge className="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-4 py-1">
+                  <Sparkles className="h-3 w-3 mr-1" />
+                  Mais Popular
+                </Badge>
+              </div>
+
+              <div className="mb-6">
+                <h3 className="text-2xl font-bold mb-2">Plano Pro</h3>
+                <div className="flex items-baseline gap-2 mb-4">
+                  <span className="text-5xl font-bold">R$ 97</span>
+                  <span className="text-muted-foreground">/mês</span>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  Para quem vende ativamente
+                </p>
+              </div>
+
+              <div className="mb-6 p-4 bg-green-50 dark:bg-green-950/20 rounded-lg border border-green-200 dark:border-green-800">
+                <div className="text-3xl font-bold text-green-600 mb-1">8%</div>
+                <div className="text-sm text-muted-foreground">
+                  taxa por venda
+                </div>
+                <div className="text-xs text-green-600 mt-1">
+                  ↓ Economize 7% por venda
+                </div>
+              </div>
+
+              <ul className="space-y-3 mb-8">
+                {[
+                  'Cursos ilimitados',
+                  'Chat IA INCLUSO (R$ 29,90)',
+                  'Landing page personalizada',
+                  'Analytics avançado',
+                  'Suporte prioritário (12h)',
+                ].map((perk, idx) => (
+                  <li key={idx} className="flex items-start gap-3">
+                    <CheckCircle className="h-5 w-5 text-green-600 shrink-0 mt-0.5" />
+                    <span className="text-sm font-medium">{perk}</span>
+                  </li>
+                ))}
+              </ul>
+
+              <Button
+                asChild
+                className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
+              >
+                <Link href="/register?plan=pro" suppressHydrationWarning>
+                  Começar Agora
+                </Link>
+              </Button>
+            </div>
+
+            {/* Plano Enterprise */}
+            <div className="relative p-8 rounded-2xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 hover:shadow-xl transition-all hover:scale-105">
+              <div className="mb-6">
+                <h3 className="text-2xl font-bold mb-2">Enterprise</h3>
+                <div className="flex items-baseline gap-2 mb-4">
+                  <span className="text-5xl font-bold">R$ 297</span>
+                  <span className="text-muted-foreground">/mês</span>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  Para escolas e empresas
+                </p>
+              </div>
+
+              <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-950/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                <div className="text-3xl font-bold text-blue-600 mb-1">5%</div>
+                <div className="text-sm text-muted-foreground">
+                  taxa por venda
+                </div>
+                <div className="text-xs text-blue-600 mt-1">
+                  ↓ Economize 10% por venda
+                </div>
+              </div>
+
+              <ul className="space-y-3 mb-8">
+                <li className="flex items-start gap-3">
+                  <CheckCircle className="h-5 w-5 text-green-600 shrink-0 mt-0.5" />
+                  <span className="text-sm">Tudo do Pro +</span>
                 </li>
-              ))}
-            </ul>
+                {[
+                  'Até 10 instrutores',
+                  'White label',
+                  'API para integrações',
+                  'Gerente de conta dedicado',
+                  'Suporte 24/7 + telefone',
+                ].map((perk, idx) => (
+                  <li key={idx} className="flex items-start gap-3">
+                    <CheckCircle className="h-5 w-5 text-green-600 shrink-0 mt-0.5" />
+                    <span className="text-sm">{perk}</span>
+                  </li>
+                ))}
+              </ul>
+
+              <Button asChild className="w-full" variant="outline">
+                <Link href="/contato?plan=enterprise" suppressHydrationWarning>
+                  Falar com Vendas
+                </Link>
+              </Button>
+            </div>
+          </div>
+
+          {/* Comparação de Receita */}
+          <div className="bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-950/20 dark:to-blue-950/20 rounded-2xl p-8 border-2 border-purple-200 dark:border-purple-800">
+            <h3 className="text-2xl font-bold mb-6 text-center">
+              Quanto você recebe por venda?
+            </h3>
+            <div className="grid md:grid-cols-3 gap-6">
+              <div className="text-center p-6 bg-white dark:bg-gray-900 rounded-xl">
+                <div className="text-sm text-muted-foreground mb-2">
+                  Plano Free
+                </div>
+                <div className="text-4xl font-bold text-orange-600 mb-1">
+                  R$ 85
+                </div>
+                <div className="text-xs text-muted-foreground">
+                  de uma venda de R$ 100
+                </div>
+              </div>
+              <div className="text-center p-6 bg-white dark:bg-gray-900 rounded-xl border-2 border-purple-500">
+                <div className="text-sm font-semibold text-purple-600 mb-2">
+                  Plano Pro ⭐
+                </div>
+                <div className="text-4xl font-bold text-green-600 mb-1">
+                  R$ 92
+                </div>
+                <div className="text-xs text-muted-foreground">
+                  de uma venda de R$ 100
+                </div>
+                <div className="text-xs text-green-600 mt-1">+R$ 7 a mais!</div>
+              </div>
+              <div className="text-center p-6 bg-white dark:bg-gray-900 rounded-xl">
+                <div className="text-sm text-muted-foreground mb-2">
+                  Enterprise
+                </div>
+                <div className="text-4xl font-bold text-blue-600 mb-1">
+                  R$ 95
+                </div>
+                <div className="text-xs text-muted-foreground">
+                  de uma venda de R$ 100
+                </div>
+                <div className="text-xs text-blue-600 mt-1">+R$ 10 a mais!</div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -637,15 +709,12 @@ export default function HomePage() {
             </div>
 
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 leading-tight bg-gradient-to-r from-gray-900 to-primary dark:from-white dark:to-purple-400 bg-clip-text text-transparent">
-              {translationsLoaded
-                ? t.home.cta.title
-                : 'Comece sua jornada hoje'}
+              Comece sua jornada hoje
             </h2>
 
             <p className="text-muted-foreground mb-8 md:mb-10 text-base md:text-lg leading-relaxed max-w-xl">
-              {translationsLoaded
-                ? t.home.cta.subtitle
-                : 'Cadastre-se gratuitamente e tenha acesso imediato a cursos de qualidade. Sem cartão de crédito. Sem compromisso.'}
+              Cadastre-se gratuitamente e tenha acesso imediato a cursos de
+              qualidade. Sem cartão de crédito. Sem compromisso.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 sm:items-center">
@@ -659,20 +728,13 @@ export default function HomePage() {
                   className="flex items-center justify-center gap-2"
                   suppressHydrationWarning
                 >
-                  <span>
-                    {translationsLoaded
-                      ? t.home.cta.button
-                      : 'Criar conta gratuita'}
-                  </span>
+                  <span>Criar conta gratuita</span>
                   <ArrowRight className="h-5 w-5 group-hover/btn:translate-x-1 transition-transform" />
                 </Link>
               </Button>
 
               <p className="text-sm text-muted-foreground flex items-center gap-1">
-                ✓{' '}
-                {translationsLoaded
-                  ? t.home.cta.noCreditCard
-                  : 'Sem cartão de crédito'}
+                ✓ Sem cartão de crédito
               </p>
             </div>
 

@@ -24,10 +24,16 @@ import {
   Sparkles,
   Lock,
   CheckCircle2,
+  Palette,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import {
+  Sheet,
+  SheetContent,
+  SheetTrigger,
+  SheetTitle,
+} from '@/components/ui/sheet';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -40,6 +46,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
+import { ThemeToggle } from '@/components/theme/theme-toggle-new';
 
 type Role = 'ADMIN' | 'TEACHER' | 'STUDENT';
 
@@ -127,23 +134,15 @@ const legacyNav: Record<Role, NavItem[]> = {
 const defaultSlotNav: Record<Role, SlotNavItem[]> = {
   ADMIN: [
     {
-      href: '/admin/ai-assistant',
+      href: '/admin/ai-chat',
       label: 'Chat IA',
       icon: MessageSquare,
-      locked: true,
-      upsellHref: '/checkout/ai-suite',
-      badge: 'Pro',
+      locked: false,
+      badge: 'Beta',
       featureId: 'ai-assistant',
     },
     {
-      href: '/admin/plans/stripe',
-      label: 'Mentorias',
-      icon: Sparkles,
-      locked: false,
-      featureId: 'mentorships',
-    },
-    {
-      href: '/admin/advertisements',
+      href: '/admin/analytics',
       label: 'Ferramentas Pro',
       icon: BarChart3,
       locked: false,
@@ -329,6 +328,9 @@ export function DashboardShell({
                     </Button>
                   </SheetTrigger>
                   <SheetContent side="left" className="p-0 w-72">
+                    <SheetTitle className="sr-only">
+                      Menu de Navegação
+                    </SheetTitle>
                     {Sidebar}
                   </SheetContent>
                 </Sheet>
@@ -343,6 +345,8 @@ export function DashboardShell({
                 </div>
 
                 <div className="flex items-center gap-2">
+                  <ThemeToggle userRole={role} />
+
                   <Button variant="ghost" size="icon" className="relative">
                     <Bell className="h-5 w-5" />
                     <span className="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-emerald-500" />
@@ -396,10 +400,30 @@ export function DashboardShell({
                       </DropdownMenuItem>
                       <DropdownMenuItem asChild>
                         <Link
-                          href="/settings"
+                          href={
+                            role === 'ADMIN'
+                              ? '/admin/settings'
+                              : role === 'TEACHER'
+                              ? '/teacher/settings'
+                              : '/student/settings'
+                          }
                           className="flex items-center gap-2"
                         >
                           <Settings className="h-4 w-4" /> Configurações
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link
+                          href={
+                            role === 'ADMIN'
+                              ? '/admin/settings/theme'
+                              : role === 'TEACHER'
+                              ? '/teacher/settings/theme'
+                              : '/student/settings/theme'
+                          }
+                          className="flex items-center gap-2"
+                        >
+                          <Palette className="h-4 w-4" /> Personalizar Tema
                         </Link>
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />

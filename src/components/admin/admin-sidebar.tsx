@@ -4,224 +4,121 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useMounted } from '@/hooks/use-mounted';
 import { cn } from '@/lib/utils';
-import {
-  LayoutDashboard,
-  Users,
-  BookOpen,
-  GraduationCap,
-  DollarSign,
-  Settings,
-  FileText,
-  BarChart3,
-  MessageSquare,
-  Bell,
-  Shield,
-  ChevronRight,
-} from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { ChevronRight } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from '@/components/ui/collapsible';
-import { useState } from 'react';
-
-interface NavItem {
-  title: string;
-  href: string;
-  icon: React.ElementType;
-  badge?: string;
-  children?: Array<{
-    title: string;
-    href: string;
-  }>;
-}
-
-const navItems: NavItem[] = [
-  {
-    title: 'Dashboard',
-    href: '/admin',
-    icon: LayoutDashboard,
-  },
-  {
-    title: 'Usuários',
-    href: '/admin/users',
-    icon: Users,
-    children: [
-      { title: 'Todos os Usuários', href: '/admin/users' },
-      { title: 'Alunos', href: '/admin/users?role=STUDENT' },
-      { title: 'Professores', href: '/admin/users?role=TEACHER' },
-      { title: 'Administradores', href: '/admin/users?role=ADMIN' },
-    ],
-  },
-  {
-    title: 'Cursos',
-    href: '/admin/courses',
-    icon: BookOpen,
-    children: [
-      { title: 'Todos os Cursos', href: '/admin/courses' },
-      { title: 'Novo Curso', href: '/admin/courses/create' },
-      { title: 'Categorias', href: '/admin/courses/categories' },
-    ],
-  },
-  {
-    title: 'Matrículas',
-    href: '/admin/enrollments',
-    icon: GraduationCap,
-  },
-  {
-    title: 'Financeiro',
-    href: '/admin/payments',
-    icon: DollarSign,
-    children: [
-      { title: 'Pagamentos', href: '/admin/payments' },
-      { title: 'Assinaturas', href: '/admin/subscriptions' },
-      { title: 'Relatório Fiscal', href: '/admin/financial-reports' },
-    ],
-  },
-  {
-    title: 'Analytics',
-    href: '/admin/analytics',
-    icon: BarChart3,
-  },
-  {
-    title: 'Mensagens',
-    href: '/admin/messages',
-    icon: MessageSquare,
-    badge: '3',
-  },
-  {
-    title: 'Notificações',
-    href: '/admin/notifications',
-    icon: Bell,
-  },
-  {
-    title: 'Relatórios',
-    href: '/admin/reports',
-    icon: FileText,
-    children: [
-      { title: 'Relatório Geral', href: '/admin/reports' },
-      { title: 'Relatório de Acessos', href: '/admin/reports/access' },
-      {
-        title: 'Relatório de Certificados',
-        href: '/admin/reports/certificates',
-      },
-    ],
-  },
-  {
-    title: 'Segurança',
-    href: '/admin/security',
-    icon: Shield,
-  },
-  {
-    title: 'Configurações',
-    href: '/admin/settings',
-    icon: Settings,
-  },
-];
+import {
+  ADMIN_MAIN_MENU,
+  MenuItem,
+  getMenuIdForRoute,
+} from '@/config/admin-menu-v2';
 
 export function AdminSidebar() {
   const pathname = usePathname();
   const mounted = useMounted();
   const [openItems, setOpenItems] = useState<string[]>([]);
 
-  const toggleItem = (title: string) => {
+  // Auto-expand menu quando rota mudar
+  useEffect(() => {
+    const parentId = getMenuIdForRoute(pathname);
+    if (parentId) {
+      setOpenItems((prev) =>
+        prev.includes(parentId) ? prev : [...prev, parentId]
+      );
+    }
+  }, [pathname]);
+
+  const toggleItem = (id: string) => {
     setOpenItems((prev) =>
-      prev.includes(title)
-        ? prev.filter((item) => item !== title)
-        : [...prev, title]
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
     );
+  };
+
+  const renderMenuItems = (items: MenuItem[]): React.ReactNode => {
+    return items.map((item) => {
+      const Icon = item.icon;
+      const isActive =
+        mounted &&
+        item.href &&
+        (pathname === item.href || pathname?.startsWith(item.href + '/'));
+      const hasChildren = item.children && item.children.length > 0;
+      const isOpen = openItems.includes(item.id);
+
+      if (hasChildren) {
+        return (
+          <Collapsible
+            key={item.id}
+            open={isOpen}
+            onOpenChange={() => toggleItem(item.id)}
+          >
+            <CollapsibleTrigger asChild suppressHydrationWarning>
+              <button
+                className={cn(
+                  'flex items-center justify-between w-full gap-3 px-3 py-2 text-sm font-medium rounded-lg transition-all hover:bg-accent hover:text-accent-foreground',
+                  isActive && 'bg-accent text-accent-foreground'
+                )}
+              >
+                <div className="flex items-center gap-3">
+                  <Icon className="h-5 w-5 flex-shrink-0" />
+                  <span>{item.label}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  {item.badge && item.badge !== 'dynamic' && (
+                    <Badge variant="secondary" className="h-5 px-1.5 text-xs">
+                      {item.badge}
+                    </Badge>
+                  )}
+                  <ChevronRight
+                    className={cn(
+                      'h-4 w-4 transition-transform',
+                      isOpen && 'rotate-90'
+                    )}
+                  />
+                </div>
+              </button>
+            </CollapsibleTrigger>
+            <CollapsibleContent className="pl-11 pr-3 pt-2 space-y-1">
+              {renderMenuItems(item.children || [])}
+            </CollapsibleContent>
+          </Collapsible>
+        );
+      }
+
+      // Itens sem children devem ter href
+      if (!item.href) return null;
+
+      return (
+        <Link
+          key={item.id}
+          href={item.href}
+          suppressHydrationWarning
+          className={cn(
+            'flex items-center justify-between gap-3 px-3 py-2 text-sm font-medium rounded-lg transition-all hover:bg-accent hover:text-accent-foreground',
+            isActive && 'bg-accent text-accent-foreground'
+          )}
+        >
+          <div className="flex items-center gap-3">
+            <Icon className="h-5 w-5 flex-shrink-0" />
+            <span>{item.label}</span>
+          </div>
+          {item.badge && item.badge !== 'dynamic' && (
+            <Badge variant="secondary" className="h-5 px-1.5 text-xs">
+              {item.badge}
+            </Badge>
+          )}
+        </Link>
+      );
+    });
   };
 
   return (
     <aside className="w-64 border-r bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 fixed left-0 top-16 bottom-0 overflow-y-auto">
-      <nav className="space-y-2 p-4">
-        {navItems?.map((item) => {
-          const Icon = item.icon;
-          const isActive =
-            mounted &&
-            (pathname === item.href || pathname?.startsWith(item.href + '/'));
-          const hasChildren = item.children && item.children.length > 0;
-          const isOpen = openItems.includes(item.title);
-
-          if (hasChildren) {
-            return (
-              <Collapsible
-                key={item.title}
-                open={isOpen}
-                onOpenChange={() => toggleItem(item.title)}
-              >
-                <CollapsibleTrigger
-                  suppressHydrationWarning
-                  className={cn(
-                    'flex items-center justify-between w-full gap-3 px-3 py-2 text-sm font-medium rounded-lg transition-all hover:bg-accent hover:text-accent-foreground',
-                    isActive && 'bg-accent text-accent-foreground'
-                  )}
-                >
-                  <div className="flex items-center gap-3">
-                    <Icon className="h-5 w-5 flex-shrink-0" />
-                    <span>{item.title}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    {item.badge && (
-                      <Badge variant="secondary" className="h-5 px-1.5 text-xs">
-                        {item.badge}
-                      </Badge>
-                    )}
-                    <ChevronRight
-                      className={cn(
-                        'h-4 w-4 transition-transform',
-                        isOpen && 'rotate-90'
-                      )}
-                    />
-                  </div>
-                </CollapsibleTrigger>
-                <CollapsibleContent className="pl-11 pr-3 pt-2 space-y-1">
-                  {item.children?.map((child) => {
-                    const isChildActive = mounted && pathname === child.href;
-                    return (
-                      <Link
-                        key={child.href}
-                        href={child.href}
-                        suppressHydrationWarning
-                        className={cn(
-                          'block px-3 py-1.5 text-sm rounded-md transition-colors hover:bg-accent hover:text-accent-foreground',
-                          isChildActive &&
-                            'bg-accent text-accent-foreground font-medium'
-                        )}
-                      >
-                        {child.title}
-                      </Link>
-                    );
-                  })}
-                </CollapsibleContent>
-              </Collapsible>
-            );
-          }
-
-          return (
-            <Link
-              key={item.title}
-              href={item.href}
-              suppressHydrationWarning
-              className={cn(
-                'flex items-center justify-between gap-3 px-3 py-2 text-sm font-medium rounded-lg transition-all hover:bg-accent hover:text-accent-foreground',
-                isActive && 'bg-accent text-accent-foreground'
-              )}
-            >
-              <div className="flex items-center gap-3">
-                <Icon className="h-5 w-5 flex-shrink-0" />
-                <span>{item.title}</span>
-              </div>
-              {item.badge && (
-                <Badge variant="secondary" className="h-5 px-1.5 text-xs">
-                  {item.badge}
-                </Badge>
-              )}
-            </Link>
-          );
-        })}
-      </nav>
+      <nav className="space-y-2 p-4">{renderMenuItems(ADMIN_MAIN_MENU)}</nav>
     </aside>
   );
 }

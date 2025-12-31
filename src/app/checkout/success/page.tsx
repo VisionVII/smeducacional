@@ -22,6 +22,13 @@ function CheckoutSuccessContent() {
   const courseId = searchParams.get('courseId');
   const sessionIdParam = searchParams.get('session_id');
 
+  // Determinar label do tipo de compra
+  const typeLabel =
+    type === 'feature_purchase' &&
+    searchParams.get('featureId') === 'ai-assistant'
+      ? 'Chat IA'
+      : 'Acesso Premium';
+
   const confirmWithSessionId = async (sid: string) => {
     const res = await fetch('/api/checkout/confirm', {
       method: 'POST',
@@ -129,29 +136,52 @@ function CheckoutSuccessContent() {
             <CheckCircle className="h-12 w-12 text-green-600" />
           </div>
           <CardTitle className={error ? 'text-red-600' : 'text-green-700'}>
-            {error ? 'Ação necessária' : 'Pagamento confirmado!'}
+            {error ? 'Ação necessária' : 'Pagamento confirmado! 🎉'}
           </CardTitle>
           <CardDescription>
             {error
               ? 'Pagamento recebido, mas houve falha ao liberar o acesso.'
-              : 'Sua transação foi processada com sucesso. Redirecionando para Meus Cursos...'}
+              : type === 'feature_purchase'
+              ? 'Sua compra foi processada com sucesso. Acesso à ferramenta foi liberado!'
+              : 'Sua transação foi processada com sucesso. Redirecionando...'}
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4 text-center">
+        <CardContent className="space-y-4">
           {error ? (
-            <p className="text-sm text-destructive font-medium">{error}</p>
+            <div className="bg-red-50 border border-red-200 rounded-md p-3 text-sm text-red-700">
+              <p className="font-semibold mb-1">❌ Erro ao Processar</p>
+              <p>{error}</p>
+            </div>
           ) : (
-            <p className="text-sm text-muted-foreground">
-              {type === 'course_purchase' &&
-                'Acesso liberado. Indo para Meus Cursos...'}
-              {type === 'student_subscription' &&
-                'Subscrição ativada. Redirecionando...'}
-              {type === 'teacher_subscription' &&
-                'Plano ativado. Redirecionando...'}
-            </p>
+            <div className="bg-green-50 border border-green-200 rounded-md p-3 text-sm text-green-700">
+              <p className="font-semibold mb-2">✅ Sucesso</p>
+              {type === 'course_purchase' && (
+                <p>
+                  Acesso ao curso foi liberado. Você pode começar a estudar
+                  agora!
+                </p>
+              )}
+              {type === 'student_subscription' && (
+                <p>Sua subscrição foi ativada. Bem-vindo ao plano premium!</p>
+              )}
+              {type === 'teacher_subscription' && (
+                <p>Seu plano como professor foi ativado com sucesso!</p>
+              )}
+              {type === 'feature_purchase' && (
+                <p>
+                  Sua compra de <strong>{typeLabel}</strong> foi processada.
+                  Você tem acesso completo a partir de agora!
+                </p>
+              )}
+            </div>
           )}
-          <Button onClick={handleRedirect} className="w-full">
-            {error ? 'Ir para Meus Cursos' : 'Clique se não redirecionar'}
+
+          <Button onClick={handleRedirect} className="w-full" size="lg">
+            {error
+              ? 'Contatar Suporte'
+              : type === 'feature_purchase'
+              ? 'Acessar Ferramenta'
+              : 'Continuar'}
           </Button>
         </CardContent>
       </Card>

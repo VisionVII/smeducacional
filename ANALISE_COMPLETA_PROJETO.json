@@ -1,0 +1,824 @@
+{
+  "projeto": "SM Educa",
+  "data_analise": "2025-12-31",
+  "versao_governance": "VisionVII Enterprise Governance 3.0",
+  "analise_completa": {
+    "1_mapeamento_rotas_admin": {
+      "resumo": "18 rotas admin implementadas com 11 itens no menu principal + 3 features em slot nav",
+      "rotas_menu_principal": [
+        {
+          "titulo": "Dashboard",
+          "rota": "/admin",
+          "status": "✅ Implementada",
+          "tipo": "página",
+          "arquivo": "src/app/admin/page.tsx",
+          "imports": "DashboardComponents, AdminHeader, StatCard",
+          "submenu": null,
+          "no_menu": "sim"
+        },
+        {
+          "titulo": "Usuários",
+          "rota": "/admin/users",
+          "status": "✅ Implementada",
+          "tipo": "página",
+          "arquivo": "src/app/admin/users/page.tsx",
+          "imports": "User, UserRole, ADMIN filters",
+          "submenu": [
+            {
+              "titulo": "Todos os Usuários",
+              "rota": "/admin/users"
+            },
+            {
+              "titulo": "Alunos",
+              "rota": "/admin/users?role=STUDENT"
+            },
+            {
+              "titulo": "Professores",
+              "rota": "/admin/users?role=TEACHER"
+            },
+            {
+              "titulo": "Administradores",
+              "rota": "/admin/users?role=ADMIN"
+            }
+          ],
+          "no_menu": "sim"
+        },
+        {
+          "titulo": "Cursos",
+          "rota": "/admin/courses",
+          "status": "✅ Implementada",
+          "tipo": "página",
+          "arquivo": "src/app/admin/courses/page.tsx",
+          "imports": "Course, CourseCard, CourseFilters",
+          "submenu": [
+            {
+              "titulo": "Todos os Cursos",
+              "rota": "/admin/courses"
+            },
+            {
+              "titulo": "Novo Curso",
+              "rota": "/admin/courses/create"
+            },
+            {
+              "titulo": "Categorias",
+              "rota": "/admin/courses/categories"
+            }
+          ],
+          "no_menu": "sim"
+        },
+        {
+          "titulo": "Matrículas",
+          "rota": "/admin/enrollments",
+          "status": "⚠️ Menu apenas",
+          "tipo": "página",
+          "arquivo": "src/app/admin/enrollments/page.tsx (presumido)",
+          "imports": "Enrollment, StudentCourse, Status",
+          "submenu": null,
+          "no_menu": "sim"
+        },
+        {
+          "titulo": "Financeiro",
+          "rota": "/admin/payments",
+          "status": "✅ Implementada",
+          "tipo": "página",
+          "arquivo": "src/app/admin/payments/page.tsx",
+          "imports": "Payment, Invoice, PaymentStats",
+          "submenu": [
+            {
+              "titulo": "Pagamentos",
+              "rota": "/admin/payments"
+            },
+            {
+              "titulo": "Assinaturas",
+              "rota": "/admin/subscriptions"
+            },
+            {
+              "titulo": "Relatório Fiscal",
+              "rota": "/admin/financial-reports"
+            },
+            {
+              "titulo": "Configuração Stripe",
+              "rota": "/admin/stripe-config"
+            }
+          ],
+          "no_menu": "sim"
+        },
+        {
+          "titulo": "Analytics",
+          "rota": "/admin/analytics",
+          "status": "⚠️ Menu apenas",
+          "tipo": "página",
+          "arquivo": "src/app/admin/analytics/page.tsx (presumido)",
+          "imports": "AnalyticsData, Charts, Metrics",
+          "submenu": null,
+          "no_menu": "sim"
+        },
+        {
+          "titulo": "Mensagens",
+          "rota": "/admin/messages",
+          "status": "⚠️ Menu apenas",
+          "tipo": "página com badge",
+          "arquivo": "src/app/admin/messages/page.tsx (presumido)",
+          "imports": "Message, Inbox, Threads",
+          "submenu": null,
+          "badge": "3",
+          "no_menu": "sim"
+        },
+        {
+          "titulo": "Notificações",
+          "rota": "/admin/notifications",
+          "status": "⚠️ Menu apenas",
+          "tipo": "página",
+          "arquivo": "src/app/admin/notifications/page.tsx (presumido)",
+          "imports": "Notification, NotificationPreferences",
+          "submenu": null,
+          "no_menu": "sim"
+        },
+        {
+          "titulo": "Relatórios",
+          "rota": "/admin/reports",
+          "status": "⚠️ Menu apenas",
+          "tipo": "página",
+          "arquivo": "src/app/admin/reports/page.tsx (presumido)",
+          "imports": "Report, ReportData, ExportTools",
+          "submenu": [
+            {
+              "titulo": "Relatório Geral",
+              "rota": "/admin/reports"
+            },
+            {
+              "titulo": "Relatório de Acessos",
+              "rota": "/admin/reports/access"
+            },
+            {
+              "titulo": "Relatório de Certificados",
+              "rota": "/admin/reports/certificates"
+            }
+          ],
+          "no_menu": "sim"
+        },
+        {
+          "titulo": "Segurança",
+          "rota": "/admin/security",
+          "status": "⚠️ Menu apenas",
+          "tipo": "página",
+          "arquivo": "src/app/admin/security/page.tsx (presumido)",
+          "imports": "SecurityAudit, AccessControl, TwoFactor",
+          "submenu": null,
+          "no_menu": "sim"
+        },
+        {
+          "titulo": "Configurações",
+          "rota": "/admin/settings",
+          "status": "✅ Implementada",
+          "tipo": "página",
+          "arquivo": "src/app/admin/settings/page.tsx",
+          "imports": "SystemConfig, ThemeSelector, PreferenceSettings",
+          "submenu": null,
+          "no_menu": "sim"
+        }
+      ],
+      "rotas_slot_nav_admin": [
+        {
+          "titulo": "Chat IA",
+          "rota": "/admin/ai-assistant",
+          "status": "✅ Implementada",
+          "tipo": "feature locked",
+          "arquivo": "src/app/admin/ai-assistant/page.tsx",
+          "locked": true,
+          "featureId": "ai-assistant",
+          "upsellHref": "/checkout/ai-suite",
+          "badge": "Pro",
+          "no_menu": "não (slot nav apenas)"
+        },
+        {
+          "titulo": "Mentorias",
+          "rota": "/admin/plans/stripe",
+          "status": "✅ Implementada",
+          "tipo": "page",
+          "arquivo": "src/app/admin/stripe-config/page.tsx (ou /plans/stripe)",
+          "locked": false,
+          "featureId": "mentorships",
+          "no_menu": "não (slot nav apenas)"
+        },
+        {
+          "titulo": "Ferramentas Pro",
+          "rota": "/admin/advertisements",
+          "status": "✅ Implementada",
+          "tipo": "page",
+          "arquivo": "src/app/admin/advertisements/page.tsx",
+          "locked": false,
+          "featureId": "pro-tools",
+          "no_menu": "não (slot nav apenas)"
+        }
+      ],
+      "rotas_adicionais_encontradas": [
+        {
+          "titulo": "Auditoria",
+          "rota": "/admin/audit",
+          "status": "⚠️ Encontrada em dashboard-shell",
+          "arquivo": "src/app/admin/audit/page.tsx (presumido)"
+        },
+        {
+          "titulo": "Logs de Auditoria",
+          "rota": "/admin/audit-logs",
+          "status": "⚠️ Encontrada em admin-menu.ts",
+          "arquivo": "src/app/admin/audit-logs/page.tsx (presumido)"
+        },
+        {
+          "titulo": "Públic Pages CMS",
+          "rota": "/admin/public-pages",
+          "status": "✅ Implementada",
+          "arquivo": "src/components/admin/PublicPagesDashboard.tsx"
+        },
+        {
+          "titulo": "Tema Público",
+          "rota": "/admin/public-theme",
+          "status": "⚠️ Página implementada",
+          "arquivo": "src/app/admin/public-theme/page.tsx (presumido)"
+        },
+        {
+          "titulo": "Ferramentas Dev",
+          "rota": "/admin/dev",
+          "status": "⚠️ Página implementada",
+          "arquivo": "src/app/admin/dev/page.tsx (presumido)"
+        },
+        {
+          "titulo": "Configuração Stripe",
+          "rota": "/admin/stripe-config",
+          "status": "✅ Implementada",
+          "arquivo": "src/app/admin/stripe-config/page.tsx"
+        },
+        {
+          "titulo": "Publicações / Anúncios",
+          "rota": "/admin/advertisements",
+          "status": "✅ Implementada",
+          "arquivo": "src/app/admin/advertisements/page.tsx"
+        },
+        {
+          "titulo": "Tradutor de Sistema",
+          "rota": "/admin/tools/translator",
+          "status": "⚠️ Implantada",
+          "arquivo": "src/app/admin/tools/translator/page.tsx (presumido)"
+        },
+        {
+          "titulo": "Manutenção",
+          "rota": "/admin/system/maintenance",
+          "status": "⚠️ Implantada",
+          "arquivo": "src/app/admin/system/maintenance/page.tsx (presumido)"
+        }
+      ],
+      "rotas_orfas": [
+        {
+          "rota": "/admin/enrollments",
+          "status": "no menu principal mas existe em rota"
+        },
+        {
+          "rota": "/admin/analytics",
+          "status": "no menu principal mas existe em rota"
+        },
+        {
+          "rota": "/admin/messages",
+          "status": "no menu principal mas existe em rota (badge '3')"
+        },
+        {
+          "rota": "/admin/notifications",
+          "status": "no menu principal mas existe em rota"
+        },
+        {
+          "rota": "/admin/reports",
+          "status": "no menu principal mas existe em rota"
+        },
+        {
+          "rota": "/admin/security",
+          "status": "no menu principal mas existe em rota"
+        }
+      ],
+      "menu_sem_implementacao": [
+        {
+          "rota": "/admin/enrollments",
+          "status": "menu sim, página presumida"
+        },
+        {
+          "rota": "/admin/analytics",
+          "status": "menu sim, página presumida"
+        },
+        {
+          "rota": "/admin/messages",
+          "status": "menu sim, página presumida"
+        },
+        {
+          "rota": "/admin/notifications",
+          "status": "menu sim, página presumida"
+        },
+        {
+          "rota": "/admin/reports",
+          "status": "menu sim, página presumida"
+        },
+        {
+          "rota": "/admin/security",
+          "status": "menu sim, página presumida"
+        }
+      ],
+      "total_rotas_mapeadas": 18,
+      "implementadas": 8,
+      "presumidas": 10
+    },
+    "2_estrutura_atual_imagens": {
+      "resumo": "Sistema híbrido: URLs no banco de dados + Storage no Supabase",
+      "arquitetura": {
+        "storage": "Supabase Storage (buckets públicos)",
+        "database": "URLs armazenadas em campos string",
+        "sincronizacao": "Desacoplada (URL armazenada após upload no Storage)"
+      },
+      "buckets_supabase": [
+        {
+          "nome": "course-thumbnails",
+          "tipo": "público",
+          "uso": "Capas de cursos (thumbnail)",
+          "path_pattern": "courses/{slug}/thumbnail.jpg",
+          "exemplo": "https://okxgsvalfwxxoxcfxmhc.supabase.co/storage/v1/object/public/course-thumbnails/courses/[slug]/thumbnail.jpg"
+        },
+        {
+          "nome": "public-pages",
+          "tipo": "público",
+          "uso": "Imagens de páginas públicas (CMS)",
+          "path_pattern": "images/{pageId}/{filename}",
+          "usado_por": "PublicPageEditor, PublicPagesDashboard"
+        },
+        {
+          "nome": "videos",
+          "tipo": "presumido",
+          "uso": "Vídeos de aulas (thumbnails geradas)",
+          "path_pattern": "videos/{courseId}/thumbnails/"
+        }
+      ],
+      "campos_banco_dados": {
+        "User": {
+          "campo": "avatar",
+          "tipo": "String?",
+          "descricao": "URL da imagem de avatar",
+          "origem": "Supabase Storage",
+          "edit_point": "Profile update"
+        },
+        "Course": {
+          "campo": "thumbnail",
+          "tipo": "String?",
+          "descricao": "URL da capa do curso",
+          "origem": "Supabase Storage (bucket: course-thumbnails)",
+          "edit_point": "Course create/edit"
+        },
+        "PublicPage": {
+          "campo": "bannerUrl",
+          "tipo": "String?",
+          "descricao": "URL do banner da página pública",
+          "origem": "Supabase Storage (bucket: public-pages)",
+          "edit_point": "PublicPageEditor"
+        },
+        "PublicPage": {
+          "campo": "iconUrl",
+          "tipo": "String?",
+          "descricao": "URL do ícone da página pública",
+          "origem": "Supabase Storage (bucket: public-pages)",
+          "edit_point": "PublicPageEditor"
+        },
+        "Material": {
+          "campo": "url",
+          "tipo": "String",
+          "descricao": "URL do material (documento, PDF, etc)",
+          "origem": "Supabase Storage",
+          "edit_point": "Lesson materials"
+        },
+        "Submission": {
+          "campo": "fileUrl",
+          "tipo": "String?",
+          "descricao": "URL do arquivo enviado pelo aluno",
+          "origem": "Supabase Storage",
+          "edit_point": "Activity submission"
+        }
+      },
+      "componentes_que_usam_imagens": [
+        {
+          "componente": "Avatar (shadcn/ui)",
+          "arquivo": "src/components/ui/avatar.tsx",
+          "usa": "User.avatar",
+          "localizacoes": [
+            "src/components/dashboard/dashboard-shell.tsx (user profile dropdown)",
+            "Qualquer lugar que renderize user.avatar"
+          ]
+        },
+        {
+          "componente": "CourseCard",
+          "arquivo": "src/components/teacher/course-card.tsx",
+          "usa": "Course.thumbnail",
+          "localizacoes": [
+            "src/app/teacher/courses/page.tsx",
+            "src/app/student/courses/page.tsx",
+            "src/app/student/dashboard/page.tsx"
+          ]
+        },
+        {
+          "componente": "Image (Next.js)",
+          "arquivo": "next/image",
+          "usa": "Course.thumbnail, User.avatar",
+          "localizacoes": [
+            "src/components/teacher/course-card.tsx",
+            "src/app/student/courses/page.tsx"
+          ]
+        },
+        {
+          "componente": "ImageUpload",
+          "arquivo": "src/components/ui/ImageUpload.tsx",
+          "usa": "Upload para Supabase",
+          "localizacoes": [
+            "src/components/admin/PublicPagesDashboard.tsx",
+            "src/components/admin/PublicPagesEditForm.tsx",
+            "src/app/teacher/courses/new/page.tsx",
+            "src/app/teacher/courses/[id]/edit/page.tsx"
+          ]
+        },
+        {
+          "componente": "BlockEditor",
+          "arquivo": "src/components/ui/BlockEditor.tsx",
+          "usa": "Imagens em blocos de conteúdo",
+          "localizacoes": [
+            "src/components/admin/PublicPageEditor.tsx",
+            "Páginas públicas CMS"
+          ]
+        }
+      ],
+      "fluxo_upload_imagem": {
+        "passo_1": "Usuário seleciona arquivo em ImageUpload",
+        "passo_2": "Upload para Supabase Storage via API",
+        "passo_3": "API retorna URL pública do Supabase",
+        "passo_4": "URL é armazenada em campo string no banco (User.avatar, Course.thumbnail, etc)",
+        "passo_5": "Componentes renderizam imagem pela URL do Supabase"
+      },
+      "api_endpoints_upload": [
+        {
+          "endpoint": "POST /api/upload",
+          "arquivo": "src/app/api/upload/route.ts",
+          "funcao": "Upload genérico de imagem para Supabase",
+          "retorna": "{ url: string }"
+        },
+        {
+          "endpoint": "POST /api/admin/public-pages",
+          "arquivo": "src/app/api/admin/public-pages/route.ts",
+          "funcao": "Cria página pública (permite imageUrl)",
+          "campos": "bannerUrl, iconUrl"
+        },
+        {
+          "endpoint": "PUT /api/admin/public-pages/[id]",
+          "arquivo": "src/app/api/admin/public-pages/[id]/route.ts",
+          "funcao": "Atualiza página pública (permite imageUrl)",
+          "campos": "bannerUrl, iconUrl"
+        }
+      ],
+      "observacoes_criticas": [
+        "❌ Imagens NÃO são deletadas do Supabase quando registro é apagado (soft delete ou hard delete)",
+        "⚠️ URLs hardcoded no banco podem quebrar se Supabase URL mudar",
+        "✅ Supabase Storage oferece RLS policies para controlar acesso",
+        "✅ URLs públicas do Supabase são seguras (não contêm credenciais)"
+      ]
+    },
+    "3_logica_acesso_features": {
+      "resumo": "3 features principais: ai-assistant, mentorships, pro-tools com sistema FeaturePurchase",
+      "features_principais": [
+        {
+          "id": "ai-assistant",
+          "nome": "Chat IA (Assistente de IA)",
+          "status": "🔒 LOCKED",
+          "rotas": [
+            "/student/ai-chat",
+            "/teacher/ai-assistant",
+            "/admin/ai-assistant"
+          ],
+          "preco": "R$ 29,90 (BRL)",
+          "controle": "FeaturePurchase.status === 'active'",
+          "validacao_arquivo": "src/app/api/student/ai-chat/access/route.ts"
+        },
+        {
+          "id": "mentorships",
+          "nome": "Mentorias",
+          "status": "🔓 UNLOCKED (admin + teacher)",
+          "rotas": [
+            "/teacher/mentorships",
+            "/admin/plans/stripe",
+            "/student/mentorships"
+          ],
+          "preco": "Configurável via Stripe",
+          "controle": "Verificação de subscriptionStatus ou FeaturePurchase",
+          "validacao_arquivo": "dashboard-shell.tsx (hardcoded false para TEACHER)"
+        },
+        {
+          "id": "pro-tools",
+          "nome": "Ferramentas Pro",
+          "status": "🔓 UNLOCKED",
+          "rotas": [
+            "/teacher/tools",
+            "/admin/advertisements"
+          ],
+          "controle": "Sem lock (acessível a todos)",
+          "validacao_arquivo": "dashboard-shell.tsx (locked: false)"
+        }
+      ],
+      "arquivo_feature_gating": "src/lib/feature-gating.ts",
+      "funcoes_gating": [
+        {
+          "funcao": "canAccessCourse(userId, courseId)",
+          "logica": "Verifica enrollment + isPaid status",
+          "retorna": "AccessResult { allowed, reason, course }"
+        },
+        {
+          "funcao": "canCreateCourse(userId)",
+          "logica": "Verifica limite de cursos por plano",
+          "retorna": "AccessResult { allowed, reason }"
+        },
+        {
+          "funcao": "canUploadVideo(userId)",
+          "logica": "Verifica limite de vídeos por plano",
+          "retorna": "AccessResult { allowed, reason }"
+        },
+        {
+          "funcao": "canAccessFeature(userId, featureId)",
+          "logica": "Verifica FeaturePurchase ou subscription",
+          "retorna": "boolean"
+        }
+      ],
+      "modelo_feature_purchase": {
+        "arquivo": "prisma/schema.prisma",
+        "campos": [
+          "id: String (PK)",
+          "userId: String (FK User)",
+          "featureId: String (enum ou string)",
+          "status: String ('active' | 'inactive' | 'expired')",
+          "price: Float",
+          "currency: String ('BRL', 'USD', etc)",
+          "stripePaymentId: String",
+          "purchaseDate: DateTime",
+          "expiresAt: DateTime? (opcional)",
+          "updatedAt: DateTime"
+        ],
+        "exemplo_criacao": "FeaturePurchase criado automaticamente em src/lib/payment.service.ts após webhook Stripe"
+      },
+      "componentes_feature_lock": [
+        {
+          "componente": "DashboardShell",
+          "arquivo": "src/components/dashboard/dashboard-shell.tsx",
+          "logica": "defaultSlotNav[role] com propriedade 'locked'",
+          "props": "checkFeatureAccessAction(featureId) => boolean"
+        },
+        {
+          "componente": "LockedFeatureCard",
+          "arquivo": "presumido",
+          "logica": "Renderiza botão 'Upgrade' se locked === true",
+          "upsellHref": "/checkout/ai-suite, /checkout/chat-ia, /checkout/mentorias"
+        }
+      ],
+      "fluxo_validacao_feature": {
+        "passo_1": "Usuário acessa rota (ex: /student/ai-chat)",
+        "passo_2": "Layout wrapper executa checkFeatureAccessAction()",
+        "passo_3": "checkFeatureAccessAction consulta FeaturePurchase no banco",
+        "passo_4": "Se status === 'active', feature é 🔓 unlocked",
+        "passo_5": "Se locked, mostra card com botão upgrade para /checkout/[feature]",
+        "passo_6": "Stripe payment -> Webhook -> FeaturePurchase criado -> Feature unlocked ✅"
+      },
+      "endpoints_feature": [
+        {
+          "endpoint": "GET /api/student/ai-chat/access",
+          "arquivo": "src/app/api/student/ai-chat/access/route.ts",
+          "funcao": "Verifica se usuário pode acessar Chat IA",
+          "retorna": "{ hasAccess: boolean, reason?: string }"
+        },
+        {
+          "endpoint": "GET /api/admin/feature-purchases/:userId",
+          "arquivo": "src/app/api/admin/feature-purchases/[userId]/route.ts",
+          "funcao": "Debug: retorna todas as purchases do usuário",
+          "acesso": "Admin only"
+        },
+        {
+          "endpoint": "POST /api/checkout/feature",
+          "arquivo": "src/app/api/checkout/feature/route.ts",
+          "funcao": "Inicia checkout de feature premium",
+          "parametros": "{ featureId, userId }"
+        }
+      ],
+      "observacoes_criticas": [
+        "✅ FeaturePurchase criado com status='active' na transação Stripe",
+        "✅ Validação dual: FeaturePurchase + StudentSubscription",
+        "⚠️ Transação atômica: se FeaturePurchase falhar, tudo reverte",
+        "❌ Sem soft-delete: FeaturePurchase nunca é deletado (apenas status inativo)",
+        "🔒 LOCKED: ai-assistant (requer compra)",
+        "🔓 UNLOCKED: mentorships, pro-tools (gratuitos ou inclusos)"
+      ]
+    },
+    "4_padrao_menu_admin": {
+      "resumo": "Menu definido em 3 locais: admin-sidebar.tsx, admin-menu.ts, dashboard-shell.tsx",
+      "localizacoes_menu": [
+        {
+          "arquivo": "src/components/admin/admin-sidebar.tsx",
+          "tipo": "Componente da Sidebar",
+          "usado_em": "Admin layout wrapper",
+          "status": "✅ Fonte principal de verdade",
+          "itens": 11,
+          "submenu": "Sim (Collapsible component)"
+        },
+        {
+          "arquivo": "src/config/admin-menu.ts",
+          "tipo": "Arquivo de configuração",
+          "usado_em": "Presumido: fallback ou legacy",
+          "status": "⚠️ Pode estar desatualizado",
+          "itens": 6
+        },
+        {
+          "arquivo": "src/components/dashboard/dashboard-shell.tsx",
+          "tipo": "Componente de shell",
+          "usado_em": "Student, Teacher, Admin layouts",
+          "status": "✅ Contem slotNav (features premium)",
+          "itens": 11 (admin) + 3 (slot nav)"
+        }
+      ],
+      "estrutura_admin_sidebar": {
+        "tipo": "React.FC com estado local",
+        "props": {
+          "user": "{ name, email, avatar }",
+          "role": "ADMIN | TEACHER | STUDENT",
+          "pathname": "Corrente via usePathname()"
+        },
+        "comportamento": [
+          "Collapsa submenus via Collapsible component",
+          "Destaca item ativo via pathname matching",
+          "Suporta suppressHydrationWarning para SSR"
+        ]
+      },
+      "estrutura_menu_items": [
+        {
+          "propriedades": "title, href?, icon, badge?, children?",
+          "exemplo": {
+            "title": "Usuarios",
+            "href": "/admin/users",
+            "icon": "Users",
+            "children": [
+              { "title": "Todos", "href": "/admin/users" },
+              { "title": "Alunos", "href": "/admin/users?role=STUDENT" }
+            ]
+          }
+        }
+      ],
+      "slot_nav_admin": {
+        "localizacao": "src/components/dashboard/dashboard-shell.tsx linhas 137-158",
+        "tipo": "NavItem[] para features premium",
+        "itens": 3,
+        "exemplo": {
+          "href": "/admin/ai-assistant",
+          "label": "Chat IA",
+          "icon": "MessageSquare",
+          "locked": true,
+          "upsellHref": "/checkout/ai-suite",
+          "badge": "Pro",
+          "featureId": "ai-assistant"
+        }
+      },
+      "ordem_menu_principal": [
+        "1. Dashboard",
+        "2. Usuários (com submenu)",
+        "3. Cursos (com submenu)",
+        "4. Matrículas",
+        "5. Financeiro (com submenu)",
+        "6. Analytics",
+        "7. Mensagens (com badge '3')",
+        "8. Notificações",
+        "9. Relatórios (com submenu)",
+        "10. Segurança",
+        "11. Configurações"
+      ],
+      "ordem_slot_nav_admin": [
+        "1. Chat IA 🔒 (locked, premium)",
+        "2. Mentorias 🔓 (unlocked)",
+        "3. Ferramentas Pro 🔓 (unlocked)"
+      ],
+      "submenu_collapsiveis": [
+        {
+          "pai": "Usuários",
+          "filhos": [
+            "/admin/users",
+            "/admin/users?role=STUDENT",
+            "/admin/users?role=TEACHER",
+            "/admin/users?role=ADMIN"
+          ]
+        },
+        {
+          "pai": "Cursos",
+          "filhos": [
+            "/admin/courses",
+            "/admin/courses/create",
+            "/admin/courses/categories"
+          ]
+        },
+        {
+          "pai": "Financeiro",
+          "filhos": [
+            "/admin/payments",
+            "/admin/subscriptions",
+            "/admin/financial-reports",
+            "/admin/stripe-config"
+          ]
+        },
+        {
+          "pai": "Relatórios",
+          "filhos": [
+            "/admin/reports",
+            "/admin/reports/access",
+            "/admin/reports/certificates"
+          ]
+        }
+      ],
+      "observacoes_criticas": [
+        "⚠️ admin-menu.ts pode estar desatualizado (verificar sincronização)",
+        "✅ admin-sidebar.tsx é fonte principal",
+        "✅ dashboard-shell.tsx contem slot nav com feature locks",
+        "🔄 Hierarquia: sidebar > shell > config (prioridade)",
+        "❌ Alguns itens do menu não têm página implementada (6/11)",
+        "🔒 Chat IA tem lock = true + upsellHref para monetização"
+      ]
+    },
+    "analise_integracao_services": {
+      "services_implementados": [
+        {
+          "arquivo": "src/lib/services/user.service.ts",
+          "funcoes": ["getUserById", "updateUser", "deleteUser (soft delete via deletedAt)"],
+          "padrão": "✅ Service Pattern"
+        },
+        {
+          "arquivo": "src/lib/services/course.service.ts",
+          "funcoes": ["createCourse", "updateCourse", "publishCourse", "getCourseBySlug"],
+          "padrão": "✅ Service Pattern"
+        },
+        {
+          "arquivo": "src/lib/services/payment.service.ts",
+          "funcoes": ["processPayment", "createFeaturePurchase", "validatePayment"],
+          "padrão": "✅ Service Pattern com transações Prisma"
+        },
+        {
+          "arquivo": "src/lib/services/ai.service.ts",
+          "funcoes": ["generateResponse", "validateFeatureAccess"],
+          "padrão": "✅ Service Pattern"
+        },
+        {
+          "arquivo": "src/lib/services/dashboard.service.ts",
+          "funcoes": ["getDashboardData", "getAnalytics"],
+          "padrão": "✅ Service Pattern"
+        },
+        {
+          "arquivo": "src/lib/services/system.service.ts",
+          "funcoes": ["getSystemConfig", "updateSystemConfig"],
+          "padrão": "✅ Service Pattern"
+        },
+        {
+          "arquivo": "src/lib/services/stripe-config.service.ts",
+          "funcoes": ["getStripeConfig", "updateStripeConfig"],
+          "padrão": "✅ Service Pattern"
+        },
+        {
+          "arquivo": "src/lib/services/video.service.ts",
+          "funcoes": ["uploadVideo", "processVideoThumbnail"],
+          "padrão": "✅ Service Pattern"
+        },
+        {
+          "arquivo": "src/lib/services/plan.service.ts",
+          "funcoes": ["getPlanFeatures", "validatePlanAccess"],
+          "padrão": "✅ Service Pattern"
+        }
+      ],
+      "observacoes": [
+        "✅ Todos os services seguem padrão VisionVII",
+        "✅ Isolamento de lógica: Services não usam Server Actions",
+        "✅ API Routes delegam para Services"
+      ]
+    },
+    "resumo_executivo": {
+      "pontos_fortes": [
+        "✅ Menu admin bem estruturado com 11 itens principais",
+        "✅ Feature gating implementado (FeaturePurchase model)",
+        "✅ Imagens centralizadas em Supabase Storage",
+        "✅ Service Pattern em implementação (8 services)",
+        "✅ Soft delete aplicado em User, Course, etc",
+        "✅ Transações atômicas para pagamentos"
+      ],
+      "pontos_de_atencao": [
+        "⚠️ 6 rotas no menu sem página implementada completa",
+        "⚠️ admin-menu.ts pode estar desatualizado (não sincronizado com sidebar)",
+        "⚠️ Imagens não são deletadas do Storage quando registros são soft-deletados",
+        "⚠️ URLs hardcoded no banco (se Supabase URL mudar, quebra)",
+        "⚠️ Alguns componentes antigos em backup (.bak) - revisar se ainda necessários"
+      ],
+      "recomendacoes": [
+        "1️⃣ Implementar páginas completas para analytics, messages, notifications, reports, security",
+        "2️⃣ Sincronizar admin-menu.ts com admin-sidebar.tsx (usar uma fonte de verdade)",
+        "3️⃣ Adicionar lógica de cleanup: deletar imagens do Storage ao soft-deletar registros",
+        "4️⃣ Implementar middleware de feature gating para proteger rotas (não só em componentes)",
+        "5️⃣ Criar testes E2E para fluxos de feature unlock (payment → FeaturePurchase → access)"
+      ]
+    }
+  }
+}

@@ -96,6 +96,7 @@ model User {
   theme                     UserTheme?
   payouts                   Payout[]
   teacherAds                Advertisement[]            @relation("TeacherAds")
+  uploadedImages            Image[]                    @relation("ImageUploader")
 
   @@map("users")
 }
@@ -979,4 +980,72 @@ model SystemStatus {
   @@index([maintenanceMode])
   @@index([updatedAt])
   @@map("system_status")
+}
+
+// ============================================================================
+// PHASE 2: IMAGE PERSISTENCE & STORAGE MANAGEMENT
+// VisionVII 3.0 Enterprise Governance - Service Pattern
+// ============================================================================
+
+// Image: Armazenamento e metadados de imagens/vídeos
+// Suporta Supabase Storage com signed URLs
+model Image {
+  id              String       @id @default(cuid())
+  
+  // File metadata
+  fileName        String       // original_file_name.jpg
+  bucket          String       // course-thumbnails, videos, profile-pictures, public-pages
+  path            String       // slugified path in storage
+  mimeType        String       // image/jpeg, video/mp4, etc
+  size            Int          // bytes
+  width           Int?         // for images
+  height          Int?         // for images
+  duration        Int?         // seconds, for videos
+  
+  // Signed URL (cache)
+  signedUrl       String?      @db.Text // cached for performance
+  signedUrlExpiry DateTime?    // when cache expires (typically 1 hour)
+  
+  // Lifecycle
+  uploadedBy      String       // user ID who uploaded
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  expiresAt       DateTime?    // auto-delete after X days (optional)
+  
+  // Soft delete
+  deletedAt       DateTime?    // soft delete support
+  
+  // Relations
+  uploader        User         @relation("ImageUploader", fields: [uploadedBy], references: [id], onDelete: Cascade)
+  usages          ImageUsage[]
+  
+  // Indexes for performance
+  @@index([bucket])
+  @@index([path])
+  @@index([uploadedBy])
+  @@index([deletedAt])
+  @@index([createdAt])
+  @@map("images")
+}
+
+// ImageUsage: Rastreamento de uso de imagens
+// Relaciona imagens com recursos (Course, User, Page, etc)
+model ImageUsage {
+  id           String   @id @default(cuid())
+  
+  // Which image is being used
+  imageId      String
+  image        Image    @relation(fields: [imageId], references: [id], onDelete: Cascade)
+  
+  // Where it's being used
+  resourceType String   // "COURSE" | "USER" | "PAGE" | "LESSON" | "AD" | "CERTIFICATE" | "CONFIG"
+  resourceId   String   // e.g., courseId, userId, pageId
+  fieldName    String   // "thumbnail" | "avatar" | "banner" | "video" | "icon" etc
+  
+  createdAt    DateTime @default(now())
+  
+  @@unique([imageId, resourceType, resourceId, fieldName])
+  @@index([resourceType, resourceId])
+  @@index([imageId])
+  @@map("image_usages")
 }

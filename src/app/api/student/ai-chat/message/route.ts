@@ -2,7 +2,10 @@ import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 import { z } from 'zod';
-import { processStudentMessage, logAIInteraction } from '@/lib/services/ai.service';
+import {
+  processStudentMessage,
+  logAIInteraction,
+} from '@/lib/services/ai.service';
 
 /**
  * Schema de validação para mensagens do Chat IA

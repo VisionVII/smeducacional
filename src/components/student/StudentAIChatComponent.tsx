@@ -57,19 +57,46 @@ export function StudentAIChatComponent() {
   // Verificar acesso à feature
   useEffect(() => {
     const checkAccess = async () => {
-      if (status !== 'authenticated' || !session?.user?.id) return;
+      if (status !== 'authenticated' || !session?.user?.id) {
+        console.log('[StudentAIChat] ⏳ Aguardando autenticação...');
+        return;
+      }
+
+      console.log(
+        '[StudentAIChat] 🔍 Verificando acesso para:',
+        session.user.id
+      );
 
       try {
         const response = await fetch('/api/student/ai-chat/access');
+        const data = await response.json();
+
+        console.log('[StudentAIChat] 📋 Resposta da API:', {
+          ok: response.ok,
+          hasAccess: data.hasAccess,
+          enrolledCourses: data.enrolledCourses?.length,
+          debug: data.debug,
+          error: data.error,
+        });
+
         if (response.ok) {
-          const data = await response.json();
           setHasAccess(data.hasAccess);
           setEnrolledCourses(data.enrolledCourses || []);
+
+          if (data.hasAccess) {
+            console.log('[StudentAIChat] ✅ ACESSO CONCEDIDO');
+          } else {
+            console.log(
+              '[StudentAIChat] ❌ ACESSO NEGADO - Motivo:',
+              data.debug
+            );
+          }
         } else {
+          console.log('[StudentAIChat] ❌ Erro na resposta:', data.error);
           setHasAccess(false);
         }
       } catch (err) {
-        console.error('Erro ao verificar acesso:', err);
+        console.error('[StudentAIChat] 💥 Erro ao verificar acesso:', err);
         setHasAccess(false);
       }
     };
@@ -272,8 +299,8 @@ export function StudentAIChatComponent() {
             <Alert>
               <AlertCircle className="h-4 w-4" />
               <AlertDescription>
-                Você não está matriculado em nenhum curso ainda. Matricule-se
-                em um curso para começar a usar o Chat IA.
+                Você não está matriculado em nenhum curso ainda. Matricule-se em
+                um curso para começar a usar o Chat IA.
               </AlertDescription>
             </Alert>
           )}
@@ -295,7 +322,9 @@ export function StudentAIChatComponent() {
             />
             <Button
               onClick={handleSendMessage}
-              disabled={loading || !input.trim() || enrolledCourses.length === 0}
+              disabled={
+                loading || !input.trim() || enrolledCourses.length === 0
+              }
               className="self-end"
               size="lg"
             >
@@ -308,8 +337,8 @@ export function StudentAIChatComponent() {
           </div>
 
           <p className="text-xs text-muted-foreground text-center">
-            💡 Dica: Faça perguntas específicas sobre o conteúdo dos seus
-            cursos matriculados.
+            💡 Dica: Faça perguntas específicas sobre o conteúdo dos seus cursos
+            matriculados.
           </p>
         </div>
       </div>

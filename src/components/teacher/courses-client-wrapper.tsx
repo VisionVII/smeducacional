@@ -7,7 +7,6 @@ import Link from 'next/link';
 import { StatsCard } from '@/components/teacher/stats-card';
 import { CourseCard } from '@/components/teacher/course-card';
 import { EmptyState } from '@/components/teacher/empty-state';
-import { useTranslations } from '@/hooks/use-translations';
 import { useState } from 'react';
 
 interface Course {
@@ -51,8 +50,6 @@ export function CoursesClientWrapper({
   pageSize,
   totalCoursesCount,
 }: CoursesClientWrapperProps) {
-  const { t, mounted } = useTranslations();
-
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [courseList, setCourseList] = useState<Course[]>(courses);
@@ -102,25 +99,25 @@ export function CoursesClientWrapper({
                 </div>
                 <div>
                   <h1 className="text-3xl sm:text-4xl font-bold tracking-tight bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                    {mounted ? t.dashboard.teacher.myCourses : 'Meus Cursos'}
+                    Meus Cursos
                   </h1>
                   <p className="text-sm sm:text-base text-muted-foreground mt-1">
-                    {mounted
-                      ? t.dashboard.teacher.headerDescription
-                      : 'Gerencie todos os seus cursos em um só lugar'}
+                    Gerencie todos os seus cursos em um só lugar
                   </p>
                 </div>
               </div>
             </div>
-            <Link href="/teacher/courses/new" className="w-full sm:w-auto">
+            <Link
+              href="/teacher/courses/new"
+              className="w-full sm:w-auto"
+              suppressHydrationWarning
+            >
               <Button
                 size="lg"
                 className="w-full sm:w-auto bg-gradient-theme hover:bg-gradient-theme-soft shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 text-white font-bold h-12 px-8"
               >
                 <Plus className="h-5 w-5 mr-2" />
-                {mounted
-                  ? t.dashboard.teacher.createNewCourse
-                  : 'Criar Novo Curso'}
+                Criar Novo Curso
               </Button>
             </Link>
           </div>
@@ -130,45 +127,33 @@ export function CoursesClientWrapper({
       {/* Estatísticas */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-7 lg:gap-8">
         <StatsCard
-          title={mounted ? t.dashboard.teacher.totalCourses : 'Total de Cursos'}
+          title="Total de Cursos"
           value={totalCoursesStat}
-          description={
-            mounted
-              ? `${publishedCourses} ${t.dashboard.teacher.publishedCount}, ${draftCourses} ${t.dashboard.teacher.draftCoursesCount}`
-              : `${publishedCourses} publicados, ${draftCourses} rascunhos`
-          }
+          description={`${publishedCourses} publicados, ${draftCourses} rascunhos`}
           icon={BookOpen}
           iconColor="from-blue-500 to-blue-600"
         />
 
         <StatsCard
-          title={mounted ? t.dashboard.teacher.coursesPublished : 'Publicados'}
+          title="Publicados"
           value={publishedCourses}
-          description={
-            mounted
-              ? t.dashboard.teacher.availableForStudents
-              : 'Disponíveis para alunos'
-          }
+          description="Disponíveis para alunos"
           icon={CheckCircle}
           iconColor="from-green-500 to-green-600"
         />
 
         <StatsCard
-          title={mounted ? t.dashboard.teacher.drafts : 'Rascunhos'}
+          title="Rascunhos"
           value={draftCourses}
-          description={
-            mounted ? t.dashboard.teacher.inConstruction : 'Em construção'
-          }
+          description="Em construção"
           icon={Clock}
           iconColor="from-amber-500 to-amber-600"
         />
 
         <StatsCard
-          title={
-            mounted ? t.dashboard.teacher.totalStudents : 'Total de Alunos'
-          }
+          title="Total de Alunos"
           value={totalStudents}
-          description={mounted ? t.dashboard.teacher.enrolled : 'Matriculados'}
+          description="Matriculados"
           icon={Users}
           iconColor="from-purple-500 to-purple-600"
         />
@@ -179,32 +164,17 @@ export function CoursesClientWrapper({
         {courseList.length === 0 ? (
           <EmptyState
             icon={BookOpen}
-            title={
-              mounted
-                ? t.dashboard.teacher.emptyTitle
-                : 'Nenhum curso criado ainda'
-            }
-            description={
-              mounted
-                ? t.dashboard.teacher.emptyDescription
-                : 'Comece criando seu primeiro curso agora mesmo'
-            }
+            title="Nenhum curso criado ainda"
+            description="Comece criando seu primeiro curso agora mesmo"
             action={{
-              label: mounted
-                ? t.dashboard.teacher.emptyAction
-                : 'Criar Primeiro Curso',
+              label: 'Criar Primeiro Curso',
               href: '/teacher/courses/new',
             }}
           />
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 lg:gap-6">
             {courseList.map((course) => (
-              <CourseCard
-                key={course.id}
-                course={course}
-                t={t}
-                mounted={mounted}
-              />
+              <CourseCard key={course.id} course={course} />
             ))}
           </div>
         )}

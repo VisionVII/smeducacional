@@ -1,10 +1,10 @@
 /**
  * AIService.ts
  * Serviço de IA para Chat do Estudante
- * 
+ *
  * Abstrai toda a lógica de comunicação com IA, validação de matrícula e deflecção inteligente.
  * Implementa o padrão Service definido em system-blueprint.md
- * 
+ *
  * Métodos principais:
  * - validateEnrollmentContext: Valida se mensagem está dentro do contexto dos cursos matriculados
  * - processStudentMessage: Processa mensagem com validação automática
@@ -271,10 +271,14 @@ function generateAIResponse(
       `Para resolver este exercício do curso ${courses[0]}, considere os seguintes passos: `,
 
     concept: (courses) =>
-      `Este conceito é fundamental! Nos seus cursos (${courses.join(', ')}), você aprenderá: `,
+      `Este conceito é fundamental! Nos seus cursos (${courses.join(
+        ', '
+      )}), você aprenderá: `,
 
     default: (courses) =>
-      `Obrigado pela pergunta! Com base nos seus cursos (${courses.join(', ')}), `,
+      `Obrigado pela pergunta! Com base nos seus cursos (${courses.join(
+        ', '
+      )}), `,
   };
 
   const courseTitles = enrolledCourses.map((c) => `"${c.title}"`);
@@ -283,10 +287,7 @@ function generateAIResponse(
   let template = responseTemplates.default;
 
   const lowerMessage = message.toLowerCase();
-  if (
-    lowerMessage.includes('ajud') ||
-    lowerMessage.includes('pode')
-  ) {
+  if (lowerMessage.includes('ajud') || lowerMessage.includes('pode')) {
     template = responseTemplates.help;
   } else if (
     lowerMessage.includes('entend') ||

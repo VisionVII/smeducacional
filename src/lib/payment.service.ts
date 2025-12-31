@@ -530,7 +530,7 @@ async function handleCheckoutSessionCompleted(
 
     await prisma.$transaction(async (tx) => {
       // Criar ou atualizar FeaturePurchase
-      await tx.featurePurchase.upsert({
+      const featurePurchaseResult = await tx.featurePurchase.upsert({
         where: {
           userId_featureId: {
             userId: metadata.userId as string,
@@ -558,7 +558,7 @@ async function handleCheckoutSessionCompleted(
       });
 
       // Registrar pagamento
-      await tx.payment.create({
+      const paymentResult = await tx.payment.create({
         data: {
           userId: metadata.userId as string,
           stripePaymentId: paymentIntentId,
@@ -600,12 +600,27 @@ async function handleCheckoutSessionCompleted(
             stripeEventId: eventId,
             stripePaymentIntentId: paymentIntentId,
             featureId,
+            featurePurchaseId: featurePurchaseResult.id,
+            paymentId: paymentResult.id,
           },
         },
       });
+
+      // Log estruturado CRÍTICO
+      console.log('[PaymentService] ✅ FEATURE PURCHASE COMPLETED', {
+        timestamp: new Date().toISOString(),
+        userId: metadata.userId,
+        featureId,
+        status: featurePurchaseResult.status,
+        stripePaymentId: paymentIntentId,
+        amount: `${amount} ${currency}`,
+        isTest,
+        featurePurchaseId: featurePurchaseResult.id,
+        paymentId: paymentResult.id,
+        stripeEventId: eventId,
+      });
     });
 
-    console.log('[PaymentService] Feature purchase completed:', featureId);
     return;
   }
 

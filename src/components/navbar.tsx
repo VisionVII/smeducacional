@@ -126,22 +126,25 @@ export function Navbar({ user, links }: NavbarProps) {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-1 lg:gap-2">
-            {links?.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={cn(
-                  'navbar-link flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors',
-                  pathname === link.href
-                    ? 'navbar-link-active bg-primary text-primary-foreground'
-                    : 'hover:bg-accent hover:text-accent-foreground'
-                )}
-                suppressHydrationWarning
-              >
-                {link.icon}
-                <span className="hidden lg:inline">{link.label}</span>
-              </Link>
-            ))}
+            {links?.map((link) => {
+              const isActive = mounted && pathname === link.href;
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  suppressHydrationWarning
+                  className={cn(
+                    'navbar-link flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors',
+                    isActive
+                      ? 'navbar-link-active bg-primary text-primary-foreground'
+                      : 'hover:bg-accent hover:text-accent-foreground'
+                  )}
+                >
+                  {link.icon}
+                  <span className="hidden lg:inline">{link.label}</span>
+                </Link>
+              );
+            })}
           </div>
 
           {/* Right Side Actions */}

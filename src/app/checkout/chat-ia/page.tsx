@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import {
@@ -31,6 +31,7 @@ export default function ChatIACheckoutPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [checkingAccess, setCheckingAccess] = useState(true);
 
   // Feature pricing e metadata
   const feature = {
@@ -48,6 +49,32 @@ export default function ChatIACheckoutPage() {
     ],
     icon: MessageSquare,
   };
+
+  // Verificar se usuário já tem acesso
+  useEffect(() => {
+    const checkAccess = async () => {
+      try {
+        const response = await fetch('/api/student/ai-chat/access');
+        if (response.ok) {
+          const data = await response.json();
+          if (data.hasAccess) {
+            // Usuário já tem acesso, redirecionar para chat
+            router.push('/student/ai-chat');
+          }
+        }
+      } catch (err) {
+        console.error('Erro ao verificar acesso:', err);
+      } finally {
+        setCheckingAccess(false);
+      }
+    };
+
+    if (session?.user) {
+      checkAccess();
+    } else {
+      setCheckingAccess(false);
+    }
+  }, [session, router]);
 
   const handleCheckout = async () => {
     if (!session?.user) {
@@ -87,6 +114,18 @@ export default function ChatIACheckoutPage() {
     }
   };
 
+  // Mostrar loading enquanto verifica acesso
+  if (checkingAccess) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 dark:from-gray-900 dark:to-gray-800 p-6 flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-2 text-purple-600" />
+          <p className="text-muted-foreground">Verificando acesso...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 dark:from-gray-900 dark:to-gray-800 p-6">
       <div className="max-w-4xl mx-auto">
@@ -109,8 +148,8 @@ export default function ChatIACheckoutPage() {
           <Card className="md:col-span-2">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <feature.icon className="h-6 w-6 text-purple-600" />
-                O que você ganha?
+                <feature.icon className="h-6 w-6 text-purple-600" />O que você
+                ganha?
               </CardTitle>
               <CardDescription>
                 Um professor 100% dedicado aos seus cursos
@@ -142,9 +181,9 @@ export default function ChatIACheckoutPage() {
                     conteúdos.
                   </p>
                   <p>
-                    <strong>🔒 Focado:</strong> Se você perguntar sobre um
-                    curso que não está matriculado, a IA sugere que você se
-                    inscreva primeiro.
+                    <strong>🔒 Focado:</strong> Se você perguntar sobre um curso
+                    que não está matriculado, a IA sugere que você se inscreva
+                    primeiro.
                   </p>
                   <p>
                     <strong>💬 Ilimitado:</strong> Sem limite de perguntas ou
@@ -234,7 +273,9 @@ export default function ChatIACheckoutPage() {
                 </Button>
 
                 {error && (
-                  <p className="text-sm text-destructive text-center">{error}</p>
+                  <p className="text-sm text-destructive text-center">
+                    {error}
+                  </p>
                 )}
 
                 {/* Garantia */}
@@ -283,8 +324,8 @@ export default function ChatIACheckoutPage() {
         {/* Footer */}
         <div className="text-center mt-8 text-sm text-muted-foreground">
           <p>
-            Ao clicar em &quot;Comprar Agora&quot;, você será redirecionado para o
-            checkout seguro do Stripe.
+            Ao clicar em &quot;Comprar Agora&quot;, você será redirecionado para
+            o checkout seguro do Stripe.
           </p>
           <p className="mt-1">
             Tem dúvidas?{' '}

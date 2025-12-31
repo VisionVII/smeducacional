@@ -8,7 +8,7 @@ Implementação completa do sistema de Chat IA como feature premium desbloqueáv
 ✅ **Feature Gating**: Validação automática de acesso por `FeaturePurchase` ou `StudentSubscription`  
 ✅ **Validação de Matrícula**: IA responde APENAS sobre cursos em que o aluno está matriculado  
 ✅ **Deflecção Inteligente**: Sugere matrícula em cursos não enrollados quando mencionados  
-✅ **Service Pattern**: Toda lógica isolada em `ai.service.ts` para testabilidade  
+✅ **Service Pattern**: Toda lógica isolada em `ai.service.ts` para testabilidade
 
 ---
 
@@ -101,21 +101,26 @@ Exibe mensagem de assistente
 ### **Arquivos Novos**
 
 #### Pages
+
 - `src/app/checkout/chat-ia/page.tsx` - Página de checkout do Chat IA
 - `src/app/student/ai-chat/page.tsx` - Página do Chat IA para estudantes
 
 #### Components
+
 - `src/components/student/StudentAIChatComponent.tsx` - Componente principal do chat
 
 #### APIs
+
 - `src/app/api/checkout/feature/route.ts` - Criar sessão de checkout para features
 - `src/app/api/student/ai-chat/access/route.ts` - Verificar acesso à feature
 - `src/app/api/student/ai-chat/message/route.ts` - Processar mensagens do chat
 
 #### Services
+
 - `src/lib/services/ai.service.ts` - Serviço de IA (validação, deflecção, contexto)
 
 #### Database
+
 - `prisma/schema.prisma` - Adicionado:
   - Campo `featureId` em `CheckoutSession`
   - Novo modelo `FeaturePurchase`
@@ -136,11 +141,13 @@ Exibe mensagem de assistente
 Usuário tem acesso se:
 
 1. **FeaturePurchase** encontrada:
+
    ```sql
    WHERE userId = ? AND featureId = 'ai-assistant' AND status = 'active'
    ```
 
 2. **OU StudentSubscription** ativa com plano adequado:
+
    ```sql
    WHERE userId = ? AND status = 'active' AND plan IN ('basic', 'premium')
    ```
@@ -173,7 +180,7 @@ Quando aluno pergunta sobre curso não matriculado:
 
 "📚 **Pergunta sobre 'Python'**
 
-Vejo que você está perguntando sobre este tópico, mas você ainda não está 
+Vejo que você está perguntando sobre este tópico, mas você ainda não está
 matriculado no curso **"Python Avançado"**.
 
 Atualmente você está matriculado em:
@@ -194,12 +201,12 @@ Você está interessado neste curso? Posso ajudá-lo com informações sobre ele
 
 ### **Planos & Features**
 
-| Feature | Free | Basic | Premium | Enterprise |
-|---------|------|-------|---------|-----------|
-| Chat IA | ❌ Bloqueado | ✅ Incluído | ✅ Incluído | ✅ Incluído |
-| Mentorias | ❌ | ❌ | ✅ | ✅ |
-| Pro Tools | ❌ | ❌ | ✅ | ✅ |
-| Analytics | ❌ | ❌ | ❌ | ✅ (Teachers) |
+| Feature   | Free         | Basic       | Premium     | Enterprise    |
+| --------- | ------------ | ----------- | ----------- | ------------- |
+| Chat IA   | ❌ Bloqueado | ✅ Incluído | ✅ Incluído | ✅ Incluído   |
+| Mentorias | ❌           | ❌          | ✅          | ✅            |
+| Pro Tools | ❌           | ❌          | ✅          | ✅            |
+| Analytics | ❌           | ❌          | ❌          | ✅ (Teachers) |
 
 ### **Standalone Purchase**
 
@@ -215,6 +222,7 @@ Você está interessado neste curso? Posso ajudá-lo com informações sobre ele
 ### **Cenário: João (Student, Free) compra Chat IA**
 
 **1. Clica em Chat IA (locked)**
+
 ```
 GET /student/ai-chat
 → Sem FeaturePurchase
@@ -222,6 +230,7 @@ GET /student/ai-chat
 ```
 
 **2. Clica "Desbloqueiar Agora"**
+
 ```
 POST /api/checkout/feature
 {
@@ -236,6 +245,7 @@ Resposta:
 ```
 
 **3. Vai para Stripe, paga R$ 29,90**
+
 ```
 Stripe Webhook → /api/webhooks/stripe
 Event: checkout.session.completed
@@ -247,6 +257,7 @@ Metadata:
 ```
 
 **4. Webhook processa**
+
 ```prisma
 INSERT INTO feature_purchases
   (userId, featureId, status, stripePaymentId, amount)
@@ -260,6 +271,7 @@ VALUES
 ```
 
 **5. Redirecionado para `/checkout/success`**
+
 ```
 ?type=feature_purchase&featureId=ai-assistant
 → Exibe confirmação
@@ -268,6 +280,7 @@ VALUES
 ```
 
 **6. Chat IA agora desbloqueado**
+
 ```
 GET /api/student/ai-chat/access
 → Encontra FeaturePurchase (status='active')
@@ -276,6 +289,7 @@ GET /api/student/ai-chat/access
 ```
 
 **7. João pergunta: "Qual é a capital da França?"**
+
 ```
 POST /api/student/ai-chat/message
 {
@@ -288,13 +302,14 @@ Processamento:
    → Pergunta genérica → PERMITIR
 2. generateAIResponse()
    → Retorna resposta contextualizada baseada em cursos enrolled
-   
+
 Resposta:
 "Obrigado pela pergunta! Com base nos seus cursos (JavaScript, React),
 recomendo consultar o material da aula..."
 ```
 
 **8. João pergunta: "Como fazer Python? Preciso de uma aula de Python"**
+
 ```
 POST /api/student/ai-chat/message
 {
@@ -309,10 +324,10 @@ Processamento:
    → Retorna DEFLECTION: true
 2. Resposta:
    "📚 **Pergunta sobre 'Python'**
-   
-   Vejo que você está perguntando sobre este tópico, mas você ainda não está 
+
+   Vejo que você está perguntando sobre este tópico, mas você ainda não está
    matriculado no curso **"Python Avançado"**...
-   
+
    Visite: /courses/python-avancado"
 ```
 
@@ -332,7 +347,7 @@ async function generateAIResponse(
   // Construir prompt com contexto dos cursos
   const systemPrompt = `
     Você é um professor de IA. O aluno está matriculado em:
-    ${context.enrolledCourses.map(c => `- ${c.title}`).join('\n')}
+    ${context.enrolledCourses.map((c) => `- ${c.title}`).join('\n')}
     
     Responda APENAS sobre conteúdo desses cursos.
     Se perguntarem sobre outros cursos, sugira inscrição.
@@ -343,13 +358,11 @@ async function generateAIResponse(
     model: 'claude-3-5-sonnet-20241022',
     max_tokens: 1024,
     system: systemPrompt,
-    messages: [
-      { role: 'user', content: message }
-    ]
+    messages: [{ role: 'user', content: message }],
   });
 
-  return response.content[0].type === 'text' 
-    ? response.content[0].text 
+  return response.content[0].type === 'text'
+    ? response.content[0].text
     : 'Erro ao gerar resposta';
 }
 ```
@@ -359,6 +372,7 @@ async function generateAIResponse(
 ## ✅ Checklist de Funcionalidades
 
 ### **Checkout Flow**
+
 - [x] Página de checkout visual com preço e benefícios
 - [x] API POST `/api/checkout/feature` com validação
 - [x] Integração Stripe (pagamento único)
@@ -367,6 +381,7 @@ async function generateAIResponse(
 - [x] Analytics e audit logging
 
 ### **Feature Gating**
+
 - [x] GET `/api/student/ai-chat/access` com validação
 - [x] Suporte para FeaturePurchase.status
 - [x] Suporte para StudentSubscription.plan
@@ -374,6 +389,7 @@ async function generateAIResponse(
 - [x] Tela de bloqueio com CTA
 
 ### **Chat Interface**
+
 - [x] Componente React com autoscroll
 - [x] Interface responsiva (mobile/desktop)
 - [x] Indicadores de loading
@@ -381,6 +397,7 @@ async function generateAIResponse(
 - [x] Suporte para Enter + Shift
 
 ### **Message Processing**
+
 - [x] POST `/api/student/ai-chat/message` com validação
 - [x] Contexto de matrícula (enrolled courses)
 - [x] Detecção de menções de cursos
@@ -389,6 +406,7 @@ async function generateAIResponse(
 - [x] Logging de interações
 
 ### **Database**
+
 - [x] Tabela `FeaturePurchase`
 - [x] Campo `featureId` em `CheckoutSession`
 - [x] Migrations aplicadas
@@ -396,6 +414,7 @@ async function generateAIResponse(
 - [x] Soft deletes considerados
 
 ### **Security**
+
 - [x] Autenticação obrigatória
 - [x] Feature gating em API
 - [x] Validação de role (STUDENT/TEACHER)
@@ -466,19 +485,19 @@ NEXT_PUBLIC_URL=https://seu-app.vercel.app
 
 ```bash
 # Verificar FeaturePurchases ativas
-SELECT * FROM feature_purchases 
-WHERE featureId = 'ai-assistant' 
+SELECT * FROM feature_purchases
+WHERE featureId = 'ai-assistant'
 AND status = 'active'
 LIMIT 10;
 
 # Ver histórico de compras
-SELECT * FROM checkout_sessions 
-WHERE featureId = 'ai-assistant' 
+SELECT * FROM checkout_sessions
+WHERE featureId = 'ai-assistant'
 ORDER BY createdAt DESC;
 
 # Contar usuários com acesso
-SELECT COUNT(DISTINCT userId) FROM feature_purchases 
-WHERE status = 'active' 
+SELECT COUNT(DISTINCT userId) FROM feature_purchases
+WHERE status = 'active'
 AND featureId = 'ai-assistant';
 ```
 
@@ -486,4 +505,4 @@ AND featureId = 'ai-assistant';
 
 **Documentação gerada em**: 2025-12-30 20:26 UTC  
 **Versão**: 1.0 - Implementação Inicial  
-**Revisor**: VisionVII Enterprise Governance 3.0  
+**Revisor**: VisionVII Enterprise Governance 3.0
