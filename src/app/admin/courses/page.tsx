@@ -328,17 +328,8 @@ export default function AdminCoursesPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-        <div className="space-y-1">
-          <h1 className="text-xl sm:text-2xl lg:text-3xl font-semibold flex items-center gap-2">
-            <BookOpen className="h-6 w-6 sm:h-8 sm:w-8" />
-            Conteúdo Educacional
-          </h1>
-          <p className="text-xs sm:text-sm text-muted-foreground">
-            Gerencie os cursos e materiais da plataforma
-          </p>
-        </div>
-        <div className="flex gap-2 justify-end">
+      <div className="flex justify-end">
+        <div className="flex gap-2">
           <Button
             variant="outline"
             onClick={() => setIsFeaturedModalOpen(true)}
