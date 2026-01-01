@@ -143,7 +143,7 @@ const defaultSlotNav: Record<Role, SlotNavItem[]> = {
     },
     {
       href: '/admin/analytics',
-      label: 'Ferramentas Pro',
+      label: 'Insights',
       icon: BarChart3,
       locked: false,
       featureId: 'pro-tools',
