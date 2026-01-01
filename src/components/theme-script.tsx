@@ -47,7 +47,7 @@ export async function ThemeScript() {
     if (session?.user?.id && session.user.role !== 'ADMIN') {
       // Teacher ou Student: usa tema customizado (com fallback ao admin)
       try {
-        const userTheme = await Promise.race([
+        const userTheme = (await Promise.race([
           getUserTheme(session.user.id),
           new Promise((_, reject) =>
             setTimeout(
@@ -55,7 +55,7 @@ export async function ThemeScript() {
               2000
             )
           ),
-        ]);
+        ])) as Awaited<ReturnType<typeof getUserTheme>>;
         lightVars = generateCssVariables(userTheme.preset.light);
         darkVars = generateCssVariables(userTheme.preset.dark);
 
