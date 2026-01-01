@@ -107,12 +107,12 @@ async function checkFeatureAccess(
   ]);
 
   const hasFeatureFromPurchase =
-    featurePurchase && featurePurchase.status === 'active';
+    (featurePurchase && featurePurchase.status === 'active') ?? false;
 
   const hasFeatureFromSubscription =
-    subscription &&
-    subscription.status === 'active' &&
-    (subscription.plan === 'basic' || subscription.plan === 'premium');
+    (subscription &&
+      subscription.status === 'active' &&
+      (subscription.plan === 'basic' || subscription.plan === 'premium')) ?? false;
 
   return hasFeatureFromPurchase || hasFeatureFromSubscription;
 }
