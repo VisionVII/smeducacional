@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 
@@ -8,7 +8,7 @@ import { prisma } from '@/lib/db';
  * RESTRITO A ADMIN
  */
 export async function GET(
-  request: Request,
+  _request: NextRequest,
   { params }: { params: { userId: string } }
 ) {
   try {
@@ -26,7 +26,7 @@ export async function GET(
       );
     }
 
-    const userId = params.userId;
+    const { userId } = params;
 
     // Buscar todas as FeaturePurchases do usuário
     const featurePurchases = await prisma.featurePurchase.findMany({
