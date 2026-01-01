@@ -9,7 +9,7 @@ import { prisma } from '@/lib/db';
  */
 export async function GET(
   _request: NextRequest,
-  { params }: { params: { userId: string } }
+  { params }: { params: Promise<{ userId: string }> }
 ) {
   try {
     const session = await auth();
@@ -26,7 +26,7 @@ export async function GET(
       );
     }
 
-    const { userId } = params;
+    const { userId } = await params;
 
     // Buscar todas as FeaturePurchases do usuário
     const featurePurchases = await prisma.featurePurchase.findMany({
