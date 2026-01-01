@@ -352,18 +352,6 @@ export default function AdminUsersPage() {
   );
 }
 
-  // Calcular estatísticas
-  const stats: DashboardStats = useMemo(() => {
-    return {
-      totalStudents: users?.filter((u) => u.role === 'STUDENT').length || 0,
-      totalTeachers: users?.filter((u) => u.role === 'TEACHER').length || 0,
-      totalAdmins: users?.filter((u) => u.role === 'ADMIN').length || 0,
-      activeStudents:
-        users?.filter(
-          (u) =>
-            u.role === 'STUDENT' &&
-            u.lastActiveAt &&
-            new Date(u.lastActiveAt) > new Date(now - 7 * 24 * 60 * 60 * 1000)
         ).length || 0,
       studentsAtRisk:
         users?.filter(
