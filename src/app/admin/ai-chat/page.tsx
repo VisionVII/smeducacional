@@ -1,9 +1,8 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Sparkles, Send, Bot, User, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -70,7 +69,7 @@ export default function AdminAIChatPage() {
     }
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
+  const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSend();
@@ -78,180 +77,136 @@ export default function AdminAIChatPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/20 dark:from-slate-900 dark:via-slate-900 dark:to-slate-950 p-4 sm:p-6 lg:p-8">
-      <div className="max-w-5xl mx-auto space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-gradient-to-br from-purple-500 to-blue-500">
-                <Sparkles className="h-6 w-6 text-white" />
-              </div>
-              <div>
-                <h1 className="text-3xl font-bold tracking-tight">
-                  Chat IA Admin
-                </h1>
-                <p className="text-slate-600 dark:text-slate-400 mt-1">
-                  Assistente administrativo inteligente
-                </p>
-              </div>
-            </div>
+    <div className="flex flex-col h-[calc(100vh-4rem)] md:h-[calc(100vh-5rem)] lg:p-6">
+      {/* Header - Hidden on mobile for fullscreen experience */}
+      <div className="hidden md:flex items-center justify-between mb-6 px-6 lg:px-0">
+        <div className="flex items-center gap-3">
+          <div className="p-2 rounded-lg bg-primary/10">
+            <Sparkles className="h-5 w-5 text-primary" />
           </div>
-          <Badge className="bg-gradient-to-r from-purple-500 to-blue-500 text-white border-none">
-            Beta
-          </Badge>
-        </div>
-
-        {/* Chat Interface */}
-        <Card className="h-[calc(100vh-250px)] flex flex-col">
-          <CardHeader className="border-b">
-            <CardTitle className="text-lg flex items-center gap-2">
-              <Bot className="h-5 w-5 text-purple-600 dark:text-purple-400" />
-              Conversa
-            </CardTitle>
-          </CardHeader>
-
-          {/* Messages Area */}
-          <CardContent className="flex-1 overflow-y-auto p-4 space-y-4">
-            {messages.map((message) => (
-              <div
-                key={message.id}
-                className={cn(
-                  'flex gap-3 animate-in fade-in slide-in-from-bottom-2',
-                  message.role === 'user' ? 'justify-end' : 'justify-start'
-                )}
-              >
-                {message.role === 'assistant' && (
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center flex-shrink-0">
-                    <Bot className="h-5 w-5 text-white" />
-                  </div>
-                )}
-
-                <div
-                  className={cn(
-                    'max-w-[70%] rounded-lg p-3',
-                    message.role === 'user'
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-100'
-                  )}
-                >
-                  <p className="text-sm leading-relaxed">{message.content}</p>
-                  <span className="text-xs opacity-70 mt-1 block">
-                    {message.timestamp.toLocaleTimeString('pt-BR', {
-                      hour: '2-digit',
-                      minute: '2-digit',
-                    })}
-                  </span>
-                </div>
-
-                {message.role === 'user' && (
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-600 to-blue-700 flex items-center justify-center flex-shrink-0">
-                    <User className="h-5 w-5 text-white" />
-                  </div>
-                )}
-              </div>
-            ))}
-
-            {isLoading && (
-              <div className="flex gap-3 animate-in fade-in">
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center flex-shrink-0">
-                  <Bot className="h-5 w-5 text-white" />
-                </div>
-                <div className="bg-slate-100 dark:bg-slate-800 rounded-lg p-3">
-                  <div className="flex items-center gap-2">
-                    <Loader2 className="h-4 w-4 animate-spin text-purple-600" />
-                    <span className="text-sm text-slate-600 dark:text-slate-400">
-                      Pensando...
-                    </span>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            <div ref={messagesEndRef} />
-          </CardContent>
-
-          {/* Input Area */}
-          <div className="border-t p-4">
-            <div className="flex gap-2">
-              <Input
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyPress={handleKeyPress}
-                placeholder="Digite sua mensagem..."
-                disabled={isLoading}
-                className="flex-1"
-              />
-              <Button
-                onClick={handleSend}
-                disabled={isLoading || !input.trim()}
-                className="gap-2"
-              >
-                {isLoading ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <Send className="h-4 w-4" />
-                )}
-                Enviar
-              </Button>
-            </div>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">
-              💡 Dica: Pressione Enter para enviar, Shift+Enter para nova linha
+          <div>
+            <h1 className="text-2xl font-bold">Chat IA Admin</h1>
+            <p className="text-sm text-muted-foreground">
+              Assistente administrativo inteligente
             </p>
           </div>
-        </Card>
+        </div>
+        <Badge variant="secondary">Beta</Badge>
+      </div>
 
-        {/* Info Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-purple-100 dark:bg-purple-900/30">
-                  <Sparkles className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+      {/* Chat Container - Fullscreen on mobile, card on desktop */}
+      <div className="flex-1 flex flex-col bg-background md:bg-card md:border md:rounded-lg overflow-hidden">
+        {/* Mobile Header */}
+        <div className="md:hidden flex items-center justify-between p-4 border-b bg-card">
+          <div className="flex items-center gap-2">
+            <Bot className="h-5 w-5 text-primary" />
+            <span className="font-semibold">Chat IA</span>
+          </div>
+          <Badge variant="secondary" className="text-xs">Beta</Badge>
+        </div>
+
+        {/* Messages Area */}
+        <div className="flex-1 overflow-y-auto p-4 space-y-4">
+          {messages.map((message) => (
+            <div
+              key={message.id}
+              className={cn(
+                'flex gap-3 animate-in fade-in slide-in-from-bottom-2 duration-300',
+                message.role === 'user' ? 'justify-end' : 'justify-start'
+              )}
+            >
+              {message.role === 'assistant' && (
+                <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                  <Bot className="h-4 w-4 text-primary" />
                 </div>
-                <div>
-                  <p className="text-sm font-medium">Modo Admin</p>
-                  <p className="text-xs text-slate-600 dark:text-slate-400">
-                    Acesso completo
-                  </p>
+              )}
+
+              <div
+                className={cn(
+                  'max-w-[85%] md:max-w-[70%] rounded-2xl px-4 py-3',
+                  message.role === 'user'
+                    ? 'bg-primary text-primary-foreground rounded-br-sm'
+                    : 'bg-muted rounded-bl-sm'
+                )}
+              >
+                <p className="text-sm leading-relaxed whitespace-pre-wrap break-words">
+                  {message.content}
+                </p>
+                <span
+                  className={cn(
+                    'text-xs mt-1.5 block',
+                    message.role === 'user'
+                      ? 'text-primary-foreground/70'
+                      : 'text-muted-foreground'
+                  )}
+                >
+                  {message.timestamp.toLocaleTimeString('pt-BR', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  })}
+                </span>
+              </div>
+
+              {message.role === 'user' && (
+                <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
+                  <User className="h-4 w-4 text-primary-foreground" />
+                </div>
+              )}
+            </div>
+          ))}
+
+          {isLoading && (
+            <div className="flex gap-3 animate-in fade-in">
+              <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                <Bot className="h-4 w-4 text-primary" />
+              </div>
+              <div className="bg-muted rounded-2xl rounded-bl-sm px-4 py-3">
+                <div className="flex items-center gap-2">
+                  <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                  <span className="text-sm text-muted-foreground">
+                    Pensando...
+                  </span>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          )}
 
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-blue-100 dark:bg-blue-900/30">
-                  <Bot className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium">Assistente GPT</p>
-                  <p className="text-xs text-slate-600 dark:text-slate-400">
-                    Sempre disponível
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <div ref={messagesEndRef} />
+        </div>
 
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-green-100 dark:bg-green-900/30">
-                  <Sparkles className="h-5 w-5 text-green-600 dark:text-green-400" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium">Beta Gratuita</p>
-                  <p className="text-xs text-slate-600 dark:text-slate-400">
-                    Sem limites
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+        {/* Input Area */}
+        <div className="border-t p-4 bg-card">
+          <div className="flex gap-2 items-end">
+            <Textarea
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder="Digite sua mensagem..."
+              disabled={isLoading}
+              className="min-h-[44px] max-h-32 resize-none"
+              rows={1}
+            />
+            <Button
+              onClick={handleSend}
+              disabled={isLoading || !input.trim()}
+              size="icon"
+              className="h-11 w-11 flex-shrink-0"
+            >
+              {isLoading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Send className="h-4 w-4" />
+              )}
+            </Button>
+          </div>
+          <p className="text-xs text-muted-foreground mt-2 hidden md:block">
+            💡 Pressione Enter para enviar, Shift+Enter para nova linha
+          </p>
         </div>
       </div>
+    </div>
+  );
+}
     </div>
   );
 }
