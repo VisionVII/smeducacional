@@ -10,7 +10,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await auth();
@@ -18,7 +18,8 @@ export async function GET(
       return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
     }
 
-    const signedUrl = await ImageService.getSignedUrl(params.id);
+    const { id } = await params;
+    const signedUrl = await ImageService.getSignedUrl(id);
 
     return NextResponse.json({
       success: true,

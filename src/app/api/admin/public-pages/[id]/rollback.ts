@@ -10,12 +10,14 @@ const rollbackSchema = z.object({
 // POST /api/admin/public-pages/[id]/rollback
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await auth();
   if (!session || session.user.role !== 'ADMIN') {
     return NextResponse.json({ error: 'Acesso negado' }, { status: 403 });
   }
+  
+  const { id } = await params;
   const body = await req.json();
   const result = rollbackSchema.safeParse(body);
   if (!result.success) {
@@ -27,7 +29,7 @@ export async function POST(
   const { version } = result.data;
 
   const logs = await prisma.publicPageLog.findMany({
-    where: { pageId: params.id },
+    where: { pageId: id },
     orderBy: { createdAt: 'desc' },
   });
   const log = logs.find((l, idx) => idx + 1 === version);
@@ -40,7 +42,7 @@ export async function POST(
   const changes = log.changes as any;
 
   const page = await prisma.publicPage.update({
-    where: { id: params.id },
+    where: { id },
     data: {
       title: changes.title,
       description: changes.description,

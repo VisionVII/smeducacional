@@ -37,7 +37,11 @@ export async function GET(request: NextRequest) {
     const skip = (page - 1) * limit;
 
     // Build where clause
-    const where: Parameters<typeof prisma.image.findMany>[0]['where'] = {
+    const where: {
+      deletedAt: null;
+      bucket?: string;
+      fileName?: { contains: string; mode: 'insensitive' };
+    } = {
       deletedAt: null, // Apenas imagens não deletadas
     };
 

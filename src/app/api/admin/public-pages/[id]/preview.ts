@@ -10,12 +10,14 @@ const previewSchema = z.object({
 // GET /api/admin/public-pages/[id]/preview?version=1
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await auth();
   if (!session || session.user.role !== 'ADMIN') {
     return NextResponse.json({ error: 'Acesso negado' }, { status: 403 });
   }
+
+  const { id } = await params;
   const { searchParams } = new URL(req.url);
   const versionParam = searchParams.get('version');
   const version = Number(versionParam);
@@ -28,7 +30,7 @@ export async function GET(
   }
 
   const logs = await prisma.publicPageLog.findMany({
-    where: { pageId: params.id },
+    where: { pageId: id },
     orderBy: { createdAt: 'desc' },
   });
   const log = logs.find((l, idx) => idx + 1 === version);
