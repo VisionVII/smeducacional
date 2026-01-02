@@ -102,7 +102,9 @@ export default function AdminAIChatPage() {
             <Bot className="h-5 w-5 text-primary" />
             <span className="font-semibold">Chat IA</span>
           </div>
-          <Badge variant="secondary" className="text-xs">Beta</Badge>
+          <Badge variant="secondary" className="text-xs">
+            Beta
+          </Badge>
         </div>
 
         {/* Messages Area */}
@@ -204,9 +206,6 @@ export default function AdminAIChatPage() {
           </p>
         </div>
       </div>
-    </div>
-  );
-}
     </div>
   );
 }
