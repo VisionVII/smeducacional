@@ -297,10 +297,82 @@ export default function LoginPage() {
             <p className="text-sm text-muted-foreground">
               {t.auth.login.subtitle}
             </p>
+
+            {/* Credenciais de Teste */}
+            {process.env.NODE_ENV === 'development' && (
+              <div className="mt-4 p-3 rounded-lg bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800">
+                <p className="text-xs font-semibold text-blue-900 dark:text-blue-100 mb-2">
+                  🧪 Credenciais de Teste (Dev):
+                </p>
+                <div className="space-y-1 text-xs text-blue-800 dark:text-blue-200">
+                  <div>
+                    <strong>Admin:</strong> admin@smeducacional.com / admin123
+                  </div>
+                  <div>
+                    <strong>Professor:</strong> professor@smeducacional.com /
+                    teacher123
+                  </div>
+                  <div>
+                    <strong>Aluno:</strong> aluno@smeducacional.com / student123
+                  </div>
+                </div>
+              </div>
+            )}
           </CardHeader>
 
           <form onSubmit={handleSubmit}>
             <CardContent className="space-y-4">
+              {/* Quick Login Buttons para Dev */}
+              {process.env.NODE_ENV === 'development' && (
+                <div className="grid grid-cols-3 gap-2 mb-4">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="text-xs"
+                    onClick={() =>
+                      setFormData({
+                        email: 'admin@smeducacional.com',
+                        password: 'admin123',
+                        rememberMe: false,
+                      })
+                    }
+                  >
+                    Admin
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="text-xs"
+                    onClick={() =>
+                      setFormData({
+                        email: 'professor@smeducacional.com',
+                        password: 'teacher123',
+                        rememberMe: false,
+                      })
+                    }
+                  >
+                    Professor
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="text-xs"
+                    onClick={() =>
+                      setFormData({
+                        email: 'aluno@smeducacional.com',
+                        password: 'student123',
+                        rememberMe: false,
+                      })
+                    }
+                  >
+                    Aluno
+                  </Button>
+                </div>
+              )}
+
               <div className="space-y-2">
                 <Label htmlFor="email">{t.auth.login.email}</Label>
                 <Input
