@@ -83,8 +83,8 @@ export async function POST(req: NextRequest) {
 
     const payoutsToCreate = [] as Array<{ teacherId: string; amount: number }>;
     for (const [tId, data] of totals.entries()) {
-      // NOVA LÓGICA: 100% se plano pago, 70% se free
-      const sharePercent = data.hasPaidPlan ? 1.0 : 0.7;
+      // NOVA LÓGICA: 100% (0% taxa) se plano pago, 95% (5% taxa) se free
+      const sharePercent = data.hasPaidPlan ? 1.0 : 0.95;
       const amount = Number((data.total * sharePercent).toFixed(2));
       payoutsToCreate.push({ teacherId: tId, amount });
     }

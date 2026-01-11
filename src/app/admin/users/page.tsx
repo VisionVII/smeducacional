@@ -78,8 +78,8 @@ export default function AdminUsersPage() {
   const filteredUsers =
     users?.filter(
       (user) =>
-        user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.email.toLowerCase().includes(searchTerm.toLowerCase())
+        (user.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (user.email || '').toLowerCase().includes(searchTerm.toLowerCase())
     ) || [];
 
   const getInitials = (name: string) =>

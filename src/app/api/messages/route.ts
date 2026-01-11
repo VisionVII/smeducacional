@@ -1,21 +1,19 @@
-import { NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
-import { prisma } from "@/lib/db";
+import { NextResponse } from 'next/server';
+import { auth } from '@/lib/auth';
+import { prisma } from '@/lib/db';
+import { NotificationType } from '@prisma/client';
 
 export async function GET() {
   try {
     const session = await auth();
 
     if (!session) {
-      return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
+      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     }
 
     const messages = await prisma.message.findMany({
       where: {
-        OR: [
-          { senderId: session.user.id },
-          { receiverId: session.user.id },
-        ],
+        OR: [{ senderId: session.user.id }, { receiverId: session.user.id }],
       },
       include: {
         sender: {
@@ -36,15 +34,15 @@ export async function GET() {
         },
       },
       orderBy: {
-        createdAt: "desc",
+        createdAt: 'desc',
       },
     });
 
     return NextResponse.json(messages);
   } catch (error) {
-    console.error("Erro ao buscar mensagens:", error);
+    console.error('Erro ao buscar mensagens:', error);
     return NextResponse.json(
-      { error: "Erro ao buscar mensagens" },
+      { error: 'Erro ao buscar mensagens' },
       { status: 500 }
     );
   }
@@ -55,7 +53,7 @@ export async function POST(request: Request) {
     const session = await auth();
 
     if (!session) {
-      return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
+      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     }
 
     const { receiverId, subject, content } = await request.json();
@@ -91,17 +89,17 @@ export async function POST(request: Request) {
     await prisma.notification.create({
       data: {
         userId: receiverId,
-        title: "Nova mensagem",
+        title: 'Nova mensagem',
         message: `${session.user.name} enviou uma mensagem para você`,
-        type: "MESSAGE",
+        type: NotificationType.INSTRUCTOR_MESSAGE,
       },
     });
 
     return NextResponse.json(message, { status: 201 });
   } catch (error) {
-    console.error("Erro ao enviar mensagem:", error);
+    console.error('Erro ao enviar mensagem:', error);
     return NextResponse.json(
-      { error: "Erro ao enviar mensagem" },
+      { error: 'Erro ao enviar mensagem' },
       { status: 500 }
     );
   }

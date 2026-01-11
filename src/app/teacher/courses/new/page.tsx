@@ -39,6 +39,8 @@ export default function NewCoursePage() {
     duration: '',
     level: 'Iniciante',
     price: '0',
+    compareAtPrice: '',
+    discount: '',
     isPaid: false,
     categoryId: '',
     requirements: '',
@@ -73,6 +75,26 @@ export default function NewCoursePage() {
       .replace(/-+/g, '-')
       .trim();
 
+  // Calcular desconto automaticamente
+  const calculateDiscount = () => {
+    const price = parseFloat(formData.price) || 0;
+    const compareAtPrice = parseFloat(formData.compareAtPrice) || 0;
+
+    if (compareAtPrice > 0 && price > 0) {
+      const discount = Math.round(
+        ((compareAtPrice - price) / compareAtPrice) * 100
+      );
+      return Math.min(discount, 100);
+    }
+    return 0;
+  };
+
+  // Calcular comissão do instrutor (70%)
+  const calculateCommission = () => {
+    const finalPrice = parseFloat(formData.price) || 0;
+    return finalPrice * 0.7;
+  };
+
   const handleTitleChange = (value: string) => {
     setFormData((prev) => ({
       ...prev,
@@ -92,29 +114,37 @@ export default function NewCoursePage() {
           ? parseInt(formData.duration, 10)
           : undefined,
         price: parseFloat(formData.price),
+        compareAtPrice: formData.compareAtPrice
+          ? parseFloat(formData.compareAtPrice)
+          : undefined,
         thumbnail: formData.thumbnail || undefined,
         requirements: formData.requirements || undefined,
         whatYouLearn: formData.whatYouLearn || undefined,
       };
 
-      const response = await fetch('/api/courses', {
+      const response = await fetch('/api/teacher/courses', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
 
-      const data = await response.json();
+      const result = await response.json();
 
       if (response.ok) {
+        const createdCourse = result.data; // API retorna { data: course }
+
         toast({
           title: 'Curso criado com sucesso!',
-          description: 'Agora você pode adicionar módulos e aulas.',
+          description: 'Redirecionando para a edição do curso...',
         });
-        router.push(`/teacher/courses/${data.id}/content`);
+
+        // ✅ FIX: Redirecionar para edição (não para página pública ainda)
+        // Página pública só após publicar
+        router.push(`/teacher/courses/${createdCourse.id}/edit`);
       } else {
         toast({
           title: 'Erro ao criar curso',
-          description: data.error || 'Tente novamente mais tarde.',
+          description: result.error || 'Tente novamente mais tarde.',
           variant: 'destructive',
         });
       }
@@ -303,7 +333,7 @@ export default function NewCoursePage() {
 
                 <div className="space-y-2">
                   <Label htmlFor="price" className="text-base font-semibold">
-                    💰 Preço (R$)
+                    💰 Preço Final (R$)
                   </Label>
                   <Input
                     id="price"
@@ -324,6 +354,122 @@ export default function NewCoursePage() {
                   <p className="text-xs text-muted-foreground">
                     💡 Digite 0 para curso gratuito
                   </p>
+                </div>
+              </div>
+
+              {/* Seção de Preço Comparativo (estilo Udemy) */}
+              <div className="p-6 bg-gradient-to-br from-blue-50/40 to-purple-50/40 dark:from-blue-950/20 dark:to-purple-950/20 rounded-xl border-2 border-blue-200/50 dark:border-blue-800/50">
+                <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
+                  📊 Preço Comparativo (Opcional)
+                </h3>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-4">
+                  <div className="space-y-2">
+                    <Label
+                      htmlFor="compareAtPrice"
+                      className="text-base font-semibold"
+                    >
+                      Preço Original (R$)
+                    </Label>
+                    <Input
+                      id="compareAtPrice"
+                      type="number"
+                      placeholder="99.90"
+                      min="0"
+                      step="0.01"
+                      value={formData.compareAtPrice}
+                      onChange={(event) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          compareAtPrice: event.target.value,
+                        }))
+                      }
+                      className="h-11"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Deixe em branco se não houver desconto
+                    </p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label
+                      htmlFor="discount"
+                      className="text-base font-semibold"
+                    >
+                      % Desconto (automático)
+                    </Label>
+                    <Input
+                      id="discount"
+                      type="text"
+                      value={
+                        calculateDiscount() > 0
+                          ? `${calculateDiscount()}%`
+                          : '-'
+                      }
+                      disabled
+                      className="h-11 bg-muted"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Calculado automaticamente
+                    </p>
+                  </div>
+                </div>
+
+                {/* Resumo de preços */}
+                <div className="mt-6 pt-6 border-t-2 border-blue-200/50 dark:border-blue-800/50">
+                  <h4 className="font-semibold text-sm mb-3">
+                    📋 Resumo de Preços
+                  </h4>
+                  <div className="space-y-2 text-sm">
+                    {parseFloat(formData.compareAtPrice) > 0 && (
+                      <>
+                        <div className="flex justify-between items-center">
+                          <span className="text-muted-foreground">
+                            Preço Original:
+                          </span>
+                          <span className="line-through text-muted-foreground">
+                            R$ {parseFloat(formData.compareAtPrice).toFixed(2)}
+                          </span>
+                        </div>
+                        <div className="flex justify-between items-center text-green-600 dark:text-green-400 font-semibold">
+                          <span>Preço com Desconto:</span>
+                          <span>
+                            R$ {parseFloat(formData.price || '0').toFixed(2)}
+                          </span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-muted-foreground">
+                            Economia:
+                          </span>
+                          <span className="font-semibold text-orange-600 dark:text-orange-400">
+                            R${' '}
+                            {(
+                              parseFloat(formData.compareAtPrice) -
+                              parseFloat(formData.price || '0')
+                            ).toFixed(2)}
+                          </span>
+                        </div>
+                      </>
+                    )}
+                    {parseFloat(formData.compareAtPrice) === 0 ||
+                    !formData.compareAtPrice ? (
+                      <div className="flex justify-between items-center">
+                        <span className="text-muted-foreground">
+                          Preço Final:
+                        </span>
+                        <span className="font-semibold">
+                          R$ {parseFloat(formData.price || '0').toFixed(2)}
+                        </span>
+                      </div>
+                    ) : null}
+
+                    <div className="flex justify-between items-center bg-primary/10 dark:bg-primary/20 p-3 rounded-lg mt-3">
+                      <span className="font-semibold">Sua Comissão (70%):</span>
+                      <span className="text-lg font-bold text-primary">
+                        R$ {calculateCommission().toFixed(2)}
+                      </span>
+                    </div>
+                  </div>
                 </div>
               </div>
 

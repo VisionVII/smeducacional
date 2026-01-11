@@ -27,11 +27,21 @@ export async function PUT(
   try {
     const session = await auth();
 
+    console.log('[Lessons/Update] Iniciando atualização de lição:', {
+      hasSession: !!session?.user,
+      userId: session?.user?.id,
+      userRole: session?.user?.role,
+    });
+
     if (!session?.user) {
+      console.warn('[Lessons/Update] Usuário não autenticado');
       return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
     }
 
     const { id } = await params;
+
+    console.log('[Lessons/Update] Buscando lição:', { lessonId: id });
+
     const lesson = await prisma.lesson.findUnique({
       where: { id },
       include: {
@@ -44,17 +54,44 @@ export async function PUT(
     });
 
     if (!lesson) {
+      console.warn('[Lessons/Update] Lição não encontrada:', { lessonId: id });
       return NextResponse.json(
         { error: 'Aula não encontrada' },
         { status: 404 }
       );
     }
 
+    console.log('[Lessons/Update] Lição encontrada:', {
+      lessonId: id,
+      lessonTitle: lesson.title,
+      moduleId: lesson.moduleId,
+      courseId: lesson.module.courseId,
+      instructorId: lesson.module.course.instructorId,
+      currentUserId: session.user.id,
+      userRole: session.user.role,
+    });
+
     // Verificar permissão
-    if (
-      lesson.module.course.instructorId !== session.user.id &&
-      session.user.role !== 'ADMIN'
-    ) {
+    const isInstructor = lesson.module.course.instructorId === session.user.id;
+    const isAdmin = session.user.role === 'ADMIN';
+
+    console.log('[Lessons/Update] Verificação de permissões:', {
+      isInstructor,
+      isAdmin,
+      hasPermission: isInstructor || isAdmin,
+    });
+
+    if (!isInstructor && !isAdmin) {
+      console.error('[Lessons/Update] ❌ ACESSO NEGADO - Sem permissão:', {
+        lessonId: id,
+        lessonTitle: lesson.title,
+        courseId: lesson.module.courseId,
+        courseInstructorId: lesson.module.course.instructorId,
+        attemptingUserId: session.user.id,
+        attemptingUserEmail: session.user.email,
+        attemptingUserRole: session.user.role,
+      });
+
       return NextResponse.json(
         { error: 'Sem permissão para editar esta aula' },
         { status: 403 }
@@ -62,11 +99,27 @@ export async function PUT(
     }
 
     const body = await req.json();
+
+    console.log('[Lessons/Update] Dados recebidos para atualização:', {
+      lessonId: id,
+      hasTitle: !!body.title,
+      hasDescription: !!body.description,
+      hasContent: !!body.content,
+      hasDuration: !!body.duration,
+      hasVideoUrl: !!body.videoUrl,
+      contentLength: body.content?.length || 0,
+    });
+
     const validatedData = updateLessonSchema.parse(body);
 
     const updatedLesson = await prisma.lesson.update({
       where: { id },
       data: validatedData,
+    });
+
+    console.log('[Lessons/Update] ✅ Lição atualizada com sucesso:', {
+      lessonId: id,
+      lessonTitle: updatedLesson.title,
     });
 
     // Registrar log
@@ -81,13 +134,21 @@ export async function PUT(
     return NextResponse.json(updatedLesson);
   } catch (error) {
     if (error instanceof z.ZodError) {
+      console.error('[Lessons/Update] ❌ Erro de validação Zod:', {
+        errors: error.errors,
+      });
       return NextResponse.json(
         { error: 'Dados inválidos', details: error.errors },
         { status: 400 }
       );
     }
 
-    console.error('Erro ao atualizar aula:', error);
+    console.error('[Lessons/Update] ❌ ERRO NÃO TRATADO:', {
+      error,
+      message: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : 'N/A',
+    });
+
     return NextResponse.json(
       { error: 'Erro ao atualizar aula' },
       { status: 500 }

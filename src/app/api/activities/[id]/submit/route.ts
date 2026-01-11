@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { NotificationType } from '@prisma/client';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 
@@ -101,7 +102,7 @@ export async function POST(
         userId: activity.createdById,
         title: 'Nova submissão de atividade',
         message: `${session.user.name} enviou a atividade "${activity.title}"`,
-        type: 'ACTIVITY',
+        type: NotificationType.COURSE_UPDATE,
       },
     });
 

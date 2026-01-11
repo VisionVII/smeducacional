@@ -11,31 +11,17 @@ interface SlowLoadingPageProps {
 }
 
 /**
- * Wrapper para páginas com carregamento lento
- * Detecta automaticamente quando o carregamento está demorando
- * e mostra a tela de loading personalizada
+ * DISABLED: Wrapper para páginas com carregamento lento
+ * PROBLEMA: Estava causando bloqueio de página
+ * SOLUÇÃO: Renderizar children diretamente, sem overlay
  */
 export function SlowLoadingPage({
   children,
   loadingMessage = 'Carregando seu dashboard...',
   delayMs = 800,
 }: SlowLoadingPageProps) {
-  const [isLoading, setIsLoading] = useState(true);
-  const showLoading = useSlowLoading(isLoading, { delayMs });
+  // DISABLED: Não renderizar loading screen
+  // apenas renderizar children normalmente
 
-  useEffect(() => {
-    // Simular fim do carregamento quando a página está pronta
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 100);
-
-    return () => clearTimeout(timer);
-  }, []);
-
-  return (
-    <>
-      <LoadingScreen show={showLoading} message={loadingMessage} />
-      {children}
-    </>
-  );
+  return <>{children}</>;
 }

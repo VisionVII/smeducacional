@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/db';
+import { NotificationType } from '@prisma/client';
 
 export async function POST(
   request: NextRequest,
@@ -140,7 +141,7 @@ export async function POST(
         await prisma.notification.create({
           data: {
             userId: session.user.id,
-            type: 'COURSE',
+            type: NotificationType.CERTIFICATE_EARNED,
             title: 'Parabéns! Curso concluído',
             message: `Você concluiu o curso "${lesson.module.course.title}" e pode baixar seu certificado!`,
           },

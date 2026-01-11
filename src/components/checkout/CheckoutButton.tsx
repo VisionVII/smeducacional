@@ -42,6 +42,8 @@ export function CheckoutButton({
       setLoading(true);
       setError(null);
 
+      console.log('[CheckoutButton] Iniciando checkout para curso:', courseId);
+
       const response = await fetch('/api/checkout/course', {
         method: 'POST',
         headers: {
@@ -50,14 +52,41 @@ export function CheckoutButton({
         body: JSON.stringify({ courseId }),
       });
 
+      console.log('[CheckoutButton] Resposta recebida:', {
+        status: response.status,
+        statusText: response.statusText,
+      });
+
+      // Primeiro, tentar ler como JSON
+      let data;
+      try {
+        data = await response.json();
+      } catch (parseError) {
+        console.error(
+          '[CheckoutButton] Erro ao fazer parse da resposta JSON:',
+          parseError
+        );
+        const text = await response.text();
+        console.error('[CheckoutButton] Texto da resposta:', text);
+        throw new Error(
+          `Resposta inválida do servidor: ${text.substring(0, 100)}`
+        );
+      }
+
       if (!response.ok) {
-        const data = await response.json();
+        console.error('[CheckoutButton] Erro na resposta:', data);
         throw new Error(data.error || 'Erro ao criar sessão de checkout');
       }
 
-      const { url } = await response.json();
+      const { url, sessionId } = data;
+
+      console.log('[CheckoutButton] Sessão criada com sucesso:', {
+        sessionId,
+        hasUrl: !!url,
+      });
 
       if (url) {
+        console.log('[CheckoutButton] Redirecionando para Stripe...');
         window.location.href = url;
       } else {
         throw new Error('URL de checkout não retornada');
@@ -66,7 +95,11 @@ export function CheckoutButton({
       const message =
         err instanceof Error ? err.message : 'Erro ao processar checkout';
       setError(message);
-      console.error('Checkout error:', err);
+      console.error('[CheckoutButton] Erro completo:', {
+        message,
+        error: err,
+        stack: err instanceof Error ? err.stack : 'N/A',
+      });
     } finally {
       setLoading(false);
     }

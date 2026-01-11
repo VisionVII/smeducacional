@@ -83,7 +83,7 @@ export async function createCourseCheckoutSession(
     const stripe = getStripeClient();
 
     // Build session params dynamically
-    const sessionParams: any = {
+    const sessionParams: Stripe.Checkout.SessionCreateParams = {
       mode: 'payment',
       payment_method_types: ['card'],
       line_items: [
@@ -105,7 +105,7 @@ export async function createCourseCheckoutSession(
         userId: input.userId,
         courseId: input.courseId,
         type: 'course_purchase',
-        instructorId: instructorId || undefined,
+        instructorId: instructorId || '',
       },
     };
 
@@ -143,7 +143,7 @@ export async function createSubscriptionSession(
     const stripe = getStripeClient();
 
     // Build session params dynamically
-    const sessionParams: any = {
+    const sessionParams: Stripe.Checkout.SessionCreateParams = {
       mode: 'subscription',
       payment_method_types: ['card'],
       line_items: [
@@ -286,8 +286,15 @@ export type FinancialStats = {
   windowDays: number;
 };
 
-export function calculateRevenueSplit(amount: number) {
-  const feeRate = Number(process.env.PLATFORM_FEE_PERCENT ?? '0.3');
+export function calculateRevenueSplit(
+  amount: number,
+  hasPaidPlan: boolean = false
+) {
+  // 5% para plano FREE, 0% para plano PAGO
+  const feeRate = hasPaidPlan
+    ? 0
+    : Number(process.env.PLATFORM_FEE_PERCENT ?? '0.05');
+
   const safeAmount = Number.isFinite(amount) ? amount : 0;
   const platformFee = Math.max(0, Number((safeAmount * feeRate).toFixed(2)));
   const instructorNet = Math.max(
@@ -306,6 +313,7 @@ export function calculateRevenueSplit(amount: number) {
 type CheckoutMetadata = {
   userId?: string;
   courseId?: string;
+  courseIds?: string;
   type?: string;
 };
 
@@ -359,6 +367,7 @@ function safeCheckoutMetadata(
     userId: metadata.userId,
     courseId: metadata.courseId,
     type: metadata.type,
+    courseIds: metadata.courseIds,
   };
 }
 
@@ -503,9 +512,264 @@ async function handleCheckoutSessionCompleted(
     return;
   }
 
-  // Detectar tipo de compra: feature_purchase ou course_purchase
+  // ========== CHECKOUT MÚLTIPLO ==========
+  if (metadata.type === 'multiple_courses' && metadata.courseIds) {
+    try {
+      const courseIds = metadata.courseIds.split(',');
+
+      // Validar que não há cursos duplicados
+      if (new Set(courseIds).size !== courseIds.length) {
+        console.error(
+          '[PaymentService] Duplicate courseIds detected in multiple checkout'
+        );
+        return;
+      }
+
+      // Validar limite de cursos (máximo 50 por transação para evitar timeout)
+      if (courseIds.length > 50) {
+        console.error(
+          '[PaymentService] Too many courses in single checkout (max 50)'
+        );
+        return;
+      }
+
+      const paymentIntentId =
+        typeof session.payment_intent === 'string'
+          ? session.payment_intent
+          : session.id;
+      const currency = session.currency || 'BRL';
+      const isTest = session.livemode === false;
+
+      // Buscar todos os cursos
+      const courses = await prisma.course.findMany({
+        where: {
+          id: { in: courseIds },
+          isPublished: true,
+          deletedAt: null, // Não permitir cursos soft-deleted
+        },
+        select: {
+          id: true,
+          title: true,
+          price: true,
+          instructorId: true,
+        },
+      });
+
+      if (courses.length === 0) {
+        console.error(
+          '[PaymentService] No courses found for multiple checkout'
+        );
+        return;
+      }
+
+      // Validar que todos os cursos requisitados foram encontrados
+      if (courses.length !== courseIds.length) {
+        console.warn(
+          '[PaymentService] Some courses not found or not published',
+          {
+            requestedCount: courseIds.length,
+            foundCount: courses.length,
+            notFound: courseIds.filter(
+              (id) => !courses.find((c) => c.id === id)
+            ),
+          }
+        );
+        // Continuar com os cursos encontrados
+      }
+
+      // Buscar usuário
+      const user = await prisma.user.findUnique({
+        where: { id: metadata.userId },
+        select: { id: true, email: true, name: true, deletedAt: true },
+      });
+
+      if (!user?.email || user.deletedAt) {
+        console.error(
+          '[PaymentService] User not found or deleted for multiple checkout'
+        );
+        return;
+      }
+
+      // Calcular total
+      const totalAmount = courses.reduce(
+        (sum, course) => sum + (course.price || 0),
+        0
+      );
+
+      await prisma.$transaction(async (tx) => {
+        // Criar matrículas para cada curso
+        for (const course of courses) {
+          // 🛡️ RED LINE: Instrutor não pode comprar próprio curso
+          if (course.instructorId === metadata.userId) {
+            console.warn(
+              '[PaymentService] Bloqueado: Instrutor tentou comprar próprio curso',
+              {
+                userId: metadata.userId,
+                courseId: course.id,
+                courseTitle: course.title,
+              }
+            );
+
+            // Registrar tentativa de fraude em auditoria
+            await tx.auditLog.create({
+              data: {
+                userId: metadata.userId as string,
+                action: AuditAction.SECURITY_VIOLATION,
+                targetId: course.id,
+                targetType: 'Course',
+                metadata: {
+                  reason: 'OWN_COURSE_PURCHASE_BLOCKED',
+                  stripeEventId: eventId,
+                  courseId: course.id,
+                  courseTitle: course.title,
+                },
+              },
+            });
+
+            continue; // Pular este curso
+          }
+
+          await tx.enrollment.upsert({
+            where: {
+              studentId_courseId: {
+                studentId: metadata.userId as string,
+                courseId: course.id,
+              },
+            },
+            update: {
+              status: 'ACTIVE',
+            },
+            create: {
+              studentId: metadata.userId as string,
+              courseId: course.id,
+              status: 'ACTIVE',
+            },
+          });
+
+          // Criar payout para cada instrutor (taxa de 5% da plataforma)
+          const split = calculateRevenueSplit(course.price || 0, false);
+          if (course.instructorId && split.instructorNet > 0) {
+            await tx.payout.create({
+              data: {
+                teacherId: course.instructorId,
+                amount: split.instructorNet,
+                periodStart: new Date(),
+                periodEnd: new Date(),
+                status: 'pending',
+                transferId: null,
+                currency,
+              },
+            });
+          }
+
+          // Criar auditoria individual por curso
+          await tx.auditLog.create({
+            data: {
+              userId: metadata.userId as string,
+              action: AuditAction.PAYMENT_CREATED,
+              targetId: course.id,
+              targetType: 'Course',
+              metadata: {
+                stripeEventId: eventId,
+                courseId: course.id,
+                courseTitle: course.title,
+                coursePrice: course.price,
+                instructorId: course.instructorId,
+              },
+            },
+          });
+        }
+
+        // Criar um único pagamento para o checkout múltiplo
+        await tx.payment.create({
+          data: {
+            userId: metadata.userId as string,
+            stripePaymentId: paymentIntentId,
+            stripeIntentId: paymentIntentId,
+            checkoutSessionId: session.id,
+            amount: totalAmount,
+            currency,
+            paymentMethod: 'stripe',
+            type: 'course',
+            status: 'completed',
+            isTest,
+            metadata: {
+              stripeEventId: eventId,
+              sessionId: session.id,
+              livemode: session.livemode,
+              courseIds: courseIds.join(','),
+              courseCount: courseIds.length,
+            },
+          },
+        });
+
+        // Atualizar sessão de checkout
+        await tx.checkoutSession.updateMany({
+          where: { stripeSessionId: session.id },
+          data: {
+            status: 'completed',
+            paymentIntentId,
+            stripeCustomerId: session.customer
+              ? String(session.customer)
+              : null,
+          },
+        });
+
+        // Registrar auditoria agregada do checkout múltiplo
+        await tx.auditLog.create({
+          data: {
+            userId: metadata.userId as string,
+            action: AuditAction.PAYMENT_CREATED,
+            targetType: 'MultipleCourses',
+            metadata: {
+              stripeEventId: eventId,
+              stripePaymentIntentId: paymentIntentId,
+              courseIds: courseIds.join(','),
+              courseCount: courseIds.length,
+              totalAmount,
+              courses: courses.map((c) => ({
+                id: c.id,
+                title: c.title,
+                price: c.price,
+                instructorId: c.instructorId,
+              })),
+            },
+          },
+        });
+
+        // Log estruturado
+        console.log('[PaymentService] ✅ MULTIPLE COURSES PURCHASE COMPLETED', {
+          timestamp: new Date().toISOString(),
+          userId: metadata.userId,
+          courseCount: courseIds.length,
+          courseIds: courseIds.join(','),
+          courseDetails: courses.map((c) => ({
+            id: c.id,
+            title: c.title,
+            price: c.price,
+          })),
+          totalAmount: `${totalAmount} ${currency}`,
+          isTest,
+          stripeEventId: eventId,
+        });
+      }); // Fechamento do $transaction
+    } catch (error) {
+      console.error('[PaymentService] ❌ MULTIPLE COURSES PURCHASE FAILED', {
+        timestamp: new Date().toISOString(),
+        userId: metadata.userId,
+        courseIds: metadata.courseIds,
+        error: error instanceof Error ? error.message : 'Unknown error',
+        stack: error instanceof Error ? error.stack : undefined,
+        stripeEventId: eventId,
+      });
+      throw error; // Re-throw para que o webhook saiba que houve erro
+    }
+
+    return;
+  }
+
+  // ========== CHECKOUT DE FEATURE ==========
   if (metadata.type === 'feature_purchase' && metadata.courseId === undefined) {
-    // Processando compra de feature standalone
     const featureId = session.metadata?.featureId;
 
     if (!featureId) {
@@ -659,9 +923,11 @@ async function handleCheckoutSessionCompleted(
   const amount = course.price ?? 0;
   const currency = session.currency || 'BRL';
   const isTest = session.livemode === false;
-  const split = calculateRevenueSplit(amount);
 
   const instructorId = course.instructorId;
+
+  // Calcular split (taxa de 5% da plataforma)
+  const split = calculateRevenueSplit(amount, false);
 
   await prisma.$transaction(async (tx) => {
     await tx.enrollment.upsert({

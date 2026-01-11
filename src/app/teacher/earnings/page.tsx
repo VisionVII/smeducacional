@@ -106,7 +106,7 @@ export default function TeacherEarningsPage() {
   }
 
   const commissionPercent = Math.round((earnings.commissionRate || 0) * 100);
-  const isFreePlan = earnings.plan?.toLowerCase() === 'free';
+  const isFreePlan = (earnings.plan || '').toLowerCase() === 'free';
 
   return (
     <div className="container mx-auto p-6 space-y-8 max-w-7xl">
@@ -138,9 +138,12 @@ export default function TeacherEarningsPage() {
               R$ {(earnings.totalEarnings / 100).toFixed(2)}
             </div>
             <p className="text-xs text-muted-foreground mt-2">
-              {earnings.totalSales} transações · valores líquidos (
-              {Math.round(earnings.commissionRate * 100)}% de taxa no plano
-              atual)
+              {earnings.totalSales} transações · valores líquidos{' '}
+              {earnings.plan === 'PAID'
+                ? '(Plano PAGO: 100% das vendas)'
+                : `(Plano FREE: 95% das vendas - taxa de ${Math.round(
+                    earnings.commissionRate * 100
+                  )}%)`}
             </p>
           </CardContent>
         </Card>

@@ -1,6 +1,7 @@
 'use client';
 
 import { useSystemBranding } from '@/hooks/use-system-branding';
+import { useEffect } from 'react';
 import Image from 'next/image';
 import { GraduationCap, Loader2 } from 'lucide-react';
 
@@ -15,12 +16,65 @@ export function LoadingScreen({
 }: LoadingScreenProps) {
   const { branding } = useSystemBranding();
 
+  // Safety: Auto-hide after 3 seconds to prevent blocking
+  useEffect(() => {
+    if (!show) return;
+
+    // Hide loading screen after 3 seconds (safety net)
+    const safetyTimeout = setTimeout(() => {
+      console.warn(
+        '[LoadingScreen] Safety timeout reached - forcing hide after 3s'
+      );
+      // Emit event for parent to listen to
+      window.dispatchEvent(
+        new CustomEvent('loading-screen-timeout', {
+          detail: { forcedHide: true },
+        })
+      );
+      // Also hide via DOM manipulation as fallback
+      const el = document.getElementById('loading-screen-root');
+      if (el) {
+        el.style.display = 'none !important';
+        el.style.pointerEvents = 'none !important';
+        el.setAttribute('data-force-hidden', 'true');
+      }
+    }, 3000);
+
+    // ESC key handler
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        console.log('[LoadingScreen] ESC key pressed - hiding');
+        const el = document.getElementById('loading-screen-root');
+        if (el) {
+          el.style.display = 'none !important';
+          el.style.pointerEvents = 'none !important';
+        }
+        window.dispatchEvent(
+          new CustomEvent('loading-screen-escape', {
+            detail: { escapedVia: 'ESC' },
+          })
+        );
+      }
+    };
+
+    window.addEventListener('keydown', handleEscape);
+
+    return () => {
+      clearTimeout(safetyTimeout);
+      window.removeEventListener('keydown', handleEscape);
+    };
+  }, [show]);
+
   if (!show) return null;
 
   const primaryColor = branding?.primaryColor || '#3B82F6';
 
   return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center overflow-hidden">
+    <div
+      id="loading-screen-root"
+      className="fixed inset-0 z-[9999] flex items-center justify-center overflow-hidden"
+      data-loading-screen="true"
+    >
       {/* Background com gradiente divertido */}
       <div
         className="absolute inset-0 bg-gradient-to-br opacity-90"

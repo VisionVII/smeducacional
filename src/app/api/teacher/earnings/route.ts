@@ -16,6 +16,12 @@ export async function GET() {
 
     const teacherId = session.user.id;
 
+    // Taxa de comissão fixa (5% de comissão da plataforma)
+    const commissionRate = 0.05;
+    const revenueShare = 1 - commissionRate;
+    const net = (value: number | null | undefined) =>
+      (value || 0) * revenueShare;
+
     // Buscar pagamentos de cursos do professor
     const payments = await prisma.payment.findMany({
       where: {
@@ -41,12 +47,6 @@ export async function GET() {
     const teacherFinancial = await prisma.teacherFinancial.findUnique({
       where: { userId: teacherId },
     });
-
-    const plan = teacherFinancial?.plan?.toLowerCase() ?? 'free';
-    const commissionRate = plan === 'free' ? 0.15 : 0;
-    const revenueShare = 1 - commissionRate;
-    const net = (value: number | null | undefined) =>
-      (value || 0) * revenueShare;
 
     // Calcular métricas
     const totalEarnings = payments.reduce((sum, p) => sum + net(p.amount), 0);
@@ -135,7 +135,7 @@ export async function GET() {
     }));
 
     return NextResponse.json({
-      plan,
+      plan: 'FREE',
       commissionRate,
       grossEarnings,
       totalEarnings,

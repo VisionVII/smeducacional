@@ -150,120 +150,165 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div className="min-h-screen w-full overflow-hidden">
-      <style>{keyframes}</style>
+    <div className="min-h-screen w-full flex bg-background">
+      <style jsx global>
+        {keyframes}
+      </style>
 
-      {/* Background */}
-      <div className="fixed inset-0">
-        <div className="absolute inset-0 bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950 dark:from-gray-950 dark:via-slate-900 dark:to-gray-950" />
-        <div className="absolute inset-0 bg-gradient-to-b from-primary/30 via-transparent to-transparent opacity-50" />
+      {/* Hero Section - Desktop Only */}
+      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden">
+        {/* Background com Gradient Profissional */}
+        <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary/90 to-primary/70" />
+
+        {/* Background Image (se existir) */}
+        <div className="absolute inset-0 z-0">
+          {branding.promotedCourse?.thumbnail ? (
+            <Image
+              src={branding.promotedCourse.thumbnail}
+              alt={branding.promotedCourse.title}
+              fill
+              className="object-cover opacity-20"
+              priority
+            />
+          ) : (
+            <div className="w-full h-full bg-gradient-to-br from-primary/30 via-primary/10 to-transparent" />
+          )}
+        </div>
+
+        {/* Overlay sutil */}
+        <div className="absolute inset-0 z-10 bg-gradient-to-t from-black/40 via-transparent to-black/10" />
+
+        {/* Content Area */}
+        <div className="relative z-20 flex flex-col justify-between p-12 text-white">
+          {/* Logo Area */}
+          <div
+            className="flex items-center gap-3"
+            style={{ animation: 'slideInLeft 0.6s ease-out both' }}
+          >
+            {branding.logoUrl ? (
+              <Image
+                src={branding.logoUrl}
+                alt={branding.companyName || 'Logo'}
+                width={150}
+                height={40}
+                className="h-10 w-auto object-contain brightness-0 invert"
+              />
+            ) : (
+              <div className="flex items-center gap-2">
+                <div className="h-10 w-10 rounded-lg bg-white/10 backdrop-blur flex items-center justify-center">
+                  <GraduationCap className="h-6 w-6 text-white" />
+                </div>
+                <span className="text-2xl font-bold text-white tracking-tight">
+                  {branding.companyName}
+                </span>
+              </div>
+            )}
+          </div>
+
+          {/* Hero Content */}
+          <div
+            className="space-y-8 max-w-lg"
+            style={{ animation: 'slideInLeft 0.6s ease-out 0.2s both' }}
+          >
+            {branding.advertisements && branding.advertisements.length > 0 ? (
+              <div className="w-full">
+                <PromotedCoursesCarousel />
+              </div>
+            ) : branding.promotedCourse ? (
+              <div className="flex justify-center w-full">
+                <PromotedCourseCard course={branding.promotedCourse} />
+              </div>
+            ) : (
+              <>
+                <div className="space-y-4">
+                  <h1 className="text-4xl lg:text-5xl font-bold tracking-tight leading-[1.1]">
+                    {mounted
+                      ? t.auth.forgotPassword.title
+                      : 'Recupere o acesso com segurança'}
+                  </h1>
+                  <p className="text-lg text-white/90 leading-relaxed max-w-md">
+                    {step === 'email' &&
+                      (mounted
+                        ? t.auth.forgotPassword.subtitle
+                        : 'Envie seu e-mail para receber o código de validação instantaneamente.')}
+                    {step === 'code' &&
+                      (mounted
+                        ? t.auth.forgotPassword.codeSubtitle
+                        : 'Digite o código enviado para seu email')}
+                    {step === 'newPassword' &&
+                      (mounted
+                        ? t.auth.forgotPassword.newPasswordSubtitle
+                        : 'Crie uma nova senha segura')}
+                  </p>
+                </div>
+
+                {/* Stats */}
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm p-4">
+                    <p className="text-sm text-white/70">Tempo médio</p>
+                    <p className="text-2xl font-semibold">45s</p>
+                    <p className="text-xs text-white/60">para recuperar</p>
+                  </div>
+                  <div className="rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm p-4">
+                    <p className="text-sm text-white/70">99,9%</p>
+                    <p className="text-2xl font-semibold">uptime</p>
+                    <p className="text-xs text-white/60">infra segura</p>
+                  </div>
+                  <div className="rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm p-4">
+                    <p className="text-sm text-white/70">Suporte</p>
+                    <p className="text-2xl font-semibold">24/7</p>
+                    <p className="text-xs text-white/60">monitorado</p>
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+
+          {/* Footer */}
+          <div className="text-sm text-white/60">
+            © {new Date().getFullYear()} {branding.companyName}. Todos os
+            direitos reservados.
+          </div>
+        </div>
       </div>
 
-      {/* Content */}
-      <div className="relative z-10 min-h-screen flex items-center justify-center px-4 py-10 sm:px-6 lg:px-10">
-        <div className="w-full max-w-5xl grid gap-8 lg:grid-cols-2 items-center">
-          {/* Brand / Hero Side */}
-          <div className="relative hidden lg:block overflow-hidden rounded-2xl border border-white/10 bg-slate-950 shadow-2xl min-h-[600px]">
-            {/* Background Image or Gradient */}
-            <div className="absolute inset-0 z-0">
-              {branding.promotedCourse?.thumbnail ? (
+      {/* Form Section - Responsivo */}
+      <div className="flex-1 flex items-center justify-center p-4 sm:p-6 lg:p-12 bg-background">
+        <Card
+          className="w-full max-w-[440px] border shadow-xl bg-card"
+          style={{ animation: 'fadeIn 0.6s ease-out both' }}
+        >
+          <CardHeader className="space-y-3 text-center pb-6 px-6 sm:px-8 pt-8">
+            {/* Logo Mobile */}
+            <div className="lg:hidden flex justify-center mb-4">
+              {branding.logoUrl ? (
                 <Image
-                  src={branding.promotedCourse.thumbnail}
-                  alt={branding.promotedCourse.title}
-                  fill
-                  className="object-cover"
-                  priority
+                  src={branding.logoUrl}
+                  alt={branding.companyName}
+                  width={140}
+                  height={40}
+                  className="h-10 w-auto object-contain"
                 />
               ) : (
-                <div className="w-full h-full bg-gradient-to-br from-primary/20 via-primary/10 to-transparent" />
+                <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center">
+                  <GraduationCap className="h-7 w-7 text-primary" />
+                </div>
               )}
             </div>
 
-            {/* Overlay */}
-            <div
-              className={`absolute inset-0 z-10 ${
-                branding.promotedCourse
-                  ? 'bg-gradient-to-t from-black/90 via-black/60 to-black/40'
-                  : 'bg-gradient-to-br from-primary/40 via-primary/20 to-transparent'
-              }`}
-            />
-
-            <div className="relative z-20 h-full flex flex-col justify-center p-10 gap-10">
-              <div className="flex items-center justify-center">
-                {branding.logoUrl ? (
-                  <div className="relative h-16 w-auto min-w-[120px] overflow-hidden rounded-xl border border-white/10 bg-white/5 p-2 backdrop-blur-sm">
-                    <Image
-                      src={branding.logoUrl}
-                      alt={branding.companyName || 'Logo do sistema'}
-                      width={160}
-                      height={60}
-                      className="h-12 w-auto object-contain"
-                      priority
-                    />
-                  </div>
-                ) : (
-                  <div className="h-16 w-16 rounded-xl bg-white/10 flex items-center justify-center">
-                    <GraduationCap className="h-8 w-8 text-white" />
-                  </div>
-                )}
-              </div>
-              <div className="space-y-4 flex-1 flex flex-col justify-center">
-                {branding.advertisements &&
-                branding.advertisements.length > 0 ? (
-                  <div className="w-full max-w-5xl mx-auto">
-                    <PromotedCoursesCarousel />
-                  </div>
-                ) : branding.promotedCourse ? (
-                  <div className="flex justify-center w-full">
-                    <PromotedCourseCard course={branding.promotedCourse} />
-                  </div>
-                ) : (
-                  <>
-                    <h2 className="text-3xl font-bold text-white leading-tight text-center">
-                      {mounted
-                        ? t.auth.forgotPassword.title
-                        : 'Recupere o acesso com segurança'}
-                    </h2>
-                    <p className="text-white/80 leading-relaxed text-center">
-                      {step === 'email' &&
-                        (mounted
-                          ? t.auth.forgotPassword.subtitle
-                          : 'Envie seu e-mail para receber o código de validação instantaneamente.')}
-                      {step === 'code' &&
-                        (mounted
-                          ? t.auth.forgotPassword.codeSubtitle
-                          : 'Digite o código enviado para seu email')}
-                      {step === 'newPassword' &&
-                        (mounted
-                          ? t.auth.forgotPassword.newPasswordSubtitle
-                          : 'Crie uma nova senha segura')}
-                    </p>
-                  </>
-                )}
-              </div>
-              <div className="grid grid-cols-3 gap-4 text-white/80">
-                <div className="rounded-xl border border-white/10 bg-white/5 p-4">
-                  <p className="text-sm text-white/60">Tempo médio</p>
-                  <p className="text-2xl font-semibold">
-                    <span className="text-white">45s</span>
-                  </p>
-                  <p className="text-xs text-white/50">para recuperar acesso</p>
-                </div>
-                <div className="rounded-xl border border-white/10 bg-white/5 p-4">
-                  <p className="text-sm text-white/60">99,9%</p>
-                  <p className="text-2xl font-semibold">uptime</p>
-                  <p className="text-xs text-white/50">infra VisionVII</p>
-                </div>
-                <div className="rounded-xl border border-white/10 bg-white/5 p-4">
-                  <p className="text-sm text-white/60">Suporte</p>
-                  <p className="text-2xl font-semibold">24/7</p>
-                  <p className="text-xs text-white/50">monitorado</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Form Card */}
+            <CardTitle className="text-2xl sm:text-3xl font-bold tracking-tight">
+              {step === 'email' &&
+                (mounted ? t.auth.forgotPassword.title : 'Recuperar Senha')}
+              {step === 'code' &&
+                (mounted
+                  ? t.auth.forgotPassword.codeTitle
+                  : 'Verificar Código')}
+              {step === 'newPassword' &&
+                (mounted
+                  ? t.auth.forgotPassword.newPasswordTitle
+                  : 'Nova Senha')}
+            </CardTitle>
+          </CardHeader>
           <Card
             className="w-full max-w-md relative justify-self-center shadow-2xl backdrop-blur-2xl bg-gradient-to-br from-background/95 to-background/90 border border-primary/30 hover:border-primary/50 transition-all duration-500"
             style={{ animation: 'slideInUp 0.6s ease-out 0.2s both' }}
@@ -452,7 +497,7 @@ export default function ForgotPasswordPage() {
               </form>
             )}
           </Card>
-        </div>
+        </Card>
       </div>
     </div>
   );

@@ -5,7 +5,9 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { CheckoutButton } from '@/components/checkout/CheckoutButton';
+import { AddToCartButton } from '@/components/cart/add-to-cart-button';
 import { BreadcrumbLink } from '@/components/course/breadcrumb-link';
+import { RelatedCourses } from '@/components/course/related-courses';
 import {
   Card,
   CardContent,
@@ -28,11 +30,12 @@ import { getServerTranslations } from '@/lib/i18n-server';
 
 type CourseParams = { slug: string };
 
-async function getCourse(slug: string) {
+async function getCourse(slug: string, userId?: string) {
   if (!slug) return null;
 
-  return prisma.course.findFirst({
-    where: { slug, isPublished: true },
+  // Buscar curso
+  const course = await prisma.course.findFirst({
+    where: { slug, deletedAt: null },
     include: {
       category: true,
       instructor: { select: { id: true, name: true, avatar: true, bio: true } },
@@ -43,6 +46,21 @@ async function getCourse(slug: string) {
       _count: { select: { enrollments: true } },
     },
   });
+
+  if (!course) return null;
+
+  // Se não está publicado, só o instrutor ou admin pode ver
+  if (!course.isPublished) {
+    const session = await auth();
+    const isOwner = session?.user?.id === course.instructorId;
+    const isAdmin = session?.user?.role === 'ADMIN';
+
+    if (!isOwner && !isAdmin) {
+      return null;
+    }
+  }
+
+  return course;
 }
 
 export default async function CourseDetailPage({
@@ -394,6 +412,19 @@ export default async function CourseDetailPage({
                           isPaid={true}
                           isEnrolled={false}
                         />
+                        <AddToCartButton
+                          course={{
+                            id: course.id,
+                            title: course.title,
+                            slug: course.slug,
+                            thumbnail: course.thumbnail,
+                            price: course.price || 0,
+                            compareAtPrice: course.compareAtPrice,
+                            instructor: {
+                              name: course.instructor.name,
+                            },
+                          }}
+                        />
                         {/* Aviso de Curso Bloqueado */}
                         <div className="p-4 bg-orange-50 dark:bg-orange-950/20 border-2 border-orange-200 dark:border-orange-900 rounded-xl">
                           <div className="flex items-start gap-3">
@@ -525,6 +556,9 @@ export default async function CourseDetailPage({
           </div>
         </div>
       </div>
+
+      {/* Seção: Os alunos também compraram */}
+      <RelatedCourses courseId={course.id} limit={4} />
     </div>
   );
 }

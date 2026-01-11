@@ -24,7 +24,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { GraduationCap, Home, ShieldCheck, Loader2 } from 'lucide-react';
+import {
+  GraduationCap,
+  Home,
+  ShieldCheck,
+  Loader2,
+  ArrowRight,
+} from 'lucide-react';
 import { PasswordInput } from '@/components/password-input';
 import { useSystemBranding } from '@/hooks/use-system-branding';
 import { useTranslations } from '@/hooks/use-translations';
@@ -41,6 +47,26 @@ const keyframes = `
     to {
       opacity: 1;
       transform: translateY(0);
+    }
+  }
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  
+  @keyframes slideInLeft {
+    from {
+      opacity: 0;
+      transform: translateX(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
     }
   }
 `;
@@ -166,27 +192,24 @@ export default function LoginPage() {
   if (!mounted) return null;
 
   return (
-    <div className="min-h-screen w-full flex bg-background overflow-hidden">
+    <div className="min-h-screen w-full flex bg-background">
       <style jsx global>
         {keyframes}
       </style>
 
-      {/* Lado Esquerdo - Branding e Visual */}
-      <div className="hidden lg:flex lg:w-1/2 relative bg-muted text-primary-foreground flex-col justify-between p-12 overflow-hidden">
-        <div
-          className={`absolute inset-0 z-10 ${
-            branding.promotedCourse
-              ? 'bg-gradient-to-t from-black/90 via-black/50 to-black/30'
-              : 'bg-primary/90'
-          }`}
-        />
+      {/* Hero Section - Desktop Only */}
+      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden">
+        {/* Background com Gradient Profissional */}
+        <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary/90 to-primary/70" />
+
+        {/* Background Image (se existir) */}
         <div className="absolute inset-0 z-0">
           {branding.promotedCourse?.thumbnail ? (
             <Image
               src={branding.promotedCourse.thumbnail}
               alt={branding.promotedCourse.title}
               fill
-              className="object-cover"
+              className="object-cover opacity-20"
               priority
             />
           ) : branding.loginBgUrl ? (
@@ -194,7 +217,7 @@ export default function LoginPage() {
               src={branding.loginBgUrl}
               alt="Background"
               fill
-              className="object-cover opacity-50"
+              className="object-cover opacity-20"
               priority
             />
           ) : (
@@ -202,81 +225,94 @@ export default function LoginPage() {
           )}
         </div>
 
-        {/* Logo Area */}
-        <div className="relative z-20 flex items-center gap-3">
-          {branding.logoUrl ? (
-            <Image
-              src={branding.logoUrl}
-              alt={branding.companyName}
-              width={150}
-              height={40}
-              className="h-10 w-auto object-contain brightness-0 invert"
-            />
-          ) : (
-            <div className="flex items-center gap-2">
-              <div className="h-10 w-10 rounded-lg bg-white/10 backdrop-blur flex items-center justify-center">
-                <GraduationCap className="h-6 w-6 text-white" />
-              </div>
-              <span className="text-2xl font-bold text-white tracking-tight">
-                {branding.companyName}
-              </span>
-            </div>
-          )}
-        </div>
+        {/* Overlay sutil */}
+        <div className="absolute inset-0 z-10 bg-gradient-to-t from-black/40 via-transparent to-black/10" />
 
-        {/* Hero Content */}
-        <div className="relative z-20 space-y-6 max-w-lg w-full flex flex-col justify-center flex-1">
-          {branding.advertisements && branding.advertisements.length > 0 ? (
-            <div className="w-full max-w-5xl mx-auto">
-              <PromotedCoursesCarousel />
-            </div>
-          ) : branding.promotedCourse ? (
-            <div className="flex justify-center w-full">
-              <PromotedCourseCard course={branding.promotedCourse} />
-            </div>
-          ) : (
-            <>
-              <h1 className="text-4xl font-bold tracking-tight text-white leading-tight">
-                {t.auth.login.heroTitle ||
-                  'Transforme seu futuro com educação de qualidade.'}
-              </h1>
-              <p className="text-lg text-white/80 leading-relaxed">
-                {t.auth.login.heroSubtitle ||
-                  'Acesse nossa plataforma e descubra um mundo de conhecimento preparado especialmente para você.'}
-              </p>
-
-              {/* Stats/Features */}
-              <div className="grid grid-cols-2 gap-6 pt-8">
-                <div className="space-y-1">
-                  <h3 className="text-2xl font-bold text-white">+1000</h3>
-                  <p className="text-sm text-white/70">Alunos ativos</p>
+        {/* Content Area */}
+        <div className="relative z-20 flex flex-col justify-between p-12 text-white">
+          {/* Logo Area */}
+          <div
+            className="flex items-center gap-3"
+            style={{ animation: 'slideInLeft 0.6s ease-out both' }}
+          >
+            {branding.logoUrl ? (
+              <Image
+                src={branding.logoUrl}
+                alt={branding.companyName}
+                width={150}
+                height={40}
+                className="h-10 w-auto object-contain brightness-0 invert"
+              />
+            ) : (
+              <div className="flex items-center gap-2">
+                <div className="h-10 w-10 rounded-lg bg-white/10 backdrop-blur flex items-center justify-center">
+                  <GraduationCap className="h-6 w-6 text-white" />
                 </div>
-                <div className="space-y-1">
-                  <h3 className="text-2xl font-bold text-white">4.9/5</h3>
-                  <p className="text-sm text-white/70">Avaliação média</p>
-                </div>
+                <span className="text-2xl font-bold text-white tracking-tight">
+                  {branding.companyName}
+                </span>
               </div>
-            </>
-          )}
-        </div>
+            )}
+          </div>
 
-        {/* Footer */}
-        <div className="relative z-20 text-sm text-white/60">
-          © {new Date().getFullYear()} {branding.companyName}. Todos os direitos
-          reservados.
+          {/* Hero Content */}
+          <div
+            className="space-y-8 max-w-lg"
+            style={{ animation: 'slideInLeft 0.6s ease-out 0.2s both' }}
+          >
+            {branding.advertisements && branding.advertisements.length > 0 ? (
+              <div className="w-full">
+                <PromotedCoursesCarousel />
+              </div>
+            ) : branding.promotedCourse ? (
+              <div className="flex justify-center w-full">
+                <PromotedCourseCard course={branding.promotedCourse} />
+              </div>
+            ) : (
+              <>
+                <div className="space-y-4">
+                  <h1 className="text-4xl lg:text-5xl font-bold tracking-tight leading-[1.1]">
+                    {t.auth.login.heroTitle ||
+                      'Transforme seu futuro com educação de qualidade'}
+                  </h1>
+                  <p className="text-lg text-white/90 leading-relaxed max-w-md">
+                    {t.auth.login.heroSubtitle ||
+                      'Acesse nossa plataforma e descubra um mundo de conhecimento preparado especialmente para você.'}
+                  </p>
+                </div>
+
+                {/* Stats/Features */}
+                <div className="grid grid-cols-2 gap-6 pt-4">
+                  <div className="space-y-1">
+                    <h3 className="text-3xl font-bold text-white">+1000</h3>
+                    <p className="text-sm text-white/70">Alunos ativos</p>
+                  </div>
+                  <div className="space-y-1">
+                    <h3 className="text-3xl font-bold text-white">4.9/5</h3>
+                    <p className="text-sm text-white/70">Avaliação média</p>
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+
+          {/* Footer */}
+          <div className="text-sm text-white/60">
+            © {new Date().getFullYear()} {branding.companyName}. Todos os
+            direitos reservados.
+          </div>
         </div>
       </div>
 
-      {/* Lado Direito - Formulário */}
-      <div className="flex-1 flex items-center justify-center p-4 sm:p-8 lg:p-12 relative">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-primary/5 via-background to-background -z-10" />
-
+      {/* Form Section - Responsivo */}
+      <div className="flex-1 flex items-center justify-center p-4 sm:p-6 lg:p-12 bg-background">
         <Card
-          className="w-full max-w-md border-0 shadow-none sm:border sm:shadow-xl bg-transparent sm:bg-card/50 sm:backdrop-blur-xl"
-          style={{ animation: 'slideInUp 0.6s ease-out both' }}
+          className="w-full max-w-[440px] border shadow-xl bg-card"
+          style={{ animation: 'fadeIn 0.6s ease-out both' }}
         >
-          <CardHeader className="space-y-2 text-center pb-8">
-            <div className="lg:hidden flex justify-center mb-6">
+          <CardHeader className="space-y-3 text-center pb-6 px-6 sm:px-8 pt-8">
+            {/* Logo Mobile */}
+            <div className="lg:hidden flex justify-center mb-4">
               {branding.logoUrl ? (
                 <Image
                   src={branding.logoUrl}
@@ -291,7 +327,8 @@ export default function LoginPage() {
                 </div>
               )}
             </div>
-            <CardTitle className="text-2xl font-bold tracking-tight">
+
+            <CardTitle className="text-2xl sm:text-3xl font-bold tracking-tight">
               {t.auth.login.title}
             </CardTitle>
             <p className="text-sm text-muted-foreground">
@@ -321,7 +358,7 @@ export default function LoginPage() {
           </CardHeader>
 
           <form onSubmit={handleSubmit}>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-4 px-6 sm:px-8">
               {/* Quick Login Buttons para Dev */}
               {process.env.NODE_ENV === 'development' && (
                 <div className="grid grid-cols-3 gap-2 mb-4">
@@ -329,7 +366,7 @@ export default function LoginPage() {
                     type="button"
                     variant="outline"
                     size="sm"
-                    className="text-xs"
+                    className="text-xs h-9"
                     onClick={() =>
                       setFormData({
                         email: 'admin@smeducacional.com',
@@ -344,7 +381,7 @@ export default function LoginPage() {
                     type="button"
                     variant="outline"
                     size="sm"
-                    className="text-xs"
+                    className="text-xs h-9"
                     onClick={() =>
                       setFormData({
                         email: 'professor@smeducacional.com',
@@ -359,7 +396,7 @@ export default function LoginPage() {
                     type="button"
                     variant="outline"
                     size="sm"
-                    className="text-xs"
+                    className="text-xs h-9"
                     onClick={() =>
                       setFormData({
                         email: 'aluno@smeducacional.com',
@@ -374,7 +411,9 @@ export default function LoginPage() {
               )}
 
               <div className="space-y-2">
-                <Label htmlFor="email">{t.auth.login.email}</Label>
+                <Label htmlFor="email" className="text-sm font-medium">
+                  {t.auth.login.email}
+                </Label>
                 <Input
                   id="email"
                   type="email"
@@ -385,13 +424,15 @@ export default function LoginPage() {
                   }
                   required
                   autoComplete="username"
-                  className="h-11 bg-background/50"
+                  className="h-11 text-base"
                 />
               </div>
 
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="password">{t.auth.login.password}</Label>
+                  <Label htmlFor="password" className="text-sm font-medium">
+                    {t.auth.login.password}
+                  </Label>
                 </div>
                 <PasswordInput
                   id="password"
@@ -405,7 +446,7 @@ export default function LoginPage() {
                 />
               </div>
 
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between pt-2">
                 <div className="flex items-center space-x-2">
                   <Checkbox
                     id="rememberMe"
@@ -434,16 +475,19 @@ export default function LoginPage() {
 
               <Button
                 type="submit"
-                className="w-full h-11 font-semibold shadow-lg shadow-primary/20"
+                className="w-full h-11 text-base font-semibold mt-6"
                 disabled={isLoading}
               >
                 {isLoading ? (
                   <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                     {t.common.loading}
                   </>
                 ) : (
-                  t.auth.login.submit
+                  <>
+                    {t.auth.login.submit}
+                    <ArrowRight className="ml-2 h-5 w-5" />
+                  </>
                 )}
               </Button>
 
@@ -452,7 +496,7 @@ export default function LoginPage() {
                   <span className="w-full border-t" />
                 </div>
                 <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-background px-2 text-muted-foreground">
+                  <span className="bg-card px-2 text-muted-foreground">
                     {t.auth.login.or}
                   </span>
                 </div>
@@ -488,7 +532,7 @@ export default function LoginPage() {
             </CardContent>
           </form>
 
-          <CardFooter className="flex flex-col gap-4 pb-8">
+          <CardFooter className="flex flex-col gap-4 px-6 sm:px-8 pb-8">
             <div className="text-center text-sm text-muted-foreground">
               {t.auth.login.noAccount}{' '}
               <Link

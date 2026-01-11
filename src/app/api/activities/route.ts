@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { NotificationType } from '@prisma/client';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 
@@ -108,7 +109,7 @@ export async function POST(request: Request) {
               userId: enrollment.studentId,
               title: 'Nova atividade disponível!',
               message: `Uma nova atividade foi adicionada ao curso ${courseModule.course.title}`,
-              type: 'ACTIVITY',
+              type: NotificationType.COURSE_UPDATE,
             },
           })
         )

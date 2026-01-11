@@ -46,6 +46,9 @@ export enum AuditAction {
   // Sistema
   SYSTEM_CONFIG_UPDATED = 'SYSTEM_CONFIG_UPDATED',
   THEME_UPDATED = 'THEME_UPDATED',
+
+  // Segurança
+  SECURITY_VIOLATION = 'SECURITY_VIOLATION',
 }
 
 import { Prisma } from '@prisma/client';

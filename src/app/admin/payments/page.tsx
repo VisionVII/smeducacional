@@ -90,7 +90,7 @@ export default function AdminPaymentsPage() {
   });
 
   const getStatusBadge = (status: string) => {
-    const normalized = status.toLowerCase();
+    const normalized = (status || '').toLowerCase();
     const variants: Record<string, 'default' | 'secondary' | 'destructive'> = {
       completed: 'default',
       succeeded: 'default',
@@ -103,7 +103,7 @@ export default function AdminPaymentsPage() {
   };
 
   const getStatusLabel = (status: string) => {
-    const normalized = status.toLowerCase();
+    const normalized = (status || '').toLowerCase();
     const labels: Record<string, string> = {
       completed: 'Concluído',
       succeeded: 'Concluído',
@@ -153,17 +153,17 @@ export default function AdminPaymentsPage() {
     if (!payments) return [];
 
     return payments.filter((tx) => {
-      const normalizedStatus = tx.status.toLowerCase();
+      const normalizedStatus = tx.status?.toLowerCase() || '';
       const matchesStatus =
         filterStatus === 'all' || normalizedStatus === filterStatus;
 
       const search = searchTerm.toLowerCase();
       const matchesSearch =
-        tx.id.toLowerCase().includes(search) ||
-        tx.user?.name?.toLowerCase().includes(search) ||
-        tx.user?.email?.toLowerCase().includes(search) ||
-        tx.course?.title?.toLowerCase().includes(search) ||
-        tx.paymentMethod?.toLowerCase().includes(search);
+        (tx.id || '').toLowerCase().includes(search) ||
+        (tx.user?.name || '').toLowerCase().includes(search) ||
+        (tx.user?.email || '').toLowerCase().includes(search) ||
+        (tx.course?.title || '').toLowerCase().includes(search) ||
+        (tx.paymentMethod || '').toLowerCase().includes(search);
 
       return matchesStatus && (search ? matchesSearch : true);
     });

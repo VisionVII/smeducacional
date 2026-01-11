@@ -8,6 +8,7 @@ import { Progress } from '@/components/ui/progress';
 import { VideoPlayer } from '@/components/video-player';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/components/ui/use-toast';
+import { LessonContentViewer } from '@/components/lesson-content-viewer';
 import {
   PlayCircle,
   CheckCircle,
@@ -370,9 +371,9 @@ export function CoursePlayer({
               <Card className="mt-6">
                 <CardHeader>
                   <div className="flex items-center justify-between">
-                    <CardTitle>{selectedLesson.title}</CardTitle>
+                    <CardTitle>Conteúdo da Aula</CardTitle>
                     {selectedLesson.duration && (
-                      <div className="flex items-center gap-1 text-sm text-gray-600">
+                      <div className="flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400">
                         <Clock className="h-4 w-4" />
                         {Math.floor(selectedLesson.duration / 60)} min
                       </div>
@@ -381,21 +382,11 @@ export function CoursePlayer({
                 </CardHeader>
                 <CardContent>
                   {selectedLesson.description && (
-                    <p className="text-gray-700 dark:text-gray-300 mb-4">
+                    <p className="text-gray-700 dark:text-gray-300 mb-6 text-lg leading-relaxed">
                       {selectedLesson.description}
                     </p>
                   )}
-                  {selectedLesson.content && (
-                    <div
-                      className="prose dark:prose-invert max-w-none"
-                      dangerouslySetInnerHTML={{
-                        __html: selectedLesson.content,
-                      }}
-                    />
-                  )}
-                  <p className="text-xs text-gray-500 mt-4">
-                    ⚠️ Conteúdo fornecido pelo instrutor do curso
-                  </p>
+                  <LessonContentViewer content={selectedLesson.content} />
                 </CardContent>
               </Card>
             )}

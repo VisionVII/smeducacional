@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 import { createCourseCheckoutSession } from '@/lib/stripe';
+import { canPurchaseCourse } from '@/lib/services/course-access.service';
 
 export async function POST(request: Request) {
   try {
@@ -14,6 +15,11 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { courseId } = body;
 
+    console.log('[Checkout/Course] Iniciando checkout:', {
+      userId: session.user.id,
+      courseId,
+    });
+
     if (!courseId) {
       return NextResponse.json(
         { error: 'courseId é obrigatório' },
@@ -21,7 +27,30 @@ export async function POST(request: Request) {
       );
     }
 
-    // Buscar curso
+    // 🛡️ VALIDAÇÃO ENTERPRISE: Aplicar TODAS as regras de negócio
+    let validation;
+    try {
+      validation = await canPurchaseCourse(session.user.id, courseId);
+    } catch (validationError) {
+      console.error('[Checkout/Course] Erro na validação:', validationError);
+      return NextResponse.json(
+        { error: 'Erro ao validar permissões de compra' },
+        { status: 500 }
+      );
+    }
+
+    if (!validation.allowed) {
+      console.warn('[Checkout/Course] Compra bloqueada:', {
+        userId: session.user.id,
+        courseId,
+        reason: validation.errorCode,
+        message: validation.reason,
+      });
+
+      return NextResponse.json({ error: validation.reason }, { status: 403 });
+    }
+
+    // Buscar dados do curso para checkout (já validado acima)
     const course = await prisma.course.findUnique({
       where: { id: courseId },
       select: {
@@ -36,30 +65,6 @@ export async function POST(request: Request) {
       return NextResponse.json(
         { error: 'Curso não encontrado' },
         { status: 404 }
-      );
-    }
-
-    if (!course.price || course.price <= 0) {
-      return NextResponse.json(
-        { error: 'Este curso é gratuito' },
-        { status: 400 }
-      );
-    }
-
-    // Verificar se já está matriculado
-    const enrollment = await prisma.enrollment.findUnique({
-      where: {
-        studentId_courseId: {
-          studentId: session.user.id,
-          courseId,
-        },
-      },
-    });
-
-    if (enrollment) {
-      return NextResponse.json(
-        { error: 'Você já está matriculado neste curso' },
-        { status: 400 }
       );
     }
 
@@ -89,15 +94,32 @@ export async function POST(request: Request) {
       : `${baseUrl}/courses`;
 
     // Criar sessão de checkout
-    const checkoutSession = await createCourseCheckoutSession({
-      userId: session.user.id,
-      courseId,
-      courseTitle: course.title,
-      coursePrice: course.price,
-      userEmail: session.user.email,
-      successUrl: successUrl.toString(),
-      cancelUrl,
-    });
+    let checkoutSession;
+    try {
+      checkoutSession = await createCourseCheckoutSession({
+        userId: session.user.id,
+        courseId,
+        courseTitle: course.title,
+        coursePrice: course.price || 0,
+        userEmail: session.user.email,
+        successUrl: successUrl.toString(),
+        cancelUrl,
+      });
+    } catch (stripeError) {
+      console.error('[Checkout/Course] Erro ao criar sessão Stripe:', {
+        error: stripeError,
+        message: stripeError instanceof Error ? stripeError.message : 'Unknown',
+      });
+      return NextResponse.json(
+        {
+          error:
+            stripeError instanceof Error
+              ? stripeError.message
+              : 'Erro ao criar sessão de pagamento',
+        },
+        { status: 500 }
+      );
+    }
 
     console.log(
       '[Checkout/Course] Sessão criada com sucesso:',
@@ -125,13 +147,23 @@ export async function POST(request: Request) {
     });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error('[Checkout/Course] Erro completo:', errorMessage);
-    console.error(
-      '[Checkout/Course] Stack:',
-      error instanceof Error ? error.stack : 'N/A'
-    );
+    const errorStack = error instanceof Error ? error.stack : 'N/A';
+
+    console.error('[Checkout/Course] ⚠️ ERRO NÃO TRATADO:', {
+      message: errorMessage,
+      stack: errorStack,
+      type: error instanceof Error ? error.constructor.name : typeof error,
+      error,
+    });
+
     return NextResponse.json(
-      { error: `Erro ao criar sessão de checkout: ${errorMessage}` },
+      {
+        error: errorMessage || 'Erro ao processar checkout',
+        debug:
+          process.env.NODE_ENV === 'development'
+            ? { message: errorMessage, stack: errorStack }
+            : undefined,
+      },
       { status: 500 }
     );
   }

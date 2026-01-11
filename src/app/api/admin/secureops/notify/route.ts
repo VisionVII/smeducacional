@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { NotificationType } from '@prisma/client';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 import { resend } from '@/lib/resend';
@@ -44,7 +45,7 @@ export async function POST(req: NextRequest) {
       prisma.notification.create({
         data: {
           userId: admin.id,
-          type: 'SYSTEM',
+          type: NotificationType.SYSTEM_MAINTENANCE,
           title: 'Alerta de Segurança: Auditoria Crítica',
           message,
         },

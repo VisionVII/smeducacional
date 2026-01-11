@@ -77,7 +77,9 @@ export default function TeacherMessagesPage() {
   };
 
   const filteredThreads = threads?.filter((thread) =>
-    thread.participantName.toLowerCase().includes(searchQuery.toLowerCase())
+    (thread.participantName || '')
+      .toLowerCase()
+      .includes(searchQuery.toLowerCase())
   );
 
   const getInitials = (name: string) => {

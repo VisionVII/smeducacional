@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 import { getProvider } from '@/lib/payments';
+import { canPurchaseCourse } from '@/lib/services/course-access.service';
 
 const schema = z.object({
   courseId: z.string().min(1),
@@ -27,32 +28,45 @@ export async function POST(req: NextRequest) {
 
     const { courseId, provider } = parsed.data;
 
-    // Buscar curso
+    console.log('[Checkout/Session] Iniciando checkout:', {
+      userId: session.user.id,
+      courseId,
+      provider,
+    });
+
+    // 🛡️ VALIDAÇÃO ENTERPRISE: Aplicar TODAS as regras de negócio
+    let validation;
+    try {
+      validation = await canPurchaseCourse(session.user.id, courseId);
+    } catch (validationError) {
+      console.error('[Checkout/Session] Erro na validação:', validationError);
+      return NextResponse.json(
+        { error: 'Erro ao validar permissões de compra' },
+        { status: 500 }
+      );
+    }
+
+    if (!validation.allowed) {
+      console.warn('[Checkout/Session] Compra bloqueada:', {
+        userId: session.user.id,
+        courseId,
+        reason: validation.errorCode,
+        message: validation.reason,
+      });
+
+      return NextResponse.json({ error: validation.reason }, { status: 403 });
+    }
+
+    // Buscar dados do curso para checkout (já validado acima)
     const course = await prisma.course.findUnique({
       where: { id: courseId },
       select: { id: true, slug: true, title: true, price: true },
     });
+
     if (!course) {
       return NextResponse.json(
         { error: 'Curso não encontrado' },
         { status: 404 }
-      );
-    }
-    if (!course.price || course.price <= 0) {
-      return NextResponse.json(
-        { error: 'Este curso é gratuito' },
-        { status: 400 }
-      );
-    }
-
-    // Evitar checkout duplicado para matriculados
-    const already = await prisma.enrollment.findUnique({
-      where: { studentId_courseId: { studentId: session.user.id, courseId } },
-    });
-    if (already) {
-      return NextResponse.json(
-        { error: 'Você já está matriculado neste curso' },
-        { status: 400 }
       );
     }
 
@@ -62,15 +76,35 @@ export async function POST(req: NextRequest) {
       : `${process.env.NEXT_PUBLIC_URL}/courses`;
 
     const paymentProvider = getProvider(provider);
-    const sessionData = await paymentProvider.createSession({
-      userId: session.user.id,
-      courseId,
-      courseTitle: course.title,
-      coursePrice: course.price!,
-      userEmail: session.user.email,
-      successUrl,
-      cancelUrl,
-    });
+
+    let sessionData;
+    try {
+      sessionData = await paymentProvider.createSession({
+        userId: session.user.id,
+        courseId,
+        courseTitle: course.title,
+        coursePrice: course.price!,
+        userEmail: session.user.email,
+        successUrl,
+        cancelUrl,
+      });
+    } catch (paymentError) {
+      console.error('[Checkout/Session] Erro ao criar sessão de pagamento:', {
+        provider,
+        error: paymentError,
+        message:
+          paymentError instanceof Error ? paymentError.message : 'Unknown',
+      });
+      return NextResponse.json(
+        {
+          error:
+            paymentError instanceof Error
+              ? paymentError.message
+              : 'Erro ao criar sessão de pagamento',
+        },
+        { status: 500 }
+      );
+    }
 
     // Persistir sessão
     await prisma.checkoutSession.create({
@@ -90,9 +124,24 @@ export async function POST(req: NextRequest) {
       url: sessionData.url,
     });
   } catch (error) {
-    console.error('[API /checkout/session POST]', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    const errorStack = error instanceof Error ? error.stack : 'N/A';
+
+    console.error('[Checkout/Session] ⚠️ ERRO NÃO TRATADO:', {
+      message: errorMessage,
+      stack: errorStack,
+      type: error instanceof Error ? error.constructor.name : typeof error,
+      error,
+    });
+
     return NextResponse.json(
-      { error: 'Erro ao criar sessão de checkout' },
+      {
+        error: errorMessage || 'Erro ao processar checkout',
+        debug:
+          process.env.NODE_ENV === 'development'
+            ? { message: errorMessage, stack: errorStack }
+            : undefined,
+      },
       { status: 500 }
     );
   }

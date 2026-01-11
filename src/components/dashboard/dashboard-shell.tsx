@@ -4,7 +4,7 @@ import type React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { signOut } from 'next-auth/react';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useMounted } from '@/hooks/use-mounted';
 import {
   LayoutDashboard,
@@ -231,6 +231,7 @@ export function DashboardShell({
 }: DashboardShellProps) {
   const pathname = usePathname();
   const mounted = useMounted();
+  const [sheetOpen, setSheetOpen] = useState(false);
 
   const navigation = useMemo(() => {
     const core = operationalCoreNav[role];
@@ -312,8 +313,8 @@ export function DashboardShell({
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
-      <div className="flex min-h-screen">
-        <aside className="hidden lg:block w-64 border-r bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60 lg:sticky lg:top-0 lg:h-screen lg:overflow-y-auto lg:flex-shrink-0">
+      <div className="flex min-h-screen lg:ml-64">
+        <aside className="hidden lg:block w-64 border-r bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60 fixed lg:left-0 lg:top-0 lg:bottom-0 h-screen overflow-y-auto flex-shrink-0">
           {Sidebar}
         </aside>
 
@@ -321,7 +322,7 @@ export function DashboardShell({
           <header className="sticky top-0 z-30 border-b bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
             <div className="flex flex-col gap-3 px-4 py-3 w-full max-w-screen-xl mx-auto">
               <div className="flex items-center gap-3">
-                <Sheet>
+                <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
                   <SheetTrigger asChild>
                     <Button variant="ghost" size="icon" className="lg:hidden">
                       <Menu className="h-5 w-5" />
@@ -331,7 +332,7 @@ export function DashboardShell({
                     <SheetTitle className="sr-only">
                       Menu de Navegação
                     </SheetTitle>
-                    {Sidebar}
+                    <div onClick={() => setSheetOpen(false)}>{Sidebar}</div>
                   </SheetContent>
                 </Sheet>
 

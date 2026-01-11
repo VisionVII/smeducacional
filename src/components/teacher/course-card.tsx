@@ -1,9 +1,32 @@
+'use client';
+
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { BookOpen, Users, Video, Eye, Edit, Settings } from 'lucide-react';
+import {
+  BookOpen,
+  Users,
+  Video,
+  Eye,
+  Edit,
+  Settings,
+  Archive,
+  RefreshCw,
+  AlertTriangle,
+} from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useToast } from '@/components/ui/use-toast';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 
 interface CourseCardProps {
   course: {
@@ -33,11 +56,57 @@ interface CourseCardProps {
 }
 
 export function CourseCard({ course }: CourseCardProps) {
+  const [isArchiveDialogOpen, setIsArchiveDialogOpen] = useState(false);
+  const [isArchiving, setIsArchiving] = useState(false);
+  const router = useRouter();
+  const { toast } = useToast();
+
   const totalLessons =
     course.lessonCount ??
     course.modules?.reduce((acc, m) => acc + m._count.lessons, 0) ??
     0;
   const isPaid = typeof course.price === 'number' && course.price > 0;
+
+  const handleArchiveToggle = async () => {
+    setIsArchiving(true);
+    try {
+      const response = await fetch(
+        `/api/teacher/courses/${course.id}/archive`,
+        {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ isPublished: !course.isPublished }),
+        }
+      );
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Erro ao atualizar curso');
+      }
+
+      toast({
+        title: course.isPublished ? 'Curso arquivado' : 'Curso republicado',
+        description: course.isPublished
+          ? 'O curso foi arquivado e não está mais visível para novos alunos.'
+          : 'O curso foi republicado e está disponível novamente.',
+      });
+
+      router.refresh();
+    } catch (error) {
+      console.error('Erro ao atualizar curso:', error);
+      toast({
+        title: 'Erro ao atualizar',
+        description:
+          error instanceof Error
+            ? error.message
+            : 'Não foi possível atualizar o curso. Tente novamente.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsArchiving(false);
+      setIsArchiveDialogOpen(false);
+    }
+  };
 
   return (
     <Card className="flex flex-col overflow-hidden hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 group border-2 hover:border-primary/30 bg-gradient-to-br from-card via-card to-muted/20 h-full">
@@ -144,10 +213,19 @@ export function CourseCard({ course }: CourseCardProps) {
               variant="outline"
               size="sm"
               className="w-full hover:bg-primary/10 hover:border-primary transition-colors"
+              title={
+                course.isPublished
+                  ? 'Ver página pública'
+                  : 'Pré-visualizar (curso não publicado)'
+              }
             >
               <Link
-                href={`/courses/${course.slug}`}
-                target="_blank"
+                href={
+                  course.isPublished
+                    ? `/courses/${course.slug}`
+                    : `/teacher/courses/${course.id}/edit`
+                }
+                target={course.isPublished ? '_blank' : undefined}
                 suppressHydrationWarning
               >
                 <Eye className="h-3.5 w-3.5 mr-1.5" />
@@ -170,6 +248,25 @@ export function CourseCard({ course }: CourseCardProps) {
             </Button>
           </div>
           <Button
+            variant={course.isPublished ? 'outline' : 'default'}
+            size="sm"
+            className="w-full transition-colors"
+            onClick={() => setIsArchiveDialogOpen(true)}
+            disabled={isArchiving}
+          >
+            {course.isPublished ? (
+              <>
+                <Archive className="h-3.5 w-3.5 mr-1.5" />
+                <span className="text-xs font-semibold">Arquivar Curso</span>
+              </>
+            ) : (
+              <>
+                <RefreshCw className="h-3.5 w-3.5 mr-1.5" />
+                <span className="text-xs font-semibold">Republicar Curso</span>
+              </>
+            )}
+          </Button>
+          <Button
             asChild
             size="sm"
             className="w-full bg-gradient-theme text-white hover:opacity-90 transition-opacity"
@@ -184,6 +281,83 @@ export function CourseCard({ course }: CourseCardProps) {
           </Button>
         </div>
       </div>
+
+      {/* Dialog de Confirmação */}
+      <Dialog open={isArchiveDialogOpen} onOpenChange={setIsArchiveDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              {course.isPublished ? (
+                <Archive className="h-5 w-5 text-orange-500" />
+              ) : (
+                <RefreshCw className="h-5 w-5 text-green-500" />
+              )}
+              {course.isPublished ? 'Arquivar Curso' : 'Republicar Curso'}
+            </DialogTitle>
+            <DialogDescription asChild>
+              <div className="space-y-3 pt-4">
+                <p className="text-sm text-muted-foreground">
+                  {course.isPublished ? (
+                    <>
+                      Tem certeza que deseja arquivar o curso{' '}
+                      <strong>&ldquo;{course.title}&rdquo;</strong>?
+                    </>
+                  ) : (
+                    <>
+                      Tem certeza que deseja republicar o curso{' '}
+                      <strong>&ldquo;{course.title}&rdquo;</strong>?
+                    </>
+                  )}
+                </p>
+                {course.isPublished ? (
+                  <div className="p-3 bg-orange-50 dark:bg-orange-950/20 border border-orange-200 dark:border-orange-900 rounded-lg">
+                    <p className="text-sm text-orange-600 dark:text-orange-400 font-medium">
+                      📦 O curso ficará invisível para novos alunos, mas os
+                      alunos já matriculados continuarão tendo acesso ao
+                      conteúdo.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="p-3 bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-900 rounded-lg">
+                    <p className="text-sm text-green-600 dark:text-green-400 font-medium">
+                      ✅ O curso voltará a ficar visível para novos alunos e
+                      aparecerá na plataforma.
+                    </p>
+                  </div>
+                )}
+                {course._count.enrollments > 0 && (
+                  <div className="p-3 bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-900 rounded-lg">
+                    <p className="text-sm text-blue-600 dark:text-blue-400 font-medium">
+                      👥 Este curso possui {course._count.enrollments} aluno(s)
+                      matriculado(s).
+                    </p>
+                  </div>
+                )}
+              </div>
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button
+              variant="outline"
+              onClick={() => setIsArchiveDialogOpen(false)}
+              disabled={isArchiving}
+            >
+              Cancelar
+            </Button>
+            <Button
+              variant={course.isPublished ? 'default' : 'default'}
+              onClick={handleArchiveToggle}
+              disabled={isArchiving}
+            >
+              {isArchiving
+                ? 'Processando...'
+                : course.isPublished
+                ? 'Sim, Arquivar'
+                : 'Sim, Republicar'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 }

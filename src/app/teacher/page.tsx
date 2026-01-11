@@ -83,7 +83,7 @@ export default function TeacherSignupPage() {
   const benefits = mounted
     ? t.dashboard.teacher.signup.benefits
     : [
-        'Comissão de até 70% do valor dos cursos',
+        'Comissão de até 95% (Plano FREE) ou 100% (Plano PAGO)',
         'Dashboard analytics avançado',
         'Suporte 24/7 dedicado',
         'Certificados digitais automáticos',

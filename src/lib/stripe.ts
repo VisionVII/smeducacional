@@ -58,14 +58,6 @@ export async function createCourseCheckoutSession({
     );
   }
 
-  console.log('[Stripe] Criando sessão de checkout:', {
-    courseTitle,
-    coursePrice,
-    unitAmount,
-    userEmail,
-    paymentMethodTypes,
-  });
-
   try {
     const stripe = getStripeClient();
 

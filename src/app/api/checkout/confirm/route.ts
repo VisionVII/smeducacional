@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 import { getStripeClient } from '@/lib/stripe';
+import { NotificationType } from '@prisma/client';
 import { z } from 'zod';
 
 const confirmSchema = z.object({
@@ -192,7 +193,7 @@ export async function POST(request: Request) {
               message: `${buyerName} comprou o curso "${
                 course.title
               }" por ${messageAmount}${isTest ? ' (AMBIENTE DE TESTE)' : ''}`,
-              type: 'PAYMENT',
+              type: NotificationType.PAYMENT_RECEIPT,
               isRead: false,
             },
           })

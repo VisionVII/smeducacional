@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import {
   Card,
   CardContent,
@@ -20,7 +20,6 @@ import {
   BookOpen,
   Search,
   Users,
-  Trash2,
   Edit,
   Plus,
   Eye,
@@ -35,7 +34,6 @@ import {
   Download,
   Star,
 } from 'lucide-react';
-import { useToast } from '@/components/ui/use-toast';
 import { ManageFeaturedCoursesModal } from '@/components/manage-featured-courses-modal';
 import Link from 'next/link';
 
@@ -79,8 +77,6 @@ interface DashboardStats {
 }
 
 export default function AdminCoursesPage() {
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState('all');
   const [performanceFilter, setPerformanceFilter] = useState<string>('all');
@@ -170,29 +166,7 @@ export default function AdminCoursesPage() {
       0,
   };
 
-  const deleteCourseMutation = useMutation({
-    mutationFn: async (courseId: string) => {
-      const res = await fetch(`/api/admin/courses/${courseId}`, {
-        method: 'DELETE',
-      });
-      if (!res.ok) throw new Error('Erro ao excluir curso');
-      return res.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['admin-courses'] });
-      toast({
-        title: 'Curso removido',
-        description: 'O curso foi excluído do catálogo com sucesso.',
-      });
-    },
-    onError: () => {
-      toast({
-        title: 'Erro ao excluir',
-        description: 'Não foi possível remover o curso. Tente novamente.',
-        variant: 'destructive',
-      });
-    },
-  });
+  // ADMIN não pode excluir cursos - apenas professores podem excluir seus próprios cursos
 
   const getStatusBadge = (status: Course['status']) => {
     const variants = {
@@ -284,12 +258,16 @@ export default function AdminCoursesPage() {
 
   const filteredCourses = courses?.filter((course) => {
     const matchesSearch =
-      course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      course.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (course.title || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (course.description || '')
+        .toLowerCase()
+        .includes(searchQuery.toLowerCase()) ||
       (course.category?.name || '')
         .toLowerCase()
         .includes(searchQuery.toLowerCase()) ||
-      course.teacherName.toLowerCase().includes(searchQuery.toLowerCase());
+      (course.teacherName || '')
+        .toLowerCase()
+        .includes(searchQuery.toLowerCase());
 
     let matchesTab = false;
     if (activeTab === 'all') matchesTab = true;
@@ -693,16 +671,6 @@ export default function AdminCoursesPage() {
                                 <Edit className="h-3 w-3" />
                               </Link>
                             </Button>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() =>
-                                deleteCourseMutation.mutate(course.id)
-                              }
-                              disabled={deleteCourseMutation.isPending}
-                            >
-                              <Trash2 className="h-3 w-3 text-destructive" />
-                            </Button>
                           </div>
                         </CardContent>
                       )}
@@ -759,16 +727,6 @@ export default function AdminCoursesPage() {
                                 <Edit className="h-3 w-3 mr-1" />
                                 Editar
                               </Link>
-                            </Button>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() =>
-                                deleteCourseMutation.mutate(course.id)
-                              }
-                              disabled={deleteCourseMutation.isPending}
-                            >
-                              <Trash2 className="h-3 w-3 text-destructive" />
                             </Button>
                           </div>
                         </CardContent>

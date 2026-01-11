@@ -13,6 +13,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { VideoUploadEnhanced } from '@/components/video-upload-enhanced';
+import { RichTextEditor } from '@/components/rich-text-editor';
 import {
   Plus,
   Edit,
@@ -761,17 +762,19 @@ export default function CourseContentPage({
                     >
                       Conteúdo em Texto
                     </Label>
-                    <textarea
-                      id="lesson-content"
-                      className="flex min-h-[150px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-primary"
-                      value={lessonForm.content}
-                      onChange={(e) =>
+                    <p className="text-xs text-gray-500 mb-2">
+                      Use a barra de ferramentas para formatar o conteúdo:
+                      títulos, listas, código, imagens, etc.
+                    </p>
+                    <RichTextEditor
+                      content={lessonForm.content}
+                      onChange={(html) =>
                         setLessonForm((prev) => ({
                           ...prev,
-                          content: e.target.value,
+                          content: html,
                         }))
                       }
-                      placeholder="Conteúdo adicional da aula em texto, código, etc..."
+                      placeholder="Escreva o conteúdo da aula... Use **negrito** _itálico_ `código`"
                     />
                   </div>
                   <div className="flex gap-3 justify-end pt-2">

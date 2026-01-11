@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
@@ -24,6 +24,8 @@ import { signOut } from 'next-auth/react';
 import { useSystemBranding } from '@/hooks/use-system-branding';
 import { LanguageSwitcher } from '@/components/language-switcher';
 import { useTranslations } from '@/hooks/use-translations';
+import { CartIcon } from '@/components/cart/cart-icon';
+import { NotificationBell } from '@/components/notifications/notification-bell';
 
 interface NavbarProps {
   user: {
@@ -149,8 +151,14 @@ export function Navbar({ user, links }: NavbarProps) {
 
           {/* Right Side Actions */}
           <div className="flex items-center gap-2">
+            {/* Notification Bell */}
+            {mounted && <NotificationBell />}
+
             {/* Language Selector */}
             {mounted && <LanguageSwitcher />}
+
+            {/* Cart Icon */}
+            {mounted && <CartIcon />}
 
             {/* Theme Toggle */}
             {mounted && (

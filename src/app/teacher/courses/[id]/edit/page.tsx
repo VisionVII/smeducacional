@@ -90,7 +90,7 @@ export default function EditCoursePage({
             thumbnail: courseData.thumbnail || '',
             duration: courseData.duration?.toString() || '',
             level: courseData.level || 'Iniciante',
-            price: courseData.price.toString(),
+            price: (courseData.price || 0).toString(),
             compareAtPrice: courseData.compareAtPrice?.toString() || '',
             isPaid: courseData.isPaid,
             isPublished: courseData.isPublished,

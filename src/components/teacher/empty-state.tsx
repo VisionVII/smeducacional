@@ -28,8 +28,10 @@ export function EmptyState({
           {description}
         </p>
         {action && (
-          <Button asChild className="w-full sm:w-auto">
-            <Link href={action.href}>{action.label}</Link>
+          <Button asChild className="w-full sm:w-auto" suppressHydrationWarning>
+            <Link href={action.href} suppressHydrationWarning>
+              {action.label}
+            </Link>
           </Button>
         )}
       </CardContent>

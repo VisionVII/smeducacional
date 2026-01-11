@@ -8,6 +8,7 @@
 
 import { Resend } from 'resend';
 import { prisma } from '@/lib/db';
+import type { Prisma } from '@prisma/client';
 
 const getResendClient = () => {
   const key = process.env.RESEND_API_KEY;
@@ -109,14 +110,19 @@ export async function sendEmailWithLogging(
     ['WELCOME', 'RESET_PASSWORD', 'PAYMENT_RECEIPT'].includes(input.emailType)
   ) {
     try {
-      await prisma.notificationLog.create({
+      // Registrar em SystemLog para auditoria de e-mails críticos
+      await prisma.systemLog.create({
         data: {
-          emailAddress: input.to,
-          emailType: input.emailType,
-          status: 'SENT',
-          resendMessageId: emailId,
-          userId: input.userId || null,
-          sentAt: new Date(),
+          level: 'INFO',
+          component: 'EmailService',
+          message: 'Email sent',
+          description: `Type=${input.emailType}`,
+          userId: input.userId ?? undefined,
+          metadata: {
+            emailAddress: input.to,
+            emailType: input.emailType,
+            resendMessageId: emailId,
+          },
         },
       });
     } catch (error) {
@@ -356,36 +362,57 @@ export async function listFailedNotificationLogs(options?: {
 
   const since = new Date(Date.now() - hours * 60 * 60 * 1000);
 
-  const failures = await prisma.notificationLog.findMany({
+  // Buscar logs de erro do EmailService no SystemLog
+  const logs = await prisma.systemLog.findMany({
     where: {
-      sentAt: { gte: since },
-      ...(criticalOnly
-        ? { emailType: { in: ['WELCOME', 'RESET_PASSWORD'] } }
-        : {}),
-      OR: [
-        { status: { not: 'SENT' } },
-        { status: 'FAILED' },
-        { status: 'ERROR' },
-      ],
+      component: 'EmailService',
+      level: 'ERROR',
+      createdAt: { gte: since },
     },
-    orderBy: { sentAt: 'desc' },
+    orderBy: { createdAt: 'desc' },
     take: limit,
     select: {
       id: true,
-      emailAddress: true,
-      emailType: true,
-      status: true,
-      error: true,
-      sentAt: true,
+      createdAt: true,
+      message: true,
+      description: true,
+      metadata: true,
     },
   });
 
+  // Helper para extrair string de metadata JSON com segurança
+  const getMetaString = (
+    meta: Prisma.JsonValue | null | undefined,
+    key: string
+  ): string | undefined => {
+    if (!meta || typeof meta !== 'object') return undefined;
+    const obj = meta as Record<string, unknown>;
+    const val = obj[key];
+    return typeof val === 'string' ? val : undefined;
+  };
+
+  const failures: NotificationLogFailure[] = logs
+    .filter((log) => {
+      const emailType = getMetaString(log.metadata, 'emailType');
+      return criticalOnly
+        ? ['WELCOME', 'RESET_PASSWORD'].includes(emailType || '')
+        : true;
+    })
+    .map((log) => {
+      const emailAddress = getMetaString(log.metadata, 'emailAddress') || '';
+      const emailType = getMetaString(log.metadata, 'emailType') || 'OTHER';
+      return {
+        id: log.id,
+        emailAddress,
+        emailType,
+        status: log.message || 'ERROR',
+        error: (log.description as string | null) || null,
+        sentAt: log.createdAt,
+      };
+    });
+
   return failures;
 }
-
-/**
- * Simula envio de e-mail em desenvolvimento (sem realmente enviar)
- */
 function simulateSendEmail(input: SendEmailInput): string {
   const mockId = `mock_${Date.now()}_${Math.random()
     .toString(36)

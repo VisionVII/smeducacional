@@ -1,8 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { sendMessageToAssistant } from '@/lib/openaiAssistant';
+import { auth } from '@/lib/auth';
 
 export async function POST(req: NextRequest) {
   try {
+    // 🔒 Segurança: Apenas ADMIN pode usar AI Assistant
+    const session = await auth();
+
+    if (!session?.user) {
+      return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
+    }
+
+    if (session.user.role !== 'ADMIN') {
+      return NextResponse.json(
+        { error: 'Acesso restrito a administradores' },
+        { status: 403 }
+      );
+    }
+
     const { message } = await req.json();
     if (!message || typeof message !== 'string') {
       return NextResponse.json(

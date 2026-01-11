@@ -117,7 +117,7 @@ export function AdminSidebar() {
   };
 
   return (
-    <aside className="w-64 border-r bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 h-[calc(100vh-4rem)] overflow-y-auto flex-shrink-0">
+    <aside className="w-64 border-r bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 fixed left-0 top-16 h-[calc(100vh-4rem)] overflow-y-auto z-40">
       <nav className="space-y-2 p-4">{renderMenuItems(ADMIN_MAIN_MENU)}</nav>
     </aside>
   );

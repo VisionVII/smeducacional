@@ -1,13 +1,14 @@
-import { NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
-import { prisma } from "@/lib/db";
+import { NextResponse } from 'next/server';
+import { auth } from '@/lib/auth';
+import { prisma } from '@/lib/db';
+import { NotificationType } from '@prisma/client';
 
 export async function GET() {
   try {
     const session = await auth();
 
-    if (!session || session.user.role !== "STUDENT") {
-      return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
+    if (!session || session.user.role !== 'STUDENT') {
+      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     }
 
     const enrollments = await prisma.enrollment.findMany({
@@ -26,7 +27,7 @@ export async function GET() {
         },
       },
       orderBy: {
-        enrolledAt: "desc",
+        enrolledAt: 'desc',
       },
     });
 
@@ -64,9 +65,9 @@ export async function GET() {
 
     return NextResponse.json(enrollmentsWithProgress);
   } catch (error) {
-    console.error("Erro ao buscar matrículas:", error);
+    console.error('Erro ao buscar matrículas:', error);
     return NextResponse.json(
-      { error: "Erro ao buscar matrículas" },
+      { error: 'Erro ao buscar matrículas' },
       { status: 500 }
     );
   }
@@ -76,8 +77,8 @@ export async function POST(request: Request) {
   try {
     const session = await auth();
 
-    if (!session || session.user.role !== "STUDENT") {
-      return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
+    if (!session || session.user.role !== 'STUDENT') {
+      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     }
 
     const { courseId } = await request.json();
@@ -94,7 +95,7 @@ export async function POST(request: Request) {
 
     if (existingEnrollment) {
       return NextResponse.json(
-        { error: "Você já está matriculado neste curso" },
+        { error: 'Você já está matriculado neste curso' },
         { status: 400 }
       );
     }
@@ -103,7 +104,7 @@ export async function POST(request: Request) {
       data: {
         studentId: session.user.id,
         courseId,
-        status: "ACTIVE",
+        status: 'ACTIVE',
       },
       include: {
         course: true,
@@ -114,17 +115,17 @@ export async function POST(request: Request) {
     await prisma.notification.create({
       data: {
         userId: session.user.id,
-        title: "Matrícula realizada!",
+        title: 'Matrícula realizada!',
         message: `Você foi matriculado no curso ${enrollment.course.title}`,
-        type: "COURSE",
+        type: NotificationType.COURSE_ENROLLED,
       },
     });
 
     return NextResponse.json(enrollment, { status: 201 });
   } catch (error) {
-    console.error("Erro ao criar matrícula:", error);
+    console.error('Erro ao criar matrícula:', error);
     return NextResponse.json(
-      { error: "Erro ao criar matrícula" },
+      { error: 'Erro ao criar matrícula' },
       { status: 500 }
     );
   }

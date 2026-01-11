@@ -13,10 +13,6 @@ if (!supabaseUrl || !supabaseAnonKey) {
   );
 }
 
-if (typeof window === 'undefined') {
-  console.log('[Supabase] Client inicializado no servidor (vars presentes)');
-}
-
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 /**

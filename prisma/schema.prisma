@@ -72,7 +72,7 @@ model User {
   activities                Activity[]                 @relation("ActivityCreator")
   activityLogs              ActivityLog[]
   auditLogs                 AuditLog[]
-  notificationLogs          NotificationLog[]
+  notificationLogs          NotificationLog[]         @relation("NotificationLogs")
   certificates              Certificate[]
   checkoutSessions          CheckoutSession[]
   featurePurchases          FeaturePurchase[]
@@ -83,6 +83,7 @@ model User {
   receivedMessages          Message[]                  @relation("MessageReceiver")
   sentMessages              Message[]                  @relation("MessageSender")
   notifications             Notification[]
+  notificationPreference    NotificationPreference?
   payments                  Payment[]
   progress                  Progress[]
   studentEnrollmentPayments StudentEnrollmentPayment[]
@@ -97,6 +98,7 @@ model User {
   payouts                   Payout[]
   teacherAds                Advertisement[]            @relation("TeacherAds")
   uploadedImages            Image[]                    @relation("ImageUploader")
+  uploadedDocuments         CourseDocument[]           @relation("CourseDocumentUploader")
 
   @@map("users")
 }
@@ -158,6 +160,7 @@ model Course {
   studentEnrollmentPayments StudentEnrollmentPayment[]
   advertisements            Advertisement[]
   promotedInConfig          SystemConfig[]             @relation("PromotedCourse")
+  documents                 CourseDocument[]
 
   @@index([categoryId])
   @@index([instructorId])
@@ -322,20 +325,6 @@ model Grade {
   @@index([activityId])
   @@index([gradedById])
   @@map("grades")
-}
-
-model Notification {
-  id        String           @id @default(cuid())
-  title     String
-  message   String
-  type      NotificationType
-  isRead    Boolean          @default(false)
-  userId    String
-  createdAt DateTime         @default(now())
-  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-  @@map("notifications")
 }
 
 model Message {
@@ -808,15 +797,6 @@ enum ActivityType {
   EXAM
 }
 
-enum NotificationType {
-  COURSE
-  ACTIVITY
-  GRADE
-  SYSTEM
-  MESSAGE
-  PAYMENT
-}
-
 enum CardStyle {
   FLAT
   ELEVATED
@@ -944,27 +924,6 @@ model AuditLog {
   @@map("audit_logs")
 }
 
-// Notification Log: Registra envio de e-mails críticos
-// Implementa system-blueprint.md seção 6 "Módulo de Comunicação (Resend)"
-model NotificationLog {
-  id                String    @id @default(cuid())
-  emailAddress      String
-  emailType         String
-  status            String    @default("SENT")
-  resendMessageId   String?
-  error             String?
-  userId            String?
-  sentAt            DateTime  @default(now())
-  user              User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
-
-  @@index([emailAddress])
-  @@index([emailType])
-  @@index([status])
-  @@index([sentAt])
-  @@index([userId])
-  @@map("notification_logs")
-}
-
 // System Status: Modo de manutenção e saúde do sistema
 // VisionVII 3.0 Maintenance Mode - Enterprise Pattern
 // Singleton table (sempre apenas 1 registro com id='singleton')
@@ -1048,4 +1007,161 @@ model ImageUsage {
   @@index([resourceType, resourceId])
   @@index([imageId])
   @@map("image_usages")
+}
+
+// ============================================
+// SISTEMA DE NOTIFICAÇÕES
+// ============================================
+
+enum NotificationType {
+  // Admin
+  SECURITY_ALERT
+  USER_REPORTED
+  PAYMENT_ISSUE
+  SYSTEM_MAINTENANCE
+  HIGH_REVENUE_DAY
+  
+  // Teacher
+  NEW_ENROLLMENT
+  COURSE_REVIEW
+  LESSON_COMPLETED_BY_STUDENT
+  PAYOUT_READY
+  COURSE_PERFORMANCE
+  
+  // Student
+  COURSE_PURCHASED
+  COURSE_ENROLLED
+  LESSON_AVAILABLE
+  INSTRUCTOR_MESSAGE
+  CERTIFICATE_EARNED
+  COURSE_UPDATE
+  PAYMENT_RECEIPT
+  REMINDER_INCOMPLETE_COURSE
+}
+
+// Notificações do Sistema
+model Notification {
+  id              String             @id @default(cuid())
+  
+  // Conteúdo
+  type            NotificationType
+  title           String
+  message         String             @db.Text
+  data            Json?              // dados estruturados (courseId, userId, etc)
+  actionUrl       String?            // URL para ação (ir para course, etc)
+  
+  // Destinatário
+  userId          String
+  user            User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Status
+  isRead          Boolean            @default(false)
+  readAt          DateTime?
+  
+  // Lifecycle
+  createdAt       DateTime           @default(now())
+  expiresAt       DateTime?          // auto-delete após 90 dias
+  
+  // Indices
+  @@index([userId])
+  @@index([type])
+  @@index([createdAt])
+  @@map("notifications")
+}
+
+// Preferências de Notificação do Usuário
+model NotificationPreference {
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Email preferences
+  emailSecurityAlerts    Boolean @default(true)   // Admin: Alertas de segurança
+  emailEnrollments       Boolean @default(true)   // Teacher: Novas inscrições
+  emailPayments          Boolean @default(true)   // Teacher: Pagamentos prontos
+  emailReviews           Boolean @default(true)   // Teacher: Reviews de cursos
+  emailCourseUpdates     Boolean @default(true)   // Student: Atualizações de curso
+  emailReminders         Boolean @default(true)   // Student: Lembretes de progresso
+  emailDigest            Boolean @default(false)  // Resumo diário? 
+  
+  // In-system preferences
+  inSystemNotifications  Boolean @default(true)   // Mostrar no sistema
+  inSystemSound          Boolean @default(false)  // Som ao notificar
+  
+  // Quiet hours
+  quietHoursEnabled      Boolean @default(false)  // Desativar notificações em horários
+  quietHoursStart        String?                  // "22:00" (HH:MM)
+  quietHoursEnd          String?                  // "07:00" (HH:MM)
+  quietHoursTimezone     String  @default("UTC")
+  
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+  
+  @@index([userId])
+  @@map("notification_preferences")
+}
+
+// Log de Notificações (para auditoria)
+model NotificationLog {
+  id              String   @id @default(cuid())
+  
+  notificationId  String?  // pode ser null se notificação foi deletada
+  type            NotificationType
+  userId          String
+  user            User     @relation("NotificationLogs", fields: [userId], references: [id], onDelete: Cascade)
+  
+  // O que aconteceu
+  action          String   // "CREATED" | "SENT" | "READ" | "ARCHIVED" | "DELETED"
+  details         Json?    // dados estruturados
+  
+  createdAt       DateTime @default(now())
+  
+  @@index([userId])
+  @@index([type])
+  @@index([action])
+  @@index([createdAt])
+  @@map("notification_logs")
+}
+
+// Documentos de Cursos (Material Complementar Seguro)
+model CourseDocument {
+  id          String    @id @default(cuid())
+  
+  // Relacionamentos
+  courseId    String
+  course      Course    @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  moduleId    String?
+  
+  // Uploader
+  uploadedBy  String
+  uploader    User      @relation("CourseDocumentUploader", fields: [uploadedBy], references: [id], onDelete: Restrict)
+  
+  // Arquivo
+  fileName    String    // Nome original (sanitizado)
+  storagePath String    // UUID no Supabase Storage
+  fileSize    Int
+  mimeType    String
+  
+  // Segurança
+  status      DocumentStatus @default(APPROVED)
+  scanResult  Json?     // Resultado de scan antivírus
+  
+  // Lifecycle
+  expiresAt   DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime? // Soft delete
+  
+  @@index([courseId])
+  @@index([moduleId])
+  @@index([uploadedBy])
+  @@index([status])
+  @@index([deletedAt])
+  @@map("course_documents")
+}
+
+enum DocumentStatus {
+  APPROVED
+  PENDING_SCAN
+  REJECTED
 }
