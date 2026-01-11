@@ -2,7 +2,16 @@ import { prisma } from '@/lib/db';
 import { NotificationType } from '@prisma/client';
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Lazy init do Resend para não quebrar o build quando a API key não existe
+let resendClient: Resend | null = null;
+function getResend(): Resend | null {
+  const key = process.env.RESEND_API_KEY;
+  if (!key) return null;
+  if (!resendClient) {
+    resendClient = new Resend(key);
+  }
+  return resendClient;
+}
 
 interface CreateNotificationInput {
   userId: string;
@@ -34,6 +43,13 @@ interface SendEmailInput {
 // Mock sendEmail - será implementado com Resend
 async function sendEmail(input: SendEmailInput) {
   try {
+    const resend = getResend();
+    if (!resend) {
+      console.warn(
+        '[SendEmail] RESEND_API_KEY não configurada; pulando envio de email'
+      );
+      return { skipped: true } as any;
+    }
     const response = await resend.emails.send({
       from: 'noreply@sm-educa.com',
       to: input.to,

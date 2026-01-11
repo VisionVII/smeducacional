@@ -5,7 +5,14 @@ import Stripe from 'stripe';
 import { prisma } from '@/lib/db';
 import { canPurchaseCourse } from '@/lib/services/course-access.service';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+// Lazy init do Stripe para evitar erro de build quando a env não está definida
+function getStripe(): Stripe {
+  const key = process.env.STRIPE_SECRET_KEY;
+  if (!key) {
+    throw new Error('STRIPE_SECRET_KEY não configurada');
+  }
+  return new Stripe(key);
+}
 
 const checkoutSchema = z.object({
   courseIds: z.array(z.string()).min(1, 'Pelo menos um curso é necessário'),
@@ -203,6 +210,7 @@ export async function POST(req: Request) {
     // Criar sessão do Stripe
     let stripeSession;
     try {
+      const stripe = getStripe();
       stripeSession = await stripe.checkout.sessions.create({
         customer_email: session.user.email || undefined,
         payment_method_types: ['card'],
