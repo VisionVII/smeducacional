@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/db';
-import { supabaseService } from '@/lib/supabase-service';
+import { getSupabaseService } from '@/lib/supabase-service';
 
 // Extrai o path interno do Supabase a partir de uma URL pública
 function extractSupabasePath(url: string): string | null {
@@ -98,6 +98,7 @@ export async function GET(
     const [bucket, ...pathParts] = storagePath.split('/');
     const path = pathParts.join('/');
 
+    const supabaseService = getSupabaseService();
     const { data, error } = await supabaseService.storage
       .from(bucket)
       .createSignedUrl(path, 60 * 60); // 1h

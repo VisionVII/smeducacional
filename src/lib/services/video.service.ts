@@ -1,4 +1,4 @@
-import { supabaseService } from '@/lib/supabase-service';
+import { getSupabaseService } from '@/lib/supabase-service';
 
 const DEFAULT_BUCKET = process.env.SUPABASE_STORAGE_BUCKET || 'courses';
 const DEFAULT_EXPIRATION_SECONDS = 60 * 60; // 60 minutos
@@ -34,6 +34,7 @@ export async function getSignedUrl(
 
   const { bucket, path: objectPath } = normalized;
 
+  const supabaseService = getSupabaseService();
   const { data, error } = await supabaseService.storage
     .from(bucket)
     .createSignedUrl(objectPath, expiresInSeconds);

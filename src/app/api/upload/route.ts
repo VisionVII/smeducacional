@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
-import { supabaseService } from '@/lib/supabase-service';
+import { getSupabaseService } from '@/lib/supabase-service';
 import { z } from 'zod';
 import {
   logAuditTrail,
@@ -157,6 +157,7 @@ export async function POST(req: NextRequest) {
     const fileName = `${timestamp}-${safeName}`;
 
     // Upload usando service role (necessário para gerar Signed URL)
+    const supabaseService = getSupabaseService();
     const { error } = await supabaseService.storage
       .from(bucket)
       .upload(fileName, uint8Array, {

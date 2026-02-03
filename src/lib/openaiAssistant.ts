@@ -1,19 +1,32 @@
 // src/lib/openaiAssistant.ts
 // Integração com OpenAI Assistants API (Node.js/TypeScript)
 
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
-const OPENAI_ASSISTANT_ID = process.env.OPENAI_ASSISTANT_ID;
+function getOpenAICredentials() {
+  const apiKey = process.env.OPENAI_API_KEY;
+  const assistantId = process.env.OPENAI_ASSISTANT_ID;
 
-if (!OPENAI_API_KEY || !OPENAI_ASSISTANT_ID) {
-  throw new Error(
-    'OPENAI_API_KEY e OPENAI_ASSISTANT_ID devem estar definidos no .env'
-  );
+  if (!apiKey || !assistantId) {
+    return null;
+  }
+
+  return { apiKey, assistantId };
 }
 
 export async function sendMessageToAssistant(
   message: string,
   threadId?: string
 ) {
+  const creds = getOpenAICredentials();
+  if (!creds) {
+    return {
+      threadId: null,
+      content: null,
+      status: 'not_configured',
+      error: 'OpenAI not configured',
+    };
+  }
+
+  const { apiKey: OPENAI_API_KEY, assistantId: OPENAI_ASSISTANT_ID } = creds;
   // Cria um novo thread se não existir
   let currentThreadId = threadId;
   if (!currentThreadId) {

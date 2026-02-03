@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { auth } from '@/lib/auth';
-import { supabaseService } from '@/lib/supabase-service';
+import { getSupabaseService } from '@/lib/supabase-service';
 import {
   AuditAction,
   getClientIpFromRequest,
@@ -49,6 +49,7 @@ export async function POST(req: NextRequest) {
     }
 
     const { bucket, path, expiresIn } = parsed.data;
+    const supabaseService = getSupabaseService();
     const { data, error } = await supabaseService.storage
       .from(bucket)
       .createSignedUrl(path, expiresIn);
