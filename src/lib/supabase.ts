@@ -1,19 +1,35 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+let supabaseClient: ReturnType<typeof createClient> | null = null;
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  const missing: string[] = [];
-  if (!supabaseUrl) missing.push('NEXT_PUBLIC_SUPABASE_URL');
-  if (!supabaseAnonKey) missing.push('NEXT_PUBLIC_SUPABASE_ANON_KEY');
-  // Não logamos valores para evitar vazar secrets
-  throw new Error(
-    `Missing Supabase environment variables: ${missing.join(', ')}`
-  );
+export function getSupabaseClient() {
+  if (supabaseClient) {
+    return supabaseClient;
+  }
+
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  if (!supabaseUrl || !supabaseAnonKey) {
+    const missing: string[] = [];
+    if (!supabaseUrl) missing.push('NEXT_PUBLIC_SUPABASE_URL');
+    if (!supabaseAnonKey) missing.push('NEXT_PUBLIC_SUPABASE_ANON_KEY');
+    // Não logamos valores para evitar vazar secrets
+    throw new Error(
+      `Missing Supabase environment variables: ${missing.join(', ')}`
+    );
+  }
+
+  supabaseClient = createClient(supabaseUrl, supabaseAnonKey);
+  return supabaseClient;
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+// Mantém compatibilidade com código existente
+export const supabase = new Proxy({} as ReturnType<typeof createClient>, {
+  get(target, prop) {
+    return (getSupabaseClient() as any)[prop];
+  },
+});
 
 /**
  * Upload de arquivo para o Supabase Storage
