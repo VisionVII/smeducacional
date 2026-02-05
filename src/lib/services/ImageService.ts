@@ -12,13 +12,54 @@ import sharp from 'sharp';
 import { z } from 'zod';
 
 // ============================================================================
+// CUSTOM ERRORS
+// ============================================================================
+
+export class ImageServiceError extends Error {
+  constructor(
+    message: string,
+    public code: string,
+    public statusCode: number = 500
+  ) {
+    super(message);
+    this.name = 'ImageServiceError';
+  }
+}
+
+// ============================================================================
 // CONFIGURAÇÃO SUPABASE
 // ============================================================================
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+let supabaseClient: ReturnType<typeof createClient> | null = null;
+
+function getSupabaseClient() {
+  if (supabaseClient) {
+    return supabaseClient;
+  }
+
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseServiceRole = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  if (!supabaseUrl || !supabaseServiceRole) {
+    const missing: string[] = [];
+    if (!supabaseUrl) missing.push('NEXT_PUBLIC_SUPABASE_URL');
+    if (!supabaseServiceRole) missing.push('SUPABASE_SERVICE_ROLE_KEY');
+    throw new ImageServiceError(
+      `Missing Supabase environment variables: ${missing.join(', ')}`,
+      'SUPABASE_ENV_MISSING',
+      500
+    );
+  }
+
+  supabaseClient = createClient(supabaseUrl, supabaseServiceRole, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
+    },
+  });
+
+  return supabaseClient;
+}
 
 // ============================================================================
 // ZOD SCHEMAS & TYPES
@@ -80,21 +121,6 @@ const SIZE_LIMITS: Record<string, number> = {
 const SIGNED_URL_EXPIRY = 3600; // 1 hour in seconds
 
 // ============================================================================
-// CUSTOM ERRORS
-// ============================================================================
-
-export class ImageServiceError extends Error {
-  constructor(
-    message: string,
-    public code: string,
-    public statusCode: number = 500
-  ) {
-    super(message);
-    this.name = 'ImageServiceError';
-  }
-}
-
-// ============================================================================
 // IMAGE SERVICE
 // ============================================================================
 
@@ -149,8 +175,8 @@ export class ImageService {
       const path = `${timestamp}-${randomSuffix}-${slugifiedName}`;
 
       // Upload para Supabase Storage
-      const { error: uploadError } = await supabase.storage
-        .from(bucket)
+      const { error: uploadError } = await getSupabaseClient()
+        .storage.from(bucket)
         .upload(path, file, {
           contentType: file.type,
           cacheControl: '3600',
@@ -166,8 +192,8 @@ export class ImageService {
       }
 
       // Gerar signed URL
-      const { data: urlData } = await supabase.storage
-        .from(bucket)
+      const { data: urlData } = await getSupabaseClient()
+        .storage.from(bucket)
         .createSignedUrl(path, SIGNED_URL_EXPIRY);
 
       if (!urlData?.signedUrl) {
@@ -274,7 +300,7 @@ export class ImageService {
       });
 
       // Opcional: deletar do Supabase Storage (comentado para permitir recovery)
-      // await supabase.storage.from(image.bucket).remove([image.path]);
+      // await getSupabaseClient().storage.from(image.bucket).remove([image.path]);
     } catch (error) {
       if (error instanceof ImageServiceError) {
         throw error;
@@ -315,8 +341,8 @@ export class ImageService {
       }
 
       // Gerar novo signed URL
-      const { data: urlData, error } = await supabase.storage
-        .from(image.bucket)
+      const { data: urlData, error } = await getSupabaseClient()
+        .storage.from(image.bucket)
         .createSignedUrl(image.path, SIGNED_URL_EXPIRY);
 
       if (error || !urlData?.signedUrl) {
