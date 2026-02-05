@@ -3,10 +3,12 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useMounted } from '@/hooks/use-mounted';
+import { useSidebar } from '@/hooks/use-sidebar';
 import { cn } from '@/lib/utils';
 import { useState, useEffect } from 'react';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, ChevronLeft } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import {
   Collapsible,
   CollapsibleContent,
@@ -21,6 +23,7 @@ import {
 export function AdminSidebar() {
   const pathname = usePathname();
   const mounted = useMounted();
+  const { isOpen, toggleSidebar } = useSidebar();
   const [openItems, setOpenItems] = useState<string[]>([]);
 
   // Auto-expand menu quando rota mudar
@@ -117,8 +120,60 @@ export function AdminSidebar() {
   };
 
   return (
-    <aside className="w-64 border-r bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 fixed left-0 top-16 h-[calc(100vh-4rem)] overflow-y-auto z-40">
-      <nav className="space-y-2 p-4">{renderMenuItems(ADMIN_MAIN_MENU)}</nav>
+    <aside
+      className={cn(
+        'border-r bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 fixed left-0 top-16 h-[calc(100vh-4rem)] overflow-y-auto z-40 transition-all duration-300 ease-in-out',
+        isOpen ? 'w-64' : 'w-20'
+      )}
+    >
+      <nav className="space-y-2 p-4">
+        {/* Botão de toggle */}
+        <div className="flex items-center justify-between mb-4">
+          {isOpen && <span className="text-sm font-semibold">Menu</span>}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={toggleSidebar}
+            className="h-8 w-8 ml-auto"
+            title={isOpen ? 'Fechar menu' : 'Abrir menu'}
+          >
+            {isOpen ? (
+              <ChevronLeft className="h-4 w-4" />
+            ) : (
+              <ChevronRight className="h-4 w-4" />
+            )}
+          </Button>
+        </div>
+
+        {/* Menu items com renderização condicional */}
+        {isOpen ? (
+          renderMenuItems(ADMIN_MAIN_MENU)
+        ) : (
+          <div className="space-y-2">
+            {ADMIN_MAIN_MENU.map((item) => {
+              const Icon = item.icon;
+              const isActive =
+                mounted &&
+                item.href &&
+                (pathname === item.href || pathname?.startsWith(item.href + '/'));
+
+              return (
+                <Link
+                  key={item.id}
+                  href={item.href || '#'}
+                  title={item.label}
+                  className={cn(
+                    'flex items-center justify-center h-10 w-10 rounded-lg transition-all hover:bg-accent hover:text-accent-foreground',
+                    isActive && 'bg-accent text-accent-foreground'
+                  )}
+                >
+                  <Icon className="h-5 w-5" />
+                </Link>
+              );
+            })}
+          </div>
+        )}
+      </nav>
     </aside>
   );
 }

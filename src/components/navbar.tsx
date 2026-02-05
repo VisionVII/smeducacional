@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { useMounted } from '@/hooks/use-mounted';
+import { useSidebar } from '@/hooks/use-sidebar';
 import { Button } from '@/components/ui/button';
 import {
   GraduationCap,
@@ -15,6 +16,8 @@ import {
   X,
   User,
   ChevronDown,
+  PanelLeft,
+  PanelLeftClose,
 } from 'lucide-react';
 import Image from 'next/image';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -44,6 +47,7 @@ interface NavbarProps {
 export function Navbar({ user, links }: NavbarProps) {
   const pathname = usePathname();
   const mounted = useMounted();
+  const { isOpen, toggleSidebar } = useSidebar();
   const { theme, setTheme } = useTheme();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
@@ -103,28 +107,48 @@ export function Navbar({ user, links }: NavbarProps) {
     >
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
-          {/* Logo - Mobile First */}
-          <Link
-            href={getHomeHref()}
-            className="flex items-center gap-2 flex-shrink-0"
-            onClick={() => setMobileMenuOpen(false)}
-            suppressHydrationWarning
-          >
-            {!mounted || !branding.logoUrl ? (
-              <Icon3D size="md" color="primary" rounded="full">
-                <GraduationCap className="h-6 w-6 text-primary" />
-              </Icon3D>
-            ) : (
-              <Image
-                src={branding.logoUrl}
-                alt={branding.companyName}
-                width={120}
-                height={40}
-                unoptimized
-                className="h-10 object-contain"
-              />
+          {/* Sidebar Toggle + Logo - Mobile First */}
+          <div className="flex items-center gap-2">
+            {/* Sidebar toggle (visible on desktop when needed) */}
+            {mounted && user.role !== 'STUDENT' && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={toggleSidebar}
+                title={isOpen ? 'Fechar menu lateral' : 'Abrir menu lateral'}
+                className="h-9 w-9"
+              >
+                {isOpen ? (
+                  <PanelLeftClose className="h-5 w-5" />
+                ) : (
+                  <PanelLeft className="h-5 w-5" />
+                )}
+              </Button>
             )}
-          </Link>
+
+            {/* Logo */}
+            <Link
+              href={getHomeHref()}
+              className="flex items-center gap-2 flex-shrink-0"
+              onClick={() => setMobileMenuOpen(false)}
+              suppressHydrationWarning
+            >
+              {!mounted || !branding.logoUrl ? (
+                <Icon3D size="md" color="primary" rounded="full">
+                  <GraduationCap className="h-6 w-6 text-primary" />
+                </Icon3D>
+              ) : (
+                <Image
+                  src={branding.logoUrl}
+                  alt={branding.companyName}
+                  width={120}
+                  height={40}
+                  unoptimized
+                  className="h-10 object-contain"
+                />
+              )}
+            </Link>
+          </div>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-1 lg:gap-2">
