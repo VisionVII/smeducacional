@@ -15,10 +15,34 @@ import { EnrollmentStatus } from '@prisma/client';
 import { createClient } from '@supabase/supabase-js';
 import { logAuditTrail, AuditAction } from '@/lib/audit.service';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+let supabaseClient: ReturnType<typeof createClient> | null = null;
+
+function getSupabaseClient() {
+  if (supabaseClient) {
+    return supabaseClient;
+  }
+
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseServiceRole = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  if (!supabaseUrl || !supabaseServiceRole) {
+    const missing: string[] = [];
+    if (!supabaseUrl) missing.push('NEXT_PUBLIC_SUPABASE_URL');
+    if (!supabaseServiceRole) missing.push('SUPABASE_SERVICE_ROLE_KEY');
+    throw new Error(
+      `Missing Supabase environment variables: ${missing.join(', ')}`
+    );
+  }
+
+  supabaseClient = createClient(supabaseUrl, supabaseServiceRole, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
+    },
+  });
+
+  return supabaseClient;
+}
 
 // Tipos MIME permitidos para documentos
 const ALLOWED_DOCUMENT_MIMES = [
@@ -175,7 +199,7 @@ export async function uploadDocument({
 
     // 7. Upload para Supabase Storage
     const fileBuffer = await file.arrayBuffer();
-    const { data: uploadData, error: uploadError } = await supabase.storage
+    const { data: uploadData, error: uploadError } = await getSupabaseClient().storage
       .from(DOCUMENTS_BUCKET)
       .upload(storagePath, fileBuffer, {
         contentType: file.type,
@@ -333,7 +357,7 @@ export async function generateDownloadUrl({
     }
 
     // 4. Gerar URL assinada (1 hora de validade)
-    const { data, error } = await supabase.storage
+    const { data, error } = await getSupabaseClient().storage
       .from(DOCUMENTS_BUCKET)
       .createSignedUrl(document.storagePath, 3600); // 1 hora
 
