@@ -6,9 +6,8 @@ import { useMounted } from '@/hooks/use-mounted';
 import { useSidebar } from '@/hooks/use-sidebar';
 import { cn } from '@/lib/utils';
 import { useState, useEffect } from 'react';
-import { ChevronRight, ChevronLeft } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import {
   Collapsible,
   CollapsibleContent,
@@ -127,25 +126,7 @@ export function AdminSidebar() {
       )}
     >
       <nav className="space-y-2 p-4">
-        {/* Botão de toggle */}
-        <div className="flex items-center justify-between mb-4">
-          {isOpen && <span className="text-sm font-semibold">Menu</span>}
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={toggleSidebar}
-            className="h-8 w-8 ml-auto"
-            title={isOpen ? 'Fechar menu' : 'Abrir menu'}
-          >
-            {isOpen ? (
-              <ChevronLeft className="h-4 w-4" />
-            ) : (
-              <ChevronRight className="h-4 w-4" />
-            )}
-          </Button>
-        </div>
-
-        {/* Menu items com renderização condicional */}
+        {/* Menu items */}
         {isOpen ? (
           renderMenuItems(ADMIN_MAIN_MENU)
         ) : (
@@ -155,7 +136,8 @@ export function AdminSidebar() {
               const isActive =
                 mounted &&
                 item.href &&
-                (pathname === item.href || pathname?.startsWith(item.href + '/'));
+                (pathname === item.href ||
+                  pathname?.startsWith(item.href + '/'));
 
               return (
                 <Link

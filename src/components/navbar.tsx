@@ -108,21 +108,24 @@ export function Navbar({ user, links }: NavbarProps) {
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           {/* Sidebar Toggle + Logo - Mobile First */}
-          <div className="flex items-center gap-2">
-            {/* Sidebar toggle (visible on desktop when needed) */}
+          <div className="flex items-center gap-1">
+            {/* Sidebar toggle (visible para ADMIN/TEACHER) */}
             {mounted && user.role !== 'STUDENT' && (
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={toggleSidebar}
                 title={isOpen ? 'Fechar menu lateral' : 'Abrir menu lateral'}
-                className="h-9 w-9"
+                className="h-10 w-10 hover:bg-accent"
               >
                 {isOpen ? (
                   <PanelLeftClose className="h-5 w-5" />
                 ) : (
                   <PanelLeft className="h-5 w-5" />
                 )}
+                <span className="sr-only">
+                  {isOpen ? 'Fechar' : 'Abrir'} menu
+                </span>
               </Button>
             )}
 
